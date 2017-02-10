@@ -1,4 +1,4 @@
-package com.nordstrom.test_automation.ui_tools.selenium_foundation;
+package com.nordstrom.automation.selenium;
 
 /**
  * Hello world!

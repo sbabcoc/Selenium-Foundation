@@ -34,9 +34,14 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.nordstrom.test-automation.ui-tools</groupId>
+      <groupId>com.nordstrom.test-automation.tools</groupId>
       <artifactId>testng-foundation</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.testng</groupId>
+    	<artifactId>testng</artifactId>
+    	<version>6.10</version>
     </dependency>
   </dependencies>
   
