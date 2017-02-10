@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.annotation;
+package com.nordstrom.automation.selenium.annotations;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

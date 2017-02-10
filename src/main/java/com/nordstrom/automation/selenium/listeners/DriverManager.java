@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.listener;
+package com.nordstrom.automation.selenium.listeners;
 
 import org.openqa.selenium.WebDriver;
 import org.testng.IInvokedMethod;
@@ -6,8 +6,8 @@ import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
-import com.nordstrom.automation.selenium.DriverProvider;
-import com.nordstrom.automation.selenium.annotation.NoDriver;
+import com.nordstrom.automation.selenium.annotations.NoDriver;
+import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 
 public class DriverManager implements IInvokedMethodListener {
 

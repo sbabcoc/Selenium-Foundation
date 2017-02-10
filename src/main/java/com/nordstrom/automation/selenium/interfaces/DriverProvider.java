@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium;
+package com.nordstrom.automation.selenium.interfaces;
 
 import org.openqa.selenium.WebDriver;
 import org.testng.IInvokedMethod;
