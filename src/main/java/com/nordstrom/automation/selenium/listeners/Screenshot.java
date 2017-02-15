@@ -19,7 +19,7 @@ import org.testng.Reporter;
 /**
  * Take the screenshot as quickly as possible to minimize the time delay between
  * the the event and what the user sees in the report. Enough time can pass and
-* the UI state may change between the event and when the screenshot is taken.
+ * the UI state may change between the event and when the screenshot is taken.
  */
 public class Screenshot implements ITestListener {
     
@@ -122,6 +122,10 @@ public class Screenshot implements ITestListener {
         return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
     }
     
+    /**
+     * @param result
+     * @return true if the screenshot storage directory already exists.
+     */
     private boolean isScreenshotStorageLocationExist(ITestResult result) {
         return Files.exists(getStorageLocation(result));
     }
@@ -162,13 +166,17 @@ public class Screenshot implements ITestListener {
         Files.write(fsTarget, memoryScreenshot);
     }
     
+    /**
+     * Create a note in the testcase results that includes a clickable reference to the screenshot.
+     * @param target
+     */
     private void createReportLinkToScreenshot(Path target) {
         Reporter.log(String.format(HTML_LINK_TEMPLATE, target.toString()));
     }
     
     /**
      * @param result
-     * @return
+     * @return the ideal location where the screenshot should be stored.
      */
     private Path getTargetFileLocation(ITestResult result) {
         Path screenshotStorage = getStorageLocation(result);
@@ -177,22 +185,25 @@ public class Screenshot implements ITestListener {
         return fsScreenshot;
     }
     
-    
     /**
      * The returned image format is assumed to be PNG, but this is not documented within the
      * Selenium project -- just appened ".png" to the filename.
      * @param result
-     * @return
+     * @return an identifying name for the screenshot file
      */
     private String getScreenshotFilename(ITestResult result) {
         StringBuilder builder = new StringBuilder();
         builder.append(getTestName(result));
         builder.append(".");
         builder.append(SCREENSHOT_FILE_EXTENSION);
+
         return builder.toString();
-        
     }
     
+    /**
+     * @param result
+     * @return the name of the testcase
+     */
     private String getTestName(ITestResult result) {
         return result.getMethod().getMethodName();
     }
