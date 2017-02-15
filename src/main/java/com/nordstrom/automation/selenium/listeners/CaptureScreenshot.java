@@ -21,7 +21,7 @@ import org.testng.Reporter;
  * what the user sees in the report. Enough time can pass and the UI state may change between the
  * event and when the screenshot is taken.
  */
-public class Screenshot implements ITestListener {
+public class CaptureScreenshot implements ITestListener {
 
     private final static String SCREENSHOT_FILE_EXTENSION = "png";
     private final static String SCREENSHOT_STORAGE_NAME = "screenshots";
@@ -29,8 +29,8 @@ public class Screenshot implements ITestListener {
 
     private final Logger logger;
 
-    public Screenshot() {
-        logger = LoggerFactory.getLogger(Screenshot.class);
+    public CaptureScreenshot() {
+        logger = LoggerFactory.getLogger(CaptureScreenshot.class);
     }
 
     @Override
