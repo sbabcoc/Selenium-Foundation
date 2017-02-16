@@ -57,11 +57,11 @@ public class CaptureScreenshot implements ITestListener {
         try {
             screenshot = getScreenshot(driver);
 
-            if (!(isScreenshotStorageLocationExist(result))) {
-                createStorageLocation(result);
+            if (!(isScreenshotStorageLocationExist(result.getTestContext()))) {
+                createStorageLocation(result.getTestContext());
             }
 
-            putScreenshotInStorage(screenshot, getTargetFileLocation(result));
+            putScreenshotInStorage(screenshot, getPathToTargetScreenshotFile(result));
 
         } catch (WebDriverException e) {
             String messageTemplate =
@@ -72,11 +72,11 @@ public class CaptureScreenshot implements ITestListener {
 
         catch (IOException e) {
             String messageTemplate = "The screenshot was unable to be written to (%s).";
-            logger.info(String.format(messageTemplate, getTargetFileLocation(result)));
+            logger.info(String.format(messageTemplate, getPathToTargetScreenshotFile(result)));
             return;
         }
 
-        createReportLinkToScreenshot(getTargetFileLocation(result));
+        createReportLinkToScreenshot(getPathToTargetScreenshotFile(result));
     }
 
     @Override
@@ -113,7 +113,6 @@ public class CaptureScreenshot implements ITestListener {
      * 
      * @param driver
      * @return
-     * @return
      */
     private byte[] getScreenshot(WebDriver driver) {
         return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
@@ -123,8 +122,8 @@ public class CaptureScreenshot implements ITestListener {
      * @param result
      * @return true if the screenshot storage directory already exists.
      */
-    private boolean isScreenshotStorageLocationExist(ITestResult result) {
-        return Files.exists(getStorageLocation(result));
+    private boolean isScreenshotStorageLocationExist(ITestContext context) {
+        return Files.exists(getStorageLocation(context));
     }
 
     /**
@@ -133,19 +132,19 @@ public class CaptureScreenshot implements ITestListener {
      * @param result
      * @throws IOException if the directory location failed to create
      */
-    private void createStorageLocation(ITestResult result) throws IOException {
-        Files.createDirectory(getStorageLocation(result));
+    private void createStorageLocation(ITestContext context) throws IOException {
+        Files.createDirectory(getStorageLocation(context));
     }
 
     /**
      * Screenshots will exist within a subdirectory of a TestNG test-output location, that is a
      * publicly-accessible.
      * 
-     * @param result
+     * @param context
      * @return the location where screenshots should be stored.
      */
-    private Path getStorageLocation(ITestResult result) {
-        String outputDirectoryLocation = result.getTestContext().getOutputDirectory();
+    private Path getStorageLocation(ITestContext context) {
+        String outputDirectoryLocation = context.getOutputDirectory();
         Path outputDirectory = Paths.get(outputDirectoryLocation);
         Path screenshotStorage = outputDirectory.resolve(SCREENSHOT_STORAGE_NAME);
 
@@ -157,11 +156,12 @@ public class CaptureScreenshot implements ITestListener {
      * 
      * @param memoryScreenshot
      * @param fsTarget
-     * @throws IOException if an error occurs while creating or writing the screenshot to a file
+     * @throws IOException if an error occurs while creating or writing the screenshot to a file.
      */
     private void putScreenshotInStorage(byte[] memoryScreenshot, Path fsTarget) throws IOException {
         String messageTemplate = "Placing a screenshot of the event at (%s).";
         logger.info(String.format(messageTemplate, fsTarget.toString()));
+        
         // Files.write should be good enough for a <2-5Mb file, typical of a screenshot.
         Files.write(fsTarget, memoryScreenshot);
     }
@@ -176,12 +176,14 @@ public class CaptureScreenshot implements ITestListener {
     }
 
     /**
+     * Create the the target path to where the screenshot will be placed.
+     * 
      * @param result
      * @return the ideal location where the screenshot should be stored.
      */
-    private Path getTargetFileLocation(ITestResult result) {
-        Path screenshotStorage = getStorageLocation(result);
-        Path fsScreenshot = screenshotStorage.resolve(getScreenshotFilename(result));
+    private Path getPathToTargetScreenshotFile(ITestResult result) {
+        Path screenshotStorage = getStorageLocation(result.getTestContext());
+        Path fsScreenshot = screenshotStorage.resolve(getTargetFilename(result));
 
         return fsScreenshot;
     }
@@ -193,7 +195,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param result
      * @return an identifying name for the screenshot file
      */
-    private String getScreenshotFilename(ITestResult result) {
+    private String getTargetFilename(ITestResult result) {
         StringBuilder builder = new StringBuilder();
         builder.append(getTestName(result));
         builder.append(".");
@@ -203,10 +205,19 @@ public class CaptureScreenshot implements ITestListener {
     }
 
     /**
+     * If a name for the test has been specified, use that.  If not, then return the name of the method.
      * @param result
      * @return the name of the testcase
      */
     private String getTestName(ITestResult result) {
-        return result.getMethod().getMethodName();
+        String testName = result.getTestName();
+        
+        if (testName != null) {
+            return testName;
+        }
+
+        testName = result.getMethod().getMethodName();
+        
+        return testName;
     }
 }
