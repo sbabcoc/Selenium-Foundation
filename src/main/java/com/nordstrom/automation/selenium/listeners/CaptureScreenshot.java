@@ -202,11 +202,9 @@ public class CaptureScreenshot implements ITestListener {
     private String getTestName(ITestResult result) {
         String testName = result.getTestName();
         
-        if (testName != null) {
-            return testName;
+        if (testName == null) {
+            testName = result.getName();
         }
-
-        testName = result.getName();
         
         return testName;
     }
