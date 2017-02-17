@@ -206,7 +206,7 @@ public class CaptureScreenshot implements ITestListener {
             return testName;
         }
 
-        testName = result.getMethod().getMethodName();
+        testName = result.getName();
         
         return testName;
     }
