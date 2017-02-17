@@ -48,7 +48,8 @@ public class CaptureScreenshot implements ITestListener {
     @Override
     public void onTestFailure(ITestResult result) {
         WebDriver driver = DriverManager.getDriver(result);
-
+        ITestContext context = result.getTestContext();
+        
         if (!isScreenshotCapable(driver)) {
             return;
         }
@@ -56,13 +57,6 @@ public class CaptureScreenshot implements ITestListener {
         byte[] screenshot;
         try {
             screenshot = getScreenshot(driver);
-
-            if (!(isScreenshotStorageLocationExist(result.getTestContext()))) {
-                createStorageLocation(result.getTestContext());
-            }
-
-            putScreenshotInStorage(screenshot, getPathToTargetScreenshotFile(result));
-
         } catch (WebDriverException e) {
             String messageTemplate =
                     "The driver is capable of taking a screenshot, but it failed because (%s).";
@@ -70,13 +64,27 @@ public class CaptureScreenshot implements ITestListener {
             return;
         }
 
-        catch (IOException e) {
-            String messageTemplate = "The screenshot was unable to be written to (%s).";
-            logger.info(String.format(messageTemplate, getPathToTargetScreenshotFile(result)));
+        Path storageLocation = getStorageLocation(context);
+        if (!(Files.exists(storageLocation))) {
+            try {
+                Files.createDirectory(storageLocation);
+            } catch (IOException e) {
+                String messageTemplate = "The screenshot storage location (%s) failed to be created, so a screenshot will be not available.";
+                logger.info(String.format(messageTemplate, storageLocation));
+                return;
+            }
+        }
+
+        Path targetScreenshotFile = getPathToTargetScreenshotFile(result) ;
+        try {
+            putScreenshotInStorage(screenshot, targetScreenshotFile);
+        } catch (IOException e) {
+            String messageTemplate = "The screenshot was successfully taken, but unable to be written to (%s).";
+            logger.info(String.format(messageTemplate, targetScreenshotFile));
             return;
         }
 
-        createReportLinkToScreenshot(getPathToTargetScreenshotFile(result));
+        createReportLinkToScreenshot(targetScreenshotFile);
     }
 
     @Override
@@ -116,24 +124,6 @@ public class CaptureScreenshot implements ITestListener {
      */
     private byte[] getScreenshot(WebDriver driver) {
         return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-    }
-
-    /**
-     * @param result
-     * @return true if the screenshot storage directory already exists.
-     */
-    private boolean isScreenshotStorageLocationExist(ITestContext context) {
-        return Files.exists(getStorageLocation(context));
-    }
-
-    /**
-     * Create the fs storage location for screenshots.
-     * 
-     * @param result
-     * @throws IOException if the directory location failed to create
-     */
-    private void createStorageLocation(ITestContext context) throws IOException {
-        Files.createDirectory(getStorageLocation(context));
     }
 
     /**
