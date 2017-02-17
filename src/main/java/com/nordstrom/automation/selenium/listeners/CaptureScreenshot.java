@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -179,6 +180,9 @@ public class CaptureScreenshot implements ITestListener {
     }
 
     /**
+     * For parameterized tests, unique identifiers are included in the filename so if it fails 2+, the
+     * the screenshots will not be overwritten.
+     * 
      * The returned image format is assumed to be PNG, but this is not documented within the
      * Selenium project -- just appened ".png" to the filename.
      * 
@@ -186,8 +190,12 @@ public class CaptureScreenshot implements ITestListener {
      * @return an identifying name for the screenshot file
      */
     private String getTargetFilename(ITestResult result) {
+        int hashcode = Arrays.deepHashCode(result.getParameters());
+        
         StringBuilder builder = new StringBuilder();
         builder.append(getTestName(result));
+        builder.append("-");
+        builder.append(hashcode);
         builder.append(".");
         builder.append(SCREENSHOT_FILE_EXTENSION);
 
@@ -205,7 +213,7 @@ public class CaptureScreenshot implements ITestListener {
         if (testName == null) {
             testName = result.getName();
         }
-        
+
         return testName;
     }
 }
