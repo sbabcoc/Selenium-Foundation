@@ -213,9 +213,11 @@ public class CaptureScreenshot implements ITestListener {
         //      redundant method call (because it might just call getName).  If it doesn't call getName,
         //      then we are providing a better default.
         String testName = result.getTestName();
+        logger.debug("getTestName result is {}", testName);
         
         if (testName == null) {
             testName = result.getName();
+            logger.debug("getName result is {}", testName);
         }
 
         return testName;
