@@ -212,6 +212,11 @@ public class CaptureScreenshot implements ITestListener {
         //      implements ITest?  Documentation is not clear.  The worst case scenario is that we have a
         //      redundant method call (because it might just call getName).  If it doesn't call getName,
         //      then we are providing a better default.
+        logger.debug("getTestname output:  {}", result.getTestName());
+        logger.debug("getName output:  {}", result.getName());
+        logger.debug("getMethodName output:  {}", result.getMethod().getMethodName());
+        logger.debug("getConstructorOrMethod.getName output:  {}", result.getMethod().getConstructorOrMethod().getName());
+        logger.debug("getConstructorOrMethod.getMethod.getName output:  {}", result.getMethod().getConstructorOrMethod().getMethod().getName());
         String testName = result.getTestName();
         logger.debug("getTestName result is {}", testName);
         
