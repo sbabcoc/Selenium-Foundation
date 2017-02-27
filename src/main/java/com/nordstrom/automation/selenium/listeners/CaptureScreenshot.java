@@ -217,12 +217,11 @@ public class CaptureScreenshot implements ITestListener {
         logger.debug("getMethodName output:  {}", result.getMethod().getMethodName());
         logger.debug("getConstructorOrMethod.getName output:  {}", result.getMethod().getConstructorOrMethod().getName());
         logger.debug("getConstructorOrMethod.getMethod.getName output:  {}", result.getMethod().getConstructorOrMethod().getMethod().getName());
+
         String testName = result.getTestName();
-        logger.debug("getTestName result is {}", testName);
         
         if (testName == null) {
             testName = result.getName();
-            logger.debug("getName result is {}", testName);
         }
 
         return testName;
