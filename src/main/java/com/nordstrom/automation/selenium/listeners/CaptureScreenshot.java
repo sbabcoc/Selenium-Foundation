@@ -208,6 +208,10 @@ public class CaptureScreenshot implements ITestListener {
      * @return the name of the testcase
      */
     private String getTestName(ITestResult result) {
+        // TODO What does `getTestName' return if @Test(testName=...) is not used, but the testcase
+        //      implements ITest?  Documentation is not clear.  The worst case scenario is that we have a
+        //      redundant method call (because it might just call getName).  If it doesn't call getName,
+        //      then we are providing a better default.
         String testName = result.getTestName();
         
         if (testName == null) {
