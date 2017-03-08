@@ -22,5 +22,10 @@ public class DriverManagerTest {
 	public void foo() {
 		boolean foo = true;
 	}
+	
+	@Test
+	public void bar() {
+		boolean bar = true;
+	}
 
 }

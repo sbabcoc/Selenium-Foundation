@@ -1,12 +1,15 @@
 package com.nordstrom.automation.selenium.listeners;
 
+import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.selenium.WebDriver;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 
 public class DriverManager implements IInvokedMethodListener {
@@ -50,7 +53,7 @@ public class DriverManager implements IInvokedMethodListener {
 	public static void setDriver(WebDriver driver, ITestResult testResult) {
 		testResult.setAttribute(DRIVER, driver);
 	}
-
+	
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
 		WebDriver driver = getDriver(testResult);
@@ -61,7 +64,9 @@ public class DriverManager implements IInvokedMethodListener {
 				if (instance instanceof DriverProvider) {
 					driver = ((DriverProvider) instance).provideDriver(method, testResult);
 				} else {
-					
+					SeleniumConfig config = SeleniumConfig.getConfig(testResult);
+					GridHubConfiguration hubConfig = config.getHubConfig();
+					driver = GridUtility.getDriver(hubConfig.host, hubConfig.port);
 				}
 				setDriver(driver, testResult);
 			}

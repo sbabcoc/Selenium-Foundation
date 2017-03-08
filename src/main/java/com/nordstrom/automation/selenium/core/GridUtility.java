@@ -14,7 +14,13 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.grid.selenium.GridLauncherV3;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class GridUtility {
 	
@@ -56,8 +62,22 @@ public class GridUtility {
 		
 		return isActive;
 	}
+	
+	public static WebDriver getDriver(String hubHost, int hubPort) {
+		try {
+			if (isHubActive(hubHost, hubPort)) {
+				return new RemoteWebDriver(SeleniumConfig.getConfig().getBrowserCaps());
+			} else {
+				throw new IllegalStateException("No Selenium Grid instance was found at http://" + hubHost + ":" + hubPort);
+			}
+		} catch (UnknownHostException e) {
+			throw new RuntimeException("Specified Selenium Grid host '" + hubHost + "' was not found", e);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException("Selenium Grid host specification '" + hubHost + "' is malformed", e);
+		}
+	}
 
-	public static boolean isThisMyIpAddress(InetAddress addr) {
+	  public static boolean isThisMyIpAddress(InetAddress addr) {
 	    // Check if the address is a valid special local or loop back
 	    if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
 	        return true;
