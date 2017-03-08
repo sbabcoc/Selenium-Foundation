@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
@@ -27,11 +26,13 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	private static final String SETTINGS_FILE = "settings.properties";
 	private static final String CONFIG = "CONFIG";
 	private static final String JSON_HEAD = "{ \"capabilities\": [";
-	private static final String DEFAULT_CAPS = "{\"browserName\" : \"chrome\"}";
+	private static final String DEFAULT_CAPS = "{\"browserName\" : \"htmlunit\"}";
 	private static final String JSON_TAIL = "] }";
 	
 	private GridNodeConfiguration nodeConfig;
+	private String[] nodeArgs;
 	private GridHubConfiguration hubConfig;
+	private String[] hubArgs;
 	private Capabilities browserCaps;
 	
 	public SeleniumConfig() throws ConfigurationException, IOException {
@@ -61,18 +62,40 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		if (nodeConfig == null) {
 			String path = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
 			nodeConfig = GridNodeConfiguration.loadFromJSON(path);
+			if (nodeConfig.host == null) nodeConfig.host = "localhost";
+			if (nodeConfig.port == null) nodeConfig.port = Integer.valueOf(5555);
+			GridHubConfiguration hubConfig = getHubConfig();
+			nodeConfig.hub = "http://" + hubConfig.host + ":" + hubConfig.port + "/grid/register/";
 		}
 		return nodeConfig;
 	}
 	
+	public String[] getNodeArgs() {
+		if (nodeArgs == null) {
+			String configPath = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
+			nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath};
+		}
+		return nodeArgs;
+	}
+
 	public GridHubConfiguration getHubConfig() {
 		if (hubConfig == null) {
 			String path = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
 			hubConfig = GridHubConfiguration.loadFromJSON(path);
+			if (hubConfig.host == null) hubConfig.host = "localhost";
+			if (hubConfig.port == null) hubConfig.port = Integer.valueOf(4444);
 		}
 		return hubConfig;
 	}
 	
+	public String[] getHubArgs() {
+		if (hubArgs == null) {
+			String configPath = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
+			hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath};
+		}
+		return hubArgs;
+	}
+
 	public Capabilities getBrowserCaps() {
 		if (browserCaps == null) {
 			JsonParser parser = new JsonParser();

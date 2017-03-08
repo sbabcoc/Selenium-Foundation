@@ -1,10 +1,3 @@
 {
-  "host": "localhost",
-  "port": 4444,
-  "newSessionWaitTimeout": -1,
-  "capabilityMatcher": "org.openqa.grid.internal.utils.DefaultCapabilityMatcher",
-  "throwOnCapabilityNotPresent": true,
-  "cleanUpCycle": 5000,
-  "role": "hub",
   "timeout": 300000
 }

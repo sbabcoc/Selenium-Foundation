@@ -9,8 +9,8 @@ public class GridUtilityTest {
 	
 	@Test
 	public void testIsActive() throws UnknownHostException, MalformedURLException {
-		GridUtility.isHubActive("localhost", 4444);
-		GridUtility.isHubActive("localhost", 4444);
+		GridUtility.isHubActive();
+		GridUtility.isHubActive();
 	}
 
 }

@@ -14,9 +14,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
+import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.selenium.GridLauncherV3;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -28,14 +27,16 @@ public class GridUtility {
 		throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
 	}
 	
-	public static boolean isHubActive(String hubHost, int hubPort) 
+	public static boolean isHubActive() 
 			throws UnknownHostException, MalformedURLException {
 		
 		boolean isActive = false;
+		SeleniumConfig config = SeleniumConfig.getConfig();
+		GridHubConfiguration hubConfig = config.getHubConfig();
 		
-		HttpHost host = new HttpHost(hubHost, hubPort);
+		HttpHost host = new HttpHost(hubConfig.host, hubConfig.port);
 		HttpClient client = HttpClientBuilder.create().build();
-		URL sessionURL = new URL("http://" + hubHost + ":" + hubPort + "/grid/api/hub/");
+		URL sessionURL = new URL("http://" + hubConfig.host + ":" + hubConfig.port + "/grid/api/hub/");
 		BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
 				new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
 		try {
@@ -47,15 +48,12 @@ public class GridUtility {
 		if (!isActive) {
 			InetAddress addr = InetAddress.getByName(sessionURL.getHost());
 			if (isThisMyIpAddress(addr)) {
-				String[] args;
 				try {
-					args = new String[] {"-host", hubHost, "-port", Integer.toString(hubPort), "-role", "hub"};
-					GridLauncherV3.main(args);
-					String hub = "http://" + hubHost + ":" + hubPort + "/grid/register/";
-					args = new String[] {"-role", "node", "-hub", hub};
-					GridLauncherV3.main(args);
+					GridLauncherV3.main(config.getHubArgs());
+					GridLauncherV3.main(config.getNodeArgs());
 					isActive = true;
 				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -63,17 +61,20 @@ public class GridUtility {
 		return isActive;
 	}
 	
-	public static WebDriver getDriver(String hubHost, int hubPort) {
+	public static WebDriver getDriver() {
+		SeleniumConfig config = SeleniumConfig.getConfig();
+		GridHubConfiguration hubConfig = config.getHubConfig();
 		try {
-			if (isHubActive(hubHost, hubPort)) {
-				return new RemoteWebDriver(SeleniumConfig.getConfig().getBrowserCaps());
+			URL hubUrl = new URL("http://" + hubConfig.host + ":" + hubConfig.port + "/wd/hub");
+			if (isHubActive()) {
+				return new RemoteWebDriver(hubUrl, SeleniumConfig.getConfig().getBrowserCaps());
 			} else {
-				throw new IllegalStateException("No Selenium Grid instance was found at http://" + hubHost + ":" + hubPort);
+				throw new IllegalStateException("No Selenium Grid instance was found at " + hubUrl);
 			}
 		} catch (UnknownHostException e) {
-			throw new RuntimeException("Specified Selenium Grid host '" + hubHost + "' was not found", e);
+			throw new RuntimeException("Specified Selenium Grid host '" + hubConfig.host + "' was not found", e);
 		} catch (MalformedURLException e) {
-			throw new RuntimeException("Selenium Grid host specification '" + hubHost + "' is malformed", e);
+			throw new RuntimeException("Selenium Grid host specification '" + hubConfig.host + "' is malformed", e);
 		}
 	}
 

@@ -26,6 +26,7 @@ public class DriverManagerTest {
 	@Test
 	public void bar() {
 		boolean bar = true;
+		DriverManager.getDriver().close();
 	}
 
 }
