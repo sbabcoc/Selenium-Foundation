@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.listener;
 
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -26,7 +27,10 @@ public class DriverManagerTest {
 	@Test
 	public void bar() {
 		boolean bar = true;
-		DriverManager.getDriver().close();
+		WebDriver driver = DriverManager.getDriver();
+		driver.get("http://www.google.com");
+		System.out.println(driver.getPageSource());
+		driver.close();
 	}
 
 }
