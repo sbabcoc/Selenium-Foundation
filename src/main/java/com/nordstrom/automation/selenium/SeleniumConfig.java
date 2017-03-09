@@ -24,7 +24,40 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.nordstrom.automation.settings.SettingsCore;
 
+/**
+ * This class contains declarations and methods related to Selenium WebDriver and Grid configuration.
+ * 
+ * @see SettingsCore
+ */
 public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings> {
+	
+	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
+		HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
+		HUB_HOST("selenium.hub.host", null),
+		HUB_PORT("selenuim.hub.port", null),
+		NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
+		NODE_HOST("selenium.node.host", null),
+		NODE_PORT("selenium.node.port", null),
+		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS);
+		
+		private String propertyName;
+		private String defaultValue;
+		
+		SeleniumSettings(String propertyName, String defaultValue) {
+			this.propertyName = propertyName;
+			this.defaultValue = defaultValue;
+		}
+		
+		@Override
+		public String key() {
+			return propertyName;
+		}
+
+		@Override
+		public String val() {
+			return defaultValue;
+		}
+	}
 	
 	private static final String SETTINGS_FILE = "settings.properties";
 	private static final String CONFIG = "CONFIG";
@@ -223,33 +256,5 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	@Override
 	public String getSettingsPath() {
 		return SETTINGS_FILE;
-	}
-	
-	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
-		HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
-		HUB_HOST("selenium.hub.host", null),
-		HUB_PORT("selenuim.hub.port", null),
-		NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
-		NODE_HOST("selenium.node.host", null),
-		NODE_PORT("selenium.node.port", null),
-		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS);
-		
-		private String propertyName;
-		private String defaultValue;
-		
-		SeleniumSettings(String propertyName, String defaultValue) {
-			this.propertyName = propertyName;
-			this.defaultValue = defaultValue;
-		}
-		
-		@Override
-		public String key() {
-			return propertyName;
-		}
-
-		@Override
-		public String val() {
-			return defaultValue;
-		}
 	}
 }

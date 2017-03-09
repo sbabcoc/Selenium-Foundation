@@ -23,6 +23,9 @@ import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class provides basic support for interacting with a Selenium Grid instance.
+ */
 public class GridUtility {
 	
 	private GridUtility() {
