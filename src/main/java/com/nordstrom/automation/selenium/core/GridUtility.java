@@ -29,10 +29,27 @@ public class GridUtility {
 		throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
 	}
 	
+	/**
+	 * Determine if the configured Selenium Grid hub is active.<br>
+	 * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
+	 * 
+	 * @return 'true' if configured hub is active; otherwise 'false'
+	 * @throws UnknownHostException
+	 * @throws MalformedURLException
+	 */
 	public static boolean isHubActive() throws UnknownHostException, MalformedURLException {
 		return isHubActive(Reporter.getCurrentTestResult());
 	}
 	
+	/**
+	 * Determine if the configured Selenium Grid hub is active.<br>
+	 * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
+	 * 
+	 * @param testResult configuration context (TestNG test result object)
+	 * @return 'true' if configured hub is active; otherwise 'false'
+	 * @throws UnknownHostException
+	 * @throws MalformedURLException
+	 */
 	public static boolean isHubActive(ITestResult testResult) throws UnknownHostException, MalformedURLException {
 		
 		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
@@ -68,10 +85,21 @@ public class GridUtility {
 		return isActive;
 	}
 	
+	/**
+	 * Get the Selenium driver for the current configuration context
+	 * 
+	 * @return driver object (may be 'null')
+	 */
 	public static WebDriver getDriver() {
 		return getDriver(Reporter.getCurrentTestResult());
 	}
 	
+	/**
+	 * Get the Selenium driver for the specified configuration context.
+	 * 
+	 * @param testResult configuration context (TestNG test result object)
+	 * @return driver object (may be 'null')
+	 */
 	public static WebDriver getDriver(ITestResult testResult) {
 		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
 		
@@ -91,10 +119,15 @@ public class GridUtility {
 		}
 	}
 
+	/**
+	 * Determine if the specified address is local to the machine we're running on.
+	 * 
+	 * @param addr Internet protocol address object
+	 * @return 'true' if the specified address is local; otherwise 'false'
+	 */
 	public static boolean isThisMyIpAddress(InetAddress addr) {
 		// Check if the address is a valid special local or loop back
-		if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
-			return true;
+		if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) return true;
 
 		// Check if the address is defined on any interface
 		try {

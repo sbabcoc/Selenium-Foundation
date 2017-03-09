@@ -42,10 +42,21 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		super(SeleniumSettings.class);
 	}
 
+	/**
+	 * Get the Selenium configuration object for the current context.
+	 * 
+	 * @return Selenium configuration object
+	 */
 	public static SeleniumConfig getConfig() {
 		return getConfig(Reporter.getCurrentTestResult());
 	}
 	
+	/**
+	 * Get the Selenium configuration object for the specified context.
+	 * 
+	 * @param testResult configuration context (TestNG test result object)
+	 * @return Selenium configuration object
+	 */
 	public static SeleniumConfig getConfig(ITestResult testResult) {
 		if (testResult.getAttribute(CONFIG) == null) {
 			synchronized (CONFIG) {
@@ -61,6 +72,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return (SeleniumConfig) testResult.getAttribute(CONFIG);
 	}
 	
+	/**
+	 * Get the Selenium Grid node configuration.
+	 * 
+	 * @return Selenium Grid node configuration
+	 */
 	public GridNodeConfiguration getNodeConfig() {
 		if (nodeConfig == null) {
 			String path = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
@@ -69,6 +85,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return nodeConfig;
 	}
 	
+	/**
+	 * Get the arguments needed to launch a local Selenium Grid node.
+	 * 
+	 * @return array of node launch arguments
+	 */
 	public String[] getNodeArgs() {
 		if (nodeArgs == null) {
 			GridNodeConfiguration config = getNodeConfig();
@@ -79,6 +100,12 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return nodeArgs;
 	}
 
+	/**
+	 * Resolve Selenium Grid node settings for host, port, and hub.
+	 * 
+	 * @param nodeConfig node configuration with unresolved settings
+	 * @return node configuration with resolved settings
+	 */
 	private GridNodeConfiguration resolveNodeSettings(GridNodeConfiguration nodeConfig) {
 		String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
 		if (nodeHost != null)  nodeConfig.host = nodeHost;
@@ -94,6 +121,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return nodeConfig;
 	}
 
+	/**
+	 * Get the Selenium Grid hub configuration.
+	 * 
+	 * @return Selenium Grid hub configuration
+	 */
 	public GridHubConfiguration getHubConfig() {
 		if (hubConfig == null) {
 			String path = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
@@ -102,6 +134,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return hubConfig;
 	}
 	
+	/**
+	 * Get the arguments needed to launch a local Selenium Grid hub.
+	 * 
+	 * @return array of hub launch arguments
+	 */
 	public String[] getHubArgs() {
 		if (hubArgs == null) {
 			GridHubConfiguration config = getHubConfig();
@@ -112,6 +149,12 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return hubArgs;
 	}
 	
+	/**
+	 * Resolve Selenium Grid hub settings for host and port.
+	 * 
+	 * @param hubConfig node configuration with unresolved settings
+	 * @return hub configuration with resolved settings
+	 */
 	private GridHubConfiguration resolveHubSettings(GridHubConfiguration hubConfig) {
 		String hubHost = getString(SeleniumSettings.HUB_HOST.key());
 		if (hubHost != null)  hubConfig.host = hubHost;
@@ -124,6 +167,23 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return hubConfig;
 	}
 
+	/**
+	 * Get Internet protocol IP address for the machine we're running on.
+	 * 
+	 * @return IP address for the machine we're running on (a.k.a. - 'localhost')
+	 */
+	private static String getLocalHost() {
+		try {
+			return InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+		}
+		return "localhost";
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public Capabilities getBrowserCaps() {
 		if (browserCaps == null) {
 			JsonParser parser = new JsonParser();
@@ -135,6 +195,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		return browserCaps;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
 	private String getConfigPath(String path) {
 		FileHandler handler = new FileHandler();
 		handler.setPath(path);
@@ -187,13 +252,4 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 			return defaultValue;
 		}
 	}
-	
-	public static String getLocalHost() {
-		try {
-			return InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-		}
-		return "localhost";
-	}
-
 }

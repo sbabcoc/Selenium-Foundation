@@ -115,6 +115,11 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 		closeDriver(testResult);
 	}
 	
+	/**
+	 * Close the Selenium driver attached to the specified configuration context.<br>
+	 * 
+	 * @param testResult configuration context (TestNG test result object)
+	 */
 	private void closeDriver(ITestResult testResult) {
 		WebDriver driver = getDriver(testResult);
 		
