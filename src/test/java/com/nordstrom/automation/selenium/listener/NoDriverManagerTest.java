@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.core;
+package com.nordstrom.automation.selenium.listener;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
