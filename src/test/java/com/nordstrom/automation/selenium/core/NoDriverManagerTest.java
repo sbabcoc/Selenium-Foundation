@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.listener;
+package com.nordstrom.automation.selenium.core;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -11,16 +11,22 @@ import com.nordstrom.automation.testng.ExecutionFlowController;
 
 @Test(threadPoolSize = 10)
 @Listeners({ExecutionFlowController.class, DriverManager.class})
-public class DriverManagerTest {
-	
-	@BeforeMethod(groups = {"WithDriverBefore"})
-	public void beforeMethodWithDriver() {
-		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
+public class NoDriverManagerTest {
+
+	@BeforeMethod(groups = {"NoDriverBefore"})
+	@NoDriver
+	public void beforeMethodNoDriver() {
+		Assert.assertNull(DriverManager.getDriver(), "Driver should not have been created");
 	}
 	
-	@Test(groups = {"WithDriverBefore"})
+	@Test(groups = {"NoBeforeNoDriver"})
 	@NoDriver
-	public void testWithDriverBefore() {
+	public void testNoBeforeNoDriver() {
+		Assert.assertNull(DriverManager.getDriver(), "Driver should not have been created");
+	}
+	
+	@Test(groups = {"NoDriverBefore"})
+	public void testNoDriverBefore() {
 		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
 	}
 	

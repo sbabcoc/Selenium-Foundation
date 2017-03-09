@@ -28,10 +28,17 @@
       "seleniumProtocol": "WebDriver"
     }
   ],
+  "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
   "maxSession": 5,
   "register": true,
-  "hub": "http://localhost:4444",
+  "registerCycle": 5000,
+  "nodeStatusCheckTimeout": 5000,
   "nodePolling": 5000,
+  "role": "node",
   "unregisterIfStillDownAfter": 60000,
-  "servlets": []
+  "downPollingLimit": 2,
+  "debug": false,
+  "servlets" : [],
+  "withoutServlets": [],
+  "custom": {}
 }

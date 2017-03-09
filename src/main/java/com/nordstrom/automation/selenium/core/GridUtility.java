@@ -18,6 +18,8 @@ import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.selenium.GridLauncherV3;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.ITestResult;
+import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
@@ -27,11 +29,16 @@ public class GridUtility {
 		throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
 	}
 	
-	public static boolean isHubActive() 
-			throws UnknownHostException, MalformedURLException {
+	public static boolean isHubActive() throws UnknownHostException, MalformedURLException {
+		return isHubActive(Reporter.getCurrentTestResult());
+	}
+	
+	public static boolean isHubActive(ITestResult testResult) throws UnknownHostException, MalformedURLException {
+		
+		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
 		
 		boolean isActive = false;
-		SeleniumConfig config = SeleniumConfig.getConfig();
+		SeleniumConfig config = SeleniumConfig.getConfig(testResult);
 		GridHubConfiguration hubConfig = config.getHubConfig();
 		
 		HttpHost host = new HttpHost(hubConfig.host, hubConfig.port);
@@ -62,12 +69,18 @@ public class GridUtility {
 	}
 	
 	public static WebDriver getDriver() {
-		SeleniumConfig config = SeleniumConfig.getConfig();
+		return getDriver(Reporter.getCurrentTestResult());
+	}
+	
+	public static WebDriver getDriver(ITestResult testResult) {
+		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
+		
+		SeleniumConfig config = SeleniumConfig.getConfig(testResult);
 		GridHubConfiguration hubConfig = config.getHubConfig();
 		try {
 			URL hubUrl = new URL("http://" + hubConfig.host + ":" + hubConfig.port + "/wd/hub");
-			if (isHubActive()) {
-				return new RemoteWebDriver(hubUrl, SeleniumConfig.getConfig().getBrowserCaps());
+			if (isHubActive(testResult)) {
+				return new RemoteWebDriver(hubUrl, config.getBrowserCaps());
 			} else {
 				throw new IllegalStateException("No Selenium Grid instance was found at " + hubUrl);
 			}
@@ -78,16 +91,16 @@ public class GridUtility {
 		}
 	}
 
-	  public static boolean isThisMyIpAddress(InetAddress addr) {
-	    // Check if the address is a valid special local or loop back
-	    if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
-	        return true;
+	public static boolean isThisMyIpAddress(InetAddress addr) {
+		// Check if the address is a valid special local or loop back
+		if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
+			return true;
 
-	    // Check if the address is defined on any interface
-	    try {
-	        return NetworkInterface.getByInetAddress(addr) != null;
-	    } catch (SocketException e) {
-	        return false;
-	    }
+		// Check if the address is defined on any interface
+		try {
+			return NetworkInterface.getByInetAddress(addr) != null;
+		} catch (SocketException e) {
+			return false;
+		}
 	}
 }

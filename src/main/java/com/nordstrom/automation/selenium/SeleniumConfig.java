@@ -2,9 +2,12 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.UnknownHostException;
+
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
@@ -61,39 +64,64 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	public GridNodeConfiguration getNodeConfig() {
 		if (nodeConfig == null) {
 			String path = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
-			nodeConfig = GridNodeConfiguration.loadFromJSON(path);
-			if (nodeConfig.host == null) nodeConfig.host = "localhost";
-			if (nodeConfig.port == null) nodeConfig.port = Integer.valueOf(5555);
-			GridHubConfiguration hubConfig = getHubConfig();
-			nodeConfig.hub = "http://" + hubConfig.host + ":" + hubConfig.port + "/grid/register/";
+			nodeConfig = resolveNodeSettings(GridNodeConfiguration.loadFromJSON(path));
 		}
 		return nodeConfig;
 	}
 	
 	public String[] getNodeArgs() {
 		if (nodeArgs == null) {
+			GridNodeConfiguration config = getNodeConfig();
 			String configPath = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
-			nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath};
+			nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", 
+					config.host, "-port", config.port.toString(), "-hub", config.hub};
 		}
 		return nodeArgs;
+	}
+
+	private GridNodeConfiguration resolveNodeSettings(GridNodeConfiguration nodeConfig) {
+		String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
+		if (nodeHost != null)  nodeConfig.host = nodeHost;
+		if (nodeConfig.host == null) nodeConfig.host = getLocalHost();
+		
+		Integer nodePort = getInteger(SeleniumSettings.NODE_PORT.key(), null);
+		if (nodePort != null) nodeConfig.port = nodePort;
+		if (nodeConfig.port == null) nodeConfig.port = Integer.valueOf(5555);
+		
+		GridHubConfiguration hubConfig = getHubConfig();
+		nodeConfig.hub = "http://" + hubConfig.host + ":" + hubConfig.port + "/grid/register/";
+		
+		return nodeConfig;
 	}
 
 	public GridHubConfiguration getHubConfig() {
 		if (hubConfig == null) {
 			String path = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
-			hubConfig = GridHubConfiguration.loadFromJSON(path);
-			if (hubConfig.host == null) hubConfig.host = "localhost";
-			if (hubConfig.port == null) hubConfig.port = Integer.valueOf(4444);
+			hubConfig = resolveHubSettings(GridHubConfiguration.loadFromJSON(path));
 		}
 		return hubConfig;
 	}
 	
 	public String[] getHubArgs() {
 		if (hubArgs == null) {
+			GridHubConfiguration config = getHubConfig();
 			String configPath = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
-			hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath};
+			hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
+					"-host", config.host, "-port", config.port.toString()};
 		}
 		return hubArgs;
+	}
+	
+	private GridHubConfiguration resolveHubSettings(GridHubConfiguration hubConfig) {
+		String hubHost = getString(SeleniumSettings.HUB_HOST.key());
+		if (hubHost != null)  hubConfig.host = hubHost;
+		if (hubConfig.host == null) hubConfig.host = getLocalHost();
+		
+		Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), null);
+		if (hubPort != null) hubConfig.port = hubPort;
+		if (hubConfig.port == null) hubConfig.port = Integer.valueOf(4444);
+		
+		return hubConfig;
 	}
 
 	public Capabilities getBrowserCaps() {
@@ -134,7 +162,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
 		HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
+		HUB_HOST("selenium.hub.host", null),
+		HUB_PORT("selenuim.hub.port", null),
 		NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
+		NODE_HOST("selenium.node.host", null),
+		NODE_PORT("selenium.node.port", null),
 		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS);
 		
 		private String propertyName;
@@ -154,6 +186,14 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		public String val() {
 			return defaultValue;
 		}
+	}
+	
+	public static String getLocalHost() {
+		try {
+			return InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+		}
+		return "localhost";
 	}
 
 }
