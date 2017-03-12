@@ -6,6 +6,7 @@ import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -59,17 +60,20 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
-		WebDriver driver = getDriver(testResult);
-		if (driver == null) {
-			NoDriver noDriver = method.getTestMethod().getConstructorOrMethod().getMethod().getAnnotation(NoDriver.class);
-			if (noDriver == null) {
-				Object instance = method.getTestMethod().getInstance();
-				if (instance instanceof DriverProvider) {
-					driver = ((DriverProvider) instance).provideDriver(method, testResult);
-				} else {
-					driver = GridUtility.getDriver(testResult);
+		ITestNGMethod testMethod = method.getTestMethod();
+		if (testMethod.isTest() || testMethod.isBeforeTestConfiguration()) {
+			WebDriver driver = getDriver(testResult);
+			if (driver == null) {
+				NoDriver noDriver = testMethod.getConstructorOrMethod().getMethod().getAnnotation(NoDriver.class);
+				if (noDriver == null) {
+					Object instance = testMethod.getInstance();
+					if (instance instanceof DriverProvider) {
+						driver = ((DriverProvider) instance).provideDriver(method, testResult);
+					} else {
+						driver = GridUtility.getDriver(testResult);
+					}
+					setDriver(driver, testResult);
 				}
-				setDriver(driver, testResult);
 			}
 		}
 	}
