@@ -31,6 +31,12 @@ import com.nordstrom.automation.settings.SettingsCore;
  */
 public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings> {
 	
+	private static final String SETTINGS_FILE = "settings.properties";
+	private static final String CONFIG = "CONFIG";
+	private static final String JSON_HEAD = "{ \"capabilities\": [";
+	private static final String DEFAULT_CAPS = "{\"browserName\" : \"phantomjs\"}";
+	private static final String JSON_TAIL = "] }";
+	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
 		HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
 		HUB_HOST("selenium.hub.host", null),
@@ -58,12 +64,6 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 			return defaultValue;
 		}
 	}
-	
-	private static final String SETTINGS_FILE = "settings.properties";
-	private static final String CONFIG = "CONFIG";
-	private static final String JSON_HEAD = "{ \"capabilities\": [";
-	private static final String DEFAULT_CAPS = "{\"browserName\" : \"phantomjs\"}";
-	private static final String JSON_TAIL = "] }";
 	
 	private GridNodeConfiguration nodeConfig;
 	private String[] nodeArgs;
@@ -214,8 +214,9 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	}
 
 	/**
+	 * Convert the configured browser specification from JSON to {@link Capabilities} object.
 	 * 
-	 * @return
+	 * @return {@link Capabilities} object for the configured browser specification
 	 */
 	public Capabilities getBrowserCaps() {
 		if (browserCaps == null) {
@@ -229,9 +230,10 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	}
 
 	/**
+	 * Get the path to the specified configuration file.
 	 * 
-	 * @param path
-	 * @return
+	 * @param path configuration file path (absolute, relative, or simple filename)
+	 * @return resolved absolute path of specified file; 'null' if file not found
 	 */
 	private String getConfigPath(String path) {
 		FileHandler handler = new FileHandler();

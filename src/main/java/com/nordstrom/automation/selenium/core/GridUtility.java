@@ -37,8 +37,8 @@ public class GridUtility {
 	 * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
 	 * 
 	 * @return 'true' if configured hub is active; otherwise 'false'
-	 * @throws UnknownHostException
-	 * @throws MalformedURLException
+	 * @throws UnknownHostException No response was received from the configured hub host. 
+	 * @throws MalformedURLException The configured hub settings produce a malformed URL.
 	 */
 	public static boolean isHubActive() throws UnknownHostException, MalformedURLException {
 		return isHubActive(Reporter.getCurrentTestResult());
@@ -50,33 +50,27 @@ public class GridUtility {
 	 * 
 	 * @param testResult configuration context (TestNG test result object)
 	 * @return 'true' if configured hub is active; otherwise 'false'
-	 * @throws UnknownHostException
-	 * @throws MalformedURLException
+	 * @throws UnknownHostException No response was received from the configured hub host. 
+	 * @throws MalformedURLException The configured hub settings produce a malformed URL.
 	 */
 	public static boolean isHubActive(ITestResult testResult) throws UnknownHostException, MalformedURLException {
 		
 		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
 		
-		boolean isActive = false;
 		SeleniumConfig config = SeleniumConfig.getConfig(testResult);
 		GridHubConfiguration hubConfig = config.getHubConfig();
 		
-		HttpHost host = new HttpHost(hubConfig.host, hubConfig.port);
-		HttpClient client = HttpClientBuilder.create().build();
-		URL sessionURL = new URL("http://" + hubConfig.host + ":" + hubConfig.port + "/grid/api/hub/");
-		BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
-				new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
-		try {
-			HttpResponse response = client.execute(host, basicHttpEntityEnclosingRequest);
-			isActive = (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
-		} catch (IOException e) {
-		}
+		boolean isActive = isHubActive(hubConfig);
 		
 		if (!isActive) {
-			InetAddress addr = InetAddress.getByName(sessionURL.getHost());
+			// get IP address of the configured hub host
+			InetAddress addr = InetAddress.getByName(hubConfig.host);
+			// if configured for local hub
 			if (isThisMyIpAddress(addr)) {
 				try {
+					// launch local Selenium Grid hub
 					GridLauncherV3.main(config.getHubArgs());
+					// launch local Selenium Grid node
 					GridLauncherV3.main(config.getNodeArgs());
 					isActive = true;
 				} catch (Exception e) {
@@ -86,6 +80,27 @@ public class GridUtility {
 		}
 		
 		return isActive;
+	}
+
+	/**
+	 * Determine if the configured Selenium Grid hub is active.<br>
+	 * 
+	 * @param hubConfig hub configuration object
+	 * @return 'true' if configured hub is active; otherwise 'false'
+	 * @throws MalformedURLException The configured hub settings produce a malformed URL.
+	 */
+	static boolean isHubActive(GridHubConfiguration hubConfig) throws MalformedURLException {
+		HttpHost host = new HttpHost(hubConfig.host, hubConfig.port);
+		HttpClient client = HttpClientBuilder.create().build();
+		URL sessionURL = new URL("http://" + hubConfig.host + ":" + hubConfig.port + "/grid/api/hub/");
+		BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
+				new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
+		try {
+			HttpResponse response = client.execute(host, basicHttpEntityEnclosingRequest);
+			return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
+		} catch (IOException e) {
+		}
+		return false;
 	}
 	
 	/**
@@ -121,7 +136,7 @@ public class GridUtility {
 			throw new RuntimeException("Selenium Grid host specification '" + hubConfig.host + "' is malformed", e);
 		}
 	}
-
+	
 	/**
 	 * Determine if the specified address is local to the machine we're running on.
 	 * 
