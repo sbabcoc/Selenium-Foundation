@@ -126,19 +126,16 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 */
 	private void closeDriver(ITestResult testResult) {
 		WebDriver driver = getDriver(testResult);
+		if (driver == null) return;
 		
-		if (driver != null) {
-			try {
-				JavascriptExecutor js = (JavascriptExecutor) driver;
-				js.executeScript("return window.stop");
-			} catch (Exception e) { }
-			
-			try {
-				driver.switchTo().alert().dismiss();
-			} catch (Exception e) { }
-			
-			driver.quit();
-		}
+		try {
+			((JavascriptExecutor) driver).executeScript("return window.stop");
+		} catch (Exception e) { }
+		
+		try {
+			driver.switchTo().alert().dismiss();
+		} catch (Exception e) { }
+		
+		driver.quit();
 	}
-
 }
