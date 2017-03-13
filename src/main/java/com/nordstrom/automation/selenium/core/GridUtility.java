@@ -22,6 +22,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
@@ -68,6 +69,9 @@ public class GridUtility {
 			// if configured for local hub
 			if (isThisMyIpAddress(addr)) {
 				try {
+					String loggerLevel = config.getString(SeleniumSettings.LOGGER_LEVEL.key());
+					System.setProperty(SeleniumConfig.SELENIUM_LOGGER_LEVEL, loggerLevel);
+					
 					// launch local Selenium Grid hub
 					GridLauncherV3.main(config.getHubArgs());
 					// launch local Selenium Grid node

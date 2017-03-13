@@ -37,7 +37,12 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	private static final String DEFAULT_CAPS = "{\"browserName\" : \"phantomjs\"}";
 	private static final String JSON_TAIL = "] }";
 	
+	public static final String SELENIUM_LOGGER = "selenium.LOGGER";
+	public static final String SELENIUM_LOGGER_LEVEL = "selenium.LOGGER.level";
+	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
+		LOGGER("selenium.logger", null),
+		LOGGER_LEVEL("selenium.logger.level", "WARNING"),
 		HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
 		HUB_HOST("selenium.hub.host", null),
 		HUB_PORT("selenuim.hub.port", null),
