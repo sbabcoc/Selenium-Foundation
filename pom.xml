@@ -18,8 +18,8 @@
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
     <deploy-plugin.version>2.8.2</deploy-plugin.version>
     <httpclient.version>4.5.2</httpclient.version>
-    <narf.version>99999-SNAPSHOT</narf.version>
-    <selenium.version>3.0.1</selenium.version>
+    <settings.version>0.1.0.0</settings.version>
+    <selenium.version>3.3.1</selenium.version>
   </properties>
   
   <distributionManagement>
@@ -38,8 +38,8 @@
       </dependency>
       <dependency>
         <groupId>com.nordstrom.test-automation.tools</groupId>
-        <artifactId>narf</artifactId>
-        <version>${narf.version}</version>
+        <artifactId>settings</artifactId>
+        <version>${settings.version}</version>
       </dependency>
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
@@ -55,7 +55,7 @@
     </dependency>
     <dependency>
       <groupId>com.nordstrom.test-automation.tools</groupId>
-      <artifactId>narf</artifactId>
+      <artifactId>settings</artifactId>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>

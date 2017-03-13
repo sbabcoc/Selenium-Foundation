@@ -69,6 +69,8 @@ public class GridUtility {
 			// if configured for local hub
 			if (isThisMyIpAddress(addr)) {
 				try {
+					String logFilePath = config.getString(SeleniumSettings.LOGGER.key());
+					if (logFilePath != null) System.setProperty(SeleniumConfig.SELENIUM_LOGGER, logFilePath);
 					String loggerLevel = config.getString(SeleniumSettings.LOGGER_LEVEL.key());
 					System.setProperty(SeleniumConfig.SELENIUM_LOGGER_LEVEL, loggerLevel);
 					
