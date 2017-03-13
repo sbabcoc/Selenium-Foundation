@@ -1,15 +1,20 @@
 package com.nordstrom.automation.selenium.listeners;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.annotations.NoDriver;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 
-public class DriverManager implements IInvokedMethodListener {
+public class DriverManager implements IInvokedMethodListener, ITestListener {
 
 	private static final String DRIVER = "DRIVER";
 	
@@ -38,6 +43,7 @@ public class DriverManager implements IInvokedMethodListener {
 	 * @return driver from the specified test result
 	 */
 	public static WebDriver getDriver(ITestResult testResult) {
+		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
 		return (WebDriver) testResult.getAttribute(DRIVER);
 	}
 	
@@ -48,22 +54,26 @@ public class DriverManager implements IInvokedMethodListener {
 	 * @param testResult driver for the specified test result
 	 */
 	public static void setDriver(WebDriver driver, ITestResult testResult) {
+		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
 		testResult.setAttribute(DRIVER, driver);
 	}
-
+	
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
-		WebDriver driver = getDriver(testResult);
-		if (driver == null) {
-			NoDriver noDriver = method.getTestMethod().getConstructorOrMethod().getMethod().getAnnotation(NoDriver.class);
-			if (noDriver == null) {
-				Object instance = method.getTestMethod().getInstance();
-				if (instance instanceof DriverProvider) {
-					driver = ((DriverProvider) instance).provideDriver(method, testResult);
-				} else {
-					
+		ITestNGMethod testMethod = method.getTestMethod();
+		if (testMethod.isTest() || testMethod.isBeforeMethodConfiguration()) {
+			WebDriver driver = getDriver(testResult);
+			if (driver == null) {
+				NoDriver noDriver = testMethod.getConstructorOrMethod().getMethod().getAnnotation(NoDriver.class);
+				if (noDriver == null) {
+					Object instance = testMethod.getInstance();
+					if (instance instanceof DriverProvider) {
+						driver = ((DriverProvider) instance).provideDriver(method, testResult);
+					} else {
+						driver = GridUtility.getDriver(testResult);
+					}
+					setDriver(driver, testResult);
 				}
-				setDriver(driver, testResult);
 			}
 		}
 	}
@@ -73,4 +83,59 @@ public class DriverManager implements IInvokedMethodListener {
 		// no post-invocation processing
 	}
 
+	@Override
+	public void onFinish(ITestContext testContext) {
+		// no post-run processing
+	}
+
+	@Override
+	public void onStart(ITestContext paramITestContext) {
+		// no pre-run processing
+		
+	}
+
+	@Override
+	public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
+		closeDriver(testResult);
+	}
+
+	@Override
+	public void onTestFailure(ITestResult testResult) {
+		closeDriver(testResult);
+	}
+
+	@Override
+	public void onTestSkipped(ITestResult testResult) {
+		closeDriver(testResult);
+	}
+
+	@Override
+	public void onTestStart(ITestResult testResult) {
+		// no pre-test processing
+	}
+
+	@Override
+	public void onTestSuccess(ITestResult testResult) {
+		closeDriver(testResult);
+	}
+	
+	/**
+	 * Close the Selenium driver attached to the specified configuration context.<br>
+	 * 
+	 * @param testResult configuration context (TestNG test result object)
+	 */
+	private void closeDriver(ITestResult testResult) {
+		WebDriver driver = getDriver(testResult);
+		if (driver == null) return;
+		
+		try {
+			((JavascriptExecutor) driver).executeScript("return window.stop");
+		} catch (Exception e) { }
+		
+		try {
+			driver.switchTo().alert().dismiss();
+		} catch (Exception e) { }
+		
+		driver.quit();
+	}
 }

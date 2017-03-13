@@ -12,19 +12,25 @@ import com.nordstrom.automation.testng.ListenerChain;
 import com.nordstrom.automation.testng.ListenerChainable;
 
 @Listeners({ListenerChain.class})
-public class DriverManagerTest implements ListenerChainable {
-	
-	@BeforeMethod(groups = {"WithDriverBefore"})
-	public void beforeMethodWithDriver() {
-		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
-	}
-	
-	@Test(groups = {"WithDriverBefore"})
-	@NoDriver
-	public void testWithDriverBefore() {
-		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
-	}
+public class NoDriverManagerTest implements ListenerChainable {
 
+	@BeforeMethod(groups = {"NoDriverBefore"})
+	@NoDriver
+	public void beforeMethodNoDriver() {
+		Assert.assertNull(DriverManager.getDriver(), "Driver should not have been created");
+	}
+	
+	@Test(groups = {"NoBeforeNoDriver"})
+	@NoDriver
+	public void testNoBeforeNoDriver() {
+		Assert.assertNull(DriverManager.getDriver(), "Driver should not have been created");
+	}
+	
+	@Test(groups = {"NoDriverBefore"})
+	public void testNoDriverBefore() {
+		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
+	}
+	
 	@Override
 	public void attachListeners(ListenerChain listenerChain) {
 		listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
