@@ -61,7 +61,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
 		ITestNGMethod testMethod = method.getTestMethod();
-		if (testMethod.isTest() || testMethod.isBeforeTestConfiguration()) {
+		if (testMethod.isTest() || testMethod.isBeforeMethodConfiguration()) {
 			WebDriver driver = getDriver(testResult);
 			if (driver == null) {
 				NoDriver noDriver = testMethod.getConstructorOrMethod().getMethod().getAnnotation(NoDriver.class);

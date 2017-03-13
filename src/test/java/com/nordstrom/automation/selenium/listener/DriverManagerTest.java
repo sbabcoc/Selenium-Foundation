@@ -8,10 +8,11 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.automation.testng.ListenerChainable;
 
-@Test(threadPoolSize = 10)
-@Listeners({ExecutionFlowController.class, DriverManager.class})
-public class DriverManagerTest {
+@Listeners({ListenerChain.class})
+public class DriverManagerTest implements ListenerChainable {
 	
 	@BeforeMethod(groups = {"WithDriverBefore"})
 	public void beforeMethodWithDriver() {
@@ -22,6 +23,11 @@ public class DriverManagerTest {
 	@NoDriver
 	public void testWithDriverBefore() {
 		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
+	}
+
+	@Override
+	public void attachListeners(ListenerChain listenerChain) {
+		listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
 	}
 	
 }

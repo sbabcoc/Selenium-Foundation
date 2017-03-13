@@ -5,7 +5,7 @@
   <groupId>com.nordstrom.test-automation.ui-tools</groupId>
   <artifactId>selenium-foundation</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>99999-SNAPSHOT</version>
   
   <name>Selenium Foundation</name>
   <url>http://maven.apache.org</url>
@@ -19,7 +19,8 @@
     <deploy-plugin.version>2.8.2</deploy-plugin.version>
     <httpclient.version>4.5.2</httpclient.version>
     <settings.version>0.1.0.0</settings.version>
-    <selenium.version>3.3.1</selenium.version>
+    <selenium.version>3.0.1</selenium.version>
+    <testng-foundation.version>1.0.3</testng-foundation.version>
   </properties>
   
   <distributionManagement>
@@ -46,6 +47,11 @@
         <artifactId>selenium-server</artifactId>
         <version>${selenium.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.nordstrom.test-automation.tools</groupId>
+        <artifactId>testng-foundation</artifactId>
+        <version>${testng-foundation.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -60,6 +66,11 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.nordstrom.test-automation.tools</groupId>
+      <artifactId>testng-foundation</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   
