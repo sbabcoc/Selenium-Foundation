@@ -36,9 +36,6 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	private static final String DEFAULT_CAPS = "{\"browserName\": \"phantomjs\"}";
 	private static final String JSON_TAIL = "], \"configuration\": {} }";
 	
-	public static final String SELENIUM_LOGGER = "selenium.LOGGER";
-	public static final String SELENIUM_LOGGER_LEVEL = "selenium.LOGGER.level";
-	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
 		LOGGER("selenium.logger", null),
 		LOGGER_LEVEL("selenium.logger.level", "WARNING"),
@@ -136,7 +133,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 			String configPath = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
 			Map<String, Object> config = nodeConfig.getConfiguration();
 			nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get("host"),
-					"-port", config.get("port").toString(), "-hub", (String) config.get("hub").toString()};
+					"-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
 		}
 		return nodeArgs;
 	}

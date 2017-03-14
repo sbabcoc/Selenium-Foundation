@@ -7,6 +7,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -69,11 +71,6 @@ public class GridUtility {
 			// if configured for local hub
 			if (isThisMyIpAddress(addr)) {
 				try {
-					String logFilePath = config.getString(SeleniumSettings.LOGGER.key());
-					if (logFilePath != null) System.setProperty(SeleniumConfig.SELENIUM_LOGGER, logFilePath);
-					String loggerLevel = config.getString(SeleniumSettings.LOGGER_LEVEL.key());
-					System.setProperty(SeleniumConfig.SELENIUM_LOGGER_LEVEL, loggerLevel);
-					
 					// launch local Selenium Grid hub
 					GridLauncherV3.main(config.getHubArgs());
 					// launch local Selenium Grid node
