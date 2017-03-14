@@ -33,7 +33,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	private static final String SETTINGS_FILE = "settings.properties";
 	private static final String CONFIG = "CONFIG";
 	private static final String JSON_HEAD = "{ \"capabilities\": [";
-	private static final String DEFAULT_CAPS = "{\"browserName\" : \"phantomjs\"}";
+	private static final String DEFAULT_CAPS = "{\"browserName\": \"phantomjs\"}";
 	private static final String JSON_TAIL = "], \"configuration\": {} }";
 	
 	public static final String SELENIUM_LOGGER = "selenium.LOGGER";
