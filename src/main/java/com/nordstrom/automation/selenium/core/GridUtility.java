@@ -7,14 +7,13 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
-
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
+import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.grid.selenium.GridLauncherV3;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -22,7 +21,6 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
@@ -65,15 +63,10 @@ public class GridUtility {
 		
 		if (!isActive) {
 			// get IP address of the configured hub host
-			InetAddress addr = InetAddress.getByName(hubConfig.host);
+			InetAddress addr = InetAddress.getByName(hubConfig.getHost());
 			// if configured for local hub
 			if (isThisMyIpAddress(addr)) {
 				try {
-					String logFilePath = config.getString(SeleniumSettings.LOGGER.key());
-					if (logFilePath != null) System.setProperty(SeleniumConfig.SELENIUM_LOGGER, logFilePath);
-					String loggerLevel = config.getString(SeleniumSettings.LOGGER_LEVEL.key());
-					System.setProperty(SeleniumConfig.SELENIUM_LOGGER_LEVEL, loggerLevel);
-					
 					// launch local Selenium Grid hub
 					GridLauncherV3.main(config.getHubArgs());
 					// launch local Selenium Grid node
@@ -96,9 +89,9 @@ public class GridUtility {
 	 * @throws MalformedURLException The configured hub settings produce a malformed URL.
 	 */
 	static boolean isHubActive(GridHubConfiguration hubConfig) throws MalformedURLException {
-		HttpHost host = new HttpHost(hubConfig.host, hubConfig.port);
+		HttpHost host = new HttpHost(hubConfig.getHost(), hubConfig.getPort());
 		HttpClient client = HttpClientBuilder.create().build();
-		URL sessionURL = new URL("http://" + hubConfig.host + ":" + hubConfig.port + "/grid/api/hub/");
+		URL sessionURL = new URL("http://" + hubConfig.getHost() + ":" + hubConfig.getPort() + "/grid/api/hub/");
 		BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
 				new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
 		try {
@@ -130,16 +123,16 @@ public class GridUtility {
 		SeleniumConfig config = SeleniumConfig.getConfig(testResult);
 		GridHubConfiguration hubConfig = config.getHubConfig();
 		try {
-			URL hubUrl = new URL("http://" + hubConfig.host + ":" + hubConfig.port + "/wd/hub");
+			URL hubUrl = new URL("http://" + hubConfig.getHost() + ":" + hubConfig.getPort() + "/wd/hub");
 			if (isHubActive(testResult)) {
 				return new RemoteWebDriver(hubUrl, config.getBrowserCaps());
 			} else {
 				throw new IllegalStateException("No Selenium Grid instance was found at " + hubUrl);
 			}
 		} catch (UnknownHostException e) {
-			throw new RuntimeException("Specified Selenium Grid host '" + hubConfig.host + "' was not found", e);
+			throw new RuntimeException("Specified Selenium Grid host '" + hubConfig.getHost() + "' was not found", e);
 		} catch (MalformedURLException e) {
-			throw new RuntimeException("Selenium Grid host specification '" + hubConfig.host + "' is malformed", e);
+			throw new RuntimeException("Selenium Grid host specification '" + hubConfig.getHost() + "' is malformed", e);
 		}
 	}
 	
