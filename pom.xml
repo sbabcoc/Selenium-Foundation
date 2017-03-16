@@ -21,6 +21,7 @@
     <httpclient.version>4.5.2</httpclient.version>
     <settings.version>0.1.0.0</settings.version>
     <selenium.version>2.53.1</selenium.version>
+    <phantomjsdriver.version>1.2.0</phantomjsdriver.version>
     <htmlunit-driver.version>2.25</htmlunit-driver.version>
     <testng-foundation.version>1.0.3</testng-foundation.version>
     <testng.version>6.11</testng.version>
@@ -54,6 +55,11 @@
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-server</artifactId>
         <version>${selenium.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.detro</groupId>
+        <artifactId>phantomjsdriver</artifactId>
+        <version>${phantomjsdriver.version}</version>
       </dependency>
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
@@ -90,8 +96,14 @@
       <artifactId>selenium-server</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.detro</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>htmlunit-driver</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.nordstrom.test-automation.tools</groupId>
