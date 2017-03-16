@@ -14,7 +14,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
-import org.openqa.grid.selenium.GridLauncherV3;
+import org.openqa.grid.selenium.GridLauncher;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
@@ -68,9 +68,9 @@ public class GridUtility {
 			if (isThisMyIpAddress(addr)) {
 				try {
 					// launch local Selenium Grid hub
-					GridLauncherV3.main(config.getHubArgs());
+					GridLauncher.main(config.getHubArgs());
 					// launch local Selenium Grid node
-					GridLauncherV3.main(config.getNodeArgs());
+					GridLauncher.main(config.getNodeArgs());
 					isActive = true;
 				} catch (Exception e) {
 					e.printStackTrace();
