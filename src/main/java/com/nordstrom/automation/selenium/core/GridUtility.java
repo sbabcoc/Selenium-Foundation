@@ -14,7 +14,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
-import org.openqa.grid.selenium.GridLauncher;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
@@ -26,6 +25,9 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
  * This class provides basic support for interacting with a Selenium Grid instance.
  */
 public class GridUtility {
+	
+	private static final String GRID_HUB = "GridHub";
+	private static final String GRID_NODE = "GridNode";
 	
 	private GridUtility() {
 		throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
@@ -68,9 +70,13 @@ public class GridUtility {
 			if (isThisMyIpAddress(addr)) {
 				try {
 					// launch local Selenium Grid hub
-					GridLauncher.main(config.getHubArgs());
+					Process gridHub = GridProcess.start(testResult, config.getHubArgs());
+					testResult.setAttribute(GRID_HUB, gridHub);
 					// launch local Selenium Grid node
-					GridLauncher.main(config.getNodeArgs());
+					Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
+					testResult.setAttribute(GRID_NODE, gridNode);
+					// FIXME - Find method to confirm that Grid is ready
+					Thread.sleep(5000);
 					isActive = true;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -136,6 +142,22 @@ public class GridUtility {
 		}
 	}
 	
+	public static Process getGridHub() {
+		return getGridHub(Reporter.getCurrentTestResult());
+	}
+	
+	public static Process getGridHub(ITestResult testResult) {
+		return (Process) testResult.getAttribute(GRID_HUB);
+	}
+
+	public static Process getGridNode() {
+		return getGridNode(Reporter.getCurrentTestResult());
+	}
+	
+	public static Process getGridNode(ITestResult testResult) {
+		return (Process) testResult.getAttribute(GRID_NODE);
+	}
+
 	/**
 	 * Determine if the specified address is local to the machine we're running on.
 	 * 
