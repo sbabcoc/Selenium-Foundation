@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ class GridProcess {
 		argsList.add(0, GridLauncher.class.getName());
 		argsList.add(0, getClasspath(GridLauncher.class));
 		argsList.add(0, "-cp");
-		argsList.add(0, "java");
+		argsList.add(0, "c:\\tools\\java\\jdk1.8.0_112\\bin\\java");
 		
 		ProcessBuilder builder = new ProcessBuilder(argsList);
 		
@@ -42,6 +43,7 @@ class GridProcess {
 		builder.redirectOutput(outputFile);
 		
 		try {
+			Files.createDirectories(outputFile.toPath().getParent());
 			return builder.start();
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to start grid " + gridRole + " process", e);

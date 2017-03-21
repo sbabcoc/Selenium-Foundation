@@ -16,6 +16,7 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -71,10 +72,10 @@ public class GridUtility {
 				try {
 					// launch local Selenium Grid hub
 					Process gridHub = GridProcess.start(testResult, config.getHubArgs());
-					testResult.setAttribute(GRID_HUB, gridHub);
+					testResult.getTestContext().setAttribute(GRID_HUB, gridHub);
 					// launch local Selenium Grid node
 					Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
-					testResult.setAttribute(GRID_NODE, gridNode);
+					testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
 					// FIXME - Find method to confirm that Grid is ready
 					Thread.sleep(5000);
 					isActive = true;
@@ -143,19 +144,19 @@ public class GridUtility {
 	}
 	
 	public static Process getGridHub() {
-		return getGridHub(Reporter.getCurrentTestResult());
+		return getGridHub(Reporter.getCurrentTestResult().getTestContext());
 	}
 	
-	public static Process getGridHub(ITestResult testResult) {
-		return (Process) testResult.getAttribute(GRID_HUB);
+	public static Process getGridHub(ITestContext testContext) {
+		return (Process) testContext.getAttribute(GRID_HUB);
 	}
 
 	public static Process getGridNode() {
-		return getGridNode(Reporter.getCurrentTestResult());
+		return getGridNode(Reporter.getCurrentTestResult().getTestContext());
 	}
 	
-	public static Process getGridNode(ITestResult testResult) {
-		return (Process) testResult.getAttribute(GRID_NODE);
+	public static Process getGridNode(ITestContext testContext) {
+		return (Process) testContext.getAttribute(GRID_NODE);
 	}
 
 	/**

@@ -85,7 +85,15 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 
 	@Override
 	public void onFinish(ITestContext testContext) {
-		// no post-run processing
+		Process gridProc = GridUtility.getGridNode(testContext);
+		if (gridProc != null) {
+			gridProc.destroy();
+		}
+		
+		gridProc = GridUtility.getGridHub(testContext);
+		if (gridProc != null) {
+			gridProc.destroy();
+		}
 	}
 
 	@Override
@@ -136,16 +144,6 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 			} catch (Exception e) { }
 			
 			driver.quit();
-		}
-		
-		Process gridProc = GridUtility.getGridNode(testResult);
-		if (gridProc != null) {
-			gridProc.destroy();
-		}
-		
-		gridProc = GridUtility.getGridHub(testResult);
-		if (gridProc != null) {
-			gridProc.destroy();
 		}
 	}
 }

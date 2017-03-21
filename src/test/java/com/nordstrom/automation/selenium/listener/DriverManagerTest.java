@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.listener;
 
 import org.testng.Assert;
-import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -23,7 +22,6 @@ public class DriverManagerTest implements ListenerChainable {
 	@Test(groups = {"WithDriverBefore"})
 	@NoDriver
 	public void testWithDriverBefore() {
-		System.out.println(Reporter.getCurrentTestResult().getTestContext().getOutputDirectory());
 		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
 	}
 
