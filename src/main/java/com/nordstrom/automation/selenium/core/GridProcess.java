@@ -3,8 +3,6 @@ package com.nordstrom.automation.selenium.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -14,12 +12,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.openqa.grid.selenium.GridLauncher;
+import org.openqa.jetty.util.MultiException;
+import org.openqa.selenium.remote.SessionNotFoundException;
+import org.seleniumhq.jetty9.util.thread.ThreadPool;
 import org.testng.ITestResult;
+
+import com.google.common.collect.ImmutableMap;
 
 class GridProcess {
 	
 	private static final String OPT_ROLE = "-role";
+	private static final Class<?>[] dependencies = { GridLauncher.class, ImmutableMap.class, ThreadPool.class, 
+			HttpServletResponse.class, MultiException.class, SessionNotFoundException.class };
 	
 	static Process start(ITestResult testResult, String[] args) {
 		List<String> argsList = new ArrayList<>(Arrays.asList(args));
@@ -27,7 +34,7 @@ class GridProcess {
 		String gridRole = args[optIndex + 1];
 		
 		argsList.add(0, GridLauncher.class.getName());
-		argsList.add(0, getClasspath(GridLauncher.class));
+		argsList.add(0, getClasspath(dependencies));
 		argsList.add(0, "-cp");
 		argsList.add(0, "c:\\tools\\java\\jdk1.8.0_112\\bin\\java");
 		
@@ -53,12 +60,10 @@ class GridProcess {
 		}
 	}
 	
-	private static String getClasspath(Class<?> clazz) {
+	private static String getClasspath(Class<?>[] dependencies) {
 		List<String> pathList = new ArrayList<>();
-		pathList.add(findPathJar(clazz));
-		URLClassLoader loader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
-		for (URL url : loader.getURLs()) {
-			pathList.add(new File(url.getPath()).getPath());
+		for (Class<?> clazz : dependencies) {
+			pathList.add(findPathJar(clazz));
 		}
 		return String.join(File.pathSeparator, pathList);
 	}
