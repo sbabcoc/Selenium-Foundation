@@ -56,7 +56,7 @@ class GridProcess {
 	private static String getClasspath(Class<?> clazz) {
 		List<String> pathList = new ArrayList<>();
 		pathList.add(findPathJar(clazz));
-		URLClassLoader loader = (URLClassLoader) GridProcess.class.getClassLoader();
+		URLClassLoader loader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
 		for (URL url : loader.getURLs()) {
 			pathList.add(new File(url.getPath()).getPath());
 		}
