@@ -2,12 +2,17 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
@@ -30,10 +35,12 @@ import com.nordstrom.automation.settings.SettingsCore;
  */
 public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings> {
 	
+	private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
+	
 	private static final String SETTINGS_FILE = "settings.properties";
 	private static final String CONFIG = "CONFIG";
 	private static final String JSON_HEAD = "{ \"capabilities\": [";
-	private static final String DEFAULT_CAPS = "{\"browserName\": \"phantomjs\"}";
+	private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "phantomjs");
 	private static final String JSON_TAIL = "], \"configuration\": {} }";
 	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
@@ -45,6 +52,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
 		NODE_HOST("selenium.node.host", null),
 		NODE_PORT("selenium.node.port", null),
+		BROWSER_NAME("selenium.browser.name", null),
 		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS);
 		
 		private String propertyName;
@@ -228,7 +236,26 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	 */
 	public Capabilities getBrowserCaps() {
 		if (browserCaps == null) {
-			String jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
+			String jsonStr = null;
+			String nameStr = getString(SeleniumSettings.BROWSER_NAME.key());
+			if (nameStr != null) {
+				URL url = getClass().getClassLoader().getResource(nameStr + "Caps.json");
+				if (url != null) {
+					try {
+						Path path = Paths.get(url.toURI());
+						jsonStr = new String(Files.readAllBytes(path));
+					} catch (URISyntaxException | IOException e) { }
+				}
+				
+				if (jsonStr == null) {
+					jsonStr = String.format(CAPS_PATTERN, nameStr);
+				}
+			}
+			
+			if (jsonStr == null) {
+				jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
+			}
+			
 			RegistrationRequest config = RegistrationRequest.getNewInstance(JSON_HEAD + jsonStr + JSON_TAIL);
 			browserCaps = config.getCapabilities().get(0);
 		}

@@ -1,0 +1,7 @@
+{
+  "browserName": "chrome",
+  "chromeOptions": { 
+    "args": [ "disable-infobars" ], 
+    "prefs": { "credentials_enable_service": false } 
+  } 
+}
