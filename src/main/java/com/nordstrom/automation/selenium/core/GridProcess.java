@@ -12,21 +12,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.openqa.grid.selenium.GridLauncher;
-import org.openqa.jetty.util.MultiException;
-import org.openqa.selenium.remote.SessionNotFoundException;
-import org.seleniumhq.jetty9.util.thread.ThreadPool;
 import org.testng.ITestResult;
-
-import com.google.common.collect.ImmutableMap;
 
 class GridProcess {
 	
 	private static final String OPT_ROLE = "-role";
-	private static final Class<?>[] dependencies = { GridLauncher.class, ImmutableMap.class, ThreadPool.class, 
-			HttpServletResponse.class, MultiException.class, SessionNotFoundException.class };
+	private static final Class<?>[] dependencies = { GridLauncher.class };
 	
 	static Process start(ITestResult testResult, String[] args) {
 		List<String> argsList = new ArrayList<>(Arrays.asList(args));
