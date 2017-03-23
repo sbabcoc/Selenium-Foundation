@@ -20,6 +20,14 @@ class GridProcess {
 	private static final String OPT_ROLE = "-role";
 	private static final Class<?>[] dependencies = { GridLauncher.class };
 	
+	/**
+	 * Start a Selenium Grid server with the specified arguments in a separate process.
+	 * 
+	 * @param testResult TestNG test results object (may be 'null')
+	 * @param args Selenium server command line arguments (check {@code See Also} below)
+	 * @return Java {@link Process} object for managing the server process
+	 * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
+	 */
 	static Process start(ITestResult testResult, String[] args) {
 		List<String> argsList = new ArrayList<>(Arrays.asList(args));
 		int optIndex = argsList.indexOf(OPT_ROLE);
@@ -28,7 +36,7 @@ class GridProcess {
 		argsList.add(0, GridLauncher.class.getName());
 		argsList.add(0, getClasspath(dependencies));
 		argsList.add(0, "-cp");
-		argsList.add(0, "c:\\tools\\java\\jdk1.8.0_112\\bin\\java");
+		argsList.add(0, System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
 		
 		ProcessBuilder builder = new ProcessBuilder(argsList);
 		
@@ -66,8 +74,7 @@ class GridProcess {
 	 * 
 	 * @param context
 	 *            The jar file that contained the class file that represents
-	 *            this class will be found. Specify {@code null} to let
-	 *            {@code LiveInjector} find its own jar.
+	 *            this class will be found.
 	 * @throws IllegalStateException
 	 *             If the specified class was loaded from a directory or in some
 	 *             other way (such as via HTTP, from a database, or some other

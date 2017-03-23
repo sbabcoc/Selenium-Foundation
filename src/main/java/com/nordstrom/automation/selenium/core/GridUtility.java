@@ -110,7 +110,7 @@ public class GridUtility {
 	}
 	
 	/**
-	 * Get the Selenium driver for the current configuration context
+	 * Get the Selenium driver for the current configuration context.
 	 * 
 	 * @return driver object (may be 'null')
 	 */
@@ -143,18 +143,40 @@ public class GridUtility {
 		}
 	}
 	
+	/**
+	 * Get the Selenium Grid hub server process for the current configuration context.
+	 * 
+	 * @return process object for the hub (may be 'null')
+	 */
 	public static Process getGridHub() {
 		return getGridHub(Reporter.getCurrentTestResult().getTestContext());
 	}
 	
+	/**
+	 * Get the Selenium Grid hub server process for the specified configuration context.
+	 * 
+	 * @param testContext configuration context (TestNG test context object)
+	 * @return process object for the hub (may be 'null')
+	 */
 	public static Process getGridHub(ITestContext testContext) {
 		return (Process) testContext.getAttribute(GRID_HUB);
 	}
 
+	/**
+	 * Get the Selenium Grid node server process for the current configuration context.
+	 * 
+	 * @return process object for the node (may be 'null')
+	 */
 	public static Process getGridNode() {
 		return getGridNode(Reporter.getCurrentTestResult().getTestContext());
 	}
 	
+	/**
+	 * Get the Selenium Grid node server process for the specified configuration context.
+	 * 
+	 * @param testContext configuration context (TestNG test context object)
+	 * @return process object for the node (may be 'null')
+	 */
 	public static Process getGridNode(ITestContext testContext) {
 		return (Process) testContext.getAttribute(GRID_NODE);
 	}
