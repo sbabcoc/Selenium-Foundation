@@ -2,14 +2,13 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
@@ -17,6 +16,7 @@ import org.apache.commons.configuration2.io.FileLocationStrategy;
 import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
+import org.apache.commons.io.IOUtils;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
@@ -236,12 +236,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 			String jsonStr = null;
 			String nameStr = getString(SeleniumSettings.BROWSER_NAME.key());
 			if (nameStr != null) {
-				URL url = getClass().getClassLoader().getResource(nameStr + "Caps.json");
-				if (url != null) {
+				InputStream inputStream = getClass().getClassLoader().getResourceAsStream(nameStr + "Caps.json");
+				if (inputStream != null) {
 					try {
-						Path path = Paths.get(url.toURI());
-						jsonStr = new String(Files.readAllBytes(path));
-					} catch (URISyntaxException | IOException e) { }
+						jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+					} catch (IOException e) { }
 				}
 				
 				if (jsonStr == null) {
