@@ -137,11 +137,15 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 		if (driver != null) {
 			try {
 				((JavascriptExecutor) driver).executeScript("return window.stop");
-			} catch (Exception e) { }
+			} catch (Exception e) {
+				// Let's make sure our graceful shutdown process doesn't cause failures.
+			}
 			
 			try {
 				driver.switchTo().alert().dismiss();
-			} catch (Exception e) { }
+			} catch (Exception e) {
+				// The driver throws an exception if no alert is present. This is normal and unavoidable.
+			}
 			
 			driver.quit();
 		}
