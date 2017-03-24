@@ -85,7 +85,15 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 
 	@Override
 	public void onFinish(ITestContext testContext) {
-		// no post-run processing
+		Process gridProc = GridUtility.getGridNode(testContext);
+		if (gridProc != null) {
+			gridProc.destroy();
+		}
+		
+		gridProc = GridUtility.getGridHub(testContext);
+		if (gridProc != null) {
+			gridProc.destroy();
+		}
 	}
 
 	@Override
@@ -126,16 +134,20 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 */
 	private void closeDriver(ITestResult testResult) {
 		WebDriver driver = getDriver(testResult);
-		if (driver == null) return;
-		
-		try {
-			((JavascriptExecutor) driver).executeScript("return window.stop");
-		} catch (Exception e) { }
-		
-		try {
-			driver.switchTo().alert().dismiss();
-		} catch (Exception e) { }
-		
-		driver.quit();
+		if (driver != null) {
+			try {
+				((JavascriptExecutor) driver).executeScript("return window.stop");
+			} catch (Exception e) {
+				// Let's make sure our graceful shutdown process doesn't cause failures.
+			}
+			
+			try {
+				driver.switchTo().alert().dismiss();
+			} catch (Exception e) {
+				// The driver throws an exception if no alert is present. This is normal and unavoidable.
+			}
+			
+			driver.quit();
+		}
 	}
 }

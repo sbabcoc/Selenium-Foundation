@@ -20,7 +20,7 @@
     <deploy-plugin.version>2.8.2</deploy-plugin.version>
     <httpclient.version>4.5.2</httpclient.version>
     <settings.version>0.1.0.0</settings.version>
-    <selenium.version>2.53.1</selenium.version>
+    <selenium.version>2.53.0</selenium.version>
     <testng-foundation.version>1.0.3</testng-foundation.version>
     <testng.version>6.11</testng.version>
   </properties>
@@ -45,11 +45,6 @@
         <version>${settings.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-server</artifactId>
-        <version>${selenium.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.nordstrom.test-automation.tools</groupId>
         <artifactId>testng-foundation</artifactId>
         <version>${testng-foundation.version}</version>
@@ -58,6 +53,11 @@
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>${testng.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-server-standalone</artifactId>
+        <version>${selenium.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -71,10 +71,6 @@
       <artifactId>settings</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-server</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.nordstrom.test-automation.tools</groupId>
       <artifactId>testng-foundation</artifactId>
       <scope>test</scope>
@@ -83,6 +79,10 @@
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-server-standalone</artifactId>
     </dependency>
   </dependencies>
   

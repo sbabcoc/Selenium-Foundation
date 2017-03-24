@@ -8,12 +8,18 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 
 import org.openqa.grid.internal.utils.GridHubConfiguration;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
+import com.nordstrom.automation.selenium.listeners.DriverManager;
+import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.automation.testng.ListenerChainable;
 
-public class GridUtilityTest {
+@Listeners({ListenerChain.class})
+public class GridUtilityTest implements ListenerChainable {
 	
 	@Test
 	@NoDriver
@@ -24,6 +30,11 @@ public class GridUtilityTest {
 		assertTrue(GridUtility.isThisMyIpAddress(InetAddress.getByName(hubConfig.getHost())), "Configured for non-local hub host");
 		assertFalse(GridUtility.isHubActive(hubConfig), "Configured local hub should initially be inactive");
 		assertTrue(GridUtility.isHubActive(), "Configured local hub should have been activated");
+	}
+
+	@Override
+	public void attachListeners(ListenerChain listenerChain) {
+		listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
 	}
 
 }

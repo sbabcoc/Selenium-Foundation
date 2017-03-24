@@ -39,9 +39,6 @@
     "role": "node",
     "unregisterIfStillDownAfter": 60000,
     "downPollingLimit": 2,
-    "debug": false,
-    "servlets" : [],
-    "withoutServlets": [],
-    "custom": []
+    "debug": false
   }
 }

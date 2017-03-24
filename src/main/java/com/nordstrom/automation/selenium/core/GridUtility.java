@@ -14,9 +14,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
-import org.openqa.grid.selenium.GridLauncherV3;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -26,6 +26,9 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
  * This class provides basic support for interacting with a Selenium Grid instance.
  */
 public class GridUtility {
+	
+	private static final String GRID_HUB = "GridHub";
+	private static final String GRID_NODE = "GridNode";
 	
 	private GridUtility() {
 		throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
@@ -68,9 +71,13 @@ public class GridUtility {
 			if (isThisMyIpAddress(addr)) {
 				try {
 					// launch local Selenium Grid hub
-					GridLauncherV3.main(config.getHubArgs());
+					Process gridHub = GridProcess.start(testResult, config.getHubArgs());
+					testResult.getTestContext().setAttribute(GRID_HUB, gridHub);
 					// launch local Selenium Grid node
-					GridLauncherV3.main(config.getNodeArgs());
+					Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
+					testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
+					// FIXME - Find method to confirm that Grid is ready
+					Thread.sleep(5000);
 					isActive = true;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -103,7 +110,7 @@ public class GridUtility {
 	}
 	
 	/**
-	 * Get the Selenium driver for the current configuration context
+	 * Get the Selenium driver for the current configuration context.
 	 * 
 	 * @return driver object (may be 'null')
 	 */
@@ -136,6 +143,44 @@ public class GridUtility {
 		}
 	}
 	
+	/**
+	 * Get the Selenium Grid hub server process for the current configuration context.
+	 * 
+	 * @return process object for the hub (may be 'null')
+	 */
+	public static Process getGridHub() {
+		return getGridHub(Reporter.getCurrentTestResult().getTestContext());
+	}
+	
+	/**
+	 * Get the Selenium Grid hub server process for the specified configuration context.
+	 * 
+	 * @param testContext configuration context (TestNG test context object)
+	 * @return process object for the hub (may be 'null')
+	 */
+	public static Process getGridHub(ITestContext testContext) {
+		return (Process) testContext.getAttribute(GRID_HUB);
+	}
+
+	/**
+	 * Get the Selenium Grid node server process for the current configuration context.
+	 * 
+	 * @return process object for the node (may be 'null')
+	 */
+	public static Process getGridNode() {
+		return getGridNode(Reporter.getCurrentTestResult().getTestContext());
+	}
+	
+	/**
+	 * Get the Selenium Grid node server process for the specified configuration context.
+	 * 
+	 * @param testContext configuration context (TestNG test context object)
+	 * @return process object for the node (may be 'null')
+	 */
+	public static Process getGridNode(ITestContext testContext) {
+		return (Process) testContext.getAttribute(GRID_NODE);
+	}
+
 	/**
 	 * Determine if the specified address is local to the machine we're running on.
 	 * 
