@@ -18,7 +18,6 @@
     },
     {
       "browserName": "htmlunit",
-      "javascriptEnabled": true,
       "maxInstances": 5,
       "seleniumProtocol": "WebDriver"
     },
