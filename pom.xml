@@ -12,7 +12,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <automation-framework-core.version>0.3.0.0</automation-framework-core.version>
+    <automation-framework-core.version>0.5.0.0</automation-framework-core.version>
     <surefire-plugin.version>2.19.1</surefire-plugin.version>
     <compiler-plugin.version>3.6.0</compiler-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
