@@ -9,6 +9,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemAlreadyExistsException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
@@ -71,8 +77,10 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		}
 	}
 	
+	private String nodeConfigPath;
 	private RegistrationRequest nodeConfig;
 	private String[] nodeArgs;
+	private String hubConfigPath;
 	private GridHubConfiguration hubConfig;
 	private String[] hubArgs;
 	private Capabilities browserCaps;
@@ -113,15 +121,26 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	}
 	
 	/**
+	 * Get the path to the Selenium Grid node configuration.
+	 * 
+	 * @return Selenium Grid node configuration path
+	 */
+	private String getNodeConfigPath() {
+		if (nodeConfigPath == null) {
+			nodeConfigPath = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
+		}
+		return nodeConfigPath;
+	}
+	
+	/**
 	 * Get the Selenium Grid node configuration.
 	 * 
 	 * @return Selenium Grid node configuration
 	 */
 	public RegistrationRequest getNodeConfig() {
 		if (nodeConfig == null) {
-			String path = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
 			nodeConfig = new RegistrationRequest();
-			nodeConfig.loadFromJSON(path);
+			nodeConfig.loadFromJSON(getNodeConfigPath());
 			nodeConfig = resolveNodeSettings(nodeConfig);
 		}
 		return nodeConfig;
@@ -134,8 +153,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	 */
 	public String[] getNodeArgs() {
 		if (nodeArgs == null) {
+			String configPath = getNodeConfigPath();
 			RegistrationRequest nodeConfig = getNodeConfig();
-			String configPath = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
 			Map<String, Object> config = nodeConfig.getConfiguration();
 			nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get("host"),
 					"-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
@@ -165,7 +184,19 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		
 		return nodeConfig;
 	}
-
+	
+	/**
+	 * Get the path to the Selenium Grid hub configuration.
+	 * 
+	 * @return Selenium Grid hub configuration path
+	 */
+	private String getHubConfigPath() {
+		if (hubConfigPath == null) {
+			hubConfigPath = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
+		}
+		return hubConfigPath;
+	}
+	
 	/**
 	 * Get the Selenium Grid hub configuration.
 	 * 
@@ -173,9 +204,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	 */
 	public GridHubConfiguration getHubConfig() {
 		if (hubConfig == null) {
-			String path = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
 			hubConfig = new GridHubConfiguration();
-			hubConfig.loadFromJSON(path);
+			hubConfig.loadFromJSON(getHubConfigPath());
 			hubConfig = resolveHubSettings(hubConfig);
 		}
 		return hubConfig;
@@ -188,8 +218,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	 */
 	public String[] getHubArgs() {
 		if (hubArgs == null) {
+			String configPath = getHubConfigPath();
 			GridHubConfiguration config = getHubConfig();
-			String configPath = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
 			hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
 					"-host", config.getHost(), "-port", Integer.toString(config.getPort())};
 		}
@@ -276,12 +306,50 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		if (url != null) {
 			try {
 				URI uri = url.toURI();
+				if ("jar".equals(uri.getScheme())) {
+					try {
+						FileSystems.newFileSystem(uri, Collections.emptyMap());
+					} catch (FileSystemAlreadyExistsException e) { } 
+					
+					String outputDir = getOutputDir();
+					File outputFile = new File(outputDir, path);
+					Path outputPath = outputFile.toPath();
+					if (Files.notExists(outputPath)) {
+						Files.copy(Paths.get(uri), outputPath);
+					}
+					uri = outputPath.toUri();
+				}
 				File file = new File(uri);
 				return file.getAbsolutePath();
-			} catch (URISyntaxException e) {
-			}
+			} catch (URISyntaxException | IOException e) { }
 		}
 		return null;
+	}
+	
+	/**
+	 * Get test run output directory.
+	 * 
+	 * @return test run output directory
+	 */
+	public static String getOutputDir() {
+		return getOutputDir(Reporter.getCurrentTestResult());
+	}
+	
+	/**
+	 * Get test run output directory.
+	 * 
+	 * @param testResult configuration context (TestNG test result object)
+	 * @return test run output directory
+	 */
+	public static String getOutputDir(ITestResult testResult) {
+		String outputDir;
+		if (testResult != null) {
+			outputDir = testResult.getTestContext().getOutputDirectory();
+		} else {
+			Path currentRelativePath = Paths.get("");
+			outputDir = currentRelativePath.toAbsolutePath().toString();
+		}
+		return outputDir;
 	}
 	
 	@Override
