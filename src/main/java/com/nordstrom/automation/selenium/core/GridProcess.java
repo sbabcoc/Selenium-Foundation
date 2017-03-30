@@ -6,14 +6,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.grid.selenium.GridLauncher;
 import org.testng.ITestResult;
+
+import com.nordstrom.automation.selenium.SeleniumConfig;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -51,13 +51,7 @@ class GridProcess {
 		
 		ProcessBuilder builder = new ProcessBuilder(argsList);
 		
-		String outputDir;
-		if (testResult != null) {
-			outputDir = testResult.getTestContext().getOutputDirectory();
-		} else {
-			Path currentRelativePath = Paths.get("");
-			outputDir = currentRelativePath.toAbsolutePath().toString();
-		}
+		String outputDir = SeleniumConfig.getOutputDir(testResult);
 		File outputFile = new File(outputDir, "grid-" + gridRole + ".log");
 		
 		builder.redirectErrorStream(true);

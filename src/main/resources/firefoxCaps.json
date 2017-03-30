@@ -1,0 +1,4 @@
+{
+  "browserName": "firefox",
+  "marionette": false
+}
