@@ -11,9 +11,10 @@ public class WebDriverUtils {
 	}
 	
 	/**
+	 * Get the driver associated with the specified search context
 	 * 
-	 * @param context
-	 * @return
+	 * @param context search context
+	 * @return search context driver
 	 */
 	public static WebDriver getDriver(SearchContext context) {
 		if (context instanceof WebDriver) {
