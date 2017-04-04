@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -9,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
 
+import com.google.common.base.Throwables;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement {
@@ -91,6 +94,28 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	protected abstract WebDriver switchToContext();
 	
 	/**
+	 * Create an container object with the specified class and context as a child of the target object
+	 * 
+	 * @param childClass class of child object to create
+	 * @param context container search context
+	 * @return new object of the specified type, with the current container as parent
+	 */
+	public <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context) {
+		T child = null;
+		try {
+			Constructor<T> ctor = childClass.getConstructor(SearchContext.class, ComponentContainer.class);
+			child = ctor.newInstance(context, this);
+		} catch (InvocationTargetException e) {
+			Throwables.propagate(e.getCause());
+		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
+			Throwables.propagate(e);
+		} catch (NoSuchMethodException | InstantiationException e) {
+			// never thrown because generic type is bounded
+		}
+		return child;
+	}
+	
+	/**
 	 * Find all elements within the current context using the given mechanism.
 	 * 
 	 * @param by the locating mechanism
@@ -131,5 +156,5 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	public WebElement getWrappedElement() {
 		return context.findElement(SELF);
 	}
-
+	
 }

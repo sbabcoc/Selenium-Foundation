@@ -11,7 +11,9 @@ public class Frame extends ComponentContainer {
 	private String nameOrId;
 	
 	private enum FrameSelect {
-		INDEX, NAME_OR_ID, ELEMENT
+		INDEX, 
+		NAME_OR_ID, 
+		ELEMENT
 	}
 
 	public Frame(WebElement element, ComponentContainer parent) {
