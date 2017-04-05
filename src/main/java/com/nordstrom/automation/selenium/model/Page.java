@@ -1,6 +1,5 @@
 package com.nordstrom.automation.selenium.model;
 
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 
 public class Page extends ComponentContainer {
@@ -17,17 +16,26 @@ public class Page extends ComponentContainer {
 
 	public Page(WebDriver driver) {
 		super(driver, null);
-	}
-	
-	public Page(SearchContext context, Frame parent) {
-		super(context, parent);
 		// FIXME - Must be set by interceptor. This won't work for actions that spawn new windows.
 		windowHandle = driver.getWindowHandle();
 	}
 	
+	Page(WebDriver driver, ComponentContainer parent) {
+		super(driver, parent);
+	}
+	
+	public String getTitle() {
+		return driver.getTitle();
+	}
+	
 	@Override
 	protected WebDriver switchToContext() {
-		return driver.switchTo().window(windowHandle);
+		// if this is frame content
+		if (windowHandle == null) {
+			return driver;
+		} else {
+			return driver.switchTo().window(windowHandle);
+		}
 	}
 
 }

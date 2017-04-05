@@ -3,7 +3,7 @@ package com.nordstrom.automation.selenium.model;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Frame extends ComponentContainer {
+public class Frame extends Page {
 	
 	private FrameSelect frameSelect;
 	private WebElement element;
@@ -17,7 +17,7 @@ public class Frame extends ComponentContainer {
 	}
 
 	public Frame(WebElement element, ComponentContainer parent) {
-		super(element, parent);
+		super(parent.driver.switchTo().frame(element), parent);
 		this.frameSelect = FrameSelect.ELEMENT;
 		this.element = element;
 	}
@@ -38,15 +38,15 @@ public class Frame extends ComponentContainer {
 	protected WebDriver switchToContext() {
 		switch (frameSelect) {
 		case ELEMENT:
-			driver = parent.driver.switchTo().frame(element);
+			driver.switchTo().frame(element);
 			break;
 			
 		case INDEX:
-			driver = parent.driver.switchTo().frame(index);
+			driver.switchTo().frame(index);
 			break;
 			
 		case NAME_OR_ID:
-			driver = parent.driver.switchTo().frame(nameOrId);
+			driver.switchTo().frame(nameOrId);
 			break;
 		}
 		return driver;
