@@ -23,7 +23,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	public static final By SELF = By.xpath(".");
 	
 	/**
-	 * Component container constructor
+	 * Constructor for component container
 	 * 
 	 * @param context container search context
 	 * @param parent container parent (may be {@code null} for {@link Page} objects
@@ -87,7 +87,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 * Switch focus to this container's search context.<br>
 	 * <br>
 	 * <b>NOTE</b>: This protected method is used to focus the driver on this container's context. This is the worker 
-	 * method for the {@link #switchTo} method, and it must be called in proper sequence to work properly.
+	 * for the {@link #switchTo} method, and it must be called in proper sequence to work properly.
 	 * 
 	 * @return driver focused on this container's context
 	 */

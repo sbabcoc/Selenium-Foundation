@@ -15,19 +15,38 @@ public class Frame extends Page {
 		NAME_OR_ID, 
 		ELEMENT
 	}
-
+	
+	/**
+	 * Constructor for frame by element
+	 * 
+	 * @param element
+	 * @param parent frame parent
+	 */
 	public Frame(WebElement element, ComponentContainer parent) {
 		super(parent.driver.switchTo().frame(element), parent);
 		this.frameSelect = FrameSelect.ELEMENT;
 		this.element = element;
 	}
 	
+	/**
+	 * Constructor for frame by index
+	 * 
+	 * @param index (zero-based) index
+	 * @param parent frame parent
+	 */
 	public Frame(int index, ComponentContainer parent) {
 		super(parent.driver.switchTo().frame(index), parent);
 		this.frameSelect = FrameSelect.INDEX;
 		this.index = index;
 	}
 	
+	/**
+	 * Constructor for frame by name or ID
+	 * 
+	 * @param nameOrId the name of the frame window, the id of the &lt;frame&gt; or &lt;iframe&gt; element, 
+	 * or the (zero-based) index
+	 * @param parent frame parent
+	 */
 	public Frame(String nameOrId, ComponentContainer parent) {
 		super(parent.driver.switchTo().frame(nameOrId), parent);
 		this.frameSelect = FrameSelect.NAME_OR_ID;
