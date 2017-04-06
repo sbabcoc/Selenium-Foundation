@@ -29,18 +29,21 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 * @param parent container parent (may be {@code null} for {@link Page} objects
 	 */
 	public ComponentContainer(SearchContext context, ComponentContainer parent) {
-		if (context != null) {
-			this.context = context;
-			this.driver = WebDriverUtils.getDriver(context);
-		} else {
-			throw new IllegalArgumentException("Context must be non-null");
-		}
+		if (context == null) throw new IllegalArgumentException("Context must be non-null");
+		validateParent(parent);
 		
-		if (parent != null) {
-			this.parent = parent;
-		} else if ( ! (this instanceof Page)) {
-			throw new IllegalArgumentException("Only page objects can omit parent");
-		}
+		this.context = context;
+		this.driver = WebDriverUtils.getDriver(context);
+		this.parent = parent;
+	}
+	
+	/**
+	 * Validate the specified parent object
+	 * 
+	 * @param parent container parent
+	 */
+	protected void validateParent(ComponentContainer parent) {
+		if (parent == null) throw new IllegalArgumentException("Parent must be non-null");
 	}
 
 	/**
