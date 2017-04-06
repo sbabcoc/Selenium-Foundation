@@ -37,6 +37,11 @@ public class Page extends ComponentContainer {
 		super(driver, parent);
 	}
 	
+	@Override
+	protected void validateParent(ComponentContainer parent) {
+		// Page objects can omit parent 
+	}
+	
 	/**
 	 * Get page title
 	 * 
