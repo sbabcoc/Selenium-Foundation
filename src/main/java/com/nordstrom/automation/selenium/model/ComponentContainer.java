@@ -97,17 +97,29 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	protected abstract WebDriver switchToContext();
 	
 	/**
-	 * Create an container object with the specified class and context as a child of the target object
+	 * Create a container object of the specified class and context as a child of the target object
 	 * 
 	 * @param childClass class of child object to create
 	 * @param context container search context
 	 * @return new object of the specified type, with the current container as parent
 	 */
 	public <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context) {
+		return newChild(childClass, context, this);
+	}
+	
+	/**
+	 * Create a container object of the specified class and context as a child of the specified parent
+	 * 
+	 * @param childClass class of child object to create
+	 * @param context container search context
+	 * @param parent parent of the new container object
+	 * @return new object of the specified type, with the specified container as parent
+	 */
+	public static <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context, ComponentContainer parent) {
 		T child = null;
 		try {
 			Constructor<T> ctor = childClass.getConstructor(SearchContext.class, ComponentContainer.class);
-			child = ctor.newInstance(context, this);
+			child = ctor.newInstance(context, parent);
 		} catch (InvocationTargetException e) {
 			Throwables.propagate(e.getCause());
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {

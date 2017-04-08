@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
@@ -47,8 +48,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	private static final String JSON_TAIL = "], \"configuration\": {} }";
 	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
-		LOGGER("selenium.logger", null),
-		LOGGER_LEVEL("selenium.logger.level", "WARNING"),
+		TARGET_SCHEME("selenium.target.scheme", "http"),
+		TARGET_CREDS("selenium.target.creds", null),
+		TARGET_HOST("selenium.target.host", "localhost"),
+		TARGET_PORT("selenium.target.port", null),
+		TARGET_PATH("selenium.target.path", "/"),
 		HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
 		HUB_HOST("selenium.hub.host", null),
 		HUB_PORT("selenuim.hub.port", null),
@@ -77,6 +81,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		}
 	}
 	
+	private URI targetUri;
 	private String nodeConfigPath;
 	private RegistrationRequest nodeConfig;
 	private String[] nodeArgs;
@@ -118,6 +123,28 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 			}
 		}
 		return (SeleniumConfig) testResult.getAttribute(CONFIG);
+	}
+	
+	/**
+	 * Get the target URI as specified by its component parts
+	 * 
+	 * @return assembled target URI
+	 */
+	public URI getTargetUri() {
+		if (targetUri == null) {
+			UriBuilder builder = UriBuilder.fromPath(getString(SeleniumSettings.TARGET_PATH.key()))
+					.scheme(getString(SeleniumSettings.TARGET_SCHEME.key()))
+					.host(getString(SeleniumSettings.TARGET_HOST.key()));
+			
+			String creds = getString(SeleniumSettings.TARGET_CREDS.key());
+			if (creds != null) builder.userInfo(creds);
+			
+			String port = getString(SeleniumSettings.TARGET_PORT.key());
+			if (port != null) builder.port(Integer.parseInt(port));
+			
+			targetUri = builder.build();
+		}
+		return targetUri;
 	}
 	
 	/**
