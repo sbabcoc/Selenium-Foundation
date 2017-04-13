@@ -1,8 +1,5 @@
 package com.nordstrom.automation.selenium.model;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
