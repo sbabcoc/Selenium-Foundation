@@ -26,7 +26,7 @@ import org.openqa.selenium.SearchContext;
  * element is visible.
  * <p>
  * Note that implementations of the Coordinator interface are expected to be idempotent. They will 
- * be called in a loop by {@link WebDriverWait} and any modification of the state of the application
+ * be called in a loop by {@link SearchContextWait} and any modification of the state of the application
  * under test may have unexpected side-effects.
  * 
  * @param <T> The return type

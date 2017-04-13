@@ -18,11 +18,11 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
  * the role of the server (either {@code hub} or {@code node}), and they get a {@link Process} object for managing
- * the server lifetime as a result.<br>
- * <br>
+ * the server lifetime as a result.
+ * <p>
  * The output of the process is redirected to a file named <ins>grid-<i>&lt;role&gt;</i>.log</ins> in the test context
- * output directory. Process error output is redirected, so this log file will contain both standard output and errors.<br>
- * <br>
+ * output directory. Process error output is redirected, so this log file will contain both standard output and errors.
+ * <p>
  * <b>NOTE</b>: If no test context is specified, the log file will be stored in the "current" directory of the parent
  * Java process.  
  */

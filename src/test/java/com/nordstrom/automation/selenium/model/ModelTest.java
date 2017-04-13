@@ -35,6 +35,7 @@ public class ModelTest implements ListenerChainable {
 		URL url = getClass().getClassLoader().getResource(DOC_NAME);
 		driver.get(url.toString());
 		ExamplePage page = new ExamplePage(driver);
+		page = page.enhanceContainer(page);
 		Reporter.getCurrentTestResult().setAttribute(DOC_NAME, page);
 	}
 	

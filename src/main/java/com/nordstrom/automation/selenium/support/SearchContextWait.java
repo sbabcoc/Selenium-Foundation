@@ -18,4 +18,13 @@ public class SearchContextWait extends WebDriverWait {
 		super(WebDriverUtils.getDriver(context), timeOutInSeconds, sleepInMillis);
 		this.context = context;
 	}
+	
+	/**
+	 * Get the search context for this wait object.
+	 * 
+	 * @return wait object search context
+	 */
+	public SearchContext getContext() {
+		return context;
+	}
 }

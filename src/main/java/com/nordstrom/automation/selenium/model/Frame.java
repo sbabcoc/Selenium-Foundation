@@ -3,9 +3,9 @@ package com.nordstrom.automation.selenium.model;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.thoughtworks.selenium.webdriven.commands.NoOp;
-
+import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.NoOp;
 
 public class Frame extends Page {
 	
@@ -27,7 +27,7 @@ public class Frame extends Page {
 	/**
 	 * Constructor for frame by element
 	 * 
-	 * @param element
+	 * @param element frame container element
 	 * @param parent frame parent
 	 */
 	public Frame(WebElement element, ComponentContainer parent) {
@@ -39,7 +39,7 @@ public class Frame extends Page {
 	/**
 	 * Constructor for frame by index
 	 * 
-	 * @param index (zero-based) index
+	 * @param index (zero-based) frame index
 	 * @param parent frame parent
 	 */
 	public Frame(int index, ComponentContainer parent) {
@@ -51,8 +51,8 @@ public class Frame extends Page {
 	/**
 	 * Constructor for frame by name or ID
 	 * 
-	 * @param nameOrId the name of the frame window, the id of the &lt;frame&gt; or &lt;iframe&gt; element, 
-	 * or the (zero-based) index
+	 * @param nameOrId the name of the frame window, the id of the &lt;frame&gt; or
+	 *            &lt;iframe&gt; element, or the (zero-based) frame index
 	 * @param parent frame parent
 	 */
 	public Frame(String nameOrId, ComponentContainer parent) {
@@ -88,9 +88,11 @@ public class Frame extends Page {
 		Frame frame = (Frame) container;
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass(type);
-		enhancer.setCallbackTypes(new Class<?>[] {ContainerMethodInterceptor.class, NoOp.class});
+		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
+		enhancer.setCallbackFilter(this);
 		
 		T enhanced = null;
+		frame.parent.switchTo();
 		switch (frame.frameSelect) {
 		case ELEMENT:
 			enhanced = (T) enhancer.create(ELEMENT_ARG_TYPES, new Object[] {frame.element, frame.parent});

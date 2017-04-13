@@ -180,7 +180,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	}
 	
 	/**
-	 * Close the Selenium driver attached to the specified configuration context.<br>
+	 * Close the Selenium driver attached to the specified configuration context.
 	 * 
 	 * @param testResult configuration context (TestNG test result object)
 	 */

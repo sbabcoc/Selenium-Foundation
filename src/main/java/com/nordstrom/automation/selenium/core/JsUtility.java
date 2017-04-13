@@ -23,11 +23,10 @@ import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
 /**
  * Provides easier access to navigate to a new URL or run JavaScript.
- *
  *<p>
- * Examples: <code><pre>
+ * Examples: 
  * 
- * import org.junit.Test;
+ * <pre><code> import org.junit.Test;
  * import org.openqa.selenium.WebElement;
  * import com.nordstrom.automation.selenium.core.JsUtility;
  * 
@@ -61,27 +60,21 @@ import com.nordstrom.automation.selenium.utility.UncheckedThrow;
  *         // This exposes the arguments passed by WebDriver to the 'testNode' function.
  *         JsUtility.run(driver, "args = arguments; testNode();", "This is a test... Booga!");
  *     }
- * }
+ * }</code></pre>
  * 
- * </pre></code>
- * 
- * <p>
  * This is sample JavaScript file &lt;getMetaTagByName.js&gt;. This file can be stored anywhere on the 
- * class path, typically a 'resources' folder within the project hierarchy.<code><pre>
+ * class path, typically a 'resources' folder within the project hierarchy.
  * 
- * var found = document.getElementsByTagName("meta");
- * for (var i = 0; i < found.length; i++) {
+ * <pre><code> var found = document.getElementsByTagName("meta");
+ * for (var i = 0; i &lt; found.length; i++) {
  *     if (found[i].getAttribute("name") == arguments[0]) return found[i];
  * }
- * return null;
+ * return null;</code></pre>
  * 
- * </pre></code>
- * 
- * <p>
  * This is sample JavaScript file &lt;testNode.js&gt;. This file can be stored anywhere on the class path,
- * typically a 'resources' folder within the project hierarchy.<code><pre>
+ * typically a 'resources' folder within the project hierarchy.
  * 
- * function testNode() {
+ * <pre><code> function testNode() {
  *   var s = document.createElement('div');
  *   try {
  *       var n = document.createTextNode(args[0]);
@@ -90,9 +83,7 @@ import com.nordstrom.automation.selenium.utility.UncheckedThrow;
  *       s.text = args[0];
  *   }
  *   document.body.appendChild(s);
- * }
- * 
- * </pre></code>
+ * }</code></pre>
  * 
  */
 public final class JsUtility {
@@ -197,6 +188,7 @@ public final class JsUtility {
      * arguments will be made available to the JavaScript via the "arguments" magic variable, as if
      * the function were called via "Function.apply"
      * 
+     * @param <T> return type
      * @param driver A handle to the currently running Selenium test window.
      * @param js The JavaScript to execute
      * @param resultType Data type returned by the script

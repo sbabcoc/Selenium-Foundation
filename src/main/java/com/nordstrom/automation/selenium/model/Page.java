@@ -1,5 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -11,10 +14,21 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.NoOp;
+
 public class Page extends ComponentContainer {
 	
 	private String windowHandle;
 	private WindowState windowState;
+	protected static final List<String> METHODS;
+	private static final Class<?>[] ARG_TYPES = {WebDriver.class};
+	
+	static {
+		METHODS = Arrays.asList("setWindowHandle", "getWindowHandle", "setWindowState", "getWindowState",
+				"openInitialPage", "getInitialUrl", "getPageUrl");
+	}
 	
 	public enum WindowState {
 		WILL_OPEN, 
@@ -28,11 +42,12 @@ public class Page extends ComponentContainer {
 	 */
 	public Page(WebDriver driver) {
 		super(driver, null);
+		windowHandle = driver.getWindowHandle();
 	}
 	
 	/**
-	 * Constructor for frame-based document context<br>
-	 * <br>
+	 * Constructor for frame-based document context
+	 * <p>
 	 * <b>NOTE</b>: This package-private constructor is reserved for the {@link Frame} class
 	 * 
 	 * @param driver driver object
@@ -52,26 +67,46 @@ public class Page extends ComponentContainer {
 		return driver.switchTo().window(windowHandle);
 	}
 	
+	/**
+	 * Set the window handle associated with this page object.
+	 * 
+	 * @param windowHandle page object window handle
+	 */
 	public void setWindowHandle(String windowHandle) {
 		this.windowHandle = windowHandle;
 	}
 	
+	/**
+	 * Get the window handle associated with this page object.
+	 * 
+	 * @return page object window handle
+	 */
 	public String getWindowHandle() {
 		return windowHandle;
 	}
 	
+	/**
+	 * Set the window state of this page object.
+	 * 
+	 * @param windowState page object {@link WindowState}
+	 */
 	public void setWindowState(WindowState windowState) {
 		this.windowState = windowState;
 	}
 	
+	/**
+	 * Get the window state of this page object.
+	 * 
+	 * @return page object {@link WindowState}
+	 */
 	public WindowState getWindowState() {
 		return windowState;
 	}
 	
 	/**
-	 * Get page title
+	 * Get the title for this page object.
 	 * 
-	 * @return page title
+	 * @return page object title
 	 */
 	public String getTitle() {
 		return driver.getTitle();
@@ -144,6 +179,24 @@ public class Page extends ComponentContainer {
 		}
 		
 		return builder.build().toString();
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T extends ComponentContainer> T enhanceContainer(T container) {
+		Class<? extends ComponentContainer> type = container.getClass();
+		if (Enhancer.isEnhanced(type)) return container;
+		
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(type);
+		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
+		enhancer.setCallbackFilter(this);
+		return (T) enhancer.create(ARG_TYPES, new Object[] {container.driver});
+	}
+	
+	@Override
+	protected boolean bypassMethod(Method method) {
+		return super.bypassMethod(method) || METHODS.contains(method.getName());
 	}
 	
 }

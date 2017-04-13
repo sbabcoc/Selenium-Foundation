@@ -12,7 +12,8 @@ import com.nordstrom.automation.selenium.support.Coordinators;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-class ContainerMethodInterceptor implements MethodInterceptor {
+enum ContainerMethodInterceptor implements MethodInterceptor {
+	INSTANCE;
 
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {

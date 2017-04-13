@@ -6,24 +6,24 @@ import java.lang.annotation.Retention;
 
 @Retention(RUNTIME)
 public @interface PageUrl {
-	/** URL scheme (<b>http</b> or <b>https</b>) */
+	/** @return URL scheme (<b>http</b> or <b>https</b>) */
 	String scheme() default "";
 	
-	/** URL user info as <b>user:password</b> */
+	/** @return URL user info as <b>user:password</b> */
 	String userInfo() default "";
 	
-	/** URL host name */
+	/** @return URL host name */
 	String host() default "";
 	
-	/** URL port number */
+	/** @return URL port number */
 	String port() default "";
 	
-	/** URL path */
+	/** @return URL path */
 	String value() default "";
 	
-	/** array of URL query parameters as <b>name=value</b> */
+	/** @return array of URL query parameters as <b>name=value</b> */
 	String[] params() default {};
 	
-	/** regular expression to validate path/parameters */
+	/** @return regular expression to validate path/parameters */
 	String pattern() default "";
 }

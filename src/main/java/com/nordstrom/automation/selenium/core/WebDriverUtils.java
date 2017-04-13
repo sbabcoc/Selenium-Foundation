@@ -1,11 +1,11 @@
 package com.nordstrom.automation.selenium.core;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class WebDriverUtils {
 	
@@ -30,22 +30,44 @@ public class WebDriverUtils {
 	}
 	
 	/**
+	 * Get a JavaScript code executor for the specified search context
 	 * 
-	 * @param context
-	 * @return
+	 * @param context search context
+	 * @return context-specific {@link JavascriptExecutor}
 	 */
 	public static JavascriptExecutor getExecutor(SearchContext context) {
-		return (JavascriptExecutor) getDriver(context);
+		WebDriver driver = getDriver(context);
+		if (driver instanceof JavascriptExecutor) {
+			return (JavascriptExecutor) driver;
+		} else {
+			throw new UnsupportedOperationException("The specified context ");
+		}
 	}
 
 	/**
-	 * 
-	 * @param driver
-	 * @return
+	 * Get the browser name for the specified context
+	 *  
+	 * @param context search context
+	 * @return context browser name
 	 */
-	public static String getBrowserName(WebDriver driver) {
-		Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
-		return caps.getBrowserName();
+	public static String getBrowserName(SearchContext context) {
+		return getCapabilities(context).getBrowserName();
+	}
+	
+	/**
+	 * Get the capabilities of the specified search context
+	 * 
+	 * @param context search context
+	 * @return context capabilities
+	 */
+	public static Capabilities getCapabilities(SearchContext context) {
+		WebDriver driver = getDriver(context);
+		
+		if (driver instanceof HasCapabilities) {
+			return ((HasCapabilities) driver).getCapabilities();
+		} else {
+			throw new UnsupportedOperationException("The specified context is unable to describe its capabilities");
+		}
 	}
 
 }

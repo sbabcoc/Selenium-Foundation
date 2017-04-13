@@ -20,6 +20,7 @@ public final class UncheckedThrow {
 	 * methods to propagate checked exceptions without being required to declare them.
 	 * 
 	 * @param thrown exception to be thrown
+	 * @return <b>nothing</b> this method always throws the specified exception
 	 */
     public static RuntimeException throwUnchecked(final Throwable thrown) {
         UncheckedThrow.<RuntimeException>propagate(thrown);
