@@ -1,5 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -31,7 +34,7 @@ public class Frame extends Page {
 	 * @param parent frame parent
 	 */
 	public Frame(WebElement element, ComponentContainer parent) {
-		super(parent.driver.switchTo().frame(element), parent);
+		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;
 		this.element = element;
 	}
@@ -43,7 +46,7 @@ public class Frame extends Page {
 	 * @param parent frame parent
 	 */
 	public Frame(int index, ComponentContainer parent) {
-		super(parent.driver.switchTo().frame(index), parent);
+		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.INDEX;
 		this.index = index;
 	}
@@ -56,7 +59,7 @@ public class Frame extends Page {
 	 * @param parent frame parent
 	 */
 	public Frame(String nameOrId, ComponentContainer parent) {
-		super(parent.driver.switchTo().frame(nameOrId), parent);
+		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.NAME_OR_ID;
 		this.nameOrId = nameOrId;
 	}

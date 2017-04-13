@@ -14,6 +14,8 @@ import net.sf.cglib.proxy.MethodProxy;
 
 enum ContainerMethodInterceptor implements MethodInterceptor {
 	INSTANCE;
+	
+	private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
@@ -24,7 +26,14 @@ enum ContainerMethodInterceptor implements MethodInterceptor {
 			throw new ContainerVacatedException(container.getVacater());
 		}
 		
-		WebDriver driver = container.switchTo();
+		WebDriver driver;
+		if (target.get() == container) {
+			driver = container.getDriver();
+		} else {
+			driver = container.switchTo();
+			target.set(container);
+		}
+		
 		Page parentPage = container.getParentPage();
 		Set<String> initialHandles = driver.getWindowHandles();
 		
