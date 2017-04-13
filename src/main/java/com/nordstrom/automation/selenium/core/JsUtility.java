@@ -23,7 +23,7 @@ import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
 /**
  * Provides easier access to navigate to a new URL or run JavaScript.
- *<p>
+ * <p>
  * Examples: 
  * 
  * <pre><code> import org.junit.Test;
