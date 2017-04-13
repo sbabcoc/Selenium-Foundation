@@ -60,7 +60,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		NODE_HOST("selenium.node.host", null),
 		NODE_PORT("selenium.node.port", null),
 		BROWSER_NAME("selenium.browser.name", null),
-		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS);
+		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
+		PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),
+		IMPLIED_TIMEOUT("selenium.timeout.implied", "15"),
+		SCRIPT_TIMEOUT("selenium.timeout.script", "30"),
+		WAIT_TIMEOUT("selenium.timeout.wait", "15");
 		
 		private String propertyName;
 		private String defaultValue;

@@ -68,7 +68,6 @@ public class ModelTest implements ListenerChainable {
 	public void testFrameByElement() {
 		ExamplePage page = getPage();
 		FrameComponent component = page.getFrameByElement();
-		component.switchTo();
 		assertEquals(component.getPageContent(), FRAME_A);
 	}
 
@@ -76,7 +75,6 @@ public class ModelTest implements ListenerChainable {
 	public void testFrameByIndex() {
 		ExamplePage page = getPage();
 		FrameComponent component = page.getFrameByIndex();
-		component.switchTo();
 		assertEquals(component.getPageContent(), FRAME_B);
 	}
 
@@ -84,7 +82,6 @@ public class ModelTest implements ListenerChainable {
 	public void testFrameById() {
 		ExamplePage page = getPage();
 		FrameComponent component = page.getFrameById();
-		component.switchTo();
 		assertEquals(component.getPageContent(), FRAME_C);
 	}
 

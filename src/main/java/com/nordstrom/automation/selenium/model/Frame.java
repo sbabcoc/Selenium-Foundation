@@ -3,12 +3,20 @@ package com.nordstrom.automation.selenium.model;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.thoughtworks.selenium.webdriven.commands.NoOp;
+
+import net.sf.cglib.proxy.Enhancer;
+
 public class Frame extends Page {
 	
 	private FrameSelect frameSelect;
 	private WebElement element;
 	private int index;
 	private String nameOrId;
+	
+	private static final Class<?>[] ELEMENT_ARG_TYPES = {WebElement.class, ComponentContainer.class};
+	private static final Class<?>[] INDEX_ARG_TYPES = {Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] NAME_OR_ID_ARG_TYPES = {String.class, ComponentContainer.class};
 	
 	private enum FrameSelect {
 		INDEX, 
@@ -69,6 +77,34 @@ public class Frame extends Page {
 			break;
 		}
 		return driver;
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T extends ComponentContainer> T enhanceContainer(T container) {
+		Class<? extends ComponentContainer> type = container.getClass();
+		if (Enhancer.isEnhanced(type)) return container;
+		
+		Frame frame = (Frame) container;
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(type);
+		enhancer.setCallbackTypes(new Class<?>[] {ContainerMethodInterceptor.class, NoOp.class});
+		
+		T enhanced = null;
+		switch (frame.frameSelect) {
+		case ELEMENT:
+			enhanced = (T) enhancer.create(ELEMENT_ARG_TYPES, new Object[] {frame.element, frame.parent});
+			break;
+			
+		case INDEX:
+			enhanced = (T) enhancer.create(INDEX_ARG_TYPES, new Object[] {frame.index, frame.parent});
+			break;
+			
+		case NAME_OR_ID:
+			enhanced = (T) enhancer.create(NAME_OR_ID_ARG_TYPES, new Object[] {frame.nameOrId, frame.parent});
+			break;
+		}
+		return enhanced;
 	}
 
 }

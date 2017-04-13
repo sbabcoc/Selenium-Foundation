@@ -18,9 +18,7 @@ public class Page extends ComponentContainer {
 	
 	public enum WindowState {
 		WILL_OPEN, 
-		WILL_CLOSE, 
-		DID_OPEN, 
-		DID_CLOSE
+		WILL_CLOSE
 	}
 	
 	/**
@@ -30,8 +28,6 @@ public class Page extends ComponentContainer {
 	 */
 	public Page(WebDriver driver) {
 		super(driver, null);
-		// FIXME - Must be set by interceptor. This won't work for actions that spawn new windows.
-		windowHandle = driver.getWindowHandle();
 	}
 	
 	/**
@@ -51,6 +47,27 @@ public class Page extends ComponentContainer {
 		// Page objects can omit parent 
 	}
 	
+	@Override
+	protected WebDriver switchToContext() {
+		return driver.switchTo().window(windowHandle);
+	}
+	
+	public void setWindowHandle(String windowHandle) {
+		this.windowHandle = windowHandle;
+	}
+	
+	public String getWindowHandle() {
+		return windowHandle;
+	}
+	
+	public void setWindowState(WindowState windowState) {
+		this.windowState = windowState;
+	}
+	
+	public WindowState getWindowState() {
+		return windowState;
+	}
+	
 	/**
 	 * Get page title
 	 * 
@@ -58,11 +75,6 @@ public class Page extends ComponentContainer {
 	 */
 	public String getTitle() {
 		return driver.getTitle();
-	}
-	
-	@Override
-	protected WebDriver switchToContext() {
-		return driver.switchTo().window(windowHandle);
 	}
 	
 	/**

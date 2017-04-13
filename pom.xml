@@ -23,6 +23,7 @@
     <testng-foundation.version>1.0.3</testng-foundation.version>
     <testng.version>6.11</testng.version>
     <resteasy.version>3.1.2.Final</resteasy.version>
+    <cglib.version>3.2.5</cglib.version>
   </properties>
   
   <distributionManagement>
@@ -64,6 +65,11 @@
         <artifactId>resteasy-client</artifactId>
         <version>${resteasy.version}</version>
       </dependency>
+      <dependency>
+        <groupId>cglib</groupId>
+        <artifactId>cglib</artifactId>
+        <version>${cglib.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -92,6 +98,10 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
     </dependency>
   </dependencies>
   

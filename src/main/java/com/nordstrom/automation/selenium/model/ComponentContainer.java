@@ -2,6 +2,8 @@ package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -12,15 +14,33 @@ import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
 
 import com.google.common.base.Throwables;
+import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.thoughtworks.selenium.webdriven.commands.NoOp;
 
-public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement {
+import net.sf.cglib.proxy.CallbackFilter;
+import net.sf.cglib.proxy.Enhancer;
+
+public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement, CallbackFilter {
 	
 	protected WebDriver driver;
 	protected SearchContext context;
 	protected ComponentContainer parent;
+	protected Method vacater;
+	protected SearchContextWait wait;
 	
 	public static final By SELF = By.xpath(".");
+	private static final List<String> METHODS;
+	private static final List<Class<?>> BYPASS;
+	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
+	
+	static {
+		METHODS = Arrays.asList("validateParent", "getDriver", "getContext", "getParent", "newChild", 
+				"switchTo", "switchToContext", "getMethods", "accept", "getVacater", "isVacated");
+		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsElement.class, CallbackFilter.class);
+	}
 	
 	/**
 	 * Constructor for component container
@@ -74,6 +94,28 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public Page getParentPage() {
+		if (parent != null) return parent.getParentPage();
+		return (Page) this;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public SearchContextWait getWait() {
+		if (wait == null) {
+			SeleniumConfig config = SeleniumConfig.getConfig();
+			long waitTimeout = config.getLong(SeleniumSettings.WAIT_TIMEOUT.key());
+			wait = new SearchContextWait(this, waitTimeout);
+		}
+		return wait;
+	}
+	
+	/**
 	 * Switch driver to this container's search context.<br>
 	 * <br>
 	 * <b>NOTE</b>: This method walks down the container lineage to the parent page object, then back up to this 
@@ -95,6 +137,37 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 * @return driver focused on this container's context
 	 */
 	protected abstract WebDriver switchToContext();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	Method getVacater() {
+		if (vacater != null) {
+			return vacater;
+		} else if (parent != null) {
+			return parent.getVacater();
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param vacater
+	 */
+	void setVacater(Method vacater) {
+		this.vacater = vacater;
+		if (parent != null) parent.setVacater(vacater);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	boolean isVacated() {
+		return (null != getVacater());
+	}
 	
 	/**
 	 * Create a container object of the specified class and context as a child of the target object
@@ -129,6 +202,8 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 		}
 		return child;
 	}
+	
+	
 	
 	/**
 	 * Find all elements within the current context using the given mechanism.
@@ -170,6 +245,40 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	@Override
 	public WebElement getWrappedElement() {
 		return context.findElement(SELF);
+	}
+	
+	/**
+	 * 
+	 * @param container
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends ComponentContainer> T enhanceContainer(T container) {
+		Class<? extends ComponentContainer> type = container.getClass();
+		if (Enhancer.isEnhanced(type)) return container;
+		
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(type);
+		enhancer.setCallbackTypes(new Class<?>[] {ContainerMethodInterceptor.class, NoOp.class});
+		return (T) enhancer.create(ARG_TYPES, new Object[] {container.context, container.parent});
+	}
+	
+	/**
+	 * Map a method to a callback type.
+	 * 
+	 * @param method the intercepted method
+	 * @return a callback type, as enumerated in the {@link Callbacks} interface
+	 * @see Callbacks
+	 */
+	@Override
+	public int accept(Method method) {
+		if (BYPASS.contains(method.getDeclaringClass())) {
+			return 1;
+		} else if (METHODS.contains(method.getName())) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 	
 }
