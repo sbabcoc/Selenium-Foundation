@@ -40,7 +40,7 @@ public class WebDriverUtils {
 		if (driver instanceof JavascriptExecutor) {
 			return (JavascriptExecutor) driver;
 		} else {
-			throw new UnsupportedOperationException("The specified context ");
+			throw new UnsupportedOperationException("The specified context is unable to execute JavaScript");
 		}
 	}
 
