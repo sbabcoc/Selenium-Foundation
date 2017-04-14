@@ -2,6 +2,8 @@ package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -12,15 +14,35 @@ import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
 
 import com.google.common.base.Throwables;
+import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.support.SearchContextWait;
 
-public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement {
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.CallbackFilter;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.NoOp;
+
+public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement, CallbackFilter {
 	
 	protected WebDriver driver;
 	protected SearchContext context;
 	protected ComponentContainer parent;
+	protected Method vacater;
+	protected SearchContextWait wait;
 	
 	public static final By SELF = By.xpath(".");
+	protected static final List<Class<?>> BYPASS;
+	protected static final List<String> METHODS;
+	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
+	
+	static {
+		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsElement.class, CallbackFilter.class);
+		METHODS = Arrays.asList("validateParent", "getDriver", "getContext", "getParent", "getParentPage", "getWait",
+				"switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "newChild", "enhanceContainer",
+				"bypassClassOf", "bypassMethod");
+	}
 	
 	/**
 	 * Constructor for component container
@@ -74,8 +96,32 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
-	 * Switch driver to this container's search context.<br>
-	 * <br>
+	 * Get the parent page for this container
+	 * 
+	 * @return container parent page
+	 */
+	public Page getParentPage() {
+		if (parent != null) return parent.getParentPage();
+		return (Page) this;
+	}
+	
+	/**
+	 * Convenience method to get a search context wait object for this container
+	 * 
+	 * @return {@link SearchContextWait} object with timeout specified by {@link SeleniumSettings#WAIT_TIMEOUT}
+	 */
+	public SearchContextWait getWait() {
+		if (wait == null) {
+			SeleniumConfig config = SeleniumConfig.getConfig();
+			long waitTimeout = config.getLong(SeleniumSettings.WAIT_TIMEOUT.key());
+			wait = new SearchContextWait(this, waitTimeout);
+		}
+		return wait;
+	}
+	
+	/**
+	 * Switch driver to this container's search context.
+	 * <p>
 	 * <b>NOTE</b>: This method walks down the container lineage to the parent page object, then back up to this 
 	 * container, focusing the driver on each container as it goes.
 	 * 
@@ -87,8 +133,8 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
-	 * Switch focus to this container's search context.<br>
-	 * <br>
+	 * Switch focus to this container's search context.
+	 * <p>
 	 * <b>NOTE</b>: This protected method is used to focus the driver on this container's context. This is the worker 
 	 * for the {@link #switchTo} method, and it must be called in proper sequence to work properly.
 	 * 
@@ -97,17 +143,65 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	protected abstract WebDriver switchToContext();
 	
 	/**
-	 * Create an container object with the specified class and context as a child of the target object
+	 * Get the method that caused this container to be vacated.
 	 * 
+	 * @return vacating method; 'null' if container is still valid
+	 */
+	Method getVacater() {
+		if (vacater != null) {
+			return vacater;
+		} else if (parent != null) {
+			return parent.getVacater();
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Set the method that caused this container to be vacated.
+	 * 
+	 * @param vacater vacating method
+	 */
+	void setVacater(Method vacater) {
+		this.vacater = vacater;
+		if (parent != null) parent.setVacater(vacater);
+	}
+	
+	/**
+	 * Determine if this container has been vacated.
+	 * 
+	 * @return 'true' if container has been vacated; otherwise 'false'
+	 */
+	boolean isVacated() {
+		return (null != getVacater());
+	}
+	
+	/**
+	 * Create a container object of the specified class and context as a child of the target object
+	 * 
+	 * @param <T> type of child object to instantiate
 	 * @param childClass class of child object to create
 	 * @param context container search context
 	 * @return new object of the specified type, with the current container as parent
 	 */
 	public <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context) {
+		return newChild(childClass, context, this);
+	}
+	
+	/**
+	 * Create a container object of the specified class and context as a child of the specified parent
+	 * 
+	 * @param <T> type of child object to instantiate
+	 * @param childClass class of child object to create
+	 * @param context container search context
+	 * @param parent parent of the new container object
+	 * @return new object of the specified type, with the specified container as parent
+	 */
+	public static <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context, ComponentContainer parent) {
 		T child = null;
 		try {
 			Constructor<T> ctor = childClass.getConstructor(SearchContext.class, ComponentContainer.class);
-			child = ctor.newInstance(context, this);
+			child = ctor.newInstance(context, parent);
 		} catch (InvocationTargetException e) {
 			Throwables.propagate(e.getCause());
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
@@ -117,6 +211,8 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 		}
 		return child;
 	}
+	
+	
 	
 	/**
 	 * Find all elements within the current context using the given mechanism.
@@ -158,6 +254,63 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	@Override
 	public WebElement getWrappedElement() {
 		return context.findElement(SELF);
+	}
+	
+	/**
+	 * Create an enhanced instance of the specified container.
+	 * 
+	 * @param <T> container type
+	 * @param container container object to be enhanced
+	 * @return enhanced container object
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends ComponentContainer> T enhanceContainer(T container) {
+		Class<? extends ComponentContainer> type = container.getClass();
+		if (Enhancer.isEnhanced(type)) return container;
+		
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(type);
+		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
+		enhancer.setCallbackFilter(this);
+		return (T) enhancer.create(ARG_TYPES, new Object[] {container.context, container.parent});
+	}
+	
+	/**
+	 * Map a method to a callback type.
+	 * 
+	 * @param method the intercepted method
+	 * @return a callback type, as enumerated by the {@link Enhancer#setCallbacks} invocation in
+	 *         {@link #enhanceContainer}
+	 */
+	@Override
+	public int accept(Method method) {
+		if (bypassClassOf(method)) {
+			return 1;
+		} else if (bypassMethod(method)) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	
+	/**
+	 * Determine if the specified method is declared in a class that should be entirely bypassed.
+	 * 
+	 * @param method method in question
+	 * @return 'true' if specified method is declared in bypassed class; otherwise 'false'
+	 */
+	protected boolean bypassClassOf(Method method) {
+		return BYPASS.contains(method.getDeclaringClass());
+	}
+	
+	/**
+	 * Determine if the specified method should not be intercepted.
+	 * 
+	 * @param method method in question
+	 * @return 'true' if specified method should be bypassed; otherwise 'false'
+	 */
+	protected boolean bypassMethod(Method method) {
+		return METHODS.contains(method.getName());
 	}
 	
 }

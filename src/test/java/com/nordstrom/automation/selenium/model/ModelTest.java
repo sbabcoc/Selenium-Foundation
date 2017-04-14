@@ -35,6 +35,7 @@ public class ModelTest implements ListenerChainable {
 		URL url = getClass().getClassLoader().getResource(DOC_NAME);
 		driver.get(url.toString());
 		ExamplePage page = new ExamplePage(driver);
+		page = page.enhanceContainer(page);
 		Reporter.getCurrentTestResult().setAttribute(DOC_NAME, page);
 	}
 	
@@ -68,7 +69,6 @@ public class ModelTest implements ListenerChainable {
 	public void testFrameByElement() {
 		ExamplePage page = getPage();
 		FrameComponent component = page.getFrameByElement();
-		component.switchTo();
 		assertEquals(component.getPageContent(), FRAME_A);
 	}
 
@@ -76,7 +76,6 @@ public class ModelTest implements ListenerChainable {
 	public void testFrameByIndex() {
 		ExamplePage page = getPage();
 		FrameComponent component = page.getFrameByIndex();
-		component.switchTo();
 		assertEquals(component.getPageContent(), FRAME_B);
 	}
 
@@ -84,7 +83,6 @@ public class ModelTest implements ListenerChainable {
 	public void testFrameById() {
 		ExamplePage page = getPage();
 		FrameComponent component = page.getFrameById();
-		component.switchTo();
 		assertEquals(component.getPageContent(), FRAME_C);
 	}
 
