@@ -38,8 +38,7 @@ public class ExamplePage extends Page {
 	
 	public FrameComponent getFrameByElement() {
 		if (frameByElement == null) {
-			WebElement element = findElement(Using.FRAME_A.selector);
-			frameByElement = new FrameComponent(element, this);
+			frameByElement = new FrameComponent(Using.FRAME_A.selector, this);
 		}
 		return frameByElement;
 	}

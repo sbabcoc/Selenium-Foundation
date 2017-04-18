@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -63,8 +64,9 @@ public class Page extends ComponentContainer {
 	}
 	
 	@Override
-	protected WebDriver switchToContext() {
-		return driver.switchTo().window(windowHandle);
+	protected SearchContext switchToContext() {
+		driver.switchTo().window(windowHandle);
+		return this;
 	}
 	
 	/**
@@ -197,6 +199,17 @@ public class Page extends ComponentContainer {
 	@Override
 	protected boolean bypassMethod(Method method) {
 		return super.bypassMethod(method) || METHODS.contains(method.getName());
+	}
+
+	@Override
+	public SearchContext getWrappedContext() {
+		return getWrappedDriver();
+	}
+
+	@Override
+	public SearchContext refreshContext() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

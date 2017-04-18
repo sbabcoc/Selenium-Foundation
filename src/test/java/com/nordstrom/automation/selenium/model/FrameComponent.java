@@ -1,12 +1,11 @@
 package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 public class FrameComponent extends Frame {
 	
-	public FrameComponent(WebElement element, ComponentContainer parent) {
-		super(element, parent);
+	public FrameComponent(By locator, ComponentContainer parent) {
+		super(locator, parent);
 	}
 	
 	public FrameComponent(int index, ComponentContainer parent) {

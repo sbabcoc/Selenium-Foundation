@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import net.sf.cglib.proxy.Callback;
@@ -10,11 +11,12 @@ import net.sf.cglib.proxy.NoOp;
 public class Frame extends Page {
 	
 	private FrameSelect frameSelect;
+	private By locator;
 	private WebElement element;
 	private int index;
 	private String nameOrId;
 	
-	private static final Class<?>[] ELEMENT_ARG_TYPES = {WebElement.class, ComponentContainer.class};
+	private static final Class<?>[] ELEMENT_ARG_TYPES = {By.class, Integer.TYPE, ComponentContainer.class};
 	private static final Class<?>[] INDEX_ARG_TYPES = {Integer.TYPE, ComponentContainer.class};
 	private static final Class<?>[] NAME_OR_ID_ARG_TYPES = {String.class, ComponentContainer.class};
 	
@@ -30,10 +32,17 @@ public class Frame extends Page {
 	 * @param element frame container element
 	 * @param parent frame parent
 	 */
-	public Frame(WebElement element, ComponentContainer parent) {
+	public Frame(By locator, ComponentContainer parent) {
+		this(locator, -1, parent);
+	}
+	
+	public Frame (By locator, int index, ComponentContainer parent) {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;
-		this.element = element;
+		this.locator = locator;
+		this.index = index;
+		
+		this.element = new RobustWebElement(null, parent, locator, index);
 	}
 	
 	/**
@@ -62,7 +71,7 @@ public class Frame extends Page {
 	}
 
 	@Override
-	protected WebDriver switchToContext() {
+	protected SearchContext switchToContext() {
 		switch (frameSelect) {
 		case ELEMENT:
 			driver.switchTo().frame(element);
@@ -76,7 +85,7 @@ public class Frame extends Page {
 			driver.switchTo().frame(nameOrId);
 			break;
 		}
-		return driver;
+		return this;
 	}
 	
 	@Override
@@ -91,22 +100,26 @@ public class Frame extends Page {
 		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
 		enhancer.setCallbackFilter(this);
 		
-		T enhanced = null;
-		frame.parent.switchTo();
 		switch (frame.frameSelect) {
 		case ELEMENT:
-			enhanced = (T) enhancer.create(ELEMENT_ARG_TYPES, new Object[] {frame.element, frame.parent});
-			break;
+			return (T) enhancer.create(ELEMENT_ARG_TYPES, new Object[] {frame.locator, frame.index, frame.parent});
 			
 		case INDEX:
-			enhanced = (T) enhancer.create(INDEX_ARG_TYPES, new Object[] {frame.index, frame.parent});
-			break;
+			return (T) enhancer.create(INDEX_ARG_TYPES, new Object[] {frame.index, frame.parent});
 			
 		case NAME_OR_ID:
-			enhanced = (T) enhancer.create(NAME_OR_ID_ARG_TYPES, new Object[] {frame.nameOrId, frame.parent});
-			break;
+			return (T) enhancer.create(NAME_OR_ID_ARG_TYPES, new Object[] {frame.nameOrId, frame.parent});
 		}
-		return enhanced;
+		throw new AssertionError("This is unreachable");
+	}
+	
+	@Override
+	public SearchContext refreshContext() {
+		parent.refreshContext();
+		if (frameSelect == FrameSelect.ELEMENT) {
+			((RobustWebElement) element).refreshContext();
+		}
+		return switchToContext();
 	}
 
 }

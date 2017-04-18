@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -17,6 +18,8 @@ import com.google.common.base.Throwables;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.interfaces.WrapsContext;
+import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 
 import net.sf.cglib.proxy.Callback;
@@ -24,7 +27,7 @@ import net.sf.cglib.proxy.CallbackFilter;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.NoOp;
 
-public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement, CallbackFilter {
+public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement, WrapsContext, CallbackFilter {
 	
 	protected WebDriver driver;
 	protected SearchContext context;
@@ -38,7 +41,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
 	
 	static {
-		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsElement.class, CallbackFilter.class);
+		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsElement.class, WrapsContext.class, CallbackFilter.class);
 		METHODS = Arrays.asList("validateParent", "getDriver", "getContext", "getParent", "getParentPage", "getWait",
 				"switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "newChild", "enhanceContainer",
 				"bypassClassOf", "bypassMethod");
@@ -127,9 +130,29 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 * 
 	 * @return driver focused on this container's context
 	 */
-	public WebDriver switchTo() {
-		if (parent != null) parent.switchTo();
-		return switchToContext();
+	public ComponentContainer switchTo() {
+		return (ComponentContainer) getWait().until(contextIsSwitched(this));
+	}
+	
+	static Coordinator<SearchContext> contextIsSwitched(final ComponentContainer context) {
+		return new Coordinator<SearchContext>() {
+
+			@Override
+			public SearchContext apply(SearchContext ignore) {
+				if (((ComponentContainer) context).parent != null) ((ComponentContainer) context).parent.switchTo();
+				
+				try {
+					return ((ComponentContainer) context).switchToContext();
+				} catch (StaleElementReferenceException e) {
+					return ((ComponentContainer) context).refreshContext();
+				}
+			}
+			
+			@Override
+			public String toString() {
+				return "context to be switched";
+			}
+		};
 	}
 	
 	/**
@@ -138,9 +161,9 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 * <b>NOTE</b>: This protected method is used to focus the driver on this container's context. This is the worker 
 	 * for the {@link #switchTo} method, and it must be called in proper sequence to work properly.
 	 * 
-	 * @return driver focused on this container's context
+	 * @return this component container
 	 */
-	protected abstract WebDriver switchToContext();
+	protected abstract SearchContext switchToContext();
 	
 	/**
 	 * Get the method that caused this container to be vacated.
@@ -222,7 +245,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 */
 	@Override
 	public List<WebElement> findElements(By by) {
-		return context.findElements(by);
+		return RobustWebElement.getElements(this, by);
 	}
 	
 	/**
@@ -233,7 +256,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 */
 	@Override
 	public WebElement findElement(By by) {
-		return context.findElement(by);
+		return RobustWebElement.getElement(this, by);
 	}
 	
 	/**
@@ -256,6 +279,75 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 		return context.findElement(SELF);
 	}
 	
+	/**
+	 * Update the specified element with the indicated value
+	 * 
+	 * @param element target element (checkbox)
+	 * @param value desired value
+	 * @return 'true' if element value changed; otherwise 'false'
+	 */
+	public static boolean updateValue(WebElement element, boolean value) {
+		String tagName = element.getTagName().toLowerCase();
+		if ("input".equals(tagName)) {
+			if ("checkbox".equals(element.getAttribute("type"))) {
+				boolean exist = element.isSelected();
+				if (exist == value) {
+					return false;
+				} else {
+					element.click();
+					return true;
+				}
+			}
+		}
+		return updateValue(element, Boolean.valueOf(value).toString());
+	}
+	
+	/**
+	 * Update the specified element with the indicated value
+	 * 
+	 * @param element target element (input, select)
+	 * @param value desired value
+	 * @return 'true' if element value changed; otherwise 'false'
+	 */
+	public static boolean updateValue(WebElement element, String value) {
+		String tagName = element.getTagName().toLowerCase();
+		if ("input".equals(tagName)) {
+			if ("checkbox".equals(element.getAttribute("type"))) {
+				return updateValue(element, Boolean.parseBoolean(value));
+			} else {
+				String exist = element.getAttribute("value");
+				if (exist == null) {
+					if (value == null) {
+						return false;
+					}
+				}
+				if (value == null) {
+					element.clear();
+					return true;
+				} else if (exist.equals(value)) {
+					return false;
+				} else {
+					element.sendKeys(value);
+					return true;
+				}
+			}
+		} else if ("select".equals(tagName)) {
+			
+		}
+		return false;
+	}
+	
+	/**
+	 * Scroll the specified element into view
+	 * 
+	 * @param element target element
+	 * @return the specified element
+	 */
+	public static WebElement scrollIntoView(WebElement element) {
+		WebDriverUtils.getExecutor(element).executeScript("arguments[0].scrollIntoView(true);", element);
+		return element;
+	}
+
 	/**
 	 * Create an enhanced instance of the specified container.
 	 * 
@@ -300,7 +392,16 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 * @return 'true' if specified method is declared in bypassed class; otherwise 'false'
 	 */
 	protected boolean bypassClassOf(Method method) {
-		return BYPASS.contains(method.getDeclaringClass());
+		for (Class<?> clazz : BYPASS) {
+			for (Method member : clazz.getMethods()) {
+				if (member.getName().endsWith(method.getName())) {
+					if (Arrays.equals(member.getGenericParameterTypes(), method.getParameterTypes())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	/**

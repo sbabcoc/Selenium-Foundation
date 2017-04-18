@@ -30,7 +30,7 @@ enum ContainerMethodInterceptor implements MethodInterceptor {
 		if (target.get() == container) {
 			driver = container.getDriver();
 		} else {
-			driver = container.switchTo();
+			driver = container.switchTo().getDriver();
 			target.set(container);
 		}
 		
