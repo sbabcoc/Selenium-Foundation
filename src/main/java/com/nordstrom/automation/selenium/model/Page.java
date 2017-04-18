@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,8 +11,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
-
-import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 
@@ -119,10 +118,11 @@ public class Page extends ComponentContainer {
 	 * 
 	 * @param initialPage initial page annotation
 	 * @param driver driver object
+	 * @param targetUri target URI
 	 * @return page object defined by the specified annotation
 	 */
-	public static Page openInitialPage(InitialPage initialPage, WebDriver driver) {
-		String initialUrl = getInitialUrl(initialPage);
+	public static Page openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
+		String initialUrl = getInitialUrl(initialPage, targetUri);
 		driver.get(initialUrl);
 		return ComponentContainer.newChild(initialPage.value(), driver, null);
 	}
@@ -131,13 +131,14 @@ public class Page extends ComponentContainer {
 	 * Get the URL defined by the specified {@link InitialPage} annotation
 	 * 
 	 * @param initialPage initial page annotation
+	 * @param targetUri target URI
 	 * @return defined initial URL as a string (may be 'null')
 	 */
-	public static String getInitialUrl(InitialPage initialPage) {
-		String url = getPageUrl(initialPage.pageUrl());
+	public static String getInitialUrl(InitialPage initialPage, URI targetUri) {
+		String url = getPageUrl(initialPage.pageUrl(), targetUri);
 		if (url == null) {
 			Class<? extends Page> pageClass = initialPage.value();
-			url = getPageUrl(pageClass.getAnnotation(PageUrl.class));
+			url = getPageUrl(pageClass.getAnnotation(PageUrl.class), targetUri);
 		}
 		return url;
 	}
@@ -146,9 +147,10 @@ public class Page extends ComponentContainer {
 	 * Get the URL defined by the specified {@link PageUrl} annotation
 	 * 
 	 * @param pageUrl page URL annotation
+	 * @param targetUri target URI
 	 * @return defined page URL as a string (may be 'null')
 	 */
-	public static String getPageUrl(PageUrl pageUrl) {
+	public static String getPageUrl(PageUrl pageUrl, URI targetUri) {
 		if (pageUrl == null) return null;
 		
 		String scheme = pageUrl.scheme();
@@ -163,8 +165,7 @@ public class Page extends ComponentContainer {
 		
 		if (len == 0) return null;
 
-		SeleniumConfig config = SeleniumConfig.getConfig();
-		UriBuilder builder = UriBuilder.fromUri(config.getTargetUri());
+		UriBuilder builder = UriBuilder.fromUri(targetUri);
 		
 		if (scheme.length() > 0) builder.scheme(scheme);
 		if (userInfo.length() > 0) builder.userInfo(userInfo);
