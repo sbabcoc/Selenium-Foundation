@@ -208,8 +208,7 @@ public class Page extends ComponentContainer {
 
 	@Override
 	public SearchContext refreshContext() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 	
 }

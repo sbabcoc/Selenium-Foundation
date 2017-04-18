@@ -40,18 +40,46 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	private String selector;
 	private Strategy strategy = Strategy.LOCATOR;
 	
-	// handling for indexed references
-	// re-acquisition of indexed references is done via JavaScript
-	
+	/**
+	 * Basic robust web element constructor
+	 * 
+	 * @param context element search context
+	 * @param locator element locator
+	 */
 	RobustWebElement(WrapsContext context, By locator) {
 		this(null, context, locator, -1);
 	}
 	
+	/**
+	 * Constructor for wrapping an existing element reference 
+	 * 
+	 * @param element element reference to be wrapped
+	 * @param context element search context
+	 * @param locator element locator
+	 */
 	RobustWebElement(WebElement element, WrapsContext context, By locator) {
 		this(element, context, locator, -1);
 	}
-
+	
+	/**
+	 * Main robust web element constructor
+	 * 
+	 * @param element element reference to be wrapped (may be 'null')
+	 * @param context element search context
+	 * @param locator element locator
+	 * @param index element index
+	 */
 	RobustWebElement(WebElement element, WrapsContext context, By locator, int index) {
+		
+		// if specified element is already robust
+		if (element instanceof RobustWebElement) {
+			RobustWebElement robust = (RobustWebElement) element;
+			element = robust.wrapped;
+			context = robust.context;
+			locator = robust.locator;
+			index = robust.index;
+		}
+		
 		this.wrapped = element;
 		this.context = context;
 		this.locator = locator;
@@ -81,10 +109,6 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		
 		if (element == null) {
 			acquireReference(this);
-		} else {
-			if (element instanceof WrapsElement) {
-				wrapped = ((WrapsElement) element).getWrappedElement();
-			}
 		}
 	}
 	
@@ -245,16 +269,28 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	public WebElement getWrappedElement() {
 		return wrapped;
 	}
-
+	
+	/**
+	 * Refresh the wrapped element reference
+	 * 
+	 * @param e {@link StaleElementReferenceException} that necessitates reference refresh
+	 * @return this robust web element with refreshed reference
+	 */
 	private WebElement refreshReference(StaleElementReferenceException e) {
 		try {
 			wrapped = ((ComponentContainer) context).getWait().until(referenceIsRefreshed(this));
-			return wrapped;
+			return this;
 		} catch (Throwable t) {
 			throw UncheckedThrow.throwUnchecked((e != null) ? e : t);
 		}
 	}
 	
+	/**
+	 * Returns a 'wait' proxy that refreshes the wrapped reference of the specified robust element
+	 * 
+	 * @param element robust web element object
+	 * @return wrapped element reference (refreshed)
+	 */
 	private static Coordinator<WebElement> referenceIsRefreshed(final RobustWebElement element) {
 		return new Coordinator<WebElement>() {
 
@@ -276,6 +312,12 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		
 	}
 	
+	/**
+	 * Acquire the element reference that's wrapped by the specified robust element
+	 * 
+	 * @param element robust web element object
+	 * @return wrapped element reference
+	 */
 	private static WebElement acquireReference(RobustWebElement element) {
 		SearchContext context = element.context.getWrappedContext();
 		
@@ -315,7 +357,14 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	public WebDriver getWrappedDriver() {
 		return WebDriverUtils.getDriver(wrapped);
 	}
-
+	
+	/**
+	 * Get the list of elements that match the specified locator in the indicated context
+	 * 
+	 * @param context element search context
+	 * @param locator element locator
+	 * @return list of robust elements in context that match the locator
+	 */
 	public static List<WebElement> getElements(ComponentContainer context, By locator) {
 		List<WebElement> elements;
 		try {
@@ -330,10 +379,26 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		return elements;
 	}
 	
+	/**
+	 * Get the first element that matches the specified locator in the indicated context
+	 * 
+	 * @param context element search context
+	 * @param locator element locator
+	 * @return robust element in context that matches the locator
+	 */
 	public static WebElement getElement(ComponentContainer context, By locator) {
 		return getElement(context, locator, -1);
 	}
-
+	
+	/**
+	 * Get the item at the specified index in the list of elements matching the specified 
+	 * locator in the indicated context
+	 * 
+	 * @param context element search context
+	 * @param locator element locator
+	 * @param index element index
+	 * @return indexed robust element in context that matches the locator
+	 */
 	public static WebElement getElement(ComponentContainer context, By locator, int index) {
 		return new RobustWebElement(null, context, locator, index);
 	}

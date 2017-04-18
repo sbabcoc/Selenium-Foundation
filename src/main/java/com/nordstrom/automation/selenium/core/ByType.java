@@ -12,6 +12,12 @@ public class ByType {
 		By locator();
 	}
 	
+	/**
+	 * Get the CSS locator string that reproduces the specified Selenium locator
+	 * 
+	 * @param locator Selenium locator
+	 * @return CSS locator string; 'null' if unconvertible
+	 */
 	public static String cssLocatorFor(By locator) {
 		
 		String val = valueOf(locator);
@@ -37,6 +43,12 @@ public class ByType {
 		return null;
 	}
 	
+	/**
+	 * Get the XPath locator string that reproduces the specified Selenium locator
+	 * 
+	 * @param locator Selenium locator
+	 * @return XPath locator string; 'null' if unconvertible
+	 */
 	public static String xpathLocatorFor(By locator) {
 		
 		String val = valueOf(locator);
@@ -62,6 +74,12 @@ public class ByType {
 		return val;
 	}
 	
+	/**
+	 * Get the underlying value of the specified Selenium locator
+	 * 
+	 * @param locator Selenium locator
+	 * @return value extracted from the specified locator
+	 */
 	private static String valueOf(By locator) {
 		String str = locator.toString();
 		int i = str.indexOf(':');

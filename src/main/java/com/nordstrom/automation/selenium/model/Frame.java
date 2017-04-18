@@ -19,21 +19,28 @@ public class Frame extends Page {
 	private static final Class<?>[] NAME_OR_ID_ARG_TYPES = {String.class, ComponentContainer.class};
 	
 	private enum FrameSelect {
+		ELEMENT,
 		INDEX, 
-		NAME_OR_ID, 
-		ELEMENT
+		NAME_OR_ID 
 	}
 	
 	/**
-	 * Constructor for frame by element
+	 * Constructor for frame by locator
 	 * 
-	 * @param element frame container element
+	 * @param locator frame element locator
 	 * @param parent frame parent
 	 */
 	public Frame(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
 	}
 	
+	/**
+	 * Constructor for frame by locator and index
+	 * 
+	 * @param locator frame element locator
+	 * @param index frame element index
+	 * @param parent frame parent
+	 */
 	public Frame(By locator, int index, ComponentContainer parent) {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;

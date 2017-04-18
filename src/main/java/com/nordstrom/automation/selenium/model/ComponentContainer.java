@@ -121,17 +121,23 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
-	 * Switch driver to this container's search context.
+	 * Switch focus to this container's search context.
 	 * <p>
 	 * <b>NOTE</b>: This method walks down the container lineage to the parent page object, then back up to this 
 	 * container, focusing the driver on each container as it goes.
 	 * 
-	 * @return driver focused on this container's context
+	 * @return this container's context
 	 */
 	public SearchContext switchTo() {
 		return getWait().until(contextIsSwitched(this));
 	}
 	
+	/**
+	 * Returns a 'wait' proxy that switches focus to the specified context
+	 * 
+	 * @param context search context on which to focus
+	 * @return target search context
+	 */
 	static Coordinator<SearchContext> contextIsSwitched(final ComponentContainer context) {
 		return new Coordinator<SearchContext>() {
 
@@ -156,10 +162,10 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	/**
 	 * Switch focus to this container's search context.
 	 * <p>
-	 * <b>NOTE</b>: This protected method is used to focus the driver on this container's context. This is the worker 
-	 * for the {@link #switchTo} method, and it must be called in proper sequence to work properly.
+	 * <b>NOTE</b>: This method walks down the container lineage to the parent page object, then back up to this 
+	 * container, focusing the driver on each container as it goes.
 	 * 
-	 * @return this component container
+	 * @return this container's context
 	 */
 	protected abstract SearchContext switchToContext();
 	
