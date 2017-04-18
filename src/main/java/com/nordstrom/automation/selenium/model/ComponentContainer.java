@@ -12,22 +12,20 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.internal.WrapsElement;
-
-import com.google.common.base.Throwables;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.CallbackFilter;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.NoOp;
 
-public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement, WrapsContext, CallbackFilter {
+public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsContext, CallbackFilter {
 	
 	protected WebDriver driver;
 	protected SearchContext context;
@@ -41,7 +39,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
 	
 	static {
-		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsElement.class, WrapsContext.class, CallbackFilter.class);
+		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsContext.class, CallbackFilter.class);
 		METHODS = Arrays.asList("validateParent", "getDriver", "getContext", "getParent", "getParentPage", "getWait",
 				"switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "newChild", "enhanceContainer",
 				"bypassClassOf", "bypassMethod");
@@ -130,8 +128,8 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 * 
 	 * @return driver focused on this container's context
 	 */
-	public ComponentContainer switchTo() {
-		return (ComponentContainer) getWait().until(contextIsSwitched(this));
+	public SearchContext switchTo() {
+		return getWait().until(contextIsSwitched(this));
 	}
 	
 	static Coordinator<SearchContext> contextIsSwitched(final ComponentContainer context) {
@@ -139,12 +137,12 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 
 			@Override
 			public SearchContext apply(SearchContext ignore) {
-				if (((ComponentContainer) context).parent != null) ((ComponentContainer) context).parent.switchTo();
+				if (context.parent != null) context.parent.switchTo();
 				
 				try {
-					return ((ComponentContainer) context).switchToContext();
+					return context.switchToContext();
 				} catch (StaleElementReferenceException e) {
-					return ((ComponentContainer) context).refreshContext();
+					return context.refreshContext();
 				}
 			}
 			
@@ -226,11 +224,11 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 			Constructor<T> ctor = childClass.getConstructor(SearchContext.class, ComponentContainer.class);
 			child = ctor.newInstance(context, parent);
 		} catch (InvocationTargetException e) {
-			Throwables.propagate(e.getCause());
+			UncheckedThrow.throwUnchecked(e.getCause());
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
-			Throwables.propagate(e);
+			UncheckedThrow.throwUnchecked(e);
 		} catch (NoSuchMethodException | InstantiationException e) {
-			// never thrown because generic type is bounded
+			UncheckedThrow.throwUnchecked(e);
 		}
 		return child;
 	}
@@ -267,16 +265,6 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	@Override
 	public WebDriver getWrappedDriver() {
 		return driver;
-	}
-	
-	/**
-	 * Get the context element for this container.
-	 * 
-	 * @return container context element
-	 */
-	@Override
-	public WebElement getWrappedElement() {
-		return context.findElement(SELF);
 	}
 	
 	/**

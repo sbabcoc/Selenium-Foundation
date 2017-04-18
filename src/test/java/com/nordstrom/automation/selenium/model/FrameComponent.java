@@ -8,6 +8,10 @@ public class FrameComponent extends Frame {
 		super(locator, parent);
 	}
 	
+	public FrameComponent(By locator, int index, ComponentContainer parent) {
+		super(locator, index, parent);
+	}
+	
 	public FrameComponent(int index, ComponentContainer parent) {
 		super(index, parent);
 	}

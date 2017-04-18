@@ -6,25 +6,16 @@ import org.openqa.selenium.WebElement;
 
 public class PageComponent extends ComponentContainer {
 
-	private By locator;
-	private int index;
-	
 	public PageComponent(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
 	}
 	
 	public PageComponent(By locator, int index, ComponentContainer parent) {
 		this(getContext(locator, index, parent), parent);
-		this.locator = locator;
-		this.index = index;
 	}
 	
 	private static WebElement getContext(By locator, int index, ComponentContainer parent) {
-		if (index > 0) {
-			return parent.findElements(locator).get(index);
-		} else {
-			return parent.findElement(locator);
-		}
+		return RobustWebElement.getElement(parent, locator, index);
 	}
 	
 	/**
@@ -33,8 +24,9 @@ public class PageComponent extends ComponentContainer {
 	 * @param context component search context
 	 * @param parent component parent
 	 */
-	private PageComponent(SearchContext context, ComponentContainer parent) {
+	public PageComponent(SearchContext context, ComponentContainer parent) {
 		super(context, parent);
+		if ( ! (context instanceof RobustWebElement)) throw new IllegalArgumentException("Context must be a RobustWebElement"); 
 	}
 
 	@Override
@@ -42,15 +34,13 @@ public class PageComponent extends ComponentContainer {
 		return this;
 	}
 
-	@Override
 	public SearchContext getWrappedContext() {
-		return getWrappedElement();
+		return context;
 	}
 
 	@Override
 	public SearchContext refreshContext() {
 		parent.refreshContext();
-		getContext(locator, index, parent);
 		return this;
 	}
 

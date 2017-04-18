@@ -2,8 +2,6 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
-
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.NoOp;
@@ -12,7 +10,7 @@ public class Frame extends Page {
 	
 	private FrameSelect frameSelect;
 	private By locator;
-	private WebElement element;
+	private RobustWebElement element;
 	private int index;
 	private String nameOrId;
 	
@@ -36,7 +34,7 @@ public class Frame extends Page {
 		this(locator, -1, parent);
 	}
 	
-	public Frame (By locator, int index, ComponentContainer parent) {
+	public Frame(By locator, int index, ComponentContainer parent) {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;
 		this.locator = locator;
@@ -74,7 +72,7 @@ public class Frame extends Page {
 	protected SearchContext switchToContext() {
 		switch (frameSelect) {
 		case ELEMENT:
-			driver.switchTo().frame(element);
+			driver.switchTo().frame(element.getWrappedElement());
 			break;
 			
 		case INDEX:
@@ -115,9 +113,10 @@ public class Frame extends Page {
 	
 	@Override
 	public SearchContext refreshContext() {
-		parent.refreshContext();
 		if (frameSelect == FrameSelect.ELEMENT) {
-			((RobustWebElement) element).refreshContext();
+			element.refreshContext();
+		} else {
+			parent.refreshContext();
 		}
 		return switchToContext();
 	}

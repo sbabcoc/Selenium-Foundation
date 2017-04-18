@@ -26,11 +26,10 @@ enum ContainerMethodInterceptor implements MethodInterceptor {
 			throw new ContainerVacatedException(container.getVacater());
 		}
 		
-		WebDriver driver;
-		if (target.get() == container) {
-			driver = container.getDriver();
-		} else {
-			driver = container.switchTo().getDriver();
+		WebDriver driver = container.getDriver();
+
+		if (target.get() != container) {
+			container.switchTo();
 			target.set(container);
 		}
 		

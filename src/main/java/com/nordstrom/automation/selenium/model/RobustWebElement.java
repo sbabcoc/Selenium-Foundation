@@ -80,6 +80,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		}
 		
 		if (element == null) {
+			acquireReference(this);
 		} else {
 			if (element instanceof WrapsElement) {
 				wrapped = ((WrapsElement) element).getWrappedElement();
@@ -318,7 +319,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	public static List<WebElement> getElements(ComponentContainer context, By locator) {
 		List<WebElement> elements;
 		try {
-			elements = context.findElements(locator);
+			context.switchTo();
+			elements = context.getWrappedContext().findElements(locator);
 		} catch (StaleElementReferenceException e) {
 			elements = context.refreshContext().findElements(locator);
 		}
@@ -329,7 +331,11 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	}
 	
 	public static WebElement getElement(ComponentContainer context, By locator) {
-		return new RobustWebElement(context, locator);
+		return getElement(context, locator, -1);
+	}
+
+	public static WebElement getElement(ComponentContainer context, By locator, int index) {
+		return new RobustWebElement(null, context, locator, index);
 	}
 
 }
