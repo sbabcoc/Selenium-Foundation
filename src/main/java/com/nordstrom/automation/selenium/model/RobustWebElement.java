@@ -46,7 +46,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param context element search context
 	 * @param locator element locator
 	 */
-	RobustWebElement(WrapsContext context, By locator) {
+	public RobustWebElement(WrapsContext context, By locator) {
 		this(null, context, locator, -1);
 	}
 	
@@ -57,7 +57,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param context element search context
 	 * @param locator element locator
 	 */
-	RobustWebElement(WebElement element, WrapsContext context, By locator) {
+	public RobustWebElement(WebElement element, WrapsContext context, By locator) {
 		this(element, context, locator, -1);
 	}
 	
@@ -69,7 +69,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param locator element locator
 	 * @param index element index
 	 */
-	RobustWebElement(WebElement element, WrapsContext context, By locator, int index) {
+	public RobustWebElement(WebElement element, WrapsContext context, By locator, int index) {
 		
 		// if specified element is already robust
 		if (element instanceof RobustWebElement) {
@@ -141,20 +141,12 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 
 	@Override
 	public WebElement findElement(final By by) {
-		try {
-			return wrapped.findElement(by);
-		} catch (StaleElementReferenceException e) {
-			return refreshReference(e).findElement(by);
-		}
+		return getElement(this, by);
 	}
 
 	@Override
 	public List<WebElement> findElements(final By by) {
-		try {
-			return wrapped.findElements(by);
-		} catch (StaleElementReferenceException e) {
-			return refreshReference(e).findElements(by);
-		}
+		return getElements(this, by);
 	}
 
 	@Override
@@ -365,10 +357,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param locator element locator
 	 * @return list of robust elements in context that match the locator
 	 */
-	public static List<WebElement> getElements(ComponentContainer context, By locator) {
+	public static List<WebElement> getElements(WrapsContext context, By locator) {
 		List<WebElement> elements;
 		try {
-			context.switchTo();
 			elements = context.getWrappedContext().findElements(locator);
 		} catch (StaleElementReferenceException e) {
 			elements = context.refreshContext().findElements(locator);
@@ -386,7 +377,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param locator element locator
 	 * @return robust element in context that matches the locator
 	 */
-	public static WebElement getElement(ComponentContainer context, By locator) {
+	public static WebElement getElement(WrapsContext context, By locator) {
 		return getElement(context, locator, -1);
 	}
 	
@@ -399,8 +390,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param index element index
 	 * @return indexed robust element in context that matches the locator
 	 */
-	public static WebElement getElement(ComponentContainer context, By locator, int index) {
+	public static WebElement getElement(WrapsContext context, By locator, int index) {
 		return new RobustWebElement(null, context, locator, index);
 	}
-
+	
 }

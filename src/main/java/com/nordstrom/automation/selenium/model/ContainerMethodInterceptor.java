@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.openqa.selenium.WebDriver;
 
@@ -9,16 +10,21 @@ import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinators;
 
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.implementation.bind.annotation.SuperCall;
+import net.bytebuddy.implementation.bind.annotation.This;
 
-enum ContainerMethodInterceptor implements MethodInterceptor {
+enum ContainerMethodInterceptor {
 	INSTANCE;
 	
 	private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
-	@Override
-	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+//	@Override
+//	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	@RuntimeType
+	public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Throwable {
 		
 		ComponentContainer container = (ComponentContainer) obj;
 		
@@ -36,7 +42,7 @@ enum ContainerMethodInterceptor implements MethodInterceptor {
 		Page parentPage = container.getParentPage();
 		Set<String> initialHandles = driver.getWindowHandles();
 		
-		Object result = proxy.invokeSuper(obj, args);
+		Object result = proxy.call();
 		
 		// if result is container, we're done
 		if (result == container) return result;
@@ -71,5 +77,5 @@ enum ContainerMethodInterceptor implements MethodInterceptor {
 		
 		return result;
 	}
-	
+
 }

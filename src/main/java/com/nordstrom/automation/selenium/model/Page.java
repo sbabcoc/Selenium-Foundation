@@ -1,9 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,22 +12,20 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.NoOp;
+import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
 public class Page extends ComponentContainer {
 	
 	private String windowHandle;
 	private WindowState windowState;
-	protected static final List<String> METHODS;
-	private static final Class<?>[] ARG_TYPES = {WebDriver.class};
+	private Class<?>[] argumentTypes;
+	private Object[] arguments;
 	
-	static {
-		METHODS = Arrays.asList("setWindowHandle", "getWindowHandle", "setWindowState", "getWindowState",
-				"openInitialPage", "getInitialUrl", "getPageUrl");
-	}
+	private static final Class<?>[] ARG_TYPES_1 = {WebDriver.class};
+	private static final Class<?>[] ARG_TYPES_2 = {WebDriver.class, ComponentContainer.class};
+	
+	private static final String[] METHODS = {"setWindowHandle", "getWindowHandle", "setWindowState", "getWindowState",
+			"openInitialPage", "getInitialUrl", "getPageUrl"};
 	
 	public enum WindowState {
 		WILL_OPEN, 
@@ -43,6 +40,9 @@ public class Page extends ComponentContainer {
 	public Page(WebDriver driver) {
 		super(driver, null);
 		windowHandle = driver.getWindowHandle();
+		
+		argumentTypes = ARG_TYPES_1;
+		arguments = new Object[] {driver};
 	}
 	
 	/**
@@ -55,6 +55,9 @@ public class Page extends ComponentContainer {
 	 */
 	Page(WebDriver driver, ComponentContainer parent) {
 		super(driver, parent);
+		
+		argumentTypes = ARG_TYPES_2;
+		arguments = new Object[] {driver, parent};
 	}
 	
 	@Override
@@ -121,10 +124,26 @@ public class Page extends ComponentContainer {
 	 * @param targetUri target URI
 	 * @return page object defined by the specified annotation
 	 */
-	public static Page openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
+	@SuppressWarnings("unchecked")
+	public static <T extends Page> T openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
 		String initialUrl = getInitialUrl(initialPage, targetUri);
 		driver.get(initialUrl);
-		return ComponentContainer.newChild(initialPage.value(), driver, null);
+		return (T) newPage(initialPage.value(), driver);
+	}
+	
+	public static <T extends Page> T newPage(Class<T> pageClass, WebDriver driver) {
+		T page = null;
+		try {
+			Constructor<T> ctor = pageClass.getConstructor(WebDriver.class);
+			page = ctor.newInstance(driver);
+		} catch (InvocationTargetException e) {
+			UncheckedThrow.throwUnchecked(e.getCause());
+		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
+			UncheckedThrow.throwUnchecked(e);
+		} catch (NoSuchMethodException | InstantiationException e) {
+			UncheckedThrow.throwUnchecked(e);
+		}
+		return page;
 	}
 	
 	/**
@@ -185,24 +204,6 @@ public class Page extends ComponentContainer {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ComponentContainer> T enhanceContainer(T container) {
-		Class<? extends ComponentContainer> type = container.getClass();
-		if (Enhancer.isEnhanced(type)) return container;
-		
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(type);
-		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
-		enhancer.setCallbackFilter(this);
-		return (T) enhancer.create(ARG_TYPES, new Object[] {container.driver});
-	}
-	
-	@Override
-	protected boolean bypassMethod(Method method) {
-		return super.bypassMethod(method) || METHODS.contains(method.getName());
-	}
-
-	@Override
 	public SearchContext getWrappedContext() {
 		return getWrappedDriver();
 	}
@@ -211,5 +212,20 @@ public class Page extends ComponentContainer {
 	public SearchContext refreshContext() {
 		return this;
 	}
+
+	@Override
+	public Class<?>[] getArgumentTypes() {
+		return argumentTypes;
+	}
+
+	@Override
+	public Object[] getArguments() {
+		return arguments;
+	}
 	
+	@Override
+	String[] bypassMethods() {
+		return METHODS;
+	}
+
 }

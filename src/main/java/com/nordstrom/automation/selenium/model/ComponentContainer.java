@@ -1,9 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -18,32 +16,26 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
-import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.CallbackFilter;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.NoOp;
+//import net.sf.cglib.proxy.Callback;
+//import net.sf.cglib.proxy.NoOp;
 
-public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsContext, CallbackFilter {
+public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsDriver, WrapsContext {
 	
 	protected WebDriver driver;
 	protected SearchContext context;
 	protected ComponentContainer parent;
 	protected Method vacater;
 	protected SearchContextWait wait;
+	private List<Class<?>> bypass;
+	private List<String> methods;
 	
 	public static final By SELF = By.xpath(".");
-	protected static final List<Class<?>> BYPASS;
-	protected static final List<String> METHODS;
+	private static final Class<?>[] BYPASS = {Object.class, WrapsDriver.class, WrapsContext.class};
+	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
+			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
+			"bypassClassOf", "bypassMethod"};
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
-	
-	static {
-		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsContext.class, CallbackFilter.class);
-		METHODS = Arrays.asList("validateParent", "getDriver", "getContext", "getParent", "getParentPage", "getWait",
-				"switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "newChild", "enhanceContainer",
-				"bypassClassOf", "bypassMethod");
-	}
 	
 	/**
 	 * Constructor for component container
@@ -204,44 +196,6 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
-	 * Create a container object of the specified class and context as a child of the target object
-	 * 
-	 * @param <T> type of child object to instantiate
-	 * @param childClass class of child object to create
-	 * @param context container search context
-	 * @return new object of the specified type, with the current container as parent
-	 */
-	public <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context) {
-		return newChild(childClass, context, this);
-	}
-	
-	/**
-	 * Create a container object of the specified class and context as a child of the specified parent
-	 * 
-	 * @param <T> type of child object to instantiate
-	 * @param childClass class of child object to create
-	 * @param context container search context
-	 * @param parent parent of the new container object
-	 * @return new object of the specified type, with the specified container as parent
-	 */
-	public static <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context, ComponentContainer parent) {
-		T child = null;
-		try {
-			Constructor<T> ctor = childClass.getConstructor(SearchContext.class, ComponentContainer.class);
-			child = ctor.newInstance(context, parent);
-		} catch (InvocationTargetException e) {
-			UncheckedThrow.throwUnchecked(e.getCause());
-		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
-			UncheckedThrow.throwUnchecked(e);
-		} catch (NoSuchMethodException | InstantiationException e) {
-			UncheckedThrow.throwUnchecked(e);
-		}
-		return child;
-	}
-	
-	
-	
-	/**
 	 * Find all elements within the current context using the given mechanism.
 	 * 
 	 * @param by the locating mechanism
@@ -342,70 +296,45 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 		return element;
 	}
 
-	/**
-	 * Create an enhanced instance of the specified container.
-	 * 
-	 * @param <T> container type
-	 * @param container container object to be enhanced
-	 * @return enhanced container object
-	 */
-	@SuppressWarnings("unchecked")
-	public <T extends ComponentContainer> T enhanceContainer(T container) {
-		Class<? extends ComponentContainer> type = container.getClass();
-		if (Enhancer.isEnhanced(type)) return container;
-		
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(type);
-		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
-		enhancer.setCallbackFilter(this);
-		return (T) enhancer.create(ARG_TYPES, new Object[] {container.context, container.parent});
-	}
-	
-	/**
-	 * Map a method to a callback type.
-	 * 
-	 * @param method the intercepted method
-	 * @return a callback type, as enumerated by the {@link Enhancer#setCallbacks} invocation in
-	 *         {@link #enhanceContainer}
-	 */
 	@Override
-	public int accept(Method method) {
-		if (bypassClassOf(method)) {
-			return 1;
-		} else if (bypassMethod(method)) {
-			return 1;
-		} else {
-			return 0;
+	Class<?>[] getArgumentTypes() {
+		return ARG_TYPES;
+	}
+
+	@Override
+	Object[] getArguments() {
+		return new Object[] {context, parent};
+	}
+
+	@Override
+	Callback[] getCallbacks() {
+		return new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE};
+	}
+
+	@Override
+	List<Class<?>> getBypassClasses() {
+		if (bypass == null) {
+			bypass = super.getBypassClasses();
+			Collections.addAll(bypass, bypassClasses());
 		}
+		return bypass;
 	}
 	
-	/**
-	 * Determine if the specified method is declared in a class that should be entirely bypassed.
-	 * 
-	 * @param method method in question
-	 * @return 'true' if specified method is declared in bypassed class; otherwise 'false'
-	 */
-	protected boolean bypassClassOf(Method method) {
-		for (Class<?> clazz : BYPASS) {
-			for (Method member : clazz.getMethods()) {
-				if (member.getName().endsWith(method.getName())) {
-					if (Arrays.equals(member.getGenericParameterTypes(), method.getParameterTypes())) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+	Class<?>[] bypassClasses() {
+		return BYPASS;
 	}
 	
-	/**
-	 * Determine if the specified method should not be intercepted.
-	 * 
-	 * @param method method in question
-	 * @return 'true' if specified method should be bypassed; otherwise 'false'
-	 */
-	protected boolean bypassMethod(Method method) {
-		return METHODS.contains(method.getName());
+	@Override
+	List<String> getBypassMethods() {
+		if (methods == null) {
+			methods = super.getBypassMethods();
+			Collections.addAll(methods, bypassMethods());
+		}
+		return methods;
+	}
+	
+	String[] bypassMethods() {
+		return METHODS;
 	}
 	
 }

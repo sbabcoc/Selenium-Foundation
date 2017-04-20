@@ -2,9 +2,15 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
 
 public class PageComponent extends ComponentContainer {
+	
+	private Class<?>[] argumentTypes;
+	private Object[] arguments;
+	
+	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
 	
 	/**
 	 * Constructor for page component by element locator
@@ -14,6 +20,9 @@ public class PageComponent extends ComponentContainer {
 	 */
 	public PageComponent(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
+		
+		argumentTypes = ARG_TYPES_1;
+		arguments = new Object[] {locator, parent};
 	}
 	
 	/**
@@ -25,6 +34,9 @@ public class PageComponent extends ComponentContainer {
 	 */
 	public PageComponent(By locator, int index, ComponentContainer parent) {
 		this(getContext(locator, index, parent), parent);
+		
+		argumentTypes = ARG_TYPES_2;
+		arguments = new Object[] {locator, index, parent};
 	}
 	
 	/**
@@ -35,19 +47,21 @@ public class PageComponent extends ComponentContainer {
 	 * @param parent element search context
 	 * @return page component context element reference
 	 */
-	private static WebElement getContext(By locator, int index, ComponentContainer parent) {
-		return RobustWebElement.getElement(parent, locator, index);
+	private static RobustWebElement getContext(By locator, int index, ComponentContainer parent) {
+		return (RobustWebElement) RobustWebElement.getElement(parent, locator, index);
 	}
 	
 	/**
-	 * Constructor for page component
+	 * Constructor for page component by context element
 	 * 
-	 * @param context component search context (must be {@link RobustWebElement}
+	 * @param element component context element
 	 * @param parent component parent
 	 */
-	public PageComponent(SearchContext context, ComponentContainer parent) {
-		super(context, parent);
-		if ( ! (context instanceof RobustWebElement)) throw new IllegalArgumentException("Context must be a RobustWebElement"); 
+	public PageComponent(RobustWebElement element, ComponentContainer parent) {
+		super(element, parent);
+		
+		argumentTypes = ARG_TYPES_3;
+		arguments = new Object[] {element, parent};
 	}
 
 	@Override
@@ -63,7 +77,18 @@ public class PageComponent extends ComponentContainer {
 	@Override
 	public SearchContext refreshContext() {
 		parent.refreshContext();
+		((RobustWebElement) context).refreshContext();
 		return this;
 	}
 
+	@Override
+	public Class<?>[] getArgumentTypes() {
+		return argumentTypes;
+	}
+
+	@Override
+	public Object[] getArguments() {
+		return arguments;
+	}
+	
 }

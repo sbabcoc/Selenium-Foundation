@@ -5,21 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class TableComponent extends PageComponent {
 
 	public TableComponent(By locator, ComponentContainer parent) {
 		super(locator, parent);
-	}
-	
-	public TableComponent(By locator, int index, ComponentContainer parent) {
-		super(locator, index, parent);
-	}
-	
-	public TableComponent(SearchContext context, ComponentContainer parent) {
-		super(context, parent);
 	}
 	
 	protected enum Using {

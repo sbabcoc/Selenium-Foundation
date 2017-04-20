@@ -2,7 +2,10 @@ package com.nordstrom.automation.selenium.support;
 
 import java.util.Set;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
@@ -62,4 +65,27 @@ public class Coordinators {
 		};
 	}
 
+	public static Coordinator<WebElement> visibilityOfElementLocated(final By locator) {
+		return new Coordinator<WebElement>() {
+
+			@Override
+			public WebElement apply(SearchContext context) {
+				try {
+					return elementIfVisible(context.findElement(locator));
+				} catch (StaleElementReferenceException e) {
+					return null;
+				}
+			}
+
+			@Override
+			public String toString() {
+				return "visibility of element located by " + locator;
+			}
+		};
+
+	}
+	
+	private static WebElement elementIfVisible(WebElement element) {
+		return element.isDisplayed() ? element : null;
+	}
 }

@@ -2,21 +2,20 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.NoOp;
 
 public class Frame extends Page {
 	
 	private FrameSelect frameSelect;
-	private By locator;
 	private RobustWebElement element;
 	private int index;
 	private String nameOrId;
+	private Class<?>[] argumentTypes;
+	private Object[] arguments;
 	
-	private static final Class<?>[] ELEMENT_ARG_TYPES = {By.class, Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] INDEX_ARG_TYPES = {Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] NAME_OR_ID_ARG_TYPES = {String.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_3 = {Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_4 = {String.class, ComponentContainer.class};
 	
 	private enum FrameSelect {
 		ELEMENT,
@@ -32,6 +31,9 @@ public class Frame extends Page {
 	 */
 	public Frame(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
+		
+		argumentTypes = ARG_TYPES_1;
+		arguments = new Object[] {locator, parent};
 	}
 	
 	/**
@@ -44,10 +46,12 @@ public class Frame extends Page {
 	public Frame(By locator, int index, ComponentContainer parent) {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;
-		this.locator = locator;
 		this.index = index;
 		
 		this.element = new RobustWebElement(null, parent, locator, index);
+		
+		argumentTypes = ARG_TYPES_2;
+		arguments = new Object[] {locator, index, parent};
 	}
 	
 	/**
@@ -60,6 +64,9 @@ public class Frame extends Page {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.INDEX;
 		this.index = index;
+		
+		argumentTypes = ARG_TYPES_3;
+		arguments = new Object[] {index, parent};
 	}
 	
 	/**
@@ -73,6 +80,9 @@ public class Frame extends Page {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.NAME_OR_ID;
 		this.nameOrId = nameOrId;
+		
+		argumentTypes = ARG_TYPES_4;
+		arguments = new Object[] {nameOrId, parent};
 	}
 
 	@Override
@@ -94,31 +104,6 @@ public class Frame extends Page {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ComponentContainer> T enhanceContainer(T container) {
-		Class<? extends ComponentContainer> type = container.getClass();
-		if (Enhancer.isEnhanced(type)) return container;
-		
-		Frame frame = (Frame) container;
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(type);
-		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
-		enhancer.setCallbackFilter(this);
-		
-		switch (frame.frameSelect) {
-		case ELEMENT:
-			return (T) enhancer.create(ELEMENT_ARG_TYPES, new Object[] {frame.locator, frame.index, frame.parent});
-			
-		case INDEX:
-			return (T) enhancer.create(INDEX_ARG_TYPES, new Object[] {frame.index, frame.parent});
-			
-		case NAME_OR_ID:
-			return (T) enhancer.create(NAME_OR_ID_ARG_TYPES, new Object[] {frame.nameOrId, frame.parent});
-		}
-		throw new AssertionError("This is unreachable");
-	}
-	
-	@Override
 	public SearchContext refreshContext() {
 		if (frameSelect == FrameSelect.ELEMENT) {
 			element.refreshContext();
@@ -128,4 +113,14 @@ public class Frame extends Page {
 		return switchToContext();
 	}
 
+	@Override
+	public Class<?>[] getArgumentTypes() {
+		return argumentTypes;
+	}
+
+	@Override
+	public Object[] getArguments() {
+		return arguments;
+	}
+	
 }

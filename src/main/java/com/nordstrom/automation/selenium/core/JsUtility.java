@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.google.gson.JsonObject;
-import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.automation.selenium.utility.UncheckedThrow;
@@ -128,7 +127,7 @@ public final class JsUtility {
      */
     public static <T extends Page> T pageForNewLocation(WebDriver driver, String url, Class<T> pageType) {
         newAddressBarLocation(driver, url);
-        return ComponentContainer.newChild(pageType, driver, null);
+        return Page.newPage(pageType, driver);
     }
     
     /**
