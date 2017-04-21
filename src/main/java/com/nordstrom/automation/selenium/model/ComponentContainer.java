@@ -304,7 +304,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 
 	@Override
-	List<Class<?>> getBypassClasses() {
+	protected List<Class<?>> getBypassClasses() {
 		if (bypass == null) {
 			bypass = super.getBypassClasses();
 			Collections.addAll(bypass, bypassClasses());
@@ -322,7 +322,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	@Override
-	List<String> getBypassMethods() {
+	protected List<String> getBypassMethods() {
 		if (methods == null) {
 			methods = super.getBypassMethods();
 			Collections.addAll(methods, bypassMethods());

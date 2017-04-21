@@ -31,7 +31,7 @@ public abstract class Enhanceable<T> {
 	 * 
 	 * @return list of bypass classes
 	 */
-	List<Class<?>> getBypassClasses() {
+	protected List<Class<?>> getBypassClasses() {
 		return new ArrayList<>(BYPASS);
 	}
 	
@@ -40,7 +40,7 @@ public abstract class Enhanceable<T> {
 	 * 
 	 * @return list of bypass method names
 	 */
-	List<String> getBypassMethods() {
+	protected List<String> getBypassMethods() {
 		return new ArrayList<>();
 	}
 	
@@ -53,7 +53,7 @@ public abstract class Enhanceable<T> {
 	 * @return enhanced container object
 	 */
 	@SuppressWarnings("unchecked")
-	<C extends T> C enhanceContainer(C container) {
+	public <C extends T> C enhanceContainer(C container) {
 		if (container instanceof DynamicType) return container;
 		
 		Class<?> containerClass = container.getClass();

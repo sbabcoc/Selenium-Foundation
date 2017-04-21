@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -10,6 +11,7 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByCssSelector;
@@ -17,11 +19,14 @@ import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
+import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
 public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, WrapsContext {
@@ -108,7 +113,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		}
 		
 		if (element == null) {
-			acquireReference(this);
+			refreshReference(null);
 		}
 	}
 	
@@ -297,7 +302,10 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 */
 	private WebElement refreshReference(StaleElementReferenceException e) {
 		try {
-			wrapped = ((ComponentContainer) context).getWait().until(referenceIsRefreshed(this));
+			long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
+			SearchContextWait wait = new SearchContextWait((ComponentContainer) context, impliedTimeout);
+			
+			wrapped = wait.until(referenceIsRefreshed(this));
 			return this;
 		} catch (Throwable t) {
 			throw UncheckedThrow.throwUnchecked((e != null) ? e : t);
@@ -352,10 +360,16 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 			break;
 			
 		case LOCATOR:
-			if (element.index > 0) {
-				element.wrapped = context.findElements(element.locator).get(element.index);
-			} else {
-				element.wrapped = context.findElement(element.locator);
+			Timeouts timeouts = element.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+			try {
+				if (element.index > 0) {
+					element.wrapped = context.findElements(element.locator).get(element.index);
+				} else {
+					element.wrapped = context.findElement(element.locator);
+				}
+			} finally {
+				long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
+				timeouts.implicitlyWait(impliedTimeout, TimeUnit.SECONDS);
 			}
 			break;
 		}
