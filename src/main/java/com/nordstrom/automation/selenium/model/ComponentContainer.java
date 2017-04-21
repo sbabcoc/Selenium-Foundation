@@ -312,6 +312,11 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		return bypass;
 	}
 	
+	/**
+	 * Returns an array of classes whose methods should not be intercepted
+	 * 
+	 * @return array of bypass classes
+	 */
 	Class<?>[] bypassClasses() {
 		return BYPASS;
 	}
@@ -325,6 +330,11 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		return methods;
 	}
 	
+	/**
+	 * Returns an array of names for methods that should not be intercepted
+	 * 
+	 * @return array of bypass method names
+	 */
 	String[] bypassMethods() {
 		return METHODS;
 	}

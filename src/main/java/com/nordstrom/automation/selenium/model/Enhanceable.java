@@ -26,10 +26,20 @@ public abstract class Enhanceable<T> {
 	abstract Class<?>[] getArgumentTypes();
 	abstract Object[]   getArguments();
 	
+	/**
+	 * Get the list of classes whose declared methods should not be intercepted
+	 * 
+	 * @return list of bypass classes
+	 */
 	List<Class<?>> getBypassClasses() {
 		return new ArrayList<>(BYPASS);
 	}
 	
+	/**
+	 * Get the list of named for methods that should not be intercepted
+	 * 
+	 * @return list of bypass method names
+	 */
 	List<String> getBypassMethods() {
 		return new ArrayList<>();
 	}
@@ -77,17 +87,11 @@ public abstract class Enhanceable<T> {
 			
 			return proxyType.getConstructor(argumentTypes).newInstance(arguments);
 			
-		} catch (InstantiationException e) {
-			throw UncheckedThrow.throwUnchecked(e);
-		} catch (IllegalAccessException e) {
-			throw UncheckedThrow.throwUnchecked(e);
-		} catch (IllegalArgumentException e) {
-			throw UncheckedThrow.throwUnchecked(e);
 		} catch (InvocationTargetException e) {
+			throw UncheckedThrow.throwUnchecked(e.getCause());
+		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
 			throw UncheckedThrow.throwUnchecked(e);
-		} catch (NoSuchMethodException e) {
-			throw UncheckedThrow.throwUnchecked(e);
-		} catch (SecurityException e) {
+		} catch (NoSuchMethodException | InstantiationException e) {
 			throw UncheckedThrow.throwUnchecked(e);
 		}
 	}

@@ -21,6 +21,16 @@ enum ContainerMethodInterceptor {
 	
 	private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
+	/**
+	 * This is the method that intercepts component container methods in "enhanced" model objects.
+	 * 
+	 * @param obj "enhanced" object upon which the method was invoked
+	 * @param method {@link Method} object for the invoked method
+	 * @param args method invocation arguments
+	 * @param proxy call-able proxy for the intercepted method
+	 * @return {@code anything} (the result of invoking the intercepted method)
+	 * @throws Throwable
+	 */
 	@RuntimeType
 	public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Throwable {
 		

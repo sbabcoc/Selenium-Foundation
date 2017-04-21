@@ -85,6 +85,12 @@ public class Coordinators {
 
 	}
 	
+	/**
+	 * Return a visibility-filtered element reference
+	 * 
+	 * @param element element whose visibility is in question
+	 * @return specified element reference; 'null' if element is hidden
+	 */
 	private static WebElement elementIfVisible(WebElement element) {
 		return element.isDisplayed() ? element : null;
 	}

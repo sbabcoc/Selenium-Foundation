@@ -132,19 +132,24 @@ public class Page extends ComponentContainer {
 		return (T) newPage(initialPage.value(), driver);
 	}
 	
+	/**
+	 * Construct a new instance of the specified page class
+	 * 
+	 * @param pageClass type of page object to instantiate
+	 * @param driver driver object
+	 * @return new instance of the specified page class
+	 */
 	public static <T extends Page> T newPage(Class<T> pageClass, WebDriver driver) {
-		T page = null;
 		try {
 			Constructor<T> ctor = pageClass.getConstructor(WebDriver.class);
-			page = ctor.newInstance(driver);
+			return ctor.newInstance(driver);
 		} catch (InvocationTargetException e) {
-			UncheckedThrow.throwUnchecked(e.getCause());
+			throw UncheckedThrow.throwUnchecked(e.getCause());
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
-			UncheckedThrow.throwUnchecked(e);
+			throw UncheckedThrow.throwUnchecked(e);
 		} catch (NoSuchMethodException | InstantiationException e) {
-			UncheckedThrow.throwUnchecked(e);
+			throw UncheckedThrow.throwUnchecked(e);
 		}
-		return page;
 	}
 	
 	/**
