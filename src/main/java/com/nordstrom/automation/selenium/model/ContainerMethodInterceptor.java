@@ -21,8 +21,6 @@ enum ContainerMethodInterceptor {
 	
 	private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
-//	@Override
-//	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 	@RuntimeType
 	public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Throwable {
 		

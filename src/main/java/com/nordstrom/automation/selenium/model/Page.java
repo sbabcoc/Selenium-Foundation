@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -225,7 +226,7 @@ public class Page extends ComponentContainer {
 	
 	@Override
 	String[] bypassMethods() {
-		return METHODS;
+		return ArrayUtils.addAll(super.bypassMethods(), METHODS);
 	}
 
 }

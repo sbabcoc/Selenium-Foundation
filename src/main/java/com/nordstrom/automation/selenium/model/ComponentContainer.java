@@ -17,9 +17,6 @@ import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 
-//import net.sf.cglib.proxy.Callback;
-//import net.sf.cglib.proxy.NoOp;
-
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsDriver, WrapsContext {
 	
 	protected WebDriver driver;
@@ -304,11 +301,6 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	@Override
 	Object[] getArguments() {
 		return new Object[] {context, parent};
-	}
-
-	@Override
-	Callback[] getCallbacks() {
-		return new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE};
 	}
 
 	@Override
