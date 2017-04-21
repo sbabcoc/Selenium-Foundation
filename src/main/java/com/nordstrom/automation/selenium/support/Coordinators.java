@@ -65,6 +65,12 @@ public class Coordinators {
 		};
 	}
 
+	/**
+	 * Returns a 'wait' proxy that determines the visibility of the element matched by the specified locator
+	 * 
+	 * @param locator web element locator
+	 * @return web element reference; 'null' if the indicated element is absent or hidden
+	 */
 	public static Coordinator<WebElement> visibilityOfElementLocated(final By locator) {
 		return new Coordinator<WebElement>() {
 
