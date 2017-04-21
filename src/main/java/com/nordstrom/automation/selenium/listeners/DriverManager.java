@@ -93,6 +93,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
 		ITestNGMethod testMethod = invokedMethod.getTestMethod();
 		if (testMethod.isTest() || testMethod.isBeforeMethodConfiguration()) {
+			SeleniumConfig config = SeleniumConfig.getConfig(testResult);
 			Method method = testMethod.getConstructorOrMethod().getMethod();
 			WebDriver driver = getDriver(testResult);
 			if (driver == null) {
@@ -104,7 +105,6 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 					} else {
 						driver = GridUtility.getDriver(testResult);
 					}
-					SeleniumConfig config = SeleniumConfig.getConfig(testResult);
 					long scriptTimeout = config.getLong(SeleniumSettings.SCRIPT_TIMEOUT.key());
 					long impliedTimeout = config.getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
 					long pageLoadTimeout = config.getLong(SeleniumSettings.PAGE_LOAD_TIMEOUT.key());
@@ -123,7 +123,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 					initialPage = method.getDeclaringClass().getAnnotation(InitialPage.class);
 				}
 				if (initialPage != null) {
-					Page page = Page.openInitialPage(initialPage, driver);
+					Page page = Page.openInitialPage(initialPage, driver, config.getTargetUri());
 					setInitialPage(page, testResult);
 				}
 			}

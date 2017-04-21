@@ -1,39 +1,57 @@
 package com.nordstrom.automation.selenium.model;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.NoOp;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 
 public class Frame extends Page {
 	
 	private FrameSelect frameSelect;
-	private WebElement element;
+	private RobustWebElement element;
 	private int index;
 	private String nameOrId;
+	private Class<?>[] argumentTypes;
+	private Object[] arguments;
 	
-	private static final Class<?>[] ELEMENT_ARG_TYPES = {WebElement.class, ComponentContainer.class};
-	private static final Class<?>[] INDEX_ARG_TYPES = {Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] NAME_OR_ID_ARG_TYPES = {String.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_3 = {Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_4 = {String.class, ComponentContainer.class};
 	
 	private enum FrameSelect {
+		ELEMENT,
 		INDEX, 
-		NAME_OR_ID, 
-		ELEMENT
+		NAME_OR_ID 
 	}
 	
 	/**
-	 * Constructor for frame by element
+	 * Constructor for frame by locator
 	 * 
-	 * @param element frame container element
+	 * @param locator frame element locator
 	 * @param parent frame parent
 	 */
-	public Frame(WebElement element, ComponentContainer parent) {
+	public Frame(By locator, ComponentContainer parent) {
+		this(locator, -1, parent);
+		
+		argumentTypes = ARG_TYPES_1;
+		arguments = new Object[] {locator, parent};
+	}
+	
+	/**
+	 * Constructor for frame by locator and index
+	 * 
+	 * @param locator frame element locator
+	 * @param index frame element index
+	 * @param parent frame parent
+	 */
+	public Frame(By locator, int index, ComponentContainer parent) {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;
-		this.element = element;
+		this.index = index;
+		
+		this.element = new RobustWebElement(null, parent, locator, index);
+		
+		argumentTypes = ARG_TYPES_2;
+		arguments = new Object[] {locator, index, parent};
 	}
 	
 	/**
@@ -46,6 +64,9 @@ public class Frame extends Page {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.INDEX;
 		this.index = index;
+		
+		argumentTypes = ARG_TYPES_3;
+		arguments = new Object[] {index, parent};
 	}
 	
 	/**
@@ -59,13 +80,16 @@ public class Frame extends Page {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.NAME_OR_ID;
 		this.nameOrId = nameOrId;
+		
+		argumentTypes = ARG_TYPES_4;
+		arguments = new Object[] {nameOrId, parent};
 	}
 
 	@Override
-	protected WebDriver switchToContext() {
+	protected SearchContext switchToContext() {
 		switch (frameSelect) {
 		case ELEMENT:
-			driver.switchTo().frame(element);
+			driver.switchTo().frame(element.getWrappedElement());
 			break;
 			
 		case INDEX:
@@ -76,37 +100,27 @@ public class Frame extends Page {
 			driver.switchTo().frame(nameOrId);
 			break;
 		}
-		return driver;
+		return this;
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ComponentContainer> T enhanceContainer(T container) {
-		Class<? extends ComponentContainer> type = container.getClass();
-		if (Enhancer.isEnhanced(type)) return container;
-		
-		Frame frame = (Frame) container;
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(type);
-		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
-		enhancer.setCallbackFilter(this);
-		
-		T enhanced = null;
-		frame.parent.switchTo();
-		switch (frame.frameSelect) {
-		case ELEMENT:
-			enhanced = (T) enhancer.create(ELEMENT_ARG_TYPES, new Object[] {frame.element, frame.parent});
-			break;
-			
-		case INDEX:
-			enhanced = (T) enhancer.create(INDEX_ARG_TYPES, new Object[] {frame.index, frame.parent});
-			break;
-			
-		case NAME_OR_ID:
-			enhanced = (T) enhancer.create(NAME_OR_ID_ARG_TYPES, new Object[] {frame.nameOrId, frame.parent});
-			break;
+	public SearchContext refreshContext() {
+		if (frameSelect == FrameSelect.ELEMENT) {
+			element.refreshContext();
+		} else {
+			parent.refreshContext();
 		}
-		return enhanced;
+		return switchToContext();
 	}
 
+	@Override
+	public Class<?>[] getArgumentTypes() {
+		return argumentTypes;
+	}
+
+	@Override
+	public Object[] getArguments() {
+		return arguments;
+	}
+	
 }

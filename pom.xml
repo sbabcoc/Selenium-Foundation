@@ -23,7 +23,7 @@
     <testng-foundation.version>1.0.3</testng-foundation.version>
     <testng.version>6.11</testng.version>
     <resteasy.version>3.1.2.Final</resteasy.version>
-    <cglib.version>3.2.5</cglib.version>
+    <bytebuddy.version>1.6.13</bytebuddy.version>
   </properties>
   
   <distributionManagement>
@@ -66,9 +66,9 @@
         <version>${resteasy.version}</version>
       </dependency>
       <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib</artifactId>
-        <version>${cglib.version}</version>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>${bytebuddy.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -100,8 +100,8 @@
       <artifactId>resteasy-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib</artifactId>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
     </dependency>
   </dependencies>
   

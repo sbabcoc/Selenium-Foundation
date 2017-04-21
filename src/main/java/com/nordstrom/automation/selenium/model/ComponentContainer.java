@@ -1,48 +1,38 @@
 package com.nordstrom.automation.selenium.model;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.internal.WrapsElement;
-
-import com.google.common.base.Throwables;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.interfaces.WrapsContext;
+import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.CallbackFilter;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.NoOp;
-
-public abstract class ComponentContainer implements SearchContext, WrapsDriver, WrapsElement, CallbackFilter {
+public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsDriver, WrapsContext {
 	
 	protected WebDriver driver;
 	protected SearchContext context;
 	protected ComponentContainer parent;
 	protected Method vacater;
 	protected SearchContextWait wait;
+	private List<Class<?>> bypass;
+	private List<String> methods;
 	
 	public static final By SELF = By.xpath(".");
-	protected static final List<Class<?>> BYPASS;
-	protected static final List<String> METHODS;
+	private static final Class<?>[] BYPASS = {Object.class, WrapsDriver.class, WrapsContext.class};
+	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
+			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
+			"bypassClassOf", "bypassMethod"};
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
-	
-	static {
-		BYPASS = Arrays.asList(Object.class, WrapsDriver.class, WrapsElement.class, CallbackFilter.class);
-		METHODS = Arrays.asList("validateParent", "getDriver", "getContext", "getParent", "getParentPage", "getWait",
-				"switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "newChild", "enhanceContainer",
-				"bypassClassOf", "bypassMethod");
-	}
 	
 	/**
 	 * Constructor for component container
@@ -120,27 +110,53 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
-	 * Switch driver to this container's search context.
+	 * Switch focus to this container's search context.
 	 * <p>
 	 * <b>NOTE</b>: This method walks down the container lineage to the parent page object, then back up to this 
 	 * container, focusing the driver on each container as it goes.
 	 * 
-	 * @return driver focused on this container's context
+	 * @return this container's context
 	 */
-	public WebDriver switchTo() {
-		if (parent != null) parent.switchTo();
-		return switchToContext();
+	public SearchContext switchTo() {
+		return getWait().until(contextIsSwitched(this));
+	}
+	
+	/**
+	 * Returns a 'wait' proxy that switches focus to the specified context
+	 * 
+	 * @param context search context on which to focus
+	 * @return target search context
+	 */
+	static Coordinator<SearchContext> contextIsSwitched(final ComponentContainer context) {
+		return new Coordinator<SearchContext>() {
+
+			@Override
+			public SearchContext apply(SearchContext ignore) {
+				if (context.parent != null) context.parent.switchTo();
+				
+				try {
+					return context.switchToContext();
+				} catch (StaleElementReferenceException e) {
+					return context.refreshContext();
+				}
+			}
+			
+			@Override
+			public String toString() {
+				return "context to be switched";
+			}
+		};
 	}
 	
 	/**
 	 * Switch focus to this container's search context.
 	 * <p>
-	 * <b>NOTE</b>: This protected method is used to focus the driver on this container's context. This is the worker 
-	 * for the {@link #switchTo} method, and it must be called in proper sequence to work properly.
+	 * <b>NOTE</b>: This method walks down the container lineage to the parent page object, then back up to this 
+	 * container, focusing the driver on each container as it goes.
 	 * 
-	 * @return driver focused on this container's context
+	 * @return this container's context
 	 */
-	protected abstract WebDriver switchToContext();
+	protected abstract SearchContext switchToContext();
 	
 	/**
 	 * Get the method that caused this container to be vacated.
@@ -177,44 +193,6 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
-	 * Create a container object of the specified class and context as a child of the target object
-	 * 
-	 * @param <T> type of child object to instantiate
-	 * @param childClass class of child object to create
-	 * @param context container search context
-	 * @return new object of the specified type, with the current container as parent
-	 */
-	public <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context) {
-		return newChild(childClass, context, this);
-	}
-	
-	/**
-	 * Create a container object of the specified class and context as a child of the specified parent
-	 * 
-	 * @param <T> type of child object to instantiate
-	 * @param childClass class of child object to create
-	 * @param context container search context
-	 * @param parent parent of the new container object
-	 * @return new object of the specified type, with the specified container as parent
-	 */
-	public static <T extends ComponentContainer> T newChild(Class<T> childClass, SearchContext context, ComponentContainer parent) {
-		T child = null;
-		try {
-			Constructor<T> ctor = childClass.getConstructor(SearchContext.class, ComponentContainer.class);
-			child = ctor.newInstance(context, parent);
-		} catch (InvocationTargetException e) {
-			Throwables.propagate(e.getCause());
-		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
-			Throwables.propagate(e);
-		} catch (NoSuchMethodException | InstantiationException e) {
-			// never thrown because generic type is bounded
-		}
-		return child;
-	}
-	
-	
-	
-	/**
 	 * Find all elements within the current context using the given mechanism.
 	 * 
 	 * @param by the locating mechanism
@@ -222,7 +200,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 */
 	@Override
 	public List<WebElement> findElements(By by) {
-		return context.findElements(by);
+		return RobustWebElement.getElements(this, by);
 	}
 	
 	/**
@@ -233,7 +211,7 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	 */
 	@Override
 	public WebElement findElement(By by) {
-		return context.findElement(by);
+		return RobustWebElement.getElement(this, by);
 	}
 	
 	/**
@@ -247,70 +225,118 @@ public abstract class ComponentContainer implements SearchContext, WrapsDriver, 
 	}
 	
 	/**
-	 * Get the context element for this container.
+	 * Update the specified element with the indicated value
 	 * 
-	 * @return container context element
+	 * @param element target element (checkbox)
+	 * @param value desired value
+	 * @return 'true' if element value changed; otherwise 'false'
 	 */
-	@Override
-	public WebElement getWrappedElement() {
-		return context.findElement(SELF);
-	}
-	
-	/**
-	 * Create an enhanced instance of the specified container.
-	 * 
-	 * @param <T> container type
-	 * @param container container object to be enhanced
-	 * @return enhanced container object
-	 */
-	@SuppressWarnings("unchecked")
-	public <T extends ComponentContainer> T enhanceContainer(T container) {
-		Class<? extends ComponentContainer> type = container.getClass();
-		if (Enhancer.isEnhanced(type)) return container;
-		
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(type);
-		enhancer.setCallbacks(new Callback[] {ContainerMethodInterceptor.INSTANCE, NoOp.INSTANCE});
-		enhancer.setCallbackFilter(this);
-		return (T) enhancer.create(ARG_TYPES, new Object[] {container.context, container.parent});
-	}
-	
-	/**
-	 * Map a method to a callback type.
-	 * 
-	 * @param method the intercepted method
-	 * @return a callback type, as enumerated by the {@link Enhancer#setCallbacks} invocation in
-	 *         {@link #enhanceContainer}
-	 */
-	@Override
-	public int accept(Method method) {
-		if (bypassClassOf(method)) {
-			return 1;
-		} else if (bypassMethod(method)) {
-			return 1;
-		} else {
-			return 0;
+	public static boolean updateValue(WebElement element, boolean value) {
+		String tagName = element.getTagName().toLowerCase();
+		if ("input".equals(tagName)) {
+			if ("checkbox".equals(element.getAttribute("type"))) {
+				boolean exist = element.isSelected();
+				if (exist == value) {
+					return false;
+				} else {
+					element.click();
+					return true;
+				}
+			}
 		}
+		return updateValue(element, Boolean.valueOf(value).toString());
 	}
 	
 	/**
-	 * Determine if the specified method is declared in a class that should be entirely bypassed.
+	 * Update the specified element with the indicated value
 	 * 
-	 * @param method method in question
-	 * @return 'true' if specified method is declared in bypassed class; otherwise 'false'
+	 * @param element target element (input, select)
+	 * @param value desired value
+	 * @return 'true' if element value changed; otherwise 'false'
 	 */
-	protected boolean bypassClassOf(Method method) {
-		return BYPASS.contains(method.getDeclaringClass());
+	public static boolean updateValue(WebElement element, String value) {
+		String tagName = element.getTagName().toLowerCase();
+		if ("input".equals(tagName)) {
+			if ("checkbox".equals(element.getAttribute("type"))) {
+				return updateValue(element, Boolean.parseBoolean(value));
+			} else {
+				String exist = element.getAttribute("value");
+				if (exist == null) {
+					if (value == null) {
+						return false;
+					}
+				}
+				if (value == null) {
+					element.clear();
+					return true;
+				} else if (exist.equals(value)) {
+					return false;
+				} else {
+					element.sendKeys(value);
+					return true;
+				}
+			}
+		} else if ("select".equals(tagName)) {
+			
+		}
+		return false;
 	}
 	
 	/**
-	 * Determine if the specified method should not be intercepted.
+	 * Scroll the specified element into view
 	 * 
-	 * @param method method in question
-	 * @return 'true' if specified method should be bypassed; otherwise 'false'
+	 * @param element target element
+	 * @return the specified element
 	 */
-	protected boolean bypassMethod(Method method) {
-		return METHODS.contains(method.getName());
+	public static WebElement scrollIntoView(WebElement element) {
+		WebDriverUtils.getExecutor(element).executeScript("arguments[0].scrollIntoView(true);", element);
+		return element;
+	}
+
+	@Override
+	Class<?>[] getArgumentTypes() {
+		return ARG_TYPES;
+	}
+
+	@Override
+	Object[] getArguments() {
+		return new Object[] {context, parent};
+	}
+
+	@Override
+	List<Class<?>> getBypassClasses() {
+		if (bypass == null) {
+			bypass = super.getBypassClasses();
+			Collections.addAll(bypass, bypassClasses());
+		}
+		return bypass;
+	}
+	
+	/**
+	 * Returns an array of classes whose methods should not be intercepted
+	 * 
+	 * @return array of bypass classes
+	 */
+	Class<?>[] bypassClasses() {
+		return BYPASS;
+	}
+	
+	@Override
+	List<String> getBypassMethods() {
+		if (methods == null) {
+			methods = super.getBypassMethods();
+			Collections.addAll(methods, bypassMethods());
+		}
+		return methods;
+	}
+	
+	/**
+	 * Returns an array of names for methods that should not be intercepted
+	 * 
+	 * @return array of bypass method names
+	 */
+	String[] bypassMethods() {
+		return METHODS;
 	}
 	
 }
