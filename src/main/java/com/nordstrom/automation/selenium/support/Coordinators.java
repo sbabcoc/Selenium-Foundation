@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.support;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.openqa.selenium.By;
@@ -66,7 +68,7 @@ public class Coordinators {
 	}
 
 	/**
-	 * Returns a 'wait' proxy that determines the visibility of the element matched by the specified locator
+	 * Returns a 'wait' proxy that determines if the first element matched by the specified locator is visible
 	 * 
 	 * @param locator web element locator
 	 * @return web element reference; 'null' if the indicated element is absent or hidden
@@ -92,6 +94,33 @@ public class Coordinators {
 	}
 	
 	/**
+	 * Returns a 'wait' proxy that determines if any element matched by the specified locator is visible
+	 * 
+	 * @param locator web element locator
+	 * @return web element reference; 'null' if no matching elements are visible
+	 */
+	public static Coordinator<WebElement> visibilityOfAnyElementLocated(final By locator) {
+		return new Coordinator<WebElement>() {
+
+			@Override
+			public WebElement apply(SearchContext context) {
+				try {
+					List<WebElement> visible = context.findElements(locator);
+					return (filterHidden(visible)) ? null : visible.get(0);
+				} catch (StaleElementReferenceException e) {
+					return null;
+				}
+			}
+
+			@Override
+			public String toString() {
+				return "visibility of element located by " + locator;
+			}
+		};
+
+	}
+	
+	/**
 	 * Return a visibility-filtered element reference
 	 * 
 	 * @param element element whose visibility is in question
@@ -99,5 +128,19 @@ public class Coordinators {
 	 */
 	private static WebElement elementIfVisible(WebElement element) {
 		return element.isDisplayed() ? element : null;
+	}
+	
+	/**
+	 * Remove hidden elements from specified list
+	 * 
+	 * @param elements list of elements
+	 * @return 'true' if no visible elements were found; otherwise 'false'
+	 */
+	public static boolean filterHidden(List<WebElement> elements) {
+		Iterator<WebElement> iter = elements.iterator();
+		while (iter.hasNext()) {
+			if ( ! iter.next().isDisplayed()) iter.remove();
+		}
+		return elements.isEmpty();
 	}
 }

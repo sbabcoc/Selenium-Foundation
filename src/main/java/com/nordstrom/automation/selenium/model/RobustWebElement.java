@@ -263,6 +263,33 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	}
 	
 	/**
+	 * Get the search context for this element
+	 * 
+	 * @return element search context
+	 */
+	public WrapsContext getContext() {
+		return context;
+	}
+	
+	/**
+	 * Get the locator for this element
+	 * 
+	 * @return element locator
+	 */
+	public By getLocator() {
+		return locator;
+	}
+	
+	/**
+	 * Get the element index
+	 * 
+	 * @return element index; -1 = first match
+	 */
+	public int getIndex() {
+		return index;
+	}
+	
+	/**
 	 * Refresh the wrapped element reference
 	 * 
 	 * @param e {@link StaleElementReferenceException} that necessitates reference refresh
