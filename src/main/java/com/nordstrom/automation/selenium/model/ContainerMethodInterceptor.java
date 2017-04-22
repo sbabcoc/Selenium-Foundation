@@ -16,7 +16,7 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
 
-enum ContainerMethodInterceptor {
+public enum ContainerMethodInterceptor {
 	INSTANCE;
 	
 	private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
