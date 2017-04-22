@@ -32,7 +32,9 @@ import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
 public class RobustWebElement implements WebElement, WrapsElement, WrapsContext {
 	
+	/** wraps 1st matched reference */
 	public static final int CARDINAL = -1;
+	/** wraps an optional reference */
 	public static final int OPTIONAL = -2;
 	
 	private static String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
@@ -317,7 +319,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	/**
 	 * Get the element index.
 	 * <p>
-	 * <b>NOTE</b>: {@link #CARDINAL} = first matching; {@link #OPTIONAL} = optional reference
+	 * <b>NOTE</b>: {@link #CARDINAL} = 1st matched reference; {@link #OPTIONAL} = an optional reference
 	 * 
 	 * @return element index (see NOTE)
 	 */
