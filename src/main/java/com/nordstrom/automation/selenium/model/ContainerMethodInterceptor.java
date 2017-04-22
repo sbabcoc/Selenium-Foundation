@@ -29,7 +29,7 @@ public enum ContainerMethodInterceptor {
 	 * @param args method invocation arguments
 	 * @param proxy call-able proxy for the intercepted method
 	 * @return {@code anything} (the result of invoking the intercepted method)
-	 * @throws Throwable
+	 * @throws Throwable {@code anything} (exception thrown by the intercepted method)
 	 */
 	@RuntimeType
 	public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Throwable {

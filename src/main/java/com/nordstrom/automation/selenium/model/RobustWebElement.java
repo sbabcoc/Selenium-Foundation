@@ -5,18 +5,19 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
-import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -29,7 +30,10 @@ import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
-public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, WrapsContext {
+public class RobustWebElement implements WebElement, WrapsElement, WrapsContext {
+	
+	public static final int CARDINAL = -1;
+	public static final int OPTIONAL = -2;
 	
 	private static String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
 	private static String LOCATE_BY_XPATH = JsUtility.getScriptResource("locateByXpath.js");
@@ -52,7 +56,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param locator element locator
 	 */
 	public RobustWebElement(WrapsContext context, By locator) {
-		this(null, context, locator, -1);
+		this(null, context, locator, CARDINAL);
 	}
 	
 	/**
@@ -63,7 +67,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	 * @param locator element locator
 	 */
 	public RobustWebElement(WebElement element, WrapsContext context, By locator) {
-		this(element, context, locator, -1);
+		this(element, context, locator, CARDINAL);
 	}
 	
 	/**
@@ -88,10 +92,11 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		this.wrapped = element;
 		this.context = context;
 		this.locator = locator;
-		this.index = (index < 0) ? -1 : index;
+		this.index = index;
 		
 		if (context == null) throw new IllegalArgumentException("Context cannot be null");
 		if (locator == null) throw new IllegalArgumentException("Locator cannot be null");
+		if (index < OPTIONAL) throw new IndexOutOfBoundsException("Specified index is invalid");
 		
 		driver = WebDriverUtils.getDriver(context.getWrappedContext());
 		boolean findsByCss = (driver instanceof FindsByCssSelector);
@@ -103,7 +108,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 				strategy = Strategy.JS_XPATH;
 				
 				this.locator = By.xpath(this.selector);
-				index = -1;
+				index = CARDINAL;
 			} else if (findsByCss) {
 				selector = ByType.cssLocatorFor(locator);
 				if (selector != null) {
@@ -113,14 +118,18 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		}
 		
 		if (element == null) {
-			refreshReference(null);
+			if (index == OPTIONAL) {
+				acquireReference(this);
+			} else {
+				refreshReference(null);
+			}
 		}
 	}
 	
 	@Override
 	public <X> X getScreenshotAs(final OutputType<X> arg0) throws WebDriverException {
 		try {
-			return wrapped.getScreenshotAs(arg0);
+			return getWrappedElement().getScreenshotAs(arg0);
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getScreenshotAs(arg0);
 		}
@@ -129,7 +138,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public void clear() {
 		try {
-			wrapped.clear();
+			getWrappedElement().clear();
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).clear();
 		}
@@ -138,7 +147,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public void click() {
 		try {
-			wrapped.click();
+			getWrappedElement().click();
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).click();
 		}
@@ -157,7 +166,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public String getAttribute(String name) {
 		try {
-			return wrapped.getAttribute(name);
+			return getWrappedElement().getAttribute(name);
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getAttribute(name);
 		}
@@ -166,7 +175,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public String getCssValue(String propertyName) {
 		try {
-			return wrapped.getCssValue(propertyName);
+			return getWrappedElement().getCssValue(propertyName);
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getCssValue(propertyName);
 		}
@@ -175,7 +184,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public Point getLocation() {
 		try {
-			return wrapped.getLocation();
+			return getWrappedElement().getLocation();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getLocation();
 		}
@@ -184,7 +193,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public Rectangle getRect() {
 		try {
-			return wrapped.getRect();
+			return getWrappedElement().getRect();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getRect();
 		}
@@ -193,7 +202,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public Dimension getSize() {
 		try {
-			return wrapped.getSize();
+			return getWrappedElement().getSize();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getSize();
 		}
@@ -202,7 +211,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public String getTagName() {
 		try {
-			return wrapped.getTagName();
+			return getWrappedElement().getTagName();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getTagName();
 		}
@@ -211,7 +220,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public String getText() {
 		try {
-			return wrapped.getText();
+			return getWrappedElement().getText();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getText();
 		}
@@ -220,7 +229,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public boolean isDisplayed() {
 		try {
-			return wrapped.isDisplayed();
+			return getWrappedElement().isDisplayed();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).isDisplayed();
 		}
@@ -229,7 +238,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public boolean isEnabled() {
 		try {
-			return wrapped.isEnabled();
+			return getWrappedElement().isEnabled();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).isEnabled();
 		}
@@ -238,7 +247,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public boolean isSelected() {
 		try {
-			return wrapped.isSelected();
+			return getWrappedElement().isSelected();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).isSelected();
 		}
@@ -247,7 +256,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public void sendKeys(CharSequence... keysToSend) {
 		try {
-			wrapped.sendKeys(keysToSend);
+			getWrappedElement().sendKeys(keysToSend);
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).sendKeys(keysToSend);
 		}
@@ -256,7 +265,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	@Override
 	public void submit() {
 		try {
-			wrapped.submit();
+			getWrappedElement().submit();
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).submit();
 		}
@@ -264,11 +273,31 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 
 	@Override
 	public WebElement getWrappedElement() {
+		if (wrapped == null) {
+			acquireReference(this);
+			if (wrapped == null) {
+				throw new NoSuchElementException("Unable to locate wrapped element: " + locator.toString());
+			}
+		}
 		return wrapped;
 	}
 	
 	/**
-	 * Get the search context for this element
+	 * Determine if this robust element wraps a valid reference.
+	 * 
+	 * @return 'true' if reference was acquired; otherwise 'false'
+	 */
+	public boolean hasReference() {
+		if ((index == OPTIONAL) && (wrapped == null)) {
+			acquireReference(this);
+			return (null != wrapped);
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 * Get the search context for this element.
 	 * 
 	 * @return element search context
 	 */
@@ -277,7 +306,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	}
 	
 	/**
-	 * Get the locator for this element
+	 * Get the locator for this element.
 	 * 
 	 * @return element locator
 	 */
@@ -286,16 +315,16 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	}
 	
 	/**
-	 * Get the element index
+	 * Get the element index.
 	 * 
-	 * @return element index; -1 = first match
+	 * @return element index; CARDINAL = first match
 	 */
 	public int getIndex() {
 		return index;
 	}
 	
 	/**
-	 * Refresh the wrapped element reference
+	 * Refresh the wrapped element reference.
 	 * 
 	 * @param e {@link StaleElementReferenceException} that necessitates reference refresh
 	 * @return this robust web element with refreshed reference
@@ -306,12 +335,14 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 			new SearchContextWait((SearchContext) context, impliedTimeout).until(referenceIsRefreshed(this));
 			return this;
 		} catch (Throwable t) {
-			throw UncheckedThrow.throwUnchecked((e != null) ? e : t);
+			if (e != null) UncheckedThrow.throwUnchecked(e);
+			if (t instanceof TimeoutException) UncheckedThrow.throwUnchecked(t.getCause());
+			throw UncheckedThrow.throwUnchecked(t);
 		}
 	}
 	
 	/**
-	 * Returns a 'wait' proxy that refreshes the wrapped reference of the specified robust element
+	 * Returns a 'wait' proxy that refreshes the wrapped reference of the specified robust element.
 	 * 
 	 * @param element robust web element object
 	 * @return wrapped element reference (refreshed)
@@ -338,7 +369,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	}
 	
 	/**
-	 * Acquire the element reference that's wrapped by the specified robust element
+	 * Acquire the element reference that's wrapped by the specified robust element.
 	 * 
 	 * @param element robust web element object
 	 * @return wrapped element reference
@@ -365,6 +396,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 				} else {
 					element.wrapped = context.findElement(element.locator);
 				}
+			} catch (NoSuchElementException e) {
+				if (element.index != OPTIONAL) throw e;
+				element.wrapped = null;
 			} finally {
 				long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
 				timeouts.implicitlyWait(impliedTimeout, TimeUnit.SECONDS);
@@ -373,10 +407,10 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 		}
 		return element;
 	}
-
+	
 	@Override
 	public SearchContext getWrappedContext() {
-		return wrapped;
+		return getWrappedElement();
 	}
 
 	@Override
@@ -386,11 +420,11 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 
 	@Override
 	public WebDriver getWrappedDriver() {
-		return WebDriverUtils.getDriver(wrapped);
+		return WebDriverUtils.getDriver(getWrappedElement());
 	}
 	
 	/**
-	 * Get the list of elements that match the specified locator in the indicated context
+	 * Get the list of elements that match the specified locator in the indicated context.
 	 * 
 	 * @param context element search context
 	 * @param locator element locator
@@ -410,26 +444,26 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	}
 	
 	/**
-	 * Get the first element that matches the specified locator in the indicated context
+	 * Get the first element that matches the specified locator in the indicated context.
 	 * 
 	 * @param context element search context
 	 * @param locator element locator
 	 * @return robust element in context that matches the locator
 	 */
-	public static WebElement getElement(WrapsContext context, By locator) {
-		return getElement(context, locator, -1);
+	public static RobustWebElement getElement(WrapsContext context, By locator) {
+		return getElement(context, locator, CARDINAL);
 	}
 	
 	/**
 	 * Get the item at the specified index in the list of elements matching the specified 
-	 * locator in the indicated context
+	 * locator in the indicated context.
 	 * 
 	 * @param context element search context
 	 * @param locator element locator
 	 * @param index element index
 	 * @return indexed robust element in context that matches the locator
 	 */
-	public static WebElement getElement(WrapsContext context, By locator, int index) {
+	public static RobustWebElement getElement(WrapsContext context, By locator, int index) {
 		return new RobustWebElement(null, context, locator, index);
 	}
 	
