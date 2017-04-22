@@ -216,7 +216,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	/**
 	 * Get a wrapped reference to the first element matching the specified locator.
 	 * <p>
-	 * <b>NOTE</b>: Use {@link RobustWebElement#hasReference()} to determine is a valid reference was acquired.
+	 * <b>NOTE</b>: Use {@link RobustWebElement#hasReference()} to determine if a valid reference was acquired.
 	 * 
 	 * @param by the locating mechanism
 	 * @return robust web element
