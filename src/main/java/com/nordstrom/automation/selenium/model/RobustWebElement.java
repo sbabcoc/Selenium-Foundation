@@ -303,9 +303,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 	private WebElement refreshReference(StaleElementReferenceException e) {
 		try {
 			long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
-			SearchContextWait wait = new SearchContextWait((ComponentContainer) context, impliedTimeout);
-			
-			wrapped = wait.until(referenceIsRefreshed(this));
+			new SearchContextWait((SearchContext) context, impliedTimeout).until(referenceIsRefreshed(this));
 			return this;
 		} catch (Throwable t) {
 			throw UncheckedThrow.throwUnchecked((e != null) ? e : t);
@@ -326,7 +324,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsDriver, 
 				try {
 					return acquireReference(element);
 				} catch (StaleElementReferenceException e) {
-					((ComponentContainer) context).refreshContext();
+					((WrapsContext) context).refreshContext();
 					return acquireReference(element);
 				}
 			}
