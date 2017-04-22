@@ -317,7 +317,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	/**
 	 * Get the element index.
 	 * 
-	 * @return element index; CARDINAL = first match
+	 * @return element index; {@link #CARDINAL} = first match
 	 */
 	public int getIndex() {
 		return index;
