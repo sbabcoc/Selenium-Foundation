@@ -120,6 +120,7 @@ public class Page extends ComponentContainer {
 	/**
 	 * Open the page defined by the specified {@link InitialPage} annotation
 	 * 
+	 * @param <T> page class
 	 * @param initialPage initial page annotation
 	 * @param driver driver object
 	 * @param targetUri target URI
@@ -135,6 +136,7 @@ public class Page extends ComponentContainer {
 	/**
 	 * Construct a new instance of the specified page class
 	 * 
+	 * @param <T> page class
 	 * @param pageClass type of page object to instantiate
 	 * @param driver driver object
 	 * @return new instance of the specified page class

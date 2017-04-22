@@ -47,7 +47,6 @@ public abstract class Enhanceable<T> {
 	/**
 	 * Create an enhanced instance of the specified container.
 	 * 
-	 * @param <T> superclass type
 	 * @param <C> container type
 	 * @param container container object to be enhanced
 	 * @return enhanced container object
