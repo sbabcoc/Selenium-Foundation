@@ -276,10 +276,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	@Override
 	public WebElement getWrappedElement() {
 		if (wrapped == null) {
-			acquireReference(this);
-			if (wrapped == null) {
-				throw new NoSuchElementException("Unable to locate wrapped element: " + locator.toString());
-			}
+			refreshReference(null);
 		}
 		return wrapped;
 	}
