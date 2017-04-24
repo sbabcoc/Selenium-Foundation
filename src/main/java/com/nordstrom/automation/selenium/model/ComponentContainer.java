@@ -9,7 +9,6 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsDriver;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
@@ -17,7 +16,7 @@ import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 
-public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsDriver, WrapsContext {
+public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
 	
 	protected WebDriver driver;
 	protected SearchContext context;
@@ -28,7 +27,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	private List<String> methods;
 	
 	public static final By SELF = By.xpath(".");
-	private static final Class<?>[] BYPASS = {Object.class, WrapsDriver.class, WrapsContext.class};
+	private static final Class<?>[] BYPASS = {Object.class, WrapsContext.class};
 	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
 			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
 			"bypassClassOf", "bypassMethod"};
@@ -215,6 +214,18 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	/**
+	 * Get a wrapped reference to the first element matching the specified locator.
+	 * <p>
+	 * <b>NOTE</b>: Use {@link RobustWebElement#hasReference()} to determine if a valid reference was acquired.
+	 * 
+	 * @param by the locating mechanism
+	 * @return robust web element
+	 */
+	public RobustWebElement findOptional(By by) {
+		return RobustWebElement.getElement(this, by, RobustWebElement.OPTIONAL);
+	}
+	
+	/**
 	 * Get the driver object associated with this container.
 	 * 
 	 * @return container driver object
@@ -304,7 +315,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 
 	@Override
-	List<Class<?>> getBypassClasses() {
+	protected List<Class<?>> getBypassClasses() {
 		if (bypass == null) {
 			bypass = super.getBypassClasses();
 			Collections.addAll(bypass, bypassClasses());
@@ -322,7 +333,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	@Override
-	List<String> getBypassMethods() {
+	protected List<String> getBypassMethods() {
 		if (methods == null) {
 			methods = super.getBypassMethods();
 			Collections.addAll(methods, bypassMethods());
