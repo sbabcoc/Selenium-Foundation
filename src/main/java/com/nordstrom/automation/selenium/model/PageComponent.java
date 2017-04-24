@@ -2,8 +2,12 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsElement;
 
-public class PageComponent extends ComponentContainer {
+import com.nordstrom.automation.selenium.support.Coordinator;
+
+public class PageComponent extends ComponentContainer implements WrapsElement {
 	
 	private Class<?>[] argumentTypes;
 	private Object[] arguments;
@@ -91,4 +95,75 @@ public class PageComponent extends ComponentContainer {
 		return arguments;
 	}
 	
+	@Override
+	public WebElement getWrappedElement() {
+		return (WebElement) context;
+	}
+	
+	/**
+	 * Determine if this component is visible
+	 * <p>
+	 * <b>NOTE</b>: The default implementation of this method uses the {@link WebElement#isDisplayed()} method of the 
+	 * component context element to determine visibility. If the component context element is always hidden, override 
+	 * this method with your scenario-specific implementation. 
+	 * 
+	 * @return 'true' if component is visible; otherwise 'false'
+	 */
+	public boolean isDisplayed() {
+		RobustWebElement element = (RobustWebElement) context;
+		return (element.hasReference()) ? element.isDisplayed() : false;
+	}
+	
+	/**
+	 * Returns a 'wait' proxy that determines if this page component is visible
+	 * 
+	 * @return 'true' if page component is visible; otherwise 'false'
+	 */
+	public static Coordinator<Boolean> componentIsVisible() {
+		return new Coordinator<Boolean>() {
+
+			@Override
+			public Boolean apply(SearchContext context) {
+				return Boolean.valueOf(verifyContext(context).isDisplayed());
+			}
+			
+			@Override
+			public String toString() {
+				return "page component to be visible";
+			}
+		};
+	}
+	
+	/**
+	 * Returns a 'wait' proxy that determines if this page component is hidden
+	 * 
+	 * @return 'true' if page component is hidden; otherwise 'false'
+	 */
+	public static Coordinator<Boolean> componentIsHidden() {
+		return new Coordinator<Boolean>() {
+
+			@Override
+			public Boolean apply(SearchContext context) {
+				return Boolean.valueOf( ! verifyContext(context).isDisplayed());
+			}
+			
+			@Override
+			public String toString() {
+				return "page component to be hidden";
+			}
+		};
+	}
+	
+	/**
+	 * Determine if the specified search context is a page component
+	 * 
+	 * @param context search context in question
+	 * @return search context as page component (throws an exception otherwise)
+	 * @throws UnsupportedOperationException if specified search context isn't a page component
+	 */
+	private static PageComponent verifyContext(SearchContext context) {
+		if (context instanceof PageComponent) return (PageComponent) context;
+		throw new UnsupportedOperationException("Wait object search context is not a page component");
+	}
+
 }
