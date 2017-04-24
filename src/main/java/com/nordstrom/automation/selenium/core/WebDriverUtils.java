@@ -1,10 +1,14 @@
 package com.nordstrom.automation.selenium.core;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 
 public class WebDriverUtils {
@@ -68,6 +72,20 @@ public class WebDriverUtils {
 		} else {
 			throw new UnsupportedOperationException("The specified context is unable to describe its capabilities");
 		}
+	}
+
+	/**
+	 * Remove hidden elements from specified list
+	 * 
+	 * @param elements list of elements
+	 * @return 'true' if no visible elements were found; otherwise 'false'
+	 */
+	public static boolean filterHidden(List<WebElement> elements) {
+		Iterator<WebElement> iter = elements.iterator();
+		while (iter.hasNext()) {
+			if ( ! iter.next().isDisplayed()) iter.remove();
+		}
+		return elements.isEmpty();
 	}
 
 }
