@@ -19,8 +19,6 @@ import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 
-import net.bytebuddy.dynamic.DynamicType;
-
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
 	
 	protected WebDriver driver;
