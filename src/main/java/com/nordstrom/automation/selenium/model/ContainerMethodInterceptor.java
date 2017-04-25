@@ -19,6 +19,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
 public enum ContainerMethodInterceptor {
 	INSTANCE;
 	
+	private int depth = 0;
 	private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
 	/**
@@ -34,56 +35,71 @@ public enum ContainerMethodInterceptor {
 	@RuntimeType
 	public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Throwable {
 		
+		if ( ! (obj instanceof ComponentContainer)) return proxy.call();
+		
+		depth++;
+		long initialTime = System.currentTimeMillis();
 		ComponentContainer container = (ComponentContainer) obj;
 		
-		if (container.isVacated()) {
-			throw new ContainerVacatedException(container.getVacater());
-		}
-		
-		WebDriver driver = container.getDriver();
-
-		if (target.get() != container) {
-			container.switchTo();
-			target.set(container);
-		}
-		
-		Page parentPage = container.getParentPage();
-		Set<String> initialHandles = driver.getWindowHandles();
-		
-		Object result = proxy.call();
-		
-		// if result is container, we're done
-		if (result == container) return result;
-		
-		if (parentPage.getWindowState() == WindowState.WILL_CLOSE) {
-			parentPage.getWait().until(Coordinators.windowIsClosed(parentPage.getWindowHandle()));
-			container.setVacater(method);
-		}
-		
-		if (ComponentContainer.class.isAssignableFrom(method.getReturnType())) {
-			if (result == null) throw new NullPointerException("A method that returns container objects cannot produce a null result");
+		try {
+			if (container.isVacated()) {
+				throw new ContainerVacatedException(container.getVacater());
+			}
 			
-			String newHandle = null;
-			ComponentContainer newChild = (ComponentContainer) result;
+			WebDriver driver = container.getDriver();
+	
+			if (target.get() != container) {
+				container.switchTo();
+				target.set(container);
+			}
 			
-			// if new child is a page object
-			if (newChild.getParent() == null) {
-				Page newPage = (Page) result;
-				if (newPage.getWindowState() == WindowState.WILL_OPEN) {
-					newHandle = newPage.getWait().until(Coordinators.newWindowIsOpened(initialHandles));
-				} else {
-					newHandle = parentPage.getWindowHandle();
-					container.setVacater(method);
+			Page parentPage = container.getParentPage();
+			Set<String> initialHandles = driver.getWindowHandles();
+			
+			Object result = proxy.call();
+			
+			// if result is container, we're done
+			if (result == container) return result;
+			
+			if (parentPage.getWindowState() == WindowState.WILL_CLOSE) {
+				parentPage.getWait().until(Coordinators.windowIsClosed(parentPage.getWindowHandle()));
+				container.setVacater(method);
+			}
+			
+			if (ComponentContainer.class.isAssignableFrom(method.getReturnType())) {
+				if (result == null) throw new NullPointerException("A method that returns container objects cannot produce a null result");
+				
+				String newHandle = null;
+				ComponentContainer newChild = (ComponentContainer) result;
+				
+				// if new child is a page object
+				if (newChild.getParent() == null) {
+					Page newPage = (Page) result;
+					if (newPage.getWindowState() == WindowState.WILL_OPEN) {
+						newHandle = newPage.getWait().until(Coordinators.newWindowIsOpened(initialHandles));
+					} else {
+						newHandle = parentPage.getWindowHandle();
+						container.setVacater(method);
+					}
+				}
+				
+				result = newChild.enhanceContainer(newChild);
+				if (newHandle != null) {
+					((Page) result).setWindowHandle(newHandle);
 				}
 			}
 			
-			result = newChild.enhanceContainer(newChild);
-			if (newHandle != null) {
-				((Page) result).setWindowHandle(newHandle);
+			return result;
+		} finally {
+			depth--;
+			long interval = System.currentTimeMillis() - initialTime;
+			
+			if (depth == 0) {
+				container.getLogger().info("[{}] {} ({}ms)", depth, method.getName(), interval);
+			} else {
+				container.getLogger().debug("[{}] {} ({}ms)", depth, method.getName(), interval);
 			}
 		}
-		
-		return result;
 	}
 
 }
