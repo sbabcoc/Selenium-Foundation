@@ -24,6 +24,8 @@
     <testng.version>6.11</testng.version>
     <resteasy.version>3.1.2.Final</resteasy.version>
     <bytebuddy.version>1.6.13</bytebuddy.version>
+    <logback.version>1.2.2</logback.version>
+    <logback-testng.version>1.0.0</logback-testng.version>
   </properties>
   
   <distributionManagement>
@@ -70,6 +72,16 @@
         <artifactId>byte-buddy</artifactId>
         <version>${bytebuddy.version}</version>
       </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.sbabcoc</groupId>
+        <artifactId>logback-testng</artifactId>
+        <version>${logback-testng.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -102,6 +114,14 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.sbabcoc</groupId>
+      <artifactId>logback-testng</artifactId>
     </dependency>
   </dependencies>
   

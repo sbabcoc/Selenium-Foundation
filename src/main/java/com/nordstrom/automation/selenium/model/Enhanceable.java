@@ -10,7 +10,6 @@ import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -19,6 +18,11 @@ import static net.bytebuddy.matcher.ElementMatchers.hasMethodName;
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static net.bytebuddy.matcher.ElementMatchers.not;
 
+/**
+ * This is the foundation for all "enhanceable" objects
+ * 
+ * @param <T> "enhanceable" object base class
+ */
 public abstract class Enhanceable<T> {
 	
 	private static final List<Class<?>> BYPASS = Arrays.asList(Enhanceable.class);
@@ -53,7 +57,7 @@ public abstract class Enhanceable<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public <C extends T> C enhanceContainer(C container) {
-		if (container instanceof DynamicType) return container;
+		if (container instanceof Enhanced) return container;
 		
 		Class<?> containerClass = container.getClass();
 		
@@ -70,6 +74,7 @@ public abstract class Enhanceable<T> {
 				matcher = matcher.or(is(method));
 			}
 		}
+		
 		for (String methodName : methodNames) {
 			matcher = matcher.or(hasMethodName(methodName));
 		}
@@ -80,6 +85,7 @@ public abstract class Enhanceable<T> {
 					.subclass(containerClass)
 					.method(not(matcher))
 					.intercept(MethodDelegation.to(ContainerMethodInterceptor.INSTANCE))
+					.implement(Enhanced.class)
 					.make()
 					.load(containerClass.getClassLoader())
 					.getLoaded();

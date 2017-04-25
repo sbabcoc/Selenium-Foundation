@@ -9,12 +9,17 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+
+import net.bytebuddy.dynamic.DynamicType;
 
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
 	
@@ -30,8 +35,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	private static final Class<?>[] BYPASS = {Object.class, WrapsContext.class};
 	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
 			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
-			"bypassClassOf", "bypassMethod"};
+			"bypassClassOf", "bypassMethod", "getLogger"};
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
+	private final Logger logger;
 	
 	/**
 	 * Constructor for component container
@@ -46,6 +52,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		this.context = context;
 		this.driver = WebDriverUtils.getDriver(context);
 		this.parent = parent;
+		
+		Class<?> clazz = getClass();		
+		logger = LoggerFactory.getLogger((this instanceof Enhanced) ? clazz.getSuperclass() : clazz);
 	}
 	
 	/**
@@ -348,6 +357,15 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 */
 	String[] bypassMethods() {
 		return METHODS;
+	}
+	
+	/**
+	 * Get the logger for this container
+	 * 
+	 * @return logger object
+	 */
+	protected Logger getLogger() {
+		return logger;
 	}
 	
 }
