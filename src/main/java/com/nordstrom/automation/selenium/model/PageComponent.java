@@ -117,14 +117,15 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	/**
 	 * Returns a 'wait' proxy that determines if this page component is visible
 	 * 
-	 * @return 'true' if page component is visible; otherwise 'false'
+	 * @return page component if visible; otherwise 'null'
 	 */
-	public static Coordinator<Boolean> componentIsVisible() {
-		return new Coordinator<Boolean>() {
+	public static Coordinator<PageComponent> componentIsVisible() {
+		return new Coordinator<PageComponent>() {
 
 			@Override
-			public Boolean apply(SearchContext context) {
-				return Boolean.valueOf(verifyContext(context).isDisplayed());
+			public PageComponent apply(SearchContext context) {
+				PageComponent component = verifyContext(context);
+				return (component.isDisplayed()) ? component : null;
 			}
 			
 			@Override
@@ -137,14 +138,15 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	/**
 	 * Returns a 'wait' proxy that determines if this page component is hidden
 	 * 
-	 * @return 'true' if page component is hidden; otherwise 'false'
+	 * @return page component if hidden; otherwise 'null'
 	 */
-	public static Coordinator<Boolean> componentIsHidden() {
-		return new Coordinator<Boolean>() {
+	public static Coordinator<PageComponent> componentIsHidden() {
+		return new Coordinator<PageComponent>() {
 
 			@Override
-			public Boolean apply(SearchContext context) {
-				return Boolean.valueOf( ! verifyContext(context).isDisplayed());
+			public PageComponent apply(SearchContext context) {
+				PageComponent component = verifyContext(context);
+				return (component.isDisplayed()) ? null : component;
 			}
 			
 			@Override

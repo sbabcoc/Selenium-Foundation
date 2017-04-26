@@ -71,11 +71,29 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 * Set the initial page object for the specified test result
 	 * 
 	 * @param pageObj page object for the specified test result
+	 */
+	public static void setInitialPage(Page pageObj) {
+		setInitialPage(pageObj, Reporter.getCurrentTestResult());
+	}
+	
+	/**
+	 * Get the initial page object for the specified test result
+	 * 
+	 * @return page object for the specified test result
+	 */
+	public static Page getInitialPage() {
+		return (Page) getInitialPage(Reporter.getCurrentTestResult());
+	}
+	
+	/**
+	 * Set the initial page object for the specified test result
+	 * 
+	 * @param pageObj page object for the specified test result
 	 * @param testResult configuration context (TestNG test result object)
 	 */
 	public static void setInitialPage(Page pageObj, ITestResult testResult) {
 		validateTestResult(testResult);
-		testResult.setAttribute(INITIAL_PAGE, pageObj);
+		testResult.setAttribute(INITIAL_PAGE, pageObj.enhanceContainer(pageObj));
 	}
 	
 	/**

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -119,6 +120,38 @@ public class Coordinators {
 
 	}
 	
+	/**
+	 * An expectation for checking that an element is either invisible or not
+	 * present on the DOM.
+	 *
+	 * @param locator used to find the element
+	 * @return true if the element is not displayed or the element doesn't exist
+	 *         or stale element
+	 */
+	public static Coordinator<Boolean> invisibilityOfElementLocated(final By locator) {
+		return new Coordinator<Boolean>() {
+			
+			@Override
+			public Boolean apply(SearchContext context) {
+				try {
+					return !(context.findElement(locator).isDisplayed());
+				} catch (NoSuchElementException e) {
+					// Returns true because the element is not present in DOM. The 
+					return true;
+				} catch (StaleElementReferenceException e) {
+					// Returns true because stale element reference implies that
+					// element is no longer visible.
+					return true;
+				}
+			}
+
+			@Override
+			public String toString() {
+				return "element to no longer be visible: " + locator;
+			}
+		};
+	}
+
 	/**
 	 * Return a visibility-filtered element reference
 	 * 
