@@ -3,11 +3,9 @@ package com.nordstrom.automation.selenium.model;
 import static org.testng.Assert.assertEquals;
 
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
-import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -32,11 +30,8 @@ public class ModelTest implements ListenerChainable {
 	@BeforeMethod
 	public void getPageDoc() throws URISyntaxException {
 		WebDriver driver = DriverManager.getDriver();
-		URL url = getClass().getClassLoader().getResource(DOC_NAME);
-		driver.get(url.toString());
-		ExamplePage page = new ExamplePage(driver);
-		page = page.enhanceContainer(page);
-		Reporter.getCurrentTestResult().setAttribute(DOC_NAME, page);
+		driver.get(getClass().getClassLoader().getResource(DOC_NAME).toString());
+		DriverManager.setInitialPage(new ExamplePage(driver));
 	}
 	
 	@Test
@@ -87,7 +82,7 @@ public class ModelTest implements ListenerChainable {
 	}
 
 	private ExamplePage getPage() {
-		return (ExamplePage) Reporter.getCurrentTestResult().getAttribute(DOC_NAME);
+		return (ExamplePage) DriverManager.getInitialPage();
 	}
 	
 	@Override

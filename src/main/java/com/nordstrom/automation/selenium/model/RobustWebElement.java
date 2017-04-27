@@ -425,6 +425,18 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	}
 	
 	/**
+	 * Get a wrapped reference to the first element matching the specified locator.
+	 * <p>
+	 * <b>NOTE</b>: Use {@link RobustWebElement#hasReference()} to determine if a valid reference was acquired.
+	 * 
+	 * @param by the locating mechanism
+	 * @return robust web element
+	 */
+	public RobustWebElement findOptional(By by) {
+		return RobustWebElement.getElement(this, by, RobustWebElement.OPTIONAL);
+	}
+	
+	/**
 	 * Get the list of elements that match the specified locator in the indicated context.
 	 * 
 	 * @param context element search context
