@@ -9,6 +9,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -278,26 +279,39 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			if ("checkbox".equals(element.getAttribute("type"))) {
 				return updateValue(element, Boolean.parseBoolean(value));
 			} else {
-				String exist = element.getAttribute("value");
-				if (exist == null) {
+				if (!valueEquals(element, value)) {
 					if (value == null) {
-						return false;
+						element.clear();
+					} else {
+						element.sendKeys(value);
 					}
-				}
-				if (value == null) {
-					element.clear();
-					return true;
-				} else if (exist.equals(value)) {
-					return false;
-				} else {
-					element.sendKeys(value);
 					return true;
 				}
 			}
 		} else if ("select".equals(tagName)) {
-			
+			if (!valueEquals(element, value)) {
+				new Select(element).selectByValue(value);
+				return true;
+			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Determine if the specified element has the desired value.
+	 * 
+	 * @param element target element (input, select)
+	 * @param value desired value
+	 * @return 'true' if element has the desired value; otherwise 'false'
+	 */
+	private static boolean valueEquals(WebElement element, String value) {
+		String exist = element.getAttribute("value");
+		if (exist == null) {
+			if (value == null) {
+				return true;
+			}
+		}
+		return (exist.equals(value));
 	}
 	
 	/**
