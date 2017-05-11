@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -111,7 +112,6 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				strategy = Strategy.JS_XPATH;
 				
 				this.locator = By.xpath(this.selector);
-				index = CARDINAL;
 			} else if (findsByCss) {
 				selector = ByType.cssLocatorFor(locator);
 				if (selector != null) {
@@ -379,18 +379,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	private static WebElement acquireReference(RobustWebElement element) {
 		SearchContext context = element.context.getWrappedContext();
 		
-		switch (element.strategy) {
-		case JS_CSS:
-			element.wrapped = JsUtility.runAndReturn(
-					element.driver, LOCATE_BY_CSS, WebElement.class, context, element.selector, element.index);
-			break;
-			
-		case JS_XPATH:
-			element.wrapped = JsUtility.runAndReturn(
-					element.driver, LOCATE_BY_XPATH, WebElement.class, context, element.selector);
-			break;
-			
-		case LOCATOR:
+		if (element.strategy == Strategy.LOCATOR) {
 			Timeouts timeouts = element.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 			try {
 				if (element.index > 0) {
@@ -405,8 +394,19 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
 				timeouts.implicitlyWait(impliedTimeout, TimeUnit.SECONDS);
 			}
-			break;
+		} else {
+			List<Object> args = new ArrayList<>();
+			List<WebElement> contextArg = new ArrayList<>();
+			if (context instanceof WebElement) contextArg.add((WebElement) context);
+			
+			args.add(contextArg);
+			args.add(element.selector);
+			args.add(element.index);
+			
+			String js = (element.strategy == Strategy.JS_CSS) ? LOCATE_BY_CSS : LOCATE_BY_XPATH;
+			element.wrapped = JsUtility.runAndReturn(element.driver, js, WebElement.class, args.toArray());
 		}
+		
 		return element;
 	}
 	
