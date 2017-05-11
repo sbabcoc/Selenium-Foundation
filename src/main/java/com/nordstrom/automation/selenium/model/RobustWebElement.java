@@ -104,9 +104,10 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 		boolean findsByCss = (driver instanceof FindsByCssSelector);
 		boolean findsByXPath = (driver instanceof FindsByXPath);
 		
-		if (index > 0) {
+		if ((index == OPTIONAL) || (index > 0)) {
 			if (findsByXPath && ( ! (locator instanceof By.ByCssSelector))) {
-				selector = ByType.xpathLocatorFor(locator) + "[" + (index + 1) + "]";
+				selector = ByType.xpathLocatorFor(locator);
+				if (index > 0) selector += "[" + (index + 1) + "]";
 				strategy = Strategy.JS_XPATH;
 				
 				this.locator = By.xpath(this.selector);
