@@ -331,7 +331,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	 * @param e {@link StaleElementReferenceException} that necessitates reference refresh
 	 * @return this robust web element with refreshed reference
 	 */
-	private WebElement refreshReference(StaleElementReferenceException e) {
+	WebElement refreshReference(StaleElementReferenceException e) {
 		try {
 			long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
 			new SearchContextWait((SearchContext) context, impliedTimeout).until(referenceIsRefreshed(this));
@@ -399,11 +399,17 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			List<WebElement> contextArg = new ArrayList<>();
 			if (context instanceof WebElement) contextArg.add((WebElement) context);
 			
+			String js;
 			args.add(contextArg);
 			args.add(element.selector);
-			args.add(element.index);
 			
-			String js = (element.strategy == Strategy.JS_CSS) ? LOCATE_BY_CSS : LOCATE_BY_XPATH;
+			if (element.strategy == Strategy.JS_XPATH) {
+				js = LOCATE_BY_XPATH;
+			} else {
+				js = LOCATE_BY_CSS;
+				args.add(element.index);
+			}
+			
 			element.wrapped = JsUtility.runAndReturn(element.driver, js, WebElement.class, args.toArray());
 		}
 		

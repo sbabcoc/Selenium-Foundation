@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 
+import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
+
 public class WebDriverUtils {
 	
 	private WebDriverUtils() {
@@ -42,7 +44,7 @@ public class WebDriverUtils {
 	public static JavascriptExecutor getExecutor(SearchContext context) {
 		WebDriver driver = getDriver(context);
 		if (driver instanceof JavascriptExecutor) {
-			return (JavascriptExecutor) driver;
+			return new RobustJavascriptExecutor(driver);
 		} else {
 			throw new UnsupportedOperationException("The specified context is unable to execute JavaScript");
 		}
