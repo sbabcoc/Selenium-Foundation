@@ -8,6 +8,9 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
@@ -121,12 +124,10 @@ public class Coordinators {
 	}
 	
 	/**
-	 * An expectation for checking that an element is either invisible or not
-	 * present on the DOM.
+	 * Returns a 'wait' proxy that determines if an element is either hidden or non-existent.
 	 *
-	 * @param locator used to find the element
-	 * @return true if the element is not displayed or the element doesn't exist
-	 *         or stale element
+	 * @param locator web element locator
+	 * @return 'true' if the element is hidden or non-existent; otherwise 'false'
 	 */
 	public static Coordinator<Boolean> invisibilityOfElementLocated(final By locator) {
 		return new Coordinator<Boolean>() {
@@ -136,11 +137,11 @@ public class Coordinators {
 				try {
 					return !(context.findElement(locator).isDisplayed());
 				} catch (NoSuchElementException e) {
-					// Returns true because the element is not present in DOM. The 
+					// Returns 'true' because the element is not present in DOM.
 					return true;
 				} catch (StaleElementReferenceException e) {
-					// Returns true because stale element reference implies that
-					// element is no longer visible.
+					// Returns 'true' because stale element reference implies that
+					// element no longer exists in the DOM.
 					return true;
 				}
 			}
@@ -161,4 +162,35 @@ public class Coordinators {
 	private static WebElement elementIfVisible(WebElement element) {
 		return element.isDisplayed() ? element : null;
 	}
+	
+	/**
+	 * Returns a 'wait' proxy that determines if the specified element reference has gone stale.
+	 *
+	 * @param element the element to wait for
+	 * @return 'false' if the element reference is still valid; otherwise 'true'
+	 */
+	public static Coordinator<Boolean> stalenessOf(final WebElement element) {
+		return new Coordinator<Boolean>() {
+			final ExpectedCondition<Boolean> condition;
+
+			{
+				if (element instanceof WrapsElement) {
+					condition = ExpectedConditions.stalenessOf(((WrapsElement) element).getWrappedElement());
+				} else {
+					condition = ExpectedConditions.stalenessOf(element);
+				}
+			}
+
+			@Override
+			public Boolean apply(SearchContext ignored) {
+				return condition.apply(null);
+			}
+
+			@Override
+			public String toString() {
+				return condition.toString();
+			}
+		};
+	}
+
 }

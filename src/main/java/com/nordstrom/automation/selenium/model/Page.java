@@ -30,7 +30,8 @@ public class Page extends ComponentContainer {
 	
 	public enum WindowState {
 		WILL_OPEN, 
-		WILL_CLOSE
+		WILL_CLOSE,
+		VIA_AJAX
 	}
 	
 	/**

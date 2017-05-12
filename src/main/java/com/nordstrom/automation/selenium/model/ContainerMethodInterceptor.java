@@ -4,7 +4,9 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
@@ -55,6 +57,7 @@ public enum ContainerMethodInterceptor {
 			
 			Page parentPage = container.getParentPage();
 			Set<String> initialHandles = driver.getWindowHandles();
+			WebElement reference = driver.findElement(By.tagName("html"));
 			
 			Object result = proxy.call();
 			
@@ -78,6 +81,9 @@ public enum ContainerMethodInterceptor {
 					if (newPage.getWindowState() == WindowState.WILL_OPEN) {
 						newHandle = newPage.getWait().until(Coordinators.newWindowIsOpened(initialHandles));
 					} else {
+						if (newPage.getWindowState() != WindowState.VIA_AJAX) {
+							newPage.getWait().until(Coordinators.stalenessOf(reference));
+						}
 						newHandle = parentPage.getWindowHandle();
 						container.setVacater(method);
 					}
