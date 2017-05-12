@@ -31,6 +31,15 @@ import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.selenium.utility.UncheckedThrow;
 
+/**
+ * This is a wrapper class for objects that implement the {@link WebElement} interface. If a 
+ * {@link StaleElementReferenceException} failure is encountered on invocation of any of the
+ * {@link WebElement} methods, an attempt is made to refresh the reference and its search 
+ * context chain down to the parent page object. 
+ * <p>
+ * This class also implements support for 'optional' elements, which provide an efficient 
+ * mechanism for handling elements that may be absent in certain scenarios.
+ */
 public class RobustWebElement implements WebElement, WrapsElement, WrapsContext {
 	
 	/** wraps 1st matched reference */
