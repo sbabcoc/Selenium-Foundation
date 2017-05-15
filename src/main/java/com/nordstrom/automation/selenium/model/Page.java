@@ -30,8 +30,7 @@ public class Page extends ComponentContainer {
 	
 	public enum WindowState {
 		WILL_OPEN, 
-		WILL_CLOSE,
-		VIA_AJAX
+		WILL_CLOSE
 	}
 	
 	/**
@@ -95,9 +94,11 @@ public class Page extends ComponentContainer {
 	 * Set the window state of this page object.
 	 * 
 	 * @param windowState page object {@link WindowState}
+	 * @return this {@link Page} object
 	 */
-	public void setWindowState(WindowState windowState) {
+	public Page setWindowState(WindowState windowState) {
 		this.windowState = windowState;
+		return this;
 	}
 	
 	/**

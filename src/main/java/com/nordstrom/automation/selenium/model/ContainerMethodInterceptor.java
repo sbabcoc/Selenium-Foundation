@@ -7,8 +7,8 @@ import java.util.concurrent.Callable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
+import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinators;
 
@@ -55,9 +55,18 @@ public enum ContainerMethodInterceptor {
 				target.set(container);
 			}
 			
+			WebElement reference = null;
+			Class<?> returnType = method.getReturnType();
 			Page parentPage = container.getParentPage();
 			Set<String> initialHandles = driver.getWindowHandles();
-			WebElement reference = driver.findElement(By.tagName("html"));
+			
+			boolean returnsPage = (Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType));
+			boolean returnsContainer = (ComponentContainer.class.isAssignableFrom(returnType));
+			boolean detectsCompletion = (returnsContainer && (DetectsLoadCompletion.class.isAssignableFrom(returnType)));
+			
+			if (returnsPage && !detectsCompletion) {
+				reference = driver.findElement(By.tagName("*"));
+			}
 			
 			Object result = proxy.call();
 			
@@ -69,24 +78,27 @@ public enum ContainerMethodInterceptor {
 				container.setVacater(method);
 			}
 			
-			if (ComponentContainer.class.isAssignableFrom(method.getReturnType())) {
+			if (returnsContainer) {
 				if (result == null) throw new NullPointerException("A method that returns container objects cannot produce a null result");
 				
 				String newHandle = null;
 				ComponentContainer newChild = (ComponentContainer) result;
 				
-				// if new child is a page object
-				if (newChild.getParent() == null) {
+				if (returnsPage) {
 					Page newPage = (Page) result;
 					if (newPage.getWindowState() == WindowState.WILL_OPEN) {
 						newHandle = newPage.getWait().until(Coordinators.newWindowIsOpened(initialHandles));
+						reference = null;
 					} else {
-						if (newPage.getWindowState() != WindowState.VIA_AJAX) {
-							newPage.getWait().until(Coordinators.stalenessOf(reference));
-						}
 						newHandle = parentPage.getWindowHandle();
 						container.setVacater(method);
 					}
+				}
+				
+				if (detectsCompletion) {
+					newChild.getWait().until(DetectsLoadCompletion.pageLoadIsComplete());
+				} else if (reference != null) {
+					newChild.getWait().until(Coordinators.stalenessOf(reference));
 				}
 				
 				result = newChild.enhanceContainer(newChild);
