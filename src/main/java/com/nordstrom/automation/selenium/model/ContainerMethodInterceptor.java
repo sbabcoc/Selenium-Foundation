@@ -60,8 +60,8 @@ public enum ContainerMethodInterceptor {
 			Page parentPage = container.getParentPage();
 			Set<String> initialHandles = driver.getWindowHandles();
 			
-			boolean returnsPage = (Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType));
 			boolean returnsContainer = (ComponentContainer.class.isAssignableFrom(returnType));
+			boolean returnsPage = (Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType));
 			boolean detectsCompletion = (returnsContainer && (DetectsLoadCompletion.class.isAssignableFrom(returnType)));
 			
 			if (returnsPage && !detectsCompletion) {
