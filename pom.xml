@@ -12,7 +12,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <nordstrom-common.version>99999-SNAPSHOT</nordstrom-common.version>
+    <nordstrom-common.version>1.0.0.0</nordstrom-common.version>
     <surefire-plugin.version>2.19.1</surefire-plugin.version>
     <compiler-plugin.version>3.6.0</compiler-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
