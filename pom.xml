@@ -12,7 +12,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <automation-framework-core.version>0.5.0.0</automation-framework-core.version>
+    <nordstrom-common.version>99999-SNAPSHOT</nordstrom-common.version>
     <surefire-plugin.version>2.19.1</surefire-plugin.version>
     <compiler-plugin.version>3.6.0</compiler-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
@@ -37,6 +37,11 @@
   
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.nordstrom.test-automation.tools</groupId>
+        <artifactId>common</artifactId>
+        <version>${nordstrom-common.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.nordstrom.test-automation.tools</groupId>
         <artifactId>settings</artifactId>
@@ -87,6 +92,10 @@
   <dependencies>
     <dependency>
       <groupId>com.nordstrom.test-automation.tools</groupId>
+      <artifactId>common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.nordstrom.test-automation.tools</groupId>
       <artifactId>settings</artifactId>
     </dependency>
     <dependency>
@@ -126,20 +135,24 @@
   </dependencies>
   
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${compiler-plugin.version}</version>
+          <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${compiler-plugin.version}</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

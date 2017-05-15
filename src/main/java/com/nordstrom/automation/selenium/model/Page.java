@@ -13,7 +13,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.utility.UncheckedThrow;
+import com.nordstrom.common.base.UncheckedThrow;
 
 public class Page extends ComponentContainer {
 	

@@ -29,7 +29,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
-import com.nordstrom.automation.selenium.utility.UncheckedThrow;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This is a wrapper class for objects that implement the {@link WebElement} interface. If a 

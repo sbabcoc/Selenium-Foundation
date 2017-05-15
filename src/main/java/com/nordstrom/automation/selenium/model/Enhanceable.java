@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.nordstrom.automation.selenium.utility.UncheckedThrow;
+import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.method.MethodDescription;
