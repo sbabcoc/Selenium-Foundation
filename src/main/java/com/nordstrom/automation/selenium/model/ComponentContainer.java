@@ -13,8 +13,8 @@ import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
@@ -109,11 +109,19 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 */
 	public SearchContextWait getWait() {
 		if (wait == null) {
-			SeleniumConfig config = SeleniumConfig.getConfig();
-			long waitTimeout = config.getLong(SeleniumSettings.WAIT_TIMEOUT.key());
-			wait = new SearchContextWait(this, waitTimeout);
+			wait = WaitType.WAIT.getWait(this);
 		}
 		return wait;
+	}
+	
+	/**
+	 * Convenience method to get a search context wait object of the specified type for this container
+	 * 
+	 * @param waitType wait type being requested
+	 * @return {@link SearchContextWait} object of the specified type for this container
+	 */
+	public SearchContextWait getWait(WaitType waitType) {
+		return waitType.getWait(this);
 	}
 	
 	/**

@@ -18,7 +18,7 @@ import com.google.common.io.Resources;
 import com.google.gson.JsonObject;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.utility.DataUtils;
-import com.nordstrom.automation.selenium.utility.UncheckedThrow;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * Provides easier access to navigate to a new URL or run JavaScript.

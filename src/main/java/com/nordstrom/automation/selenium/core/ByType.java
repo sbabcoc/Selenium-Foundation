@@ -54,19 +54,19 @@ public class ByType {
 		String val = valueOf(locator);
 		
 		if (locator instanceof By.ByClassName) {
-			return "./*[contains(concat(' ',@class,' '),' " + val + " ')]";
+			return ".//*[contains(concat(' ',@class,' '),' " + val + " ')]";
 		} else if (locator instanceof By.ByCssSelector) {
 			// unsupported
 		} else if (locator instanceof By.ById) {
-			return "./*[@id='" + val + "']";
+			return ".//*[@id='" + val + "']";
 		} else if (locator instanceof By.ByLinkText) {
-			return "./a[.='" + val + "']";
+			return ".//a[.='" + val + "']";
 		} else if (locator instanceof By.ByName) {
-			return "./*[@name='" + val + "']";
+			return ".//*[@name='" + val + "']";
 		} else if (locator instanceof By.ByPartialLinkText) {
-			return "./a[text()[contains(.,'" + val + "')]]";
+			return ".//a[text()[contains(.,'" + val + "')]]";
 		} else if (locator instanceof By.ByTagName) {
-			return "./" + val;
+			return ".//" + val;
 		} else if (locator instanceof By.ByXPath) {
 			return val;
 		}

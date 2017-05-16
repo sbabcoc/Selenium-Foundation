@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -20,16 +21,23 @@ import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.WrapsElement;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
-import com.nordstrom.automation.selenium.support.SearchContextWait;
-import com.nordstrom.automation.selenium.utility.UncheckedThrow;
+import com.nordstrom.common.base.UncheckedThrow;
 
+/**
+ * This is a wrapper class for objects that implement the {@link WebElement} interface. If a 
+ * {@link StaleElementReferenceException} failure is encountered on invocation of any of the
+ * {@link WebElement} methods, an attempt is made to refresh the reference and its search 
+ * context chain down to the parent page object. 
+ * <p>
+ * This class also implements support for 'optional' elements, which provide an efficient 
+ * mechanism for handling elements that may be absent in certain scenarios.
+ */
 public class RobustWebElement implements WebElement, WrapsElement, WrapsContext {
 	
 	/** wraps 1st matched reference */
@@ -104,13 +112,13 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 		boolean findsByCss = (driver instanceof FindsByCssSelector);
 		boolean findsByXPath = (driver instanceof FindsByXPath);
 		
-		if (index > 0) {
+		if ((index == OPTIONAL) || (index > 0)) {
 			if (findsByXPath && ( ! (locator instanceof By.ByCssSelector))) {
-				selector = ByType.xpathLocatorFor(locator) + "[" + (index + 1) + "]";
+				selector = ByType.xpathLocatorFor(locator);
+				if (index > 0) selector += "[" + (index + 1) + "]";
 				strategy = Strategy.JS_XPATH;
 				
 				this.locator = By.xpath(this.selector);
-				index = CARDINAL;
 			} else if (findsByCss) {
 				selector = ByType.cssLocatorFor(locator);
 				if (selector != null) {
@@ -330,10 +338,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	 * @param e {@link StaleElementReferenceException} that necessitates reference refresh
 	 * @return this robust web element with refreshed reference
 	 */
-	private WebElement refreshReference(StaleElementReferenceException e) {
+	WebElement refreshReference(StaleElementReferenceException e) {
 		try {
-			long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
-			new SearchContextWait((SearchContext) context, impliedTimeout).until(referenceIsRefreshed(this));
+			WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
 			return this;
 		} catch (Throwable t) {
 			if (e != null) UncheckedThrow.throwUnchecked(e);
@@ -378,18 +385,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	private static WebElement acquireReference(RobustWebElement element) {
 		SearchContext context = element.context.getWrappedContext();
 		
-		switch (element.strategy) {
-		case JS_CSS:
-			element.wrapped = JsUtility.runAndReturn(
-					element.driver, LOCATE_BY_CSS, WebElement.class, context, element.selector, element.index);
-			break;
-			
-		case JS_XPATH:
-			element.wrapped = JsUtility.runAndReturn(
-					element.driver, LOCATE_BY_XPATH, WebElement.class, context, element.selector);
-			break;
-			
-		case LOCATOR:
+		if (element.strategy == Strategy.LOCATOR) {
 			Timeouts timeouts = element.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 			try {
 				if (element.index > 0) {
@@ -401,11 +397,27 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				if (element.index != OPTIONAL) throw e;
 				element.wrapped = null;
 			} finally {
-				long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
-				timeouts.implicitlyWait(impliedTimeout, TimeUnit.SECONDS);
+				timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
 			}
-			break;
+		} else {
+			List<Object> args = new ArrayList<>();
+			List<WebElement> contextArg = new ArrayList<>();
+			if (context instanceof WebElement) contextArg.add((WebElement) context);
+			
+			String js;
+			args.add(contextArg);
+			args.add(element.selector);
+			
+			if (element.strategy == Strategy.JS_XPATH) {
+				js = LOCATE_BY_XPATH;
+			} else {
+				js = LOCATE_BY_CSS;
+				args.add(element.index);
+			}
+			
+			element.wrapped = JsUtility.runAndReturn(element.driver, js, WebElement.class, args.toArray());
 		}
+		
 		return element;
 	}
 	
