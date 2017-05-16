@@ -6,6 +6,11 @@ import com.nordstrom.automation.selenium.support.Coordinator;
 
 public interface DetectsLoadCompletion {
 	
+	/**
+	 * Determine if the page has finished loading.
+	 * 
+	 * @return 'true' if the page has finished loading; otherwise 'false'
+	 */
 	public boolean isLoadComplete();
 	
 	/**

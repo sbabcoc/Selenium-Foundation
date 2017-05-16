@@ -111,7 +111,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		
 		/**
 		 * Get the timeout interval for this wait type.<br>
-		 * <b>NOTE</b>: If {@code config} is 'null', this object will be acquired from the current execution context. 
+		 * <b>NOTE</b>: If {@code config} is 'null', this object will be acquired from the current configuration context. 
 		 * 
 		 * @param config {@link SeleniumConfig} object to interrogate; may be 'null' (see <b>NOTE</b>)
 		 * @return wait type timeout interval
