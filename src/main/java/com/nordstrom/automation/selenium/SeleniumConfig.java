@@ -27,9 +27,11 @@ import org.apache.commons.io.IOUtils;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.SearchContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -85,6 +87,43 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		}
 	}
 	
+	public enum WaitType {
+		PAGE_LOAD(SeleniumSettings.PAGE_LOAD_TIMEOUT),
+		IMPLIED(SeleniumSettings.IMPLIED_TIMEOUT),
+		SCRIPT(SeleniumSettings.SCRIPT_TIMEOUT),
+		WAIT(SeleniumSettings.WAIT_TIMEOUT);
+		
+		private SeleniumSettings timeoutSetting;
+		private Long timeoutInterval;
+		
+		WaitType(SeleniumSettings timeoutSetting) {
+			this.timeoutSetting = timeoutSetting;
+		}
+		
+		public long getInterval() {
+			return getInterval(null);
+		}
+		
+		public long getInterval(SeleniumConfig config) {
+			if (timeoutInterval == null) {
+				if (config == null) config = getConfig();
+				timeoutInterval = config.getLong(timeoutSetting.key());
+			}
+			return timeoutInterval;
+		}
+		
+		/**
+		 * Get a search context wait object for the specified context
+		 * 
+		 * @param context context for which timeout is needed
+		 * @return {@link SearchContextWait} object for the specified context
+		 */
+		public SearchContextWait getWait(SearchContext context) {
+			return new SearchContextWait(context, getInterval());
+		}
+		
+	}
+
 	private URI targetUri;
 	private String nodeConfigPath;
 	private RegistrationRequest nodeConfig;

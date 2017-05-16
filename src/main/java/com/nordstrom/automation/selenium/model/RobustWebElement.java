@@ -21,14 +21,12 @@ import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.WrapsElement;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
-import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -342,8 +340,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	 */
 	WebElement refreshReference(StaleElementReferenceException e) {
 		try {
-			long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
-			new SearchContextWait((SearchContext) context, impliedTimeout).until(referenceIsRefreshed(this));
+			WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
 			return this;
 		} catch (Throwable t) {
 			if (e != null) UncheckedThrow.throwUnchecked(e);
@@ -400,8 +397,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				if (element.index != OPTIONAL) throw e;
 				element.wrapped = null;
 			} finally {
-				long impliedTimeout = SeleniumConfig.getConfig().getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
-				timeouts.implicitlyWait(impliedTimeout, TimeUnit.SECONDS);
+				timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
 			}
 		} else {
 			List<Object> args = new ArrayList<>();

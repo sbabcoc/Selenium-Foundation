@@ -15,7 +15,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.core.GridUtility;
@@ -123,14 +123,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 					} else {
 						driver = GridUtility.getDriver(testResult);
 					}
-					long scriptTimeout = config.getLong(SeleniumSettings.SCRIPT_TIMEOUT.key());
-					long impliedTimeout = config.getLong(SeleniumSettings.IMPLIED_TIMEOUT.key());
-					long pageLoadTimeout = config.getLong(SeleniumSettings.PAGE_LOAD_TIMEOUT.key());
-					
 					Timeouts timeouts = driver.manage().timeouts();
-					timeouts.setScriptTimeout(scriptTimeout, TimeUnit.SECONDS);
-					timeouts.implicitlyWait(impliedTimeout, TimeUnit.SECONDS);
-					timeouts.pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
+					timeouts.setScriptTimeout(WaitType.SCRIPT.getInterval(config), TimeUnit.SECONDS);
+					timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);
+					timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
 					
 					setDriver(driver, testResult);
 				}

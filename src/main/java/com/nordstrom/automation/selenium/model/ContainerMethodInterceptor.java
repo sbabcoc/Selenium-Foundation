@@ -7,6 +7,8 @@ import java.util.concurrent.Callable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
@@ -96,9 +98,9 @@ public enum ContainerMethodInterceptor {
 				}
 				
 				if (detectsCompletion) {
-					newChild.getWait().until(DetectsLoadCompletion.pageLoadIsComplete());
+					newChild.getWait(WaitType.PAGE_LOAD).until(DetectsLoadCompletion.pageLoadIsComplete());
 				} else if (reference != null) {
-					newChild.getWait().until(Coordinators.stalenessOf(reference));
+					newChild.getWait(WaitType.PAGE_LOAD).until(Coordinators.stalenessOf(reference));
 				}
 				
 				result = newChild.enhanceContainer(newChild);
