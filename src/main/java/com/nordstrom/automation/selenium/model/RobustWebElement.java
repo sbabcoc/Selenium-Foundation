@@ -389,7 +389,14 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			Timeouts timeouts = element.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 			try {
 				if (element.index > 0) {
-					element.wrapped = context.findElements(element.locator).get(element.index);
+					List<WebElement> elements = context.findElements(element.locator);
+					if (element.index < elements.size()) {
+						element.wrapped = elements.get(element.index);
+					} else {
+						throw new NoSuchElementException(
+								String.format("Too few elements located by %s: need: %d; have: %d", 
+										element.locator, element.index + 1, elements.size()));
+					}
 				} else {
 					element.wrapped = context.findElement(element.locator);
 				}
