@@ -394,7 +394,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 						element.wrapped = elements.get(element.index);
 					} else {
 						throw new NoSuchElementException(
-								String.format("Too few elements located by %s: need: %d; have: %d", 
+								String.format("Too few elements located %s: need: %d; have: %d", 
 										element.locator, element.index + 1, elements.size()));
 					}
 				} else {
