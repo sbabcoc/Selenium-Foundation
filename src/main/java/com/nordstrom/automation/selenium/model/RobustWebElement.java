@@ -343,8 +343,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
 			return this;
 		} catch (Throwable t) {
-			if (e != null) UncheckedThrow.throwUnchecked(e);
-			if (t instanceof TimeoutException) UncheckedThrow.throwUnchecked(t.getCause());
+			if (e != null) throw UncheckedThrow.throwUnchecked(e);
+			if (t instanceof TimeoutException) throw UncheckedThrow.throwUnchecked(t.getCause());
 			throw UncheckedThrow.throwUnchecked(t);
 		}
 	}
