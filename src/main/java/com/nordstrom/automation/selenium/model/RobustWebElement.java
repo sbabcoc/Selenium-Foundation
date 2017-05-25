@@ -343,8 +343,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
 			return this;
 		} catch (Throwable t) {
-			if (e != null) UncheckedThrow.throwUnchecked(e);
-			if (t instanceof TimeoutException) UncheckedThrow.throwUnchecked(t.getCause());
+			if (e != null) throw UncheckedThrow.throwUnchecked(e);
+			if (t instanceof TimeoutException) throw UncheckedThrow.throwUnchecked(t.getCause());
 			throw UncheckedThrow.throwUnchecked(t);
 		}
 	}
@@ -389,7 +389,14 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			Timeouts timeouts = element.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 			try {
 				if (element.index > 0) {
-					element.wrapped = context.findElements(element.locator).get(element.index);
+					List<WebElement> elements = context.findElements(element.locator);
+					if (element.index < elements.size()) {
+						element.wrapped = elements.get(element.index);
+					} else {
+						throw new NoSuchElementException(
+								String.format("Too few elements located %s: need: %d; have: %d", 
+										element.locator, element.index + 1, elements.size()));
+					}
 				} else {
 					element.wrapped = context.findElement(element.locator);
 				}
