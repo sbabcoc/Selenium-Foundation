@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,6 +57,31 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		logger = LoggerFactory.getLogger((this instanceof Enhanced) ? clazz.getSuperclass() : clazz);
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(getArgumentTypes());
+		result = prime * result + Arrays.hashCode(getArguments());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PageComponent other = (PageComponent) obj;
+		if (!Arrays.equals(getArgumentTypes(), other.getArgumentTypes()))
+			return false;
+		if (!Arrays.equals(getArguments(), other.getArguments()))
+			return false;
+		return true;
+	}
+
 	/**
 	 * Validate the specified parent object
 	 * 

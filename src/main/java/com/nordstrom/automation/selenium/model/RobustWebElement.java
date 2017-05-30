@@ -137,6 +137,34 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	}
 	
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + context.hashCode();
+		result = prime * result + locator.hashCode();
+		result = prime * result + index;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RobustWebElement other = (RobustWebElement) obj;
+		if (!context.equals(other.context))
+			return false;
+		if (!locator.equals(other.locator))
+			return false;
+		if (index != other.index)
+			return false;
+		return true;
+	}
+
+	@Override
 	public <X> X getScreenshotAs(final OutputType<X> arg0) throws WebDriverException {
 		try {
 			return getWrappedElement().getScreenshotAs(arg0);

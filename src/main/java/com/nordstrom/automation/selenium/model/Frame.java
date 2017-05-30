@@ -1,7 +1,15 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.FindsByCssSelector;
+import org.openqa.selenium.internal.FindsByXPath;
+
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 public class Frame extends Page {
 	
@@ -123,4 +131,34 @@ public class Frame extends Page {
 		return arguments;
 	}
 	
+	public static class FrameList<E extends Frame> extends ContainerList<E> {
+		
+		private static final By FRAME_BY_CSS = By.cssSelector("iframe,frame");
+		private static final By FRAME_BY_XPATH = By.xpath(".//iframe|.//frame");
+		
+		FrameList(ComponentContainer parent, Class<E> containerType) {
+			super(parent, containerType, findElements(parent));
+		}
+		
+		private static List<WebElement> findElements(ComponentContainer parent) {
+			WebDriver driver = WebDriverUtils.getDriver(parent);
+			if (driver instanceof FindsByXPath) {
+				return parent.findElements(FRAME_BY_XPATH);
+			} else if (driver instanceof FindsByCssSelector) {
+				return parent.findElements(FRAME_BY_CSS);
+			}
+			throw new RuntimeException();
+		}
+
+		@Override
+		Class<?>[] getArgumentTypes() {
+			return ARG_TYPES_2;
+		}
+
+		@Override
+		Object[] getArguments(int index) {
+			RobustWebElement element = (RobustWebElement) elementList.get(index);
+			return new Object[] {element.getLocator(), element.getIndex(), parent};
+		}
+	}
 }
