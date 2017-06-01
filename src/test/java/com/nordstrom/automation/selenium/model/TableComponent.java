@@ -5,12 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class TableComponent extends PageComponent {
 
 	public TableComponent(By locator, ComponentContainer parent) {
 		super(locator, parent);
+	}
+	
+	public TableComponent(RobustWebElement element, ComponentContainer parent) {
+		super(element, parent);
 	}
 	
 	protected enum Using {
@@ -40,6 +45,10 @@ public class TableComponent extends PageComponent {
 			content.add(Arrays.asList(rowCells.get(0).getText(), rowCells.get(1).getText(), rowCells.get(2).getText()));
 		}
 		return content;
+	}
+	
+	public static Object getKey(SearchContext context) {
+		return ((WebElement) context).getAttribute("id");
 	}
 
 }

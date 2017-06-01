@@ -18,9 +18,11 @@ public class Frame extends Page {
 	private Class<?>[] argumentTypes;
 	private Object[] arguments;
 	
-	private static final Class<?>[] ARG_TYPES_1 = {RobustWebElement.class, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_2 = {Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_3 = {String.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_4 = {Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_5 = {String.class, ComponentContainer.class};
 	
 	private enum FrameSelect {
 		ELEMENT,
@@ -36,6 +38,9 @@ public class Frame extends Page {
 	 */
 	public Frame(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
+		
+		argumentTypes = ARG_TYPES_1;
+		arguments = new Object[] {locator, parent};
 	}
 	
 	/**
@@ -47,6 +52,9 @@ public class Frame extends Page {
 	 */
 	public Frame(By locator, int index, ComponentContainer parent) {
 		this(RobustWebElement.getElement(parent, locator, index), parent);
+		
+		argumentTypes = ARG_TYPES_2;
+		arguments = new Object[] {locator, index, parent};
 	}
 	
 	/**
@@ -61,7 +69,7 @@ public class Frame extends Page {
 		this.element = element;
 		this.index = element.getIndex();
 		
-		argumentTypes = ARG_TYPES_1;
+		argumentTypes = ARG_TYPES_3;
 		arguments = new Object[] {element, parent};
 	}
 	
@@ -76,7 +84,7 @@ public class Frame extends Page {
 		this.frameSelect = FrameSelect.INDEX;
 		this.index = index;
 		
-		argumentTypes = ARG_TYPES_2;
+		argumentTypes = ARG_TYPES_4;
 		arguments = new Object[] {index, parent};
 	}
 	
@@ -92,7 +100,7 @@ public class Frame extends Page {
 		this.frameSelect = FrameSelect.NAME_OR_ID;
 		this.nameOrId = nameOrId;
 		
-		argumentTypes = ARG_TYPES_3;
+		argumentTypes = ARG_TYPES_5;
 		arguments = new Object[] {nameOrId, parent};
 	}
 
@@ -161,7 +169,7 @@ public class Frame extends Page {
 
 		@Override
 		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_1;
+			return ARG_TYPES_3;
 		}
 
 		@Override
@@ -179,7 +187,7 @@ public class Frame extends Page {
 
 		@Override
 		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_1;
+			return ARG_TYPES_3;
 		}
 
 		@Override

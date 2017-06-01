@@ -12,7 +12,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	private Class<?>[] argumentTypes;
 	private Object[] arguments;
 	
-	private static final Class<?>[] ARG_TYPES = {RobustWebElement.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
 	
 	/**
 	 * Constructor for page component by element locator
@@ -22,6 +24,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	 */
 	public PageComponent(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
+		
+		argumentTypes = ARG_TYPES_1;
+		arguments = new Object[] {locator, parent};
 	}
 	
 	/**
@@ -33,6 +38,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	 */
 	public PageComponent(By locator, int index, ComponentContainer parent) {
 		this(RobustWebElement.getElement(parent, locator, index), parent);
+		
+		argumentTypes = ARG_TYPES_2;
+		arguments = new Object[] {locator, index, parent};
 	}
 	
 	/**
@@ -44,7 +52,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	public PageComponent(RobustWebElement element, ComponentContainer parent) {
 		super(element, parent);
 		
-		argumentTypes = ARG_TYPES;
+		argumentTypes = ARG_TYPES_3;
 		arguments = new Object[] {element, parent};
 	}
 
@@ -156,7 +164,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 
 		@Override
 		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES;
+			return ARG_TYPES_3;
 		}
 
 		@Override
@@ -174,7 +182,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 
 		@Override
 		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES;
+			return ARG_TYPES_3;
 		}
 
 		@Override
