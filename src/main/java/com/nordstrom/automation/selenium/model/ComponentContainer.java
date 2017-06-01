@@ -39,7 +39,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	private static final Class<?>[] BYPASS = {Object.class, WrapsContext.class};
 	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
 			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
-			"bypassClassOf", "bypassMethod", "getLogger"};
+			"bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes", "getArguments"};
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
 	private final Logger logger;
 	
@@ -424,7 +424,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * @param containerType target container type
 	 * @return method object for getKey(SearchContext) 
 	 */
-	public static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
+	static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
 		try {
 			Method method = containerType.getMethod("getKey", SearchContext.class);
 			if (Modifier.isStatic(method.getModifiers())) return method;

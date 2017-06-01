@@ -14,7 +14,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	
 	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
+	static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
 	
 	/**
 	 * Constructor for page component by element locator
@@ -154,40 +154,5 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	private static PageComponent verifyContext(SearchContext context) {
 		if (context instanceof PageComponent) return (PageComponent) context;
 		throw new UnsupportedOperationException("Wait object search context is not a page component");
-	}
-
-	public static class ComponentList<E extends PageComponent> extends ContainerList<E> {
-
-		public ComponentList(ComponentContainer parent, By locator, Class<E> componentType) {
-			super(parent, componentType, locator);
-		}
-
-		@Override
-		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_3;
-		}
-
-		@Override
-		Object[] getArguments(int index) {
-			RobustWebElement element = (RobustWebElement) elementList.get(index);
-			return new Object[] {element, parent};
-		}
-	}
-	
-	public static class ComponentMap<V extends PageComponent> extends ContainerMap<V> {
-
-		ComponentMap(ComponentContainer parent, Class<V> containerType, By locator) {
-			super(parent, containerType, locator);
-		}
-
-		@Override
-		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_3;
-		}
-
-		@Override
-		Object[] getArguments(WebElement element) {
-			return new Object[] {(RobustWebElement) element, parent};
-		}
 	}
 }

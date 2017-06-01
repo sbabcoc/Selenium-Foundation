@@ -2,12 +2,6 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.FindsByCssSelector;
-import org.openqa.selenium.internal.FindsByXPath;
-
-import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 public class Frame extends Page {
 	
@@ -20,7 +14,7 @@ public class Frame extends Page {
 	
 	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
+	static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_4 = {Integer.TYPE, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_5 = {String.class, ComponentContainer.class};
 	
@@ -140,59 +134,5 @@ public class Frame extends Page {
 	@Override
 	public Object[] getArguments() {
 		return arguments;
-	}
-	
-	public static class FrameList<E extends Frame> extends ContainerList<E> {
-		
-		private static final By FRAME_BY_CSS = By.cssSelector("iframe,frame");
-		private static final By FRAME_BY_XPATH = By.xpath(".//iframe|.//frame");
-		
-		FrameList(ComponentContainer parent, Class<E> containerType) {
-			super(parent, containerType, getLocator(parent));
-		}
-		
-		/**
-		 * Get frame locator for the specified parent.
-		 * 
-		 * @param parent frame parent
-		 * @return frame locator
-		 */
-		private static By getLocator(ComponentContainer parent) {
-			WebDriver driver = WebDriverUtils.getDriver(parent);
-			if (driver instanceof FindsByXPath) {
-				return FRAME_BY_XPATH;
-			} else if (driver instanceof FindsByCssSelector) {
-				return FRAME_BY_CSS;
-			}
-			throw new UnsupportedOperationException("Driver must support either Xpath or CSS selectors");
-		}
-
-		@Override
-		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_3;
-		}
-
-		@Override
-		Object[] getArguments(int index) {
-			RobustWebElement element = (RobustWebElement) elementList.get(index);
-			return new Object[] {element, parent};
-		}
-	}
-	
-	public static class ComponentMap<V extends PageComponent> extends ContainerMap<V> {
-
-		ComponentMap(ComponentContainer parent, Class<V> containerType, By locator) {
-			super(parent, containerType, locator);
-		}
-
-		@Override
-		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_3;
-		}
-
-		@Override
-		Object[] getArguments(WebElement element) {
-			return new Object[] {(RobustWebElement) element, parent};
-		}
 	}
 }
