@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.model;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
 
@@ -148,13 +149,30 @@ public class Frame extends Page {
 
 		@Override
 		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_2;
+			return ARG_TYPES_1;
 		}
 
 		@Override
 		Object[] getArguments(int index) {
 			RobustWebElement element = (RobustWebElement) elementList.get(index);
-			return new Object[] {element.getLocator(), element.getIndex(), parent};
+			return new Object[] {element, parent};
+		}
+	}
+	
+	public static class ComponentMap<V extends PageComponent> extends ContainerMap<V> {
+
+		ComponentMap(ComponentContainer parent, Class<V> containerType, By locator) {
+			super(parent, containerType, locator);
+		}
+
+		@Override
+		Class<?>[] getArgumentTypes() {
+			return ARG_TYPES_1;
+		}
+
+		@Override
+		Object[] getArguments(WebElement element) {
+			return new Object[] {(RobustWebElement) element, parent};
 		}
 	}
 }

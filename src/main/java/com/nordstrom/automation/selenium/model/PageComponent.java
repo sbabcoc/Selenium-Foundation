@@ -148,7 +148,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 		throw new UnsupportedOperationException("Wait object search context is not a page component");
 	}
 
-	public static class ComponentList<E extends PageComponent> extends ComponentContainer.ContainerList<E> {
+	public static class ComponentList<E extends PageComponent> extends ContainerList<E> {
 
 		public ComponentList(ComponentContainer parent, By locator, Class<E> componentType) {
 			super(parent, componentType, locator);
@@ -163,6 +163,23 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 		Object[] getArguments(int index) {
 			RobustWebElement element = (RobustWebElement) elementList.get(index);
 			return new Object[] {element, parent};
+		}
+	}
+	
+	public static class ComponentMap<V extends PageComponent> extends ContainerMap<V> {
+
+		ComponentMap(ComponentContainer parent, Class<V> containerType, By locator) {
+			super(parent, containerType, locator);
+		}
+
+		@Override
+		Class<?>[] getArgumentTypes() {
+			return ARG_TYPES;
+		}
+
+		@Override
+		Object[] getArguments(WebElement element) {
+			return new Object[] {(RobustWebElement) element, parent};
 		}
 	}
 }
