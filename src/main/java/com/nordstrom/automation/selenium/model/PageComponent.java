@@ -12,9 +12,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	private Class<?>[] argumentTypes;
 	private Object[] arguments;
 	
-	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES = {RobustWebElement.class, ComponentContainer.class};
 	
 	/**
 	 * Constructor for page component by element locator
@@ -24,9 +22,6 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	 */
 	public PageComponent(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
-		
-		argumentTypes = ARG_TYPES_1;
-		arguments = new Object[] {locator, parent};
 	}
 	
 	/**
@@ -37,22 +32,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	 * @param parent component parent container
 	 */
 	public PageComponent(By locator, int index, ComponentContainer parent) {
-		this(getContext(locator, index, parent), parent);
-		
-		argumentTypes = ARG_TYPES_2;
-		arguments = new Object[] {locator, index, parent};
-	}
-	
-	/**
-	 * Get context element for this page component
-	 * 
-	 * @param locator element locator
-	 * @param index element index (-1 = non-indexed)
-	 * @param parent element search context
-	 * @return page component context element reference
-	 */
-	private static RobustWebElement getContext(By locator, int index, ComponentContainer parent) {
-		return (RobustWebElement) RobustWebElement.getElement(parent, locator, index);
+		this(RobustWebElement.getElement(parent, locator, index), parent);
 	}
 	
 	/**
@@ -64,7 +44,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	public PageComponent(RobustWebElement element, ComponentContainer parent) {
 		super(element, parent);
 		
-		argumentTypes = ARG_TYPES_3;
+		argumentTypes = ARG_TYPES;
 		arguments = new Object[] {element, parent};
 	}
 
@@ -168,15 +148,15 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 		throw new UnsupportedOperationException("Wait object search context is not a page component");
 	}
 
-	public static class ComponentList<E extends PageComponent> extends ContainerList<E> {
+	public static class ComponentList<E extends PageComponent> extends ComponentContainer.ContainerList<E> {
 
 		public ComponentList(ComponentContainer parent, By locator, Class<E> componentType) {
-			super(parent, componentType, parent.findElements(locator));
+			super(parent, componentType, locator);
 		}
 
 		@Override
 		Class<?>[] getArgumentTypes() {
-			return ARG_TYPES_3;
+			return ARG_TYPES;
 		}
 
 		@Override

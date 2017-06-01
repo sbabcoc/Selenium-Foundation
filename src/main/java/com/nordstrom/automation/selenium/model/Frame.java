@@ -1,11 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
 
@@ -20,10 +17,9 @@ public class Frame extends Page {
 	private Class<?>[] argumentTypes;
 	private Object[] arguments;
 	
-	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_3 = {Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_4 = {String.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_1 = {RobustWebElement.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_2 = {Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_3 = {String.class, ComponentContainer.class};
 	
 	private enum FrameSelect {
 		ELEMENT,
@@ -39,9 +35,6 @@ public class Frame extends Page {
 	 */
 	public Frame(By locator, ComponentContainer parent) {
 		this(locator, -1, parent);
-		
-		argumentTypes = ARG_TYPES_1;
-		arguments = new Object[] {locator, parent};
 	}
 	
 	/**
@@ -52,14 +45,17 @@ public class Frame extends Page {
 	 * @param parent frame parent
 	 */
 	public Frame(By locator, int index, ComponentContainer parent) {
+		this(RobustWebElement.getElement(parent, locator, index), parent);
+	}
+	
+	private Frame(RobustWebElement element, ComponentContainer parent) {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;
-		this.index = index;
+		this.element = element;
+		this.index = element.getIndex();
 		
-		this.element = new RobustWebElement(null, parent, locator, index);
-		
-		argumentTypes = ARG_TYPES_2;
-		arguments = new Object[] {locator, index, parent};
+		argumentTypes = ARG_TYPES_1;
+		arguments = new Object[] {element, parent};
 	}
 	
 	/**
@@ -73,7 +69,7 @@ public class Frame extends Page {
 		this.frameSelect = FrameSelect.INDEX;
 		this.index = index;
 		
-		argumentTypes = ARG_TYPES_3;
+		argumentTypes = ARG_TYPES_2;
 		arguments = new Object[] {index, parent};
 	}
 	
@@ -89,7 +85,7 @@ public class Frame extends Page {
 		this.frameSelect = FrameSelect.NAME_OR_ID;
 		this.nameOrId = nameOrId;
 		
-		argumentTypes = ARG_TYPES_4;
+		argumentTypes = ARG_TYPES_3;
 		arguments = new Object[] {nameOrId, parent};
 	}
 
@@ -137,17 +133,17 @@ public class Frame extends Page {
 		private static final By FRAME_BY_XPATH = By.xpath(".//iframe|.//frame");
 		
 		FrameList(ComponentContainer parent, Class<E> containerType) {
-			super(parent, containerType, findElements(parent));
+			super(parent, containerType, getLocator(parent));
 		}
 		
-		private static List<WebElement> findElements(ComponentContainer parent) {
+		private static By getLocator(ComponentContainer parent) {
 			WebDriver driver = WebDriverUtils.getDriver(parent);
 			if (driver instanceof FindsByXPath) {
-				return parent.findElements(FRAME_BY_XPATH);
+				return FRAME_BY_XPATH;
 			} else if (driver instanceof FindsByCssSelector) {
-				return parent.findElements(FRAME_BY_CSS);
+				return FRAME_BY_CSS;
 			}
-			throw new RuntimeException();
+			throw new UnsupportedOperationException("Driver must support either Xpath or CSS selectors");
 		}
 
 		@Override

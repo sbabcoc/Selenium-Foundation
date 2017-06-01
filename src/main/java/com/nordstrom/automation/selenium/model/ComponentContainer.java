@@ -1,6 +1,11 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +25,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.nordstrom.common.base.UncheckedThrow;
 
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
 	
@@ -412,6 +418,87 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 */
 	protected Logger getLogger() {
 		return logger;
+	}
+	
+	public static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
+		try {
+			Method method = containerType.getMethod("getKey", SearchContext.class);
+			if (Modifier.isStatic(method.getModifiers())) return method;
+		} catch (NoSuchMethodException e) { }
+    	throw new UnsupportedOperationException("Container class must declare static 'getKey(SearchContext)' method");
+	}
+	
+	/**
+	 * 
+	 * @param containerType
+	 * @param argumentTypes
+	 * @param arguments
+	 * @return
+	 */
+	static <T extends ComponentContainer> T newContainer(Class<T> containerType, Class<?>[] argumentTypes, Object[] arguments) {
+		try {
+			Constructor<T> ctor = containerType.getConstructor(argumentTypes);
+			T container = ctor.newInstance(arguments);
+			return container.enhanceContainer(container);
+		} catch (NoSuchMethodException | SecurityException | InstantiationException |
+				IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw UncheckedThrow.throwUnchecked(e);
+		}
+	}
+	
+	abstract static class ContainerList<E extends ComponentContainer> extends AbstractList<E> {
+
+		protected ComponentContainer parent;
+		protected Class<E> containerType;
+		protected By locator;
+		
+		protected List<WebElement> elementList;
+		protected List<E> containerList;
+		protected List<E> immutableView;
+		
+		ContainerList(ComponentContainer parent, Class<E> containerType, By locator) {
+			if (parent == null) throw new IllegalArgumentException("Parent must be non-null");
+			if (containerType == null) throw new IllegalArgumentException("Container type must be non-null");
+			if (locator == null) throw new IllegalArgumentException("Locator must be non-null");
+			
+			this.parent = parent;
+			this.containerType = containerType;
+			this.locator = locator;
+			
+			elementList = parent.findElements(locator);
+			containerList = new ArrayList<>(elementList.size());
+			for (int i = 0; i < elementList.size(); i++) {
+				containerList.add(null);
+			}
+		}
+		
+		@Override
+		public int size() {
+			return containerList.size();
+		}
+		
+		@Override
+		public E get(int index) {
+			E container = containerList.get(index);
+			if (container == null) {
+				container = newContainer(containerType, getArgumentTypes(), getArguments(index));
+				containerList.set(index, container);
+			}
+			return container;
+		}
+		
+		/**
+		 * 
+		 * @return
+		 */
+		abstract Class<?>[] getArgumentTypes();
+		
+		/**
+		 * 
+		 * @param index
+		 * @return
+		 */
+		abstract Object[] getArguments(int index);
 	}
 	
 }
