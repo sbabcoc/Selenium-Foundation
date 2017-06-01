@@ -49,15 +49,17 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
 	}
 	
 	/**
+	 * Get array of constructor argument types.
 	 * 
-	 * @return
+	 * @return array of constructor argument types
 	 */
 	abstract Class<?>[] getArgumentTypes();
 	
 	/**
+	 * Get array of constructor argument values for the specified index.
 	 * 
-	 * @param index
-	 * @return
+	 * @param index container list index
+	 * @return array of constructor argument values
 	 */
 	abstract Object[] getArguments(int index);
 }

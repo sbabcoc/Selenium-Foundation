@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -64,13 +65,16 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
 	
 	@Override
 	public Set<Map.Entry<Object, V>> entrySet() {
-		Set<Map.Entry<Object, V>> es = entrySet;
-		if (es == null) {
-			
-		}
-		return es;
+		Set<Map.Entry<Object, V>> es;
+        return (es = entrySet) == null ? (entrySet = new EntrySet()) : es;
 	}
 	
+	/**
+	 * Get table entry for the specified key.
+	 * 
+	 * @param key key of desired entry
+	 * @return entry for the specified key; 'null' if not found
+	 */
     final Entry<V> getEntry(Object key) {
         Entry<V>[] tab; Entry<V> first, e; Object k;
         if ((tab = table) != null && tab.length > 0 &&
@@ -88,15 +92,17 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     }
     
 	/**
+	 * Get array of constructor argument types.
 	 * 
-	 * @return
+	 * @return array of constructor argument types
 	 */
 	abstract Class<?>[] getArgumentTypes();
 	
 	/**
+	 * Get array of constructor argument values for the specified context element.
 	 * 
-	 * @param element
-	 * @return
+	 * @param element container map context element
+	 * @return array of constructor argument values
 	 */
 	abstract Object[] getArguments(WebElement element);
 	
@@ -142,7 +148,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
 		}
 	}
 	
-	class EntrySet extends AbstractSet<Entry<V>> {
+	class EntrySet extends AbstractSet<Map.Entry<Object, V>> {
 		
 		@Override
         public final int size()                 {
@@ -150,7 +156,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
         
 		@Override
-        public final Iterator<Entry<V>> iterator() {
+        public final Iterator<Map.Entry<Object, V>> iterator() {
             return new EntryIterator();
         }
 		
@@ -180,7 +186,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
 	}
 	
-	class EntryIterator implements Iterator<Entry<V>> {
+	class EntryIterator implements Iterator<Map.Entry<Object, V>> {
         Entry<V> next;
         Entry<V> current;
         int index;
@@ -201,7 +207,17 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
 		public Entry<V> next() {
 			return nextEntry();
 		}
-
+        
+        @Override
+        public final void remove() {
+        	throw new UnsupportedOperationException();
+        }
+		
+		/**
+		 * Get the next table entry.
+		 * 
+		 * @return next table entry
+		 */
         final Entry<V> nextEntry() {
             Entry<V>[] t;
             Entry<V> e = next;
@@ -210,11 +226,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
                 do {} while (index < t.length && (next = t[index++]) == null);
             }
             return e;
-        }
-        
-        @Override
-        public final void remove() {
-        	throw new UnsupportedOperationException();
         }
 	}
 }

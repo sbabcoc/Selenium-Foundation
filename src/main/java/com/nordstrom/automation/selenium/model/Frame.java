@@ -49,7 +49,13 @@ public class Frame extends Page {
 		this(RobustWebElement.getElement(parent, locator, index), parent);
 	}
 	
-	private Frame(RobustWebElement element, ComponentContainer parent) {
+	/**
+	 * Constructor for frame by context element
+	 * 
+	 * @param element frame context element
+	 * @param parent frame parent
+	 */
+	public Frame(RobustWebElement element, ComponentContainer parent) {
 		super(parent.driver, parent);
 		this.frameSelect = FrameSelect.ELEMENT;
 		this.element = element;
@@ -137,6 +143,12 @@ public class Frame extends Page {
 			super(parent, containerType, getLocator(parent));
 		}
 		
+		/**
+		 * Get frame locator for the specified parent.
+		 * 
+		 * @param parent frame parent
+		 * @return frame locator
+		 */
 		private static By getLocator(ComponentContainer parent) {
 			WebDriver driver = WebDriverUtils.getDriver(parent);
 			if (driver instanceof FindsByXPath) {
