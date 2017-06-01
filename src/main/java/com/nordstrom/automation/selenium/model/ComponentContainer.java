@@ -418,6 +418,12 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		return logger;
 	}
 	
+	/**
+	 * Get {@link Method} object for the static {@code getKey(SearchContext)} method declared by the specified container type.
+	 * 
+	 * @param containerType target container type
+	 * @return method object for getKey(SearchContext) 
+	 */
 	public static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
 		try {
 			Method method = containerType.getMethod("getKey", SearchContext.class);
@@ -427,11 +433,12 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	/**
+	 * Instantiate a new container of the specified type with the supplied arguments.
 	 * 
-	 * @param containerType
-	 * @param argumentTypes
-	 * @param arguments
-	 * @return
+	 * @param containerType type of container to instantiate
+	 * @param argumentTypes array of constructor argument types
+	 * @param arguments array of constructor argument values
+	 * @return new container of the specified type
 	 */
 	static <T extends ComponentContainer> T newContainer(Class<T> containerType, Class<?>[] argumentTypes, Object[] arguments) {
 		try {
