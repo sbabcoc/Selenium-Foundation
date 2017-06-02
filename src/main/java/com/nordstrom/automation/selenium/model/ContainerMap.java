@@ -127,7 +127,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         	try {
 				key = map.method.invoke(null, element);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				UncheckedThrow.throwUnchecked(e);
+				throw UncheckedThrow.throwUnchecked(e);
 			}
         }
         
