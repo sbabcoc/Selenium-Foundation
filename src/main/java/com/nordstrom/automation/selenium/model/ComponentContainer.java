@@ -1,6 +1,10 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +23,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.nordstrom.common.base.UncheckedThrow;
 
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
 	
@@ -34,8 +39,11 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	private static final Class<?>[] BYPASS = {Object.class, WrapsContext.class};
 	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
 			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
-			"bypassClassOf", "bypassMethod", "getLogger"};
+			"bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes", "getArguments"};
+	
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
+	static final Class<?>[] SIGNATURE = {RobustWebElement.class, ComponentContainer.class};
+	
 	private final Logger logger;
 	
 	/**
@@ -56,6 +64,31 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		logger = LoggerFactory.getLogger((this instanceof Enhanced) ? clazz.getSuperclass() : clazz);
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(getArgumentTypes());
+		result = prime * result + Arrays.hashCode(getArguments());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PageComponent other = (PageComponent) obj;
+		if (!Arrays.equals(getArgumentTypes(), other.getArgumentTypes()))
+			return false;
+		if (!Arrays.equals(getArguments(), other.getArguments()))
+			return false;
+		return true;
+	}
+
 	/**
 	 * Validate the specified parent object
 	 * 
@@ -386,6 +419,55 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 */
 	protected Logger getLogger() {
 		return logger;
+	}
+	
+	/**
+	 * Get {@link Method} object for the static {@code getKey(SearchContext)} method declared by the specified container type.
+	 * 
+	 * @param containerType target container type
+	 * @return method object for getKey(SearchContext) 
+	 * @throws UnsupportedOperationException if the required method is missing
+	 */
+	static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
+		try {
+			Method method = containerType.getMethod("getKey", SearchContext.class);
+			if (Modifier.isStatic(method.getModifiers())) return method;
+		} catch (NoSuchMethodException e) { }
+    	throw new UnsupportedOperationException("Container class must declare method: public static Object getKey(SearchContext)");
+	}
+	
+	/**
+	 * Verify that the specified container type declares the required constructor.
+	 * 
+	 * @param containerType target container type
+	 * @throws UnsupportedOperationException if the required constructor is missing
+	 */
+	static <T extends ComponentContainer> void verifyCollectible(Class<T> containerType) {
+		try {
+			containerType.getConstructor(SIGNATURE);
+		} catch (NoSuchMethodException | SecurityException e) {
+			String format = "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
+			throw new UnsupportedOperationException(String.format(format, containerType.getSimpleName()));
+		}
+	}
+	
+	/**
+	 * Instantiate a new container of the specified type with the supplied arguments.
+	 * 
+	 * @param containerType type of container to instantiate
+	 * @param argumentTypes array of constructor argument types
+	 * @param arguments array of constructor argument values
+	 * @return new container of the specified type
+	 */
+	static <T extends ComponentContainer> T newContainer(Class<T> containerType, Class<?>[] argumentTypes, Object[] arguments) {
+		try {
+			Constructor<T> ctor = containerType.getConstructor(argumentTypes);
+			T container = ctor.newInstance(arguments);
+			return container.enhanceContainer(container);
+		} catch (NoSuchMethodException | SecurityException | InstantiationException |
+				IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw UncheckedThrow.throwUnchecked(e);
+		}
 	}
 	
 }

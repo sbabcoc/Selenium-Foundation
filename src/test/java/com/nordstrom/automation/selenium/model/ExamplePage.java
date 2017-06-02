@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.model;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -19,12 +20,17 @@ public class ExamplePage extends Page {
 	private FrameComponent frameByIndex;
 	private FrameComponent frameById;
 	private TableComponent table;
+	private List<TableComponent> tableList;
+	private Map<Object, TableComponent> tableMap;
+	private List<FrameComponent> frameList;
+	private Map<Object, FrameComponent> frameMap;
 	
 	protected static final String FRAME_A_ID = "frame-a";
 	protected static final String FRAME_B_ID = "frame-b";
 	protected static final String FRAME_C_ID = "frame-c";
 	
 	protected enum Using implements ByEnum {
+		FRAME(By.cssSelector("iframe[id^='frame-']")),
 		FRAME_A(By.cssSelector("iframe#frame-a")),
 		FRAME_B(By.cssSelector("iframe#frame-b")),
 		FRAME_C(By.cssSelector("iframe#frame-c")),
@@ -74,5 +80,33 @@ public class ExamplePage extends Page {
 			table = new TableComponent(Using.TABLE.locator, this);
 		}
 		return table;
+	}
+	
+	public List<TableComponent> getTableList() {
+		if (tableList == null) {
+			tableList = new ComponentList<>(this, TableComponent.class, Using.TABLE.locator);
+		}
+		return tableList;
+	}
+	
+	public Map<Object, TableComponent> getTableMap() {
+		if (tableMap == null) {
+			tableMap = new ComponentMap<>(this, TableComponent.class, Using.TABLE.locator);
+		}
+		return tableMap;
+	}
+	
+	public List<FrameComponent> getFrameList() {
+		if (frameList == null) {
+			frameList = new FrameList<>(this, FrameComponent.class, Using.FRAME.locator);
+		}
+		return frameList;
+	}
+	
+	public Map<Object, FrameComponent> getFrameMap() {
+		if (frameMap == null) {
+			frameMap = new FrameMap<>(this, FrameComponent.class, Using.FRAME.locator);
+		}
+		return frameMap;
 	}
 }

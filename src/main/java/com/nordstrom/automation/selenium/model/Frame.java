@@ -14,8 +14,8 @@ public class Frame extends Page {
 	
 	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_3 = {Integer.TYPE, ComponentContainer.class};
-	private static final Class<?>[] ARG_TYPES_4 = {String.class, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_4 = {Integer.TYPE, ComponentContainer.class};
+	private static final Class<?>[] ARG_TYPES_5 = {String.class, ComponentContainer.class};
 	
 	private enum FrameSelect {
 		ELEMENT,
@@ -44,14 +44,26 @@ public class Frame extends Page {
 	 * @param parent frame parent
 	 */
 	public Frame(By locator, int index, ComponentContainer parent) {
-		super(parent.driver, parent);
-		this.frameSelect = FrameSelect.ELEMENT;
-		this.index = index;
-		
-		this.element = new RobustWebElement(null, parent, locator, index);
+		this(RobustWebElement.getElement(parent, locator, index), parent);
 		
 		argumentTypes = ARG_TYPES_2;
 		arguments = new Object[] {locator, index, parent};
+	}
+	
+	/**
+	 * Constructor for frame by context element
+	 * 
+	 * @param element frame context element
+	 * @param parent frame parent
+	 */
+	public Frame(RobustWebElement element, ComponentContainer parent) {
+		super(parent.driver, parent);
+		this.frameSelect = FrameSelect.ELEMENT;
+		this.element = element;
+		this.index = element.getIndex();
+		
+		argumentTypes = SIGNATURE;
+		arguments = new Object[] {element, parent};
 	}
 	
 	/**
@@ -65,7 +77,7 @@ public class Frame extends Page {
 		this.frameSelect = FrameSelect.INDEX;
 		this.index = index;
 		
-		argumentTypes = ARG_TYPES_3;
+		argumentTypes = ARG_TYPES_4;
 		arguments = new Object[] {index, parent};
 	}
 	
@@ -81,7 +93,7 @@ public class Frame extends Page {
 		this.frameSelect = FrameSelect.NAME_OR_ID;
 		this.nameOrId = nameOrId;
 		
-		argumentTypes = ARG_TYPES_4;
+		argumentTypes = ARG_TYPES_5;
 		arguments = new Object[] {nameOrId, parent};
 	}
 
@@ -122,5 +134,4 @@ public class Frame extends Page {
 	public Object[] getArguments() {
 		return arguments;
 	}
-	
 }
