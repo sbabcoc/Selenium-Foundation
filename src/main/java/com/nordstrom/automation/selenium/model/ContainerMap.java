@@ -35,6 +35,8 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
 		if (containerType == null) throw new IllegalArgumentException("Container type must be non-null");
 		if (locator == null) throw new IllegalArgumentException("Locator must be non-null");
 		
+		ComponentContainer.verifyCollectible(containerType);
+		
 		this.parent = parent;
 		this.containerType = containerType;
 		this.locator = locator;
@@ -96,7 +98,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
 	 * 
 	 * @return array of constructor argument types
 	 */
-	abstract Class<?>[] getArgumentTypes();
+	Class<?>[] getArgumentTypes() {
+		return ComponentContainer.SIGNATURE;
+	}
 	
 	/**
 	 * Get array of constructor argument values for the specified context element.
@@ -104,7 +108,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
 	 * @param element container map context element
 	 * @return array of constructor argument values
 	 */
-	abstract Object[] getArguments(WebElement element);
+	Object[] getArguments(WebElement element) {
+		return new Object[] {(RobustWebElement) element, parent};
+	}
 	
 	static class Entry<V extends ComponentContainer> implements Map.Entry<Object, V> {
     	ContainerMap<V> map;

@@ -8,14 +8,4 @@ public class ComponentList<E extends PageComponent> extends ContainerList<E> {
 		super(parent, componentType, locator);
 	}
 
-	@Override
-	Class<?>[] getArgumentTypes() {
-		return PageComponent.ARG_TYPES_3;
-	}
-
-	@Override
-	Object[] getArguments(int index) {
-		RobustWebElement element = (RobustWebElement) elementList.get(index);
-		return new Object[] {element, parent};
-	}
 }

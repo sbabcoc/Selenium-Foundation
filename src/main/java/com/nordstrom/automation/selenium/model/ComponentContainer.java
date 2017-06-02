@@ -40,7 +40,10 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
 			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
 			"bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes", "getArguments"};
+	
 	private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
+	static final Class<?>[] SIGNATURE = {RobustWebElement.class, ComponentContainer.class};
+	
 	private final Logger logger;
 	
 	/**
@@ -423,13 +426,29 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * 
 	 * @param containerType target container type
 	 * @return method object for getKey(SearchContext) 
+	 * @throws UnsupportedOperationException if the required method is missing
 	 */
 	static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
 		try {
 			Method method = containerType.getMethod("getKey", SearchContext.class);
 			if (Modifier.isStatic(method.getModifiers())) return method;
 		} catch (NoSuchMethodException e) { }
-    	throw new UnsupportedOperationException("Container class must declare static 'getKey(SearchContext)' method");
+    	throw new UnsupportedOperationException("Container class must declare method: public static Object getKey(SearchContext)");
+	}
+	
+	/**
+	 * Verify that the specified container type declares the required constructor.
+	 * 
+	 * @param containerType target container type
+	 * @throws UnsupportedOperationException if the required constructor is missing
+	 */
+	static <T extends ComponentContainer> void verifyCollectible(Class<T> containerType) {
+		try {
+			containerType.getConstructor(SIGNATURE);
+		} catch (NoSuchMethodException | SecurityException e) {
+			String format = "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
+			throw new UnsupportedOperationException(String.format(format, containerType.getSimpleName()));
+		}
 	}
 	
 	/**

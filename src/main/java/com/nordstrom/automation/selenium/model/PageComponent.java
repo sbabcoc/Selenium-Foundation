@@ -14,7 +14,6 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	
 	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
-	static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
 	
 	/**
 	 * Constructor for page component by element locator
@@ -52,7 +51,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	public PageComponent(RobustWebElement element, ComponentContainer parent) {
 		super(element, parent);
 		
-		argumentTypes = ARG_TYPES_3;
+		argumentTypes = SIGNATURE;
 		arguments = new Object[] {element, parent};
 	}
 

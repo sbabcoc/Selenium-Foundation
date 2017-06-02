@@ -14,7 +14,6 @@ public class Frame extends Page {
 	
 	private static final Class<?>[] ARG_TYPES_1 = {By.class, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
-	static final Class<?>[] ARG_TYPES_3 = {RobustWebElement.class, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_4 = {Integer.TYPE, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_5 = {String.class, ComponentContainer.class};
 	
@@ -63,7 +62,7 @@ public class Frame extends Page {
 		this.element = element;
 		this.index = element.getIndex();
 		
-		argumentTypes = ARG_TYPES_3;
+		argumentTypes = SIGNATURE;
 		arguments = new Object[] {element, parent};
 	}
 	

@@ -22,6 +22,8 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
 		if (containerType == null) throw new IllegalArgumentException("Container type must be non-null");
 		if (locator == null) throw new IllegalArgumentException("Locator must be non-null");
 		
+		ComponentContainer.verifyCollectible(containerType);
+		
 		this.parent = parent;
 		this.containerType = containerType;
 		this.locator = locator;
@@ -53,7 +55,9 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
 	 * 
 	 * @return array of constructor argument types
 	 */
-	abstract Class<?>[] getArgumentTypes();
+	Class<?>[] getArgumentTypes() {
+		return ComponentContainer.SIGNATURE;
+	}
 	
 	/**
 	 * Get array of constructor argument values for the specified index.
@@ -61,5 +65,8 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
 	 * @param index container list index
 	 * @return array of constructor argument values
 	 */
-	abstract Object[] getArguments(int index);
+	Object[] getArguments(int index) {
+		RobustWebElement element = (RobustWebElement) elementList.get(index);
+		return new Object[] {element, parent};
+	}
 }
