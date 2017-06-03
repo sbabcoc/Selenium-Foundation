@@ -95,6 +95,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 		// if specified element is already robust
 		if (element instanceof RobustWebElement) {
 			RobustWebElement robust = (RobustWebElement) element;
+			this.acquiredAt = robust.acquiredAt;
+			
 			element = robust.wrapped;
 			context = robust.context;
 			locator = robust.locator;
@@ -135,6 +137,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			} else {
 				refreshReference(null);
 			}
+		} else if (acquiredAt == null) {
+			acquiredAt = Long.valueOf(System.currentTimeMillis());
 		}
 	}
 	
@@ -503,11 +507,11 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 		List<WebElement> elements;
 		try {
 			elements = context.getWrappedContext().findElements(locator);
+			for (int index = 0; index < elements.size(); index++) {
+				elements.set(index, new RobustWebElement(elements.get(index), context, locator, index));
+			}
 		} catch (StaleElementReferenceException e) {
 			elements = context.refreshContext(null).findElements(locator);
-		}
-		for (int index = 0; index < elements.size(); index++) {
-			elements.set(index, new RobustWebElement(elements.get(index), context, locator, index));
 		}
 		return elements;
 	}

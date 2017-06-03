@@ -62,7 +62,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	
 	@Override
 	public SearchContext getWrappedContext() {
-		return context;
+		return ((RobustWebElement) context).getWrappedContext();
 	}
 
 	@Override
