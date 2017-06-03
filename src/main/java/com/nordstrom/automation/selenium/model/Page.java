@@ -225,7 +225,7 @@ public class Page extends ComponentContainer {
 
 	@Override
 	public Long acquiredAt() {
-		return null;
+		return System.currentTimeMillis();
 	}
 
 	@Override
