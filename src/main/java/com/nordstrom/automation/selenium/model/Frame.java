@@ -116,11 +116,11 @@ public class Frame extends Page {
 	}
 	
 	@Override
-	public SearchContext refreshContext() {
+	public SearchContext refreshContext(Long acquiredAt) {
 		if (frameSelect == FrameSelect.ELEMENT) {
-			element.refreshContext();
+			element.refreshContext(acquiredAt);
 		} else {
-			parent.refreshContext();
+			parent.refreshContext(acquiredAt);
 		}
 		return switchToContext();
 	}

@@ -59,6 +59,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	private String selector;
 	private Strategy strategy = Strategy.LOCATOR;
 	
+	private Long acquiredAt;
+	
 	/**
 	 * Basic robust web element constructor
 	 * 
@@ -391,7 +393,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				try {
 					return acquireReference(element);
 				} catch (StaleElementReferenceException e) {
-					((WrapsContext) context).refreshContext();
+					((WrapsContext) context).refreshContext(null);
 					return acquireReference(element);
 				}
 			}
@@ -453,6 +455,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			element.wrapped = JsUtility.runAndReturn(element.driver, js, WebElement.class, args.toArray());
 		}
 		
+		if (element.wrapped != null) element.acquiredAt = System.currentTimeMillis();
 		return element;
 	}
 	
@@ -462,10 +465,16 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	}
 
 	@Override
-	public SearchContext refreshContext() {
-		return refreshReference(null);
+	public SearchContext refreshContext(Long acquiredAt) {
+		if (acquiredAt == null) acquiredAt = acquiredAt();
+		return (acquiredAt.compareTo(acquiredAt()) >= 0) ? refreshReference(null) : this;
 	}
 
+	@Override
+	public Long acquiredAt() {
+		return acquiredAt;
+	}
+	
 	@Override
 	public WebDriver getWrappedDriver() {
 		return WebDriverUtils.getDriver(getWrappedElement());
@@ -495,7 +504,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 		try {
 			elements = context.getWrappedContext().findElements(locator);
 		} catch (StaleElementReferenceException e) {
-			elements = context.refreshContext().findElements(locator);
+			elements = context.refreshContext(null).findElements(locator);
 		}
 		for (int index = 0; index < elements.size(); index++) {
 			elements.set(index, new RobustWebElement(elements.get(index), context, locator, index));

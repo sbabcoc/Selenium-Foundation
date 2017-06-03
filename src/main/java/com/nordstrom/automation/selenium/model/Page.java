@@ -219,8 +219,13 @@ public class Page extends ComponentContainer {
 	}
 
 	@Override
-	public SearchContext refreshContext() {
+	public SearchContext refreshContext(Long acquiredAt) {
 		return this;
+	}
+
+	@Override
+	public Long acquiredAt() {
+		return null;
 	}
 
 	@Override
