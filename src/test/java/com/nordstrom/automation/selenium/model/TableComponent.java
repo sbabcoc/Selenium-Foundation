@@ -19,6 +19,7 @@ public class TableComponent extends PageComponent {
 	
 	private TableRowComponent tableHdr;
 	private List<TableRowComponent> tableRows;
+	private int refreshCount;
 	
 	protected enum Using {
 		HDR_ROW(By.cssSelector("tr[id*='-h']")),
@@ -61,4 +62,27 @@ public class TableComponent extends PageComponent {
 		return ((WebElement) context).getAttribute("id");
 	}
 
+	@Override
+	public SearchContext refreshContext(Long expiration) {
+		refreshCount++;
+		return super.refreshContext(expiration);
+	}
+	
+	public int getRefreshCount() {
+		return refreshCount;
+	}
+	
+	public int getHeaderRefreshCount() {
+		return getTableHdr().getRefreshCount();
+	}
+	
+	public int[] getRowRefreshCounts() {
+		List<TableRowComponent> tableRows = getTableRows();
+		int[] counts = new int[tableRows.size()];
+		for (int i = 0; i < tableRows.size(); i++) {
+			counts[i] = tableRows.get(i).getRefreshCount();
+		}
+		return counts;
+	}
+	
 }

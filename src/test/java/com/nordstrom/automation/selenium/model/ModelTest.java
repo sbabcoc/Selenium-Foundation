@@ -60,16 +60,6 @@ public class ModelTest implements ListenerChainable {
 		verifyTable(component);
 	}
 
-	@Test
-	public void testRefresh() {
-		ExamplePage page = getPage();
-		TableComponent component = page.getTable();
-		verifyTable(component);
-		page.getDriver().navigate().refresh();
-		verifyTable(component);
-		verifyTable(component);
-	}
-
 	private void verifyTable(TableComponent component) {
 		assertEquals(component.getHeadings().toArray(), HEADINGS);
 		List<List<String>> content = component.getContent();
@@ -132,6 +122,48 @@ public class ModelTest implements ListenerChainable {
 		assertEquals(frameMap.get(FRAME_A_ID).getPageContent(), FRAME_A);
 		assertEquals(frameMap.get(FRAME_B_ID).getPageContent(), FRAME_B);
 		assertEquals(frameMap.get(FRAME_C_ID).getPageContent(), FRAME_C);
+	}
+
+	@Test
+	public void testRefresh() {
+		ExamplePage page = getPage();
+		TableComponent component = page.getTable();
+		verifyTable(component);
+		
+		int pageRefreshCount = page.getRefreshCount();
+		int tableRefreshCount = component.getRefreshCount();
+		int headerRefreshCount = component.getHeaderRefreshCount();
+		int[] rowRefreshCounts = component.getRowRefreshCounts();
+		
+		assertEquals(pageRefreshCount, 0);
+		assertEquals(tableRefreshCount, 0);
+		assertEquals(headerRefreshCount, 0);
+		assertEquals(rowRefreshCounts, new int[] {0, 0, 0});
+		
+		page.getDriver().navigate().refresh();
+		verifyTable(component);
+		
+		pageRefreshCount = page.getRefreshCount();
+		tableRefreshCount = component.getRefreshCount();
+		headerRefreshCount = component.getHeaderRefreshCount();
+		rowRefreshCounts = component.getRowRefreshCounts();
+		
+		assertEquals(pageRefreshCount, 1);
+		assertEquals(tableRefreshCount, 4);
+		assertEquals(headerRefreshCount, 1);
+		assertEquals(rowRefreshCounts, new int[] {1, 1, 1});
+		
+		verifyTable(component);
+		
+		pageRefreshCount = page.getRefreshCount();
+		tableRefreshCount = component.getRefreshCount();
+		headerRefreshCount = component.getHeaderRefreshCount();
+		rowRefreshCounts = component.getRowRefreshCounts();
+		
+		assertEquals(pageRefreshCount, 1);
+		assertEquals(tableRefreshCount, 4);
+		assertEquals(headerRefreshCount, 1);
+		assertEquals(rowRefreshCounts, new int[] {1, 1, 1});
 	}
 
 	private ExamplePage getPage() {

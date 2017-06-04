@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class TableRowComponent extends PageComponent {
@@ -26,7 +27,8 @@ public class TableRowComponent extends PageComponent {
 		}
 	}
 	
-	List<WebElement> cells;
+	private List<WebElement> cells;
+	private int refreshCount;
 	
 	public List<String> getContent() {
 		List<WebElement> cells = getCells();
@@ -38,6 +40,16 @@ public class TableRowComponent extends PageComponent {
 			cells = findElements(Using.TBL_CELL.selector);
 		}
 		return cells;
+	}
+	
+	@Override
+	public SearchContext refreshContext(Long expiration) {
+		refreshCount++;
+		return super.refreshContext(expiration);
+	}
+	
+	public int getRefreshCount() {
+		return refreshCount;
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -24,6 +25,7 @@ public class ExamplePage extends Page {
 	private Map<Object, TableComponent> tableMap;
 	private List<FrameComponent> frameList;
 	private Map<Object, FrameComponent> frameMap;
+	private int refreshCount;
 	
 	protected static final String FRAME_A_ID = "frame-a";
 	protected static final String FRAME_B_ID = "frame-b";
@@ -109,4 +111,15 @@ public class ExamplePage extends Page {
 		}
 		return frameMap;
 	}
+	
+	@Override
+	public SearchContext refreshContext(Long expiration) {
+		refreshCount++;
+		return super.refreshContext(expiration);
+	}
+	
+	public int getRefreshCount() {
+		return refreshCount;
+	}
+	
 }
