@@ -66,13 +66,13 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	}
 
 	@Override
-	public SearchContext refreshContext(Long acquiredAt) {
-		// if this context is past the pull date
-		if (acquiredAt.compareTo(acquiredAt()) >= 0) {
+	public SearchContext refreshContext(Long expiration) {
+		// if this context is past the expiration
+		if (expiration.compareTo(acquiredAt()) >= 0) {
 			// refresh context ancestry
-			parent.refreshContext(acquiredAt);
+			parent.refreshContext(expiration);
 			// refresh context element
-			((RobustWebElement) context).refreshContext(acquiredAt);
+			((RobustWebElement) context).refreshContext(expiration);
 		}
 		return this;
 	}

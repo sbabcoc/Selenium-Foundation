@@ -469,9 +469,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	}
 
 	@Override
-	public SearchContext refreshContext(Long acquiredAt) {
-		// refresh wrapped element reference if it's past the pull date
-		return (acquiredAt.compareTo(acquiredAt()) >= 0) ? refreshReference(null) : this;
+	public SearchContext refreshContext(Long expiration) {
+		// refresh wrapped element reference if it's past the expiration
+		return (expiration.compareTo(acquiredAt()) >= 0) ? refreshReference(null) : this;
 	}
 
 	@Override
