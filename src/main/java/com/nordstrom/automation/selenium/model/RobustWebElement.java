@@ -397,7 +397,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				try {
 					return acquireReference(element);
 				} catch (StaleElementReferenceException e) {
-					((WrapsContext) context).refreshContext(null);
+					((WrapsContext) context).refreshContext(((WrapsContext) context).acquiredAt());
 					return acquireReference(element);
 				}
 			}
@@ -470,7 +470,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 
 	@Override
 	public SearchContext refreshContext(Long acquiredAt) {
-		if (acquiredAt == null) acquiredAt = acquiredAt();
+		// refresh wrapped element reference if it's past the pull date
 		return (acquiredAt.compareTo(acquiredAt()) >= 0) ? refreshReference(null) : this;
 	}
 
@@ -511,7 +511,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				elements.set(index, new RobustWebElement(elements.get(index), context, locator, index));
 			}
 		} catch (StaleElementReferenceException e) {
-			elements = context.refreshContext(null).findElements(locator);
+			elements = context.refreshContext(context.acquiredAt()).findElements(locator);
 		}
 		return elements;
 	}

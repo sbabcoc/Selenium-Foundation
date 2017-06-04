@@ -185,7 +185,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				try {
 					return context.switchToContext();
 				} catch (StaleElementReferenceException e) {
-					return context.refreshContext(null);
+					return context.refreshContext(context.acquiredAt());
 				}
 			}
 			
