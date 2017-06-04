@@ -60,6 +60,16 @@ public class ModelTest implements ListenerChainable {
 		verifyTable(component);
 	}
 
+	@Test
+	public void testRefresh() {
+		ExamplePage page = getPage();
+		TableComponent component = page.getTable();
+		verifyTable(component);
+		page.getDriver().navigate().refresh();
+		verifyTable(component);
+		verifyTable(component);
+	}
+
 	private void verifyTable(TableComponent component) {
 		assertEquals(component.getHeadings().toArray(), HEADINGS);
 		List<List<String>> content = component.getContent();
