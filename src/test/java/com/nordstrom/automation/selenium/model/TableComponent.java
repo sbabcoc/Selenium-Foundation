@@ -72,11 +72,11 @@ public class TableComponent extends PageComponent {
 		return refreshCount;
 	}
 	
-	public int getHeaderRefreshCount() {
+	public int getHeadRefreshCount() {
 		return getTableHdr().getRefreshCount();
 	}
 	
-	public int[] getRowRefreshCounts() {
+	public int[] getBodyRefreshCounts() {
 		List<TableRowComponent> tableRows = getTableRows();
 		int[] counts = new int[tableRows.size()];
 		for (int i = 0; i < tableRows.size(); i++) {
