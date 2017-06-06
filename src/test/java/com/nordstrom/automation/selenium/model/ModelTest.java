@@ -60,7 +60,12 @@ public class ModelTest implements ListenerChainable {
 		verifyTable(component);
 	}
 
-	private void verifyTable(TableComponent component) {
+	/**
+	 * Verify the contents of the specified table component
+	 * 
+	 * @param component table component to be verified
+	 */
+	private static void verifyTable(TableComponent component) {
 		assertEquals(component.getHeadings().toArray(), HEADINGS);
 		List<List<String>> content = component.getContent();
 		assertEquals(content.size(), 3);
@@ -164,9 +169,9 @@ public class ModelTest implements ListenerChainable {
 		assertEquals(pageRefreshCount, 1);
 		// 1 table refresh request from each of its four row contexts
 		assertEquals(tableRefreshCount, 4);
-		// 1 head row refresh request from its web element context
+		// 1 head row refresh request from one of its web element contexts
 		assertEquals(headRefreshCount, 1);
-		// 1 refresh request per body row from its web element context
+		// 1 refresh request per body row from one of its web element contexts
 		assertEquals(bodyRefreshCounts, new int[] {1, 1, 1});
 		
 		// verify table contents again
