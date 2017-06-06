@@ -15,8 +15,16 @@ public interface WrapsContext extends WrapsDriver {
 	/**
 	 * Refresh the underlying search context for this object
 	 * 
+	 * @param expiration expiration time of context chain
 	 * @return object search context
 	 */
-	public SearchContext refreshContext();
-
+	public SearchContext refreshContext(Long expiration);
+	
+	/**
+	 * Determine when the underlying search context for this object was acquired
+	 * 
+	 * @return search context acquisition time (from {@link System#currentTimeMillis()})
+	 */
+	public Long acquiredAt();
+	
 }

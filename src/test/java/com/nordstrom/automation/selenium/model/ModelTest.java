@@ -60,7 +60,12 @@ public class ModelTest implements ListenerChainable {
 		verifyTable(component);
 	}
 
-	private void verifyTable(TableComponent component) {
+	/**
+	 * Verify the contents of the specified table component
+	 * 
+	 * @param component table component to be verified
+	 */
+	private static void verifyTable(TableComponent component) {
 		assertEquals(component.getHeadings().toArray(), HEADINGS);
 		List<List<String>> content = component.getContent();
 		assertEquals(content.size(), 3);
@@ -122,6 +127,68 @@ public class ModelTest implements ListenerChainable {
 		assertEquals(frameMap.get(FRAME_A_ID).getPageContent(), FRAME_A);
 		assertEquals(frameMap.get(FRAME_B_ID).getPageContent(), FRAME_B);
 		assertEquals(frameMap.get(FRAME_C_ID).getPageContent(), FRAME_C);
+	}
+
+	/**
+	 * This test verifies that stale elements are automatically refreshed
+	 * and that the search context chain gets refreshed efficiently.
+	 */
+	@Test
+	public void testRefresh() {
+		ExamplePage page = getPage();
+		// get the table component
+		TableComponent component = page.getTable();
+		// verify table contents
+		verifyTable(component);
+		
+		// get current refresh counts
+		int pageRefreshCount = page.getRefreshCount();
+		int tableRefreshCount = component.getRefreshCount();
+		int headRefreshCount = component.getHeadRefreshCount();
+		int[] bodyRefreshCounts = component.getBodyRefreshCounts();
+		
+		// verify no initial refresh requests
+		assertEquals(pageRefreshCount, 0);
+		assertEquals(tableRefreshCount, 0);
+		assertEquals(headRefreshCount, 0);
+		assertEquals(bodyRefreshCounts, new int[] {0, 0, 0});
+		
+		// refresh page to force DOM rebuild
+		page.getDriver().navigate().refresh();
+		// verify table contents
+		// NOTE: This necessitates refreshing stale element references
+		verifyTable(component);
+		
+		// get current refresh counts
+		pageRefreshCount = page.getRefreshCount();
+		tableRefreshCount = component.getRefreshCount();
+		headRefreshCount = component.getHeadRefreshCount();
+		bodyRefreshCounts = component.getBodyRefreshCounts();
+		
+		// 1 page refresh request from its table context
+		assertEquals(pageRefreshCount, 1);
+		// 1 table refresh request from each of its four row contexts
+		assertEquals(tableRefreshCount, 4);
+		// 1 head row refresh request from one of its web element contexts
+		assertEquals(headRefreshCount, 1);
+		// 1 refresh request per body row from one of its web element contexts
+		assertEquals(bodyRefreshCounts, new int[] {1, 1, 1});
+		
+		// verify table contents again
+		// NOTE: No additional refresh requests are expected
+		verifyTable(component);
+		
+		// get current refresh counts
+		pageRefreshCount = page.getRefreshCount();
+		tableRefreshCount = component.getRefreshCount();
+		headRefreshCount = component.getHeadRefreshCount();
+		bodyRefreshCounts = component.getBodyRefreshCounts();
+		
+		// verify no additional refresh requests
+		assertEquals(pageRefreshCount, 1);
+		assertEquals(tableRefreshCount, 4);
+		assertEquals(headRefreshCount, 1);
+		assertEquals(bodyRefreshCounts, new int[] {1, 1, 1});
 	}
 
 	private ExamplePage getPage() {

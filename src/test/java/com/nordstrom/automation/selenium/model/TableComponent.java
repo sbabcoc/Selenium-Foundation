@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -18,37 +17,72 @@ public class TableComponent extends PageComponent {
 		super(element, parent);
 	}
 	
+	private TableRowComponent tableHdr;
+	private List<TableRowComponent> tableRows;
+	private int refreshCount;
+	
 	protected enum Using {
 		HDR_ROW(By.cssSelector("tr[id*='-h']")),
-		TBL_ROW(By.cssSelector("tr[id*='-r']")),
-		HDR_CELL(By.cssSelector("th")),
-		TBL_CELL(By.cssSelector("td"));
+		TBL_ROW(By.cssSelector("tr[id*='-r']"));
 		
-		private By selector;
+		private By locator;
 		
-		Using(By selector) {
-			this.selector = selector;
+		Using(By locator) {
+			this.locator = locator;
 		}
 	}
 	
 	public List<String> getHeadings() {
-		WebElement headerRow = findElement(Using.HDR_ROW.selector);
-		List<WebElement> headerCells = headerRow.findElements(Using.HDR_CELL.selector);
-		return Arrays.asList(headerCells.get(0).getText(), headerCells.get(1).getText(), headerCells.get(2).getText());
+		return getTableHdr().getContent();
 	}
 	
 	public List<List<String>> getContent() {
-		List<List<String>> content = new ArrayList<>();
-		List<WebElement> tableRows = findElements(Using.TBL_ROW.selector);
-		for (WebElement thisRow : tableRows) {
-			List<WebElement> rowCells = thisRow.findElements(Using.TBL_CELL.selector);
-			content.add(Arrays.asList(rowCells.get(0).getText(), rowCells.get(1).getText(), rowCells.get(2).getText()));
+		List<List<String>> result = new ArrayList<>();
+		for (TableRowComponent row : getTableRows()) {
+			result.add(row.getContent());
 		}
-		return content;
+		return result;
+	}
+	
+	private TableRowComponent getTableHdr() {
+		if (tableHdr == null) {
+			tableHdr = new TableRowComponent(Using.HDR_ROW.locator, this);
+		}
+		return tableHdr;
+	}
+	
+	private List<TableRowComponent> getTableRows() {
+		if (tableRows == null) {
+			tableRows = new ComponentList<>(this, TableRowComponent.class, Using.TBL_ROW.locator);
+		}
+		return tableRows;
 	}
 	
 	public static Object getKey(SearchContext context) {
 		return ((WebElement) context).getAttribute("id");
 	}
 
+	@Override
+	public SearchContext refreshContext(Long expiration) {
+		refreshCount++;
+		return super.refreshContext(expiration);
+	}
+	
+	public int getRefreshCount() {
+		return refreshCount;
+	}
+	
+	public int getHeadRefreshCount() {
+		return getTableHdr().getRefreshCount();
+	}
+	
+	public int[] getBodyRefreshCounts() {
+		List<TableRowComponent> tableRows = getTableRows();
+		int[] counts = new int[tableRows.size()];
+		for (int i = 0; i < tableRows.size(); i++) {
+			counts[i] = tableRows.get(i).getRefreshCount();
+		}
+		return counts;
+	}
+	
 }

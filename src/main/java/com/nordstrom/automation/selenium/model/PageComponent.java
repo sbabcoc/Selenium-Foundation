@@ -62,14 +62,24 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	
 	@Override
 	public SearchContext getWrappedContext() {
-		return context;
+		return ((RobustWebElement) context).getWrappedContext();
 	}
 
 	@Override
-	public SearchContext refreshContext() {
-		parent.refreshContext();
-		((RobustWebElement) context).refreshContext();
+	public SearchContext refreshContext(Long expiration) {
+		// if this context is past the expiration
+		if (expiration.compareTo(acquiredAt()) >= 0) {
+			// refresh context ancestry
+			parent.refreshContext(expiration);
+			// refresh context element
+			((RobustWebElement) context).refreshContext(expiration);
+		}
 		return this;
+	}
+
+	@Override
+	public Long acquiredAt() {
+		return ((RobustWebElement) context).acquiredAt();
 	}
 
 	@Override
