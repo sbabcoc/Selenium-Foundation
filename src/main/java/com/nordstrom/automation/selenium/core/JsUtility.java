@@ -39,7 +39,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  *      * {@literal @param} name name of target meta tag
  *      * {@literal @return} meta element with desired name; 'null' if not found
  *      *&#47;
- *     public String runAnonymousJavaScriptFunctionWithArgument(WebDriver driver, String name) {
+ *     public static String runAnonymousJavaScriptFunctionWithArgument(WebDriver driver, String name) {
  *         // Get script text from resource file &lt;getMetaTagByName.js&gt;.
  *         String script = JsUtility.getScriptResource("getMetaTagByName.js");
  *         // Execute script as anonymous function, passing specified argument
