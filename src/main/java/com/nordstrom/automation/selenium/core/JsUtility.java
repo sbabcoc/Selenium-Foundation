@@ -25,39 +25,27 @@ import com.nordstrom.common.base.UncheckedThrow;
  * <p>
  * Examples: 
  * 
- * <pre><code> import org.junit.Test;
+ * <pre><code> import org.openqa.selenium.WebDriver;
  * import org.openqa.selenium.WebElement;
  * import com.nordstrom.automation.selenium.core.JsUtility;
  * 
- * public class JavaScriptExamples {
+ * public class JavaScriptExample {
  * 
  *     &#47;**
- *      * This example executes an anonymous function that accepts an argument.
+ *      * This example executes an anonymous function that accepts an argument.&lt;br&gt;
  *      * NOTE: Script file &lt;getMetaTagByName.js&gt; can be found below.
+ *      * 
+ *      * {@literal @param} driver Selenium driver
+ *      * {@literal @param} name name of target meta tag
+ *      * {@literal @return} meta element with desired name; 'null' if not found
  *      *&#47;
- *     {@literal @Test}
- *     public String runAnonymousJavaScriptFunctionWithArgument(String name) {
+ *     public String runAnonymousJavaScriptFunctionWithArgument(WebDriver driver, String name) {
  *         // Get script text from resource file &lt;getMetaTagByName.js&gt;.
  *         String script = JsUtility.getScriptResource("getMetaTagByName.js");
  *         // Execute script as anonymous function, passing specified argument
  *         WebElement response = JsUtility.runAndReturn(driver, script, WebElement.class, name);
  *         // If element reference was returned, extract 'content' attribute
  *         return (response == null) ? null : response.getAttribute("content");
- *     }
- * 
- *     &#47;**
- *      * This example injects a script node and executes a function that accepts an argument
- *      * NOTE: Script file &lt;testNode.js&gt; can be found below.
- *      *&#47;
- *     {@literal @Test}
- *     public void injectAndRunJavaScriptFunctionWithArgument() {
- *         // Get script text from resource file &lt;testNode.js&gt;.
- *         String script = JsUtility.getScriptResource("testNode.js");
- *         // Create HTML 'script' node, which is appended to the 'body' tag
- *         WebElement scriptNode = JsUtility.createScriptNode(driver, script);
- *         // NOTE: The script string copies local array 'arguments' to global array 'args'.
- *         // This exposes the arguments passed by WebDriver to the 'testNode' function.
- *         JsUtility.run(driver, "args = arguments; testNode();", "This is a test... Booga!");
  *     }
  * }</code></pre>
  * 
@@ -69,21 +57,6 @@ import com.nordstrom.common.base.UncheckedThrow;
  *     if (found[i].getAttribute("name") == arguments[0]) return found[i];
  * }
  * return null;</code></pre>
- * 
- * This is sample JavaScript file &lt;testNode.js&gt;. This file can be stored anywhere on the class path,
- * typically a 'resources' folder within the project hierarchy.
- * 
- * <pre><code> function testNode() {
- *   var s = document.createElement('div');
- *   try {
- *       var n = document.createTextNode(args[0]);
- *       s.appendChild(n);
- *   } catch (e) {
- *       s.text = args[0];
- *   }
- *   document.body.appendChild(s);
- * }</code></pre>
- * 
  */
 public final class JsUtility {
     
@@ -232,7 +205,7 @@ public final class JsUtility {
      * 
      * @param exception web driver exception to propagate
      */
-	public static void propagate(WebDriverException exception) {
+	public static RuntimeException propagate(WebDriverException exception) {
 		Throwable thrown = exception;
 		if (exception.getClass().equals(WebDriverException.class)) { 
 			String message = exception.getMessage();
