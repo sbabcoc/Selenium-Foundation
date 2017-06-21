@@ -204,6 +204,7 @@ public final class JsUtility {
      * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
      * 
      * @param exception web driver exception to propagate
+     * @return nothing (this method always throws the specified exception)
      */
 	public static RuntimeException propagate(WebDriverException exception) {
 		Throwable thrown = exception;

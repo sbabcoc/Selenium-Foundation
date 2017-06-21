@@ -18,7 +18,7 @@ public interface DetectsLoadCompletion {
 	 * 
 	 * @return 'true' if the page has finished loading; otherwise 'false'
 	 */
-	static Coordinator<Boolean> pageLoadIsComplete() {
+	public static Coordinator<Boolean> pageLoadIsComplete() {
 		return new Coordinator<Boolean>() {
 
 			@Override

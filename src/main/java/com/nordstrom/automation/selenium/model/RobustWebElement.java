@@ -61,6 +61,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	
 	private Long acquiredAt;
 	
+	private NoSuchElementException deferredException;
+	
 	/**
 	 * Basic robust web element constructor
 	 * 
@@ -176,6 +178,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getScreenshotAs(arg0);
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getScreenshotAs(arg0);
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -185,6 +189,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			getWrappedElement().clear();
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).clear();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -194,6 +200,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			getWrappedElement().click();
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).click();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -213,6 +221,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getAttribute(name);
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getAttribute(name);
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -222,6 +232,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getCssValue(propertyName);
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getCssValue(propertyName);
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -231,6 +243,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getLocation();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getLocation();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -240,6 +254,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getRect();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getRect();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -249,6 +265,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getSize();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getSize();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -258,6 +276,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getTagName();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getTagName();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -267,6 +287,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().getText();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).getText();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -276,6 +298,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().isDisplayed();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).isDisplayed();
+		} catch (NullPointerException e) {
+			return false;
 		}
 	}
 
@@ -285,6 +309,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().isEnabled();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).isEnabled();
+		} catch (NullPointerException e) {
+			return false;
 		}
 	}
 
@@ -294,6 +320,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			return getWrappedElement().isSelected();
 		} catch (StaleElementReferenceException e) {
 			return refreshReference(e).isSelected();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -303,6 +331,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			getWrappedElement().sendKeys(keysToSend);
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).sendKeys(keysToSend);
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -312,6 +342,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			getWrappedElement().submit();
 		} catch (StaleElementReferenceException e) {
 			refreshReference(e).submit();
+		} catch (NullPointerException e) {
+			throw deferredException();
 		}
 	}
 
@@ -436,6 +468,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 				}
 			} catch (NoSuchElementException e) {
 				if (element.index != OPTIONAL) throw e;
+				element.deferredException = e;
 				element.wrapped = null;
 			} finally {
 				timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
@@ -459,7 +492,11 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 			element.wrapped = JsUtility.runAndReturn(element.driver, js, WebElement.class, args.toArray());
 		}
 		
-		if (element.wrapped != null) element.acquiredAt = System.currentTimeMillis();
+		if (element.wrapped != null) {
+			element.acquiredAt = System.currentTimeMillis();
+			element.deferredException = null;
+		}
+		
 		return element;
 	}
 	
@@ -538,6 +575,18 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 	 */
 	public static RobustWebElement getElement(WrapsContext context, By locator, int index) {
 		return new RobustWebElement(null, context, locator, index);
+	}
+	
+	/**
+	 * Throw the deferred exception that was stored upon failing to acquire the reference for an optional element.<br>
+	 * <b>NOTE</b>: The deferred exception is not thrown directly - it's wrapped in a NullPointerException to indicate
+	 * that the failure was caused by utilizing an optional element for which no actual reference could be acquired.
+	 * 
+	 * @return nothing (always throws deferred exception wrapped in NullPointerException)
+	 */
+	private NullPointerException deferredException() {
+		throw (NullPointerException) new NullPointerException("Unable to acquire reference for optional element")
+				.initCause(deferredException);
 	}
 	
 }
