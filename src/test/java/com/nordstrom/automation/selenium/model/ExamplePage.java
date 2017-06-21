@@ -86,28 +86,28 @@ public class ExamplePage extends Page {
 	
 	public List<TableComponent> getTableList() {
 		if (tableList == null) {
-			tableList = new ComponentList<>(this, TableComponent.class, Using.TABLE.locator);
+			tableList = newComponentList(TableComponent.class, Using.TABLE.locator);
 		}
 		return tableList;
 	}
 	
 	public Map<Object, TableComponent> getTableMap() {
 		if (tableMap == null) {
-			tableMap = new ComponentMap<>(this, TableComponent.class, Using.TABLE.locator);
+			tableMap = newComponentMap(TableComponent.class, Using.TABLE.locator);
 		}
 		return tableMap;
 	}
 	
 	public List<FrameComponent> getFrameList() {
 		if (frameList == null) {
-			frameList = new FrameList<>(this, FrameComponent.class, Using.FRAME.locator);
+			frameList = newFrameList(FrameComponent.class, Using.FRAME.locator);
 		}
 		return frameList;
 	}
 	
 	public Map<Object, FrameComponent> getFrameMap() {
 		if (frameMap == null) {
-			frameMap = new FrameMap<>(this, FrameComponent.class, Using.FRAME.locator);
+			frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
 		}
 		return frameMap;
 	}

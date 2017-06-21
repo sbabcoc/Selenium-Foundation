@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -424,6 +425,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	/**
 	 * Get {@link Method} object for the static {@code getKey(SearchContext)} method declared by the specified container type.
 	 * 
+	 * @param <T> component container type
 	 * @param containerType target container type
 	 * @return method object for getKey(SearchContext) 
 	 * @throws UnsupportedOperationException if the required method is missing
@@ -439,6 +441,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	/**
 	 * Verify that the specified container type declares the required constructor.
 	 * 
+	 * @param <T> component container type
 	 * @param containerType target container type
 	 * @throws UnsupportedOperationException if the required constructor is missing
 	 */
@@ -454,6 +457,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	/**
 	 * Instantiate a new container of the specified type with the supplied arguments.
 	 * 
+	 * @param <T> component container type
 	 * @param containerType type of container to instantiate
 	 * @param argumentTypes array of constructor argument types
 	 * @param arguments array of constructor argument values
@@ -468,6 +472,72 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw UncheckedThrow.throwUnchecked(e);
 		}
+	}
+	
+	/**
+	 * Instantiate a list of page components of the specified type.<br>
+	 * <b>NOTE</b>: The specified page component class must declare a constructor with arguments
+	 * (RobustWebElement, ComponentContainer).
+	 * 
+	 * @param <T> page component type
+	 * @param componentType page component type
+	 * @param locator locator for page component container elements
+	 * @return list of page components
+	 * @see #verifyCollectible
+	 */
+	public <T extends PageComponent> List<T> newComponentList(Class<T> componentType, By locator) {
+		return new ComponentList<>(this, componentType, locator);
+	}
+	
+	/**
+	 * Instantiate a map of page components of the specified type, using self-generated keys.<br>
+	 * <b>NOTE</b>: The specified page component class must declare a constructor with arguments
+	 * (RobustWebElement, ComponentContainer).<br>
+	 * <b>NOTE</b>: The specified page component class must declare a static {@code getKey} method that generates a
+	 * unique key for each map entry.
+	 * 
+	 * @param <T> page component type
+	 * @param componentType page component type
+	 * @param locator locator for page component container elements
+	 * @return map of page components
+	 * @see #verifyCollectible
+	 * @see #getKeyMethod
+	 */
+	public <T extends PageComponent> Map<Object, T> newComponentMap(Class<T> componentType, By locator) {
+		return new ComponentMap<>(this, componentType, locator);
+	}
+	
+	/**
+	 * Instantiate a list of frames of the specified type.<br>
+	 * <b>NOTE</b>: The specified frame class must declare a constructor with arguments
+	 * (RobustWebElement, ComponentContainer).
+	 * 
+	 * @param <T> frame type
+	 * @param frameType frame type
+	 * @param locator locator for frame container elements
+	 * @return list of frames
+	 * @see #verifyCollectible
+	 */
+	public <T extends Frame> List<T> newFrameList(Class<T> frameType, By locator) {
+		return new FrameList<>(this, frameType, locator);
+	}
+	
+	/**
+	 * Instantiate a map of frames of the specified type, using self-generated keys.<br>
+	 * <b>NOTE</b>: The specified frame class must declare a constructor with arguments
+	 * (RobustWebElement, ComponentContainer).<br>
+	 * <b>NOTE</b>: The specified frame class must declare a static {@code getKey} method that generates a
+	 * unique key for each map entry.
+	 * 
+	 * @param <T> frame type
+	 * @param frameType frame type
+	 * @param locator locator for frame container elements
+	 * @return map of frames
+	 * @see #verifyCollectible
+	 * @see #getKeyMethod
+	 */
+	public <T extends Frame> Map<Object, T> newFrameMap(Class<T> frameType, By locator) {
+		return new FrameMap<>(this, frameType, locator);
 	}
 	
 }

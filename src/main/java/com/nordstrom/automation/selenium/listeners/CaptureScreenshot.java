@@ -28,28 +28,24 @@ public class CaptureScreenshot implements ITestListener {
     private final static String SCREENSHOT_STORAGE_NAME = "screenshots";
     private final static String HTML_LINK_TEMPLATE = "<br /> <img src=\"%s\" /> <br />";
 
-    private final Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CaptureScreenshot.class);
 
-    public CaptureScreenshot() {
-        logger = LoggerFactory.getLogger(CaptureScreenshot.class);
+    @Override
+    public void onFinish(ITestContext testContext) {
     }
 
     @Override
-    public void onFinish(ITestContext arg0) {
+    public void onStart(ITestContext testContext) {
     }
 
     @Override
-    public void onStart(ITestContext arg0) {
+    public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
     }
 
     @Override
-    public void onTestFailedButWithinSuccessPercentage(ITestResult arg0) {
-    }
-
-    @Override
-    public void onTestFailure(ITestResult result) {
-        WebDriver driver = DriverManager.getDriver(result);
-        ITestContext context = result.getTestContext();
+    public void onTestFailure(ITestResult testResult) {
+        WebDriver driver = DriverManager.getDriver(testResult);
+        ITestContext context = testResult.getTestContext();
         
         if (!isScreenshotCapable(driver)) {
             return;
@@ -61,7 +57,7 @@ public class CaptureScreenshot implements ITestListener {
         } catch (WebDriverException e) {
             String messageTemplate =
                     "The driver is capable of taking a screenshot, but it failed because (%s).";
-            logger.info(String.format(messageTemplate, e.toString()));
+            LOGGER.info(String.format(messageTemplate, e.toString()));
             return;
         }
 
@@ -71,17 +67,17 @@ public class CaptureScreenshot implements ITestListener {
                 Files.createDirectory(storageLocation);
             } catch (IOException e) {
                 String messageTemplate = "The screenshot storage location (%s) failed to be created, so a screenshot will be not available.";
-                logger.info(String.format(messageTemplate, storageLocation));
+                LOGGER.info(String.format(messageTemplate, storageLocation));
                 return;
             }
         }
 
-        Path targetScreenshotFile = getPathToTargetScreenshotFile(result) ;
+        Path targetScreenshotFile = getPathToTargetScreenshotFile(testResult) ;
         try {
             putScreenshotInStorage(screenshot, targetScreenshotFile);
         } catch (IOException e) {
             String messageTemplate = "The screenshot was successfully taken, but unable to be written to (%s).";
-            logger.info(String.format(messageTemplate, targetScreenshotFile));
+            LOGGER.info(String.format(messageTemplate, targetScreenshotFile));
             return;
         }
 
@@ -89,15 +85,15 @@ public class CaptureScreenshot implements ITestListener {
     }
 
     @Override
-    public void onTestSkipped(ITestResult arg0) {
+    public void onTestSkipped(ITestResult testResult) {
     }
 
     @Override
-    public void onTestStart(ITestResult arg0) {
+    public void onTestStart(ITestResult testResult) {
     }
 
     @Override
-    public void onTestSuccess(ITestResult arg0) {
+    public void onTestSuccess(ITestResult testResult) {
     }
 
     /**
@@ -111,7 +107,7 @@ public class CaptureScreenshot implements ITestListener {
         if (!(isScreenshotCapable)) {
             String messageTemplate =
                     "This driver is not capable of taking a screenshot.  If a screenshot is desired, use a WebDriver implementation that supports screenshots.  https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/TakesScreenshot.html";
-            logger.info(messageTemplate);
+            LOGGER.info(messageTemplate);
         }
 
         return isScreenshotCapable;
@@ -131,11 +127,11 @@ public class CaptureScreenshot implements ITestListener {
      * Screenshots will exist within a subdirectory of a TestNG test-output location, that is a
      * publicly-accessible.
      * 
-     * @param context
+     * @param testContext
      * @return the location where screenshots should be stored.
      */
-    private Path getStorageLocation(ITestContext context) {
-        String outputDirectoryLocation = context.getOutputDirectory();
+    private Path getStorageLocation(ITestContext testContext) {
+        String outputDirectoryLocation = testContext.getOutputDirectory();
         Path outputDirectory = Paths.get(outputDirectoryLocation);
         Path screenshotStorage = outputDirectory.resolve(SCREENSHOT_STORAGE_NAME);
 
@@ -151,7 +147,7 @@ public class CaptureScreenshot implements ITestListener {
      */
     private void putScreenshotInStorage(byte[] memoryScreenshot, Path fsTarget) throws IOException {
         String messageTemplate = "Placing a screenshot of the event at (%s).";
-        logger.info(String.format(messageTemplate, fsTarget.toString()));
+        LOGGER.info(String.format(messageTemplate, fsTarget.toString()));
         
         // Files.write should be good enough for a <2-5Mb file, typical of a screenshot.
         Files.write(fsTarget, memoryScreenshot);
@@ -169,12 +165,12 @@ public class CaptureScreenshot implements ITestListener {
     /**
      * Create the the target path to where the screenshot will be placed.
      * 
-     * @param result
+     * @param testResult
      * @return the ideal location where the screenshot should be stored.
      */
-    private Path getPathToTargetScreenshotFile(ITestResult result) {
-        Path screenshotStorage = getStorageLocation(result.getTestContext());
-        Path fsScreenshot = screenshotStorage.resolve(getTargetFilename(result));
+    private Path getPathToTargetScreenshotFile(ITestResult testResult) {
+        Path screenshotStorage = getStorageLocation(testResult.getTestContext());
+        Path fsScreenshot = screenshotStorage.resolve(getTargetFilename(testResult));
 
         return fsScreenshot;
     }
@@ -186,14 +182,14 @@ public class CaptureScreenshot implements ITestListener {
      * The returned image format is assumed to be PNG, but this is not documented within the
      * Selenium project -- just appened ".png" to the filename.
      * 
-     * @param result
+     * @param testResult
      * @return an identifying name for the screenshot file
      */
-    private String getTargetFilename(ITestResult result) {
-        int hashcode = Arrays.deepHashCode(result.getParameters());
+    private String getTargetFilename(ITestResult testResult) {
+        int hashcode = Arrays.deepHashCode(testResult.getParameters());
         
         StringBuilder builder = new StringBuilder();
-        builder.append(getTestName(result));
+        builder.append(getTestName(testResult));
         builder.append("-");
         builder.append(hashcode);
         builder.append(".");
@@ -204,24 +200,24 @@ public class CaptureScreenshot implements ITestListener {
 
     /**
      * If a name for the test has been specified, use that.  If not, then return the name of the method.
-     * @param result
+     * @param testResult
      * @return the name of the testcase
      */
-    private String getTestName(ITestResult result) {
+    private String getTestName(ITestResult testResult) {
         // TODO What does `getTestName' return if @Test(testName=...) is not used, but the testcase
         //      implements ITest?  Documentation is not clear.  The worst case scenario is that we have a
         //      redundant method call (because it might just call getName).  If it doesn't call getName,
         //      then we are providing a better default.
-        logger.debug("getTestname output:  {}", result.getTestName());
-        logger.debug("getName output:  {}", result.getName());
-        logger.debug("getMethodName output:  {}", result.getMethod().getMethodName());
-        logger.debug("getConstructorOrMethod.getName output:  {}", result.getMethod().getConstructorOrMethod().getName());
-        logger.debug("getConstructorOrMethod.getMethod.getName output:  {}", result.getMethod().getConstructorOrMethod().getMethod().getName());
+        LOGGER.debug("getTestname output:  {}", testResult.getTestName());
+        LOGGER.debug("getName output:  {}", testResult.getName());
+        LOGGER.debug("getMethodName output:  {}", testResult.getMethod().getMethodName());
+        LOGGER.debug("getConstructorOrMethod.getName output:  {}", testResult.getMethod().getConstructorOrMethod().getName());
+        LOGGER.debug("getConstructorOrMethod.getMethod.getName output:  {}", testResult.getMethod().getConstructorOrMethod().getMethod().getName());
 
-        String testName = result.getTestName();
+        String testName = testResult.getTestName();
         
         if (testName == null) {
-            testName = result.getName();
+            testName = testResult.getName();
         }
 
         return testName;
