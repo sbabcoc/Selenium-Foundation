@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
@@ -112,6 +113,25 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	}
 	
 	/**
+	 * Determine if this component is absent or hidden
+	 * <p>
+	 * <b>NOTE</b>: The default implementation of this method uses the {@link WebElement#isDisplayed()} method of the 
+	 * component context element to determine visibility. If the component context element is always hidden, override 
+	 * this method with your scenario-specific implementation. 
+	 * 
+	 * @return 'true' if component is absent or hidden; otherwise 'false'
+	 */
+	public boolean isInvisible() {
+		RobustWebElement element = (RobustWebElement) context;
+		if (element.hasReference()) {
+			try {
+				return ! element.getWrappedElement().isDisplayed();
+			} catch (StaleElementReferenceException e) { }
+		}
+		return true;
+	}
+	
+	/**
 	 * Returns a 'wait' proxy that determines if this page component is visible
 	 * 
 	 * @return page component if visible; otherwise 'null'
@@ -143,12 +163,12 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 			@Override
 			public PageComponent apply(SearchContext context) {
 				PageComponent component = verifyContext(context);
-				return (component.isDisplayed()) ? null : component;
+				return (component.isInvisible()) ? component : null;
 			}
 			
 			@Override
 			public String toString() {
-				return "page component to be hidden";
+				return "page component to be absent or hidden";
 			}
 		};
 	}
