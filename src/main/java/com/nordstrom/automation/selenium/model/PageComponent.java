@@ -99,30 +99,34 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 	}
 	
 	/**
-	 * Determine if this component is visible
+	 * Get the viewport element for this component.
 	 * <p>
-	 * <b>NOTE</b>: The default implementation of this method uses the {@link WebElement#isDisplayed()} method of the 
-	 * component context element to determine visibility. If the component context element is always hidden, override 
-	 * this method with your scenario-specific implementation. 
+	 * <b>NOTE</b>: The default implementation of this method returns the component's context element. If the context
+	 * element is always hidden, override this method to return the component's largest visible container element.
+	 * 
+	 * @return 'true' if component is visible; otherwise 'false'
+	 */
+	public RobustWebElement getViewport() {
+		return (RobustWebElement) context;
+	}
+	
+	/**
+	 * Determine if this component is visible
 	 * 
 	 * @return 'true' if component is visible; otherwise 'false'
 	 */
 	public boolean isDisplayed() {
-		RobustWebElement element = (RobustWebElement) context;
+		RobustWebElement element = getViewport();
 		return (element.hasReference()) ? element.isDisplayed() : false;
 	}
 	
 	/**
 	 * Determine if this component is absent or hidden
-	 * <p>
-	 * <b>NOTE</b>: The default implementation of this method uses the {@link WebElement#isDisplayed()} method of the 
-	 * component context element to determine visibility. If the component context element is always hidden, override 
-	 * this method with your scenario-specific implementation. 
 	 * 
 	 * @return 'true' if component is absent or hidden; otherwise 'false'
 	 */
 	public boolean isInvisible() {
-		RobustWebElement element = (RobustWebElement) context;
+		RobustWebElement element = getViewport();
 		if (element.hasReference()) {
 			try {
 				return ! element.getWrappedElement().isDisplayed();
