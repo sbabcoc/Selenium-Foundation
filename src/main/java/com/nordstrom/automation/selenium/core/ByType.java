@@ -3,7 +3,7 @@ package com.nordstrom.automation.selenium.core;
 import org.openqa.selenium.By;
 
 /**
- * This is a utility class that defined static method and interfaces related to Selenium {@link By} objects.
+ * This utility class defines static methods and interfaces related to Selenium {@link By} objects.
  */
 public class ByType {
 	

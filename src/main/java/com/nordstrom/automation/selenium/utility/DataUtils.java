@@ -15,6 +15,7 @@ public class DataUtils {
 	
 	/**
 	 * Transform the specified JSON string into the corresponding {@link JsonObject}.
+	 * 
 	 * @param json JSON object string
 	 * @return de-serialized {@link JsonObject} 
 	 */

@@ -30,7 +30,7 @@ public class ReflectUtil {
 	/**
 	 * Get method parameter type string with short type names.
 	 * 
-	 * @param method method from with to derive parameter type string
+	 * @param method method from which to derive parameter type string
 	 * @return parameter type string
 	 */
 	public static String parametersAsString(Method method) {
@@ -40,7 +40,7 @@ public class ReflectUtil {
 	/**
 	 * Get method signature with either long or short parameter type names.
 	 * 
-	 * @param method method from with to derive signature
+	 * @param method method from which to derive signature
 	 * @param longTypeNames 'true' to return long type names; 'false' to return short type names
 	 * @return method signature
 	 */
@@ -51,7 +51,7 @@ public class ReflectUtil {
 	/**
 	 * Get method parameter type string with either long or short type names.
 	 * 
-	 * @param method method from with to derive parameter type string
+	 * @param method method from which to derive parameter type string
 	 * @param longTypeNames 'true' to return long type names; 'false' to return short type names
 	 * @return parameter type string
 	 */
@@ -71,7 +71,7 @@ public class ReflectUtil {
 	/**
 	 * Get method signature with short parameter type names.
 	 * 
-	 * @param method method from with to derive signature
+	 * @param method method from which to derive signature
 	 * @return method signature
 	 */
 	public static String getSignature(Method method) {
