@@ -2,13 +2,25 @@ package com.nordstrom.automation.selenium.core;
 
 import org.openqa.selenium.By;
 
+/**
+ * This is a utility class that defined static method and interfaces related to Selenium {@link By} objects.
+ */
 public class ByType {
 	
 	private ByType() {
 		throw new AssertionError("ByType is a static utility class that cannot be instantiated");
 	}
-
+	
+	/**
+	 * This interface provides common methods for collections of Selenium locators ({@link By} objects)
+	 */
 	public interface ByEnum {
+		
+		/**
+		 * Get the Selenium locator for this enumerated constant.
+		 * 
+		 * @return Selenium locator ({@link By} object) for this constant
+		 */
 		By locator();
 	}
 	

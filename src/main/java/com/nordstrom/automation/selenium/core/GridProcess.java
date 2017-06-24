@@ -65,6 +65,12 @@ class GridProcess {
 		}
 	}
 	
+	/**
+	 * Assemble a classpath array from the specified array of dependencies.
+	 * 
+	 * @param dependencies array of dependencies
+	 * @return classpath array
+	 */
 	private static String getClasspath(Class<?>[] dependencies) {
 		List<String> pathList = new ArrayList<>();
 		for (Class<?> clazz : dependencies) {

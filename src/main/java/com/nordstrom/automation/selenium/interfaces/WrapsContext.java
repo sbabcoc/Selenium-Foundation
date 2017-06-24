@@ -3,6 +3,12 @@ package com.nordstrom.automation.selenium.interfaces;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.internal.WrapsDriver;
 
+/**
+ * Classes implement this interface to provide access to their underlying native Selenium
+ * {@link SearchContext}. This interface also defines methods related to automatic recovery from 
+ * {@link org.openqa.selenium.StaleElementReferenceException StaleElementReferenceException}
+ * failures.
+ */
 public interface WrapsContext extends WrapsDriver {
 	
 	/**

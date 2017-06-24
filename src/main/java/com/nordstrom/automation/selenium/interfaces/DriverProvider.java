@@ -4,6 +4,10 @@ import org.openqa.selenium.WebDriver;
 import org.testng.IInvokedMethod;
 import org.testng.ITestResult;
 
+/**
+ * Test classes with non-standard driver configurations implement this interface, which enables the driver manager 
+ * to obtain a driver from the {@link #provideDriver(IInvokedMethod, ITestResult)} method of test class instance.
+ */
 public interface DriverProvider {
 	
 	/**

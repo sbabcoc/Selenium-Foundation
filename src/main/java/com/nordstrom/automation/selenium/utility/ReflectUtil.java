@@ -18,20 +18,43 @@ package com.nordstrom.automation.selenium.utility;
 
 import java.lang.reflect.Method;
 
+/**
+ * This static utility class contains methods that use reflection to produce method signature strings.
+ */
 public class ReflectUtil {
 	
 	private ReflectUtil() {
 		throw new AssertionError("ReflectUtil is a static utility class that cannot be instantiated");
 	}
 	
+	/**
+	 * Get method parameter type string with short type names.
+	 * 
+	 * @param method method from with to derive parameter type string
+	 * @return parameter type string
+	 */
 	public static String parametersAsString(Method method) {
 		return parametersAsString(method, false);
 	}
-
+	
+	/**
+	 * Get method signature with either long or short parameter type names.
+	 * 
+	 * @param method method from with to derive signature
+	 * @param longTypeNames 'true' to return long type names; 'false' to return short type names
+	 * @return method signature
+	 */
 	public static String getSignature(Method method, boolean longTypeNames) {
 		return method.getName() + "(" + parametersAsString(method, longTypeNames) + ")";
 	}
-
+	
+	/**
+	 * Get method parameter type string with either long or short type names.
+	 * 
+	 * @param method method from with to derive parameter type string
+	 * @param longTypeNames 'true' to return long type names; 'false' to return short type names
+	 * @return parameter type string
+	 */
 	public static String parametersAsString(Method method, boolean longTypeNames) {
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		if (parameterTypes.length == 0)
@@ -45,6 +68,12 @@ public class ReflectUtil {
 		return paramString.toString();
 	}
 
+	/**
+	 * Get method signature with short parameter type names.
+	 * 
+	 * @param method method from with to derive signature
+	 * @return method signature
+	 */
 	public static String getSignature(Method method) {
 		return getSignature(method, false);
 	}
