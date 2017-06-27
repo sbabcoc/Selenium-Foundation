@@ -4,6 +4,11 @@ import org.openqa.selenium.SearchContext;
 
 import com.nordstrom.automation.selenium.support.Coordinator;
 
+/**
+ * Page classes that model pages with complex loading behavior implement this interface to provide scenario-specific
+ * detection of page load completion. This is typically required for single-page applications or more conventional
+ * multi-page applications that use dynamic load techniques (e.g. - AJAX).
+ */
 public interface DetectsLoadCompletion {
 	
 	/**
