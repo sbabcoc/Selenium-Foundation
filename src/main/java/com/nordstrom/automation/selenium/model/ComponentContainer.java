@@ -325,6 +325,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 					if (value == null) {
 						element.clear();
 					} else {
+						WebDriverUtils.getExecutor(element).executeScript("arguments[0].select();", element);
 						element.sendKeys(value);
 					}
 					return true;
