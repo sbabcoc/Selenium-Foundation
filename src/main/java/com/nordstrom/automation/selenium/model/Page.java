@@ -11,6 +11,8 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -120,7 +122,33 @@ public class Page extends ComponentContainer {
 	}
 	
 	/**
-	 * Open the page defined by the specified {@link InitialPage} annotation
+	 * Open the page defined by the {@link PageUrl} annotation of the specified page class.
+	 * 
+	 * @param <T> page class
+	 * @param pageClass type of page object to instantiate
+	 * @return new instance of the specified page class
+	 */
+	public <T extends Page> T openAnnotatedPage(Class<T> pageClass) {
+		return openAnnotatedPage(pageClass, driver, SeleniumConfig.getConfig().getTargetUri());
+	}
+	
+	/**
+	 * Open the page defined by the {@link PageUrl} annotation of the specified page class.
+	 * 
+	 * @param <T> page class
+	 * @param pageClass type of page object to instantiate
+	 * @param driver driver object
+	 * @param targetUri target URI
+	 * @return new instance of the specified page class
+	 */
+	public static <T extends Page> T openAnnotatedPage(Class<T> pageClass, WebDriver driver, URI targetUri) {
+		String pageUrl = getPageUrl(pageClass.getAnnotation(PageUrl.class), targetUri);
+		driver.get(pageUrl);
+		return newPage(pageClass, driver);
+	}
+	
+	/**
+	 * Open the page defined by the specified {@link InitialPage} annotation.
 	 * 
 	 * @param <T> page class
 	 * @param initialPage initial page annotation
@@ -136,7 +164,7 @@ public class Page extends ComponentContainer {
 	}
 	
 	/**
-	 * Construct a new instance of the specified page class
+	 * Construct a new instance of the specified page class.
 	 * 
 	 * @param <T> page class
 	 * @param pageClass type of page object to instantiate
@@ -157,7 +185,7 @@ public class Page extends ComponentContainer {
 	}
 	
 	/**
-	 * Get the URL defined by the specified {@link InitialPage} annotation
+	 * Get the URL defined by the specified {@link InitialPage} annotation.
 	 * 
 	 * @param initialPage initial page annotation
 	 * @param targetUri target URI
@@ -173,7 +201,7 @@ public class Page extends ComponentContainer {
 	}
 	
 	/**
-	 * Get the URL defined by the specified {@link PageUrl} annotation
+	 * Get the URL defined by the specified {@link PageUrl} annotation.
 	 * 
 	 * @param pageUrl page URL annotation
 	 * @param targetUri target URI
