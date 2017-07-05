@@ -20,8 +20,7 @@
     <deploy-plugin.version>2.8.2</deploy-plugin.version>
     <settings.version>0.2.0.0</settings.version>
     <selenium.version>2.53.0</selenium.version>
-    <testng-foundation.version>1.0.3</testng-foundation.version>
-    <testng.version>6.11</testng.version>
+    <testng-foundation.version>1.1.0.0</testng-foundation.version>
     <resteasy.version>3.1.2.Final</resteasy.version>
     <bytebuddy.version>1.6.13</bytebuddy.version>
     <logback.version>1.2.2</logback.version>
@@ -51,11 +50,6 @@
         <groupId>com.nordstrom.test-automation.tools</groupId>
         <artifactId>testng-foundation</artifactId>
         <version>${testng-foundation.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.testng</groupId>
-        <artifactId>testng</artifactId>
-        <version>${testng.version}</version>
       </dependency>
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
@@ -101,11 +95,6 @@
     <dependency>
       <groupId>com.nordstrom.test-automation.tools</groupId>
       <artifactId>testng-foundation</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

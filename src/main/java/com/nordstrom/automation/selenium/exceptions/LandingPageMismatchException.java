@@ -3,27 +3,56 @@ package com.nordstrom.automation.selenium.exceptions;
 import org.openqa.selenium.WebDriverException;
 
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.model.Page;
 
 public class LandingPageMismatchException extends WebDriverException {
 
 	private static final long serialVersionUID = -2375529252543798864L;
-
-	public LandingPageMismatchException(Class<? extends Page> pageClass, String url) {
+	
+	/**
+	 * Constructor for pattern-based landing page mismatch exception
+	 * 
+	 * @param pageClass landing page class that defines the path/parameter pattern
+	 * @param url landing page URL that doesn't match the defined pattern
+	 */
+	public LandingPageMismatchException(Class<?> pageClass, String url) {
 		super(getMessage(pageClass, url));
 	}
 	
-	public LandingPageMismatchException(String message, Class<? extends Page> pageClass, String actual, String expect) {
-		super(getMessage(message, pageClass, actual, expect));
+	/**
+	 * Constructor for property-based landing page mismatch exception
+	 * 
+	 * @param propName name of property that doesn't match the expected value
+	 * @param pageClass landing page class that defines the expected properties and values
+	 * @param actual actual value of the property that doesn't match
+	 * @param expect expected value of the property that doesn't match
+	 */
+	public LandingPageMismatchException(String propName, Class<?> pageClass, String actual, String expect) {
+		super(getMessage(propName, pageClass, actual, expect));
 	}
 	
-	private static String getMessage(Class<? extends Page> pageClass, String url) {
-		return "Landing page for '" + pageClass.getSimpleName() + "' doesn't match specified pattern.\nactual: "
+	/**
+	 * Assemble the message for pattern-based landing page mismatch exception
+	 * 
+	 * @param pageClass landing page class that defines the path/parameter pattern
+	 * @param url landing page URL that doesn't match the defined pattern
+	 * @return message for pattern-based landing page mismatch exception
+	 */
+	private static String getMessage(Class<?> pageClass, String url) {
+		return "Landing page for '" + pageClass.getSimpleName() + "' doesn't match expected pattern:\nactual: "
 				+ url + "\npattern: " + pageClass.getAnnotation(PageUrl.class).pattern();
 	}
 	
-	private static String getMessage(String message, Class<? extends Page> pageClass, String actual, String expect) {
-		return "Landing page for '" + pageClass.getSimpleName() + "' doesn't match specified properties: " + message
-				+ ".\nactual: " + actual + "\nexpected: " + expect;
+	/**
+	 * Assemble the message for property-based landing page mismatch exception
+	 * 
+	 * @param propName name of property that doesn't match the expected value
+	 * @param pageClass landing page class that defines the expected properties and values
+	 * @param actual actual value of the property that doesn't match
+	 * @param expect expected value of the property that doesn't match
+	 * @return message for property-based landing page mismatch exception
+	 */
+	private static String getMessage(String propName, Class<?> pageClass, String actual, String expect) {
+		return "Landing page for '" + pageClass.getSimpleName() + "' doesn't match expected property => " + propName
+				+ ":\nactual: " + actual + "\nexpected: " + expect;
 	}
 }

@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.openqa.selenium.By;
@@ -72,8 +73,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		this.driver = WebDriverUtils.getDriver(context);
 		this.parent = parent;
 		
-		Class<?> clazz = getClass();		
-		logger = LoggerFactory.getLogger((this instanceof Enhanced) ? clazz.getSuperclass() : clazz);
+		logger = LoggerFactory.getLogger(getContainerClass(this));
 	}
 	
 	@Override
@@ -529,8 +529,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * 
 	 * @param pageObj page object whose landing page is to be verified
 	 */
-	static <T extends Page> void verifyLandingPage(T pageObj) {
-		Class<? extends Page> pageClass = pageObj.getClass();
+	static void verifyLandingPage(Page pageObj) {
+		Class<?> pageClass = getContainerClass(pageObj);
 		PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
 		if (pageUrl != null) {
 			String actual, expect;
@@ -542,25 +542,25 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			
 			actual = actualUri.getScheme();
 			expect = expectUri.getScheme();
-			if ( ! actual.equals(expect)) {
+			if ( ! StringUtils.equals(actual, expect)) {
 				throw new LandingPageMismatchException("scheme", pageClass, actual, expect);
 			}
 			
 			actual = actualUri.getHost();
 			expect = expectUri.getHost();
-			if ( ! actual.equals(expect)) {
+			if ( ! StringUtils.equals(actual, expect)) {
 				throw new LandingPageMismatchException("host", pageClass, actual, expect);
 			}
 			
 			actual = actualUri.getUserInfo();
 			expect = expectUri.getUserInfo();
-			if ( ! actual.equals(expect)) {
+			if ( ! StringUtils.equals(actual, expect)) {
 				throw new LandingPageMismatchException("user info", pageClass, actual, expect);
 			}
 			
 			actual = Integer.toString(actualUri.getPort());
 			expect = Integer.toString(expectUri.getPort());
-			if ( ! actual.equals(expect)) {
+			if ( ! StringUtils.equals(actual, expect)) {
 				throw new LandingPageMismatchException("port", pageClass, actual, expect);
 			}
 			
@@ -570,13 +570,21 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				 * TODO - This naive implementation will produce false negatives if the pattern specifies query params
 				 * and the position of any parameter in the actual query differs from its position in the pattern.
 				 */
-				if ( ! actualUri.getQuery().matches(pattern)) {
+				actual = actualUri.getPath();
+				if (actualUri.getQuery() != null) {
+					actual += "?" + actualUri.getQuery();
+				}
+				if (actualUri.getFragment() != null) {
+					actual += "#" + actualUri.getFragment();
+				}
+				
+				if ( ! actual.matches(pattern)) {
 					throw new LandingPageMismatchException(pageClass, url);
 				}
 			} else {
 				actual = actualUri.getPath();
 				expect = expectUri.getPath();
-				if ( ! actual.equals(expect)) {
+				if ( ! StringUtils.equals(actual, expect)) {
 					throw new LandingPageMismatchException("path", pageClass, actual, expect);
 				}
 				
@@ -708,6 +716,18 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 */
 	public <T extends Frame> Map<Object, T> newFrameMap(Class<T> frameType, By locator) {
 		return new FrameMap<>(this, frameType, locator);
+	}
+	
+	/**
+	 * Get class of specified container object.
+	 * 
+	 * @param <T> container type
+	 * @param container container object
+	 * @return class of container object
+	 */
+	public static <T extends ComponentContainer> Class<?> getContainerClass(T container) {
+		Class<?> clazz = container.getClass();		
+		return (container instanceof Enhanced) ? clazz.getSuperclass() : clazz;
 	}
 
 }
