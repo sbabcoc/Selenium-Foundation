@@ -13,8 +13,8 @@ public class Page extends ComponentContainer {
 	
 	private String windowHandle;
 	private WindowState windowState;
-	private Class<?>[] argumentTypes;
-	private Object[] arguments;
+	protected Class<?>[] argumentTypes;
+	protected Object[] arguments;
 	
 	private static final Class<?>[] ARG_TYPES_1 = {WebDriver.class};
 	private static final Class<?>[] ARG_TYPES_2 = {WebDriver.class, ComponentContainer.class};
