@@ -145,8 +145,9 @@ public class Page extends ComponentContainer {
 	}
 	
 	/**
+	 * Get a string representing the current URL that the browser is looking at.
 	 * 
-	 * @return
+	 * @return The URL of the page currently loaded in the browser
 	 */
 	public String getCurrentUrl() {
 		return driver.getCurrentUrl();

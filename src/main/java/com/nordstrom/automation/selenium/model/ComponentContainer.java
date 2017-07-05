@@ -525,8 +525,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	/**
+	 * Verify actual landing page against parameters in the {@link PageUrl} annotation of the specified page object.
 	 * 
-	 * @param pageObj
+	 * @param pageObj page object whose landing page is to be verified
 	 */
 	static <T extends Page> void verifyLandingPage(T pageObj) {
 		Class<? extends Page> pageClass = pageObj.getClass();
