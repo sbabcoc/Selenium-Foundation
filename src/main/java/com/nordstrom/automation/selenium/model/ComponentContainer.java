@@ -718,16 +718,4 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		return new FrameMap<>(this, frameType, locator);
 	}
 	
-	/**
-	 * Get class of specified container object.
-	 * 
-	 * @param <T> container type
-	 * @param container container object
-	 * @return class of container object
-	 */
-	public static <T extends ComponentContainer> Class<?> getContainerClass(T container) {
-		Class<?> clazz = container.getClass();		
-		return (container instanceof Enhanced) ? clazz.getSuperclass() : clazz;
-	}
-
 }
