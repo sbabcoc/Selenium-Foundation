@@ -4,19 +4,15 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.BrowserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.google.gson.JsonObject;
-import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -60,9 +56,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  */
 public final class JsUtility {
     
-    private static final List<String> SPECIAL = Arrays.asList(BrowserType.IE, BrowserType.IPHONE, BrowserType.IPAD, null);
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
-    private static final String ASSIGN_NEW_URL = "assignNewUrl.js";
     private static final String JAVA_GLUE_LIB = "javaGlueLib.js";
     private static final String ERROR_PREFIX = "unknown error";
     private static final String CLASS_NAME_KEY = "className";
@@ -72,37 +66,6 @@ public final class JsUtility {
 		throw new AssertionError("JsUtility is a static utility class that cannot be instantiated");
 	}
 	
-    /**
-     * Uses JavaScript to move the current Selenium test window to new location.
-     * 
-     * @param driver A handle to the currently running Selenium test window.
-     * @param url The new location.
-     */
-    public static void newAddressBarLocation(WebDriver driver, String url) {
-        String browserName = WebDriverUtils.getBrowserName(driver);
-        
-        if (SPECIAL.contains(browserName)) {
-            driver.get(url);
-        } else {
-            String assign = getScriptResource(ASSIGN_NEW_URL);
-            run(driver, assign, url);
-        }
-    }
-    
-    /**
-     * Uses JavaScript to move the current Selenium test window to new location.
-     * 
-     * @param <T> The type of the resulting page.
-     * @param driver A handle to the currently running Selenium test window.
-     * @param url The new location.
-     * @param pageType The type of the resulting page.
-     * @return A page of the specified type.
-     */
-    public static <T extends Page> T pageForNewLocation(WebDriver driver, String url, Class<T> pageType) {
-        newAddressBarLocation(driver, url);
-        return Page.newPage(pageType, driver);
-    }
-    
     /**
      * Executes JavaScript in the context of the currently selected frame or window. The script
      * fragment provided will be executed as the body of an anonymous function.
@@ -231,8 +194,4 @@ public final class JsUtility {
 		}
 		throw UncheckedThrow.throwUnchecked(thrown);
 	}
-	
-	
-	
-
 }

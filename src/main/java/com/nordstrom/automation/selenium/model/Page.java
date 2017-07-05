@@ -1,21 +1,13 @@
 package com.nordstrom.automation.selenium.model;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.common.base.UncheckedThrow;
 
 public class Page extends ComponentContainer {
 	
@@ -122,32 +114,6 @@ public class Page extends ComponentContainer {
 	}
 	
 	/**
-	 * Open the page defined by the {@link PageUrl} annotation of the specified page class.
-	 * 
-	 * @param <T> page class
-	 * @param pageClass type of page object to instantiate
-	 * @return new instance of the specified page class
-	 */
-	public <T extends Page> T openAnnotatedPage(Class<T> pageClass) {
-		return openAnnotatedPage(pageClass, driver, SeleniumConfig.getConfig().getTargetUri());
-	}
-	
-	/**
-	 * Open the page defined by the {@link PageUrl} annotation of the specified page class.
-	 * 
-	 * @param <T> page class
-	 * @param pageClass type of page object to instantiate
-	 * @param driver driver object
-	 * @param targetUri target URI
-	 * @return new instance of the specified page class
-	 */
-	public static <T extends Page> T openAnnotatedPage(Class<T> pageClass, WebDriver driver, URI targetUri) {
-		String pageUrl = getPageUrl(pageClass.getAnnotation(PageUrl.class), targetUri);
-		driver.get(pageUrl);
-		return newPage(pageClass, driver);
-	}
-	
-	/**
 	 * Open the page defined by the specified {@link InitialPage} annotation.
 	 * 
 	 * @param <T> page class
@@ -158,30 +124,8 @@ public class Page extends ComponentContainer {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Page> T openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
-		String initialUrl = getInitialUrl(initialPage, targetUri);
-		driver.get(initialUrl);
-		return (T) newPage(initialPage.value(), driver);
-	}
-	
-	/**
-	 * Construct a new instance of the specified page class.
-	 * 
-	 * @param <T> page class
-	 * @param pageClass type of page object to instantiate
-	 * @param driver driver object
-	 * @return new instance of the specified page class
-	 */
-	public static <T extends Page> T newPage(Class<T> pageClass, WebDriver driver) {
-		try {
-			Constructor<T> ctor = pageClass.getConstructor(WebDriver.class);
-			return ctor.newInstance(driver);
-		} catch (InvocationTargetException e) {
-			throw UncheckedThrow.throwUnchecked(e.getCause());
-		} catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
-			throw UncheckedThrow.throwUnchecked(e);
-		} catch (NoSuchMethodException | InstantiationException e) {
-			throw UncheckedThrow.throwUnchecked(e);
-		}
+		driver.get(getInitialUrl(initialPage, targetUri));
+		return newContainer((Class<T>) initialPage.value(), ARG_TYPES_1, new Object[] {driver});
 	}
 	
 	/**
@@ -191,7 +135,7 @@ public class Page extends ComponentContainer {
 	 * @param targetUri target URI
 	 * @return defined initial URL as a string (may be 'null')
 	 */
-	public static String getInitialUrl(InitialPage initialPage, URI targetUri) {
+	private static String getInitialUrl(InitialPage initialPage, URI targetUri) {
 		String url = getPageUrl(initialPage.pageUrl(), targetUri);
 		if (url == null) {
 			Class<? extends Page> pageClass = initialPage.value();
@@ -201,44 +145,11 @@ public class Page extends ComponentContainer {
 	}
 	
 	/**
-	 * Get the URL defined by the specified {@link PageUrl} annotation.
 	 * 
-	 * @param pageUrl page URL annotation
-	 * @param targetUri target URI
-	 * @return defined page URL as a string (may be 'null')
+	 * @return
 	 */
-	public static String getPageUrl(PageUrl pageUrl, URI targetUri) {
-		if (pageUrl == null) return null;
-		
-		String scheme = pageUrl.scheme();
-		String userInfo = pageUrl.userInfo();
-		String host = pageUrl.host();
-		String port = pageUrl.port();
-		String path = pageUrl.value();
-		String[] params = pageUrl.params();
-		
-		int len = Stream.of(scheme, userInfo, host, port, path, String.join("", params))
-				.filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining("")).length();
-		
-		if (len == 0) return null;
-
-		UriBuilder builder = UriBuilder.fromUri(targetUri);
-		
-		if (scheme.length() > 0) builder.scheme(scheme);
-		if (userInfo.length() > 0) builder.userInfo(userInfo);
-		if (host.length() > 0) builder.host(host);
-		if (port.length() > 0) builder.port(Integer.parseInt(port));
-		if (path.length() > 0) builder.path(path);
-		for (String param : params) {
-			String[] bits = param.split("=");
-			if (bits.length == 2) {
-				builder.queryParam(bits[0], bits[1]);
-			} else {
-				throw new IllegalArgumentException("Unsupported format for declared parameter: " + param);
-			}
-		}
-		
-		return builder.build().toString();
+	public String getCurrentUrl() {
+		return driver.getCurrentUrl();
 	}
 	
 	@Override
