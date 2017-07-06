@@ -4,11 +4,19 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.ws.rs.core.UriBuilder;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -18,10 +26,14 @@ import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
+import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -61,8 +73,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		this.driver = WebDriverUtils.getDriver(context);
 		this.parent = parent;
 		
-		Class<?> clazz = getClass();		
-		logger = LoggerFactory.getLogger((this instanceof Enhanced) ? clazz.getSuperclass() : clazz);
+		logger = LoggerFactory.getLogger(getContainerClass(this));
 	}
 	
 	@Override
@@ -424,6 +435,171 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	/**
+	 * Open the page defined by the {@link PageUrl} annotation of the specified page class.
+	 * 
+	 * @param <T> page class
+	 * @param pageClass type of page object to instantiate
+	 * @param newWindow 'true' to open page in new window; 'false' to open page in current window
+	 * @return new instance of the specified page class
+	 */
+	public <T extends Page> T openAnnotatedPage(Class<T> pageClass, boolean newWindow) {
+		PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
+		if (pageUrl == null) throw new IllegalArgumentException(pageClass.toString() + " has no @PageUrl annotation");
+		String url = getPageUrl(pageUrl, SeleniumConfig.getConfig().getTargetUri());
+		return openPageAtUrl(pageClass, url, newWindow);
+	}
+	
+	/**
+	 * Open the specified relative path under the current target URI.
+	 * 
+	 * @param <T> page class
+	 * @param pageClass type of page object to instantiate
+	 * @param path path to open
+	 * @param newWindow 'true' to open page in new window; 'false' to open page in current window
+	 * @return new instance of the specified page class
+	 */
+	public <T extends Page> T openPageAtPath(Class<T> pageClass, String path, boolean newWindow) {
+		UriBuilder builder = UriBuilder.fromUri(SeleniumConfig.getConfig().getTargetUri()).path(path);
+		return openPageAtUrl(pageClass, builder.build().toString(), newWindow);
+	}
+	
+	/**
+	 * Open the specified URL.
+	 * 
+	 * @param <T> page class
+	 * @param pageClass type of page object to instantiate
+	 * @param url URL to open
+	 * @param newWindow 'true' to open page in new window; 'false' to open page in current window
+	 * @return new instance of the specified page class
+	 */
+	public <T extends Page> T openPageAtUrl(Class<T> pageClass, String url, boolean newWindow) {
+		T pageObj = newContainer(pageClass, new Class<?>[] {WebDriver.class}, new Object[] {driver});
+		if (newWindow) {
+			pageObj.setWindowState(WindowState.WILL_OPEN);
+			WebDriverUtils.getExecutor(driver).executeScript("window.open('" + url + "','_blank');");
+		} else {
+			driver.get(url);
+		}
+		return pageObj;
+	}
+	
+	/**
+	 * Get the URL defined by the specified {@link PageUrl} annotation.
+	 * 
+	 * @param pageUrl page URL annotation
+	 * @param targetUri target URI
+	 * @return defined page URL as a string (may be 'null')
+	 */
+	public static String getPageUrl(PageUrl pageUrl, URI targetUri) {
+		if (pageUrl == null) return null;
+		
+		String scheme = pageUrl.scheme();
+		String userInfo = pageUrl.userInfo();
+		String host = pageUrl.host();
+		String port = pageUrl.port();
+		String path = pageUrl.value();
+		String[] params = pageUrl.params();
+		
+		int len = Stream.of(scheme, userInfo, host, port, path, String.join("", params))
+				.filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining("")).length();
+		
+		if (len == 0) return null;
+	
+		UriBuilder builder = UriBuilder.fromUri(targetUri);
+		
+		if (scheme.length() > 0) builder.scheme(scheme);
+		if (userInfo.length() > 0) builder.userInfo(userInfo);
+		if (host.length() > 0) builder.host(host);
+		if (port.length() > 0) builder.port(Integer.parseInt(port));
+		if (path.length() > 0) builder.path(path);
+		for (String param : params) {
+			String[] bits = param.split("=");
+			if (bits.length == 2) {
+				builder.queryParam(bits[0], bits[1]);
+			} else {
+				throw new IllegalArgumentException("Unsupported format for declared parameter: " + param);
+			}
+		}
+		
+		return builder.build().toString();
+	}
+	
+	/**
+	 * Verify actual landing page against parameters in the {@link PageUrl} annotation of the specified page object.
+	 * 
+	 * @param pageObj page object whose landing page is to be verified
+	 */
+	static void verifyLandingPage(Page pageObj) {
+		Class<?> pageClass = getContainerClass(pageObj);
+		PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
+		if (pageUrl != null) {
+			String actual, expect;
+			String url = pageObj.getCurrentUrl();
+			
+			URI actualUri = URI.create(url);
+			URI targetUri = SeleniumConfig.getConfig().getTargetUri();
+			URI expectUri = URI.create(ComponentContainer.getPageUrl(pageUrl, targetUri));
+			
+			actual = actualUri.getScheme();
+			expect = expectUri.getScheme();
+			if ( ! StringUtils.equals(actual, expect)) {
+				throw new LandingPageMismatchException(pageClass, "scheme", actual, expect);
+			}
+			
+			actual = actualUri.getHost();
+			expect = expectUri.getHost();
+			if ( ! StringUtils.equals(actual, expect)) {
+				throw new LandingPageMismatchException(pageClass, "host", actual, expect);
+			}
+			
+			actual = actualUri.getUserInfo();
+			expect = expectUri.getUserInfo();
+			if ( ! StringUtils.equals(actual, expect)) {
+				throw new LandingPageMismatchException(pageClass, "user info", actual, expect);
+			}
+			
+			actual = Integer.toString(actualUri.getPort());
+			expect = Integer.toString(expectUri.getPort());
+			if ( ! StringUtils.equals(actual, expect)) {
+				throw new LandingPageMismatchException(pageClass, "port", actual, expect);
+			}
+			
+			String pattern = pageUrl.pattern();
+			if (StringUtils.isNotBlank(pattern)) {
+				/*
+				 * TODO - This naive implementation will produce false negatives if the pattern specifies query params
+				 * and the position of any parameter in the actual query differs from its position in the pattern.
+				 */
+				actual = actualUri.getPath();
+				if (actualUri.getQuery() != null) {
+					actual += "?" + actualUri.getQuery();
+				}
+				if (actualUri.getFragment() != null) {
+					actual += "#" + actualUri.getFragment();
+				}
+				
+				if ( ! actual.matches(pattern)) {
+					throw new LandingPageMismatchException(pageClass, url);
+				}
+			} else {
+				actual = actualUri.getPath();
+				expect = expectUri.getPath();
+				if ( ! StringUtils.equals(actual, expect)) {
+					throw new LandingPageMismatchException(pageClass, "path", actual, expect);
+				}
+				
+				List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
+				for (NameValuePair expectPair : URLEncodedUtils.parse(expectUri, "UTF-8")) {
+					if ( ! actualParams.contains(expectPair)) {
+						throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
+					}
+				}
+			}
+		}
+		
+	}
+	
+	/**
 	 * Get {@link Method} object for the static {@code getKey(SearchContext)} method declared by the specified container type.
 	 * 
 	 * @param <T> component container type
@@ -467,10 +643,11 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	static <T extends ComponentContainer> T newContainer(Class<T> containerType, Class<?>[] argumentTypes, Object[] arguments) {
 		try {
 			Constructor<T> ctor = containerType.getConstructor(argumentTypes);
-			T container = ctor.newInstance(arguments);
-			return container.enhanceContainer(container);
-		} catch (NoSuchMethodException | SecurityException | InstantiationException |
-				IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			return ctor.newInstance(arguments);
+		} catch (InvocationTargetException e) {
+			throw UncheckedThrow.throwUnchecked(e.getCause());
+		} catch (SecurityException | IllegalAccessException | IllegalArgumentException |
+				NoSuchMethodException | InstantiationException e) {
 			throw UncheckedThrow.throwUnchecked(e);
 		}
 	}

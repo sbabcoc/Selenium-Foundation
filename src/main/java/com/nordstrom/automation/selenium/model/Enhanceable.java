@@ -101,4 +101,15 @@ public abstract class Enhanceable<T> {
 		}
 	}
 	
+	/**
+	 * Get class of specified container object.
+	 * 
+	 * @param container container object
+	 * @return class of container object
+	 */
+	public static Class<?> getContainerClass(Object container) {
+		Class<?> clazz = container.getClass();		
+		return (container instanceof Enhanced) ? clazz.getSuperclass() : clazz;
+	}
+
 }

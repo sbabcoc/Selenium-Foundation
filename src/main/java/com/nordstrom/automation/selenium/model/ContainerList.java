@@ -45,6 +45,7 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
 		E container = containerList.get(index);
 		if (container == null) {
 			container = ComponentContainer.newContainer(containerType, getArgumentTypes(), getArguments(index));
+			container = container.enhanceContainer(container);
 			containerList.set(index, container);
 		}
 		return container;
