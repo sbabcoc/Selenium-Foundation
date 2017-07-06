@@ -565,7 +565,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			}
 			
 			String pattern = pageUrl.pattern();
-			if (pattern != null) {
+			if (StringUtils.isNotBlank(pattern)) {
 				/*
 				 * TODO - This naive implementation will produce false negatives if the pattern specifies query params
 				 * and the position of any parameter in the actual query differs from its position in the pattern.
