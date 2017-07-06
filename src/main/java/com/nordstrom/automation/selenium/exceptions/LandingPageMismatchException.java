@@ -20,13 +20,12 @@ public class LandingPageMismatchException extends WebDriverException {
 	
 	/**
 	 * Constructor for property-based landing page mismatch exception
-	 * 
-	 * @param propName name of property that doesn't match the expected value
 	 * @param pageClass landing page class that defines the expected properties and values
+	 * @param propName name of property that doesn't match the expected value
 	 * @param actual actual value of the property that doesn't match
 	 * @param expect expected value of the property that doesn't match
 	 */
-	public LandingPageMismatchException(String propName, Class<?> pageClass, String actual, String expect) {
+	public LandingPageMismatchException(Class<?> pageClass, String propName, String actual, String expect) {
 		super(getMessage(propName, pageClass, actual, expect));
 	}
 	

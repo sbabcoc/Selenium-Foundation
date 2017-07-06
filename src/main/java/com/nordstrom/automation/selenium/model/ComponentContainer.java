@@ -543,25 +543,25 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			actual = actualUri.getScheme();
 			expect = expectUri.getScheme();
 			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException("scheme", pageClass, actual, expect);
+				throw new LandingPageMismatchException(pageClass, "scheme", actual, expect);
 			}
 			
 			actual = actualUri.getHost();
 			expect = expectUri.getHost();
 			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException("host", pageClass, actual, expect);
+				throw new LandingPageMismatchException(pageClass, "host", actual, expect);
 			}
 			
 			actual = actualUri.getUserInfo();
 			expect = expectUri.getUserInfo();
 			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException("user info", pageClass, actual, expect);
+				throw new LandingPageMismatchException(pageClass, "user info", actual, expect);
 			}
 			
 			actual = Integer.toString(actualUri.getPort());
 			expect = Integer.toString(expectUri.getPort());
 			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException("port", pageClass, actual, expect);
+				throw new LandingPageMismatchException(pageClass, "port", actual, expect);
 			}
 			
 			String pattern = pageUrl.pattern();
@@ -585,13 +585,13 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				actual = actualUri.getPath();
 				expect = expectUri.getPath();
 				if ( ! StringUtils.equals(actual, expect)) {
-					throw new LandingPageMismatchException("path", pageClass, actual, expect);
+					throw new LandingPageMismatchException(pageClass, "path", actual, expect);
 				}
 				
 				List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
 				for (NameValuePair expectPair : URLEncodedUtils.parse(expectUri, "UTF-8")) {
 					if ( ! actualParams.contains(expectPair)) {
-						throw new LandingPageMismatchException("query parameter", pageClass, actualUri.getQuery(), expectPair.toString());
+						throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
 					}
 				}
 			}
