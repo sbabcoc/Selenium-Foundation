@@ -20,6 +20,7 @@ public class LandingPageMismatchException extends WebDriverException {
 	
 	/**
 	 * Constructor for property-based landing page mismatch exception
+	 * 
 	 * @param pageClass landing page class that defines the expected properties and values
 	 * @param propName name of property that doesn't match the expected value
 	 * @param actual actual value of the property that doesn't match
