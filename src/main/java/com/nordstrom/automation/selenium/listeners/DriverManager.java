@@ -18,10 +18,28 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
+import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
 
+/**
+ * This TestNG listener performs several basic functions related to driver session management:
+ * <ul>
+ *     <li>Manage Selenium driver lifetime.</li>
+ *     <li>For local execution, manage a local instance of Selenium Grid.</li>
+ *     <li>Store and dispense the driver instance created for the test.</li>
+ *     <li>Manage configured driver timeout intervals.</li>
+ *     <li>If an initial page class is specified:
+ *         <ul>
+ *             <li>Open the initial page based on its {@link PageUrl} annotation.</li>
+ *             <li>Store the page object for subsequent dispensing to the test.</li>
+ *         </ul>
+ *     </li>
+ * </ul>
+ * 
+ * @see GridUtility
+ */
 public class DriverManager implements IInvokedMethodListener, ITestListener {
 
 	private static final String DRIVER = "Driver";
@@ -68,18 +86,18 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	}
 	
 	/**
-	 * Set the initial page object for the specified test result
+	 * Set the initial page object for the current test
 	 * 
-	 * @param pageObj page object for the specified test result
+	 * @param pageObj page object for the current test
 	 */
 	public static void setInitialPage(Page pageObj) {
 		setInitialPage(pageObj, Reporter.getCurrentTestResult());
 	}
 	
 	/**
-	 * Get the initial page object for the specified test result
+	 * Get the initial page object for the current test
 	 * 
-	 * @return page object for the specified test result
+	 * @return page object for the current test
 	 */
 	public static Page getInitialPage() {
 		return (Page) getInitialPage(Reporter.getCurrentTestResult());
@@ -107,6 +125,18 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 		return (Page) testResult.getAttribute(INITIAL_PAGE);
 	}
 	
+	/**
+	 * Perform pre-invocation processing:
+	 * <ul>
+	 *     <li>Ensure that a driver instance has been created for the test.</li>
+	 *     <li>Store the driver instance for subsequent dispensing.</li>
+	 *     <li>Manage configured driver timeout intervals.</li>
+	 *     <li>If specified, open the initial page, storing the page object for subsequent dispensing.</li>
+	 * </ul>
+	 * 
+	 * @param invokedMethod an object representing the method that's about to be invoked
+	 * @param testResult test result object for the method that's about to be invoked
+	 */
 	@Override
 	public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
 		ITestNGMethod testMethod = invokedMethod.getTestMethod();
@@ -149,6 +179,15 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 		// no post-invocation processing
 	}
 
+	/**
+	 * Perform post-suite processing:
+	 * <ul>
+	 *     <li>If a Selenium Grid node process was spawned, shut it down.</li>
+	 *     <li>If a Selenium Grid hub process was spawned, shut it down.</li>
+	 * </ul>
+	 * 
+	 * @param testContext execution context for the test suite that just finished
+	 */
 	@Override
 	public void onFinish(ITestContext testContext) {
 		Process gridProc = GridUtility.getGridNode(testContext);
