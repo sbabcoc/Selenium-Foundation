@@ -12,3 +12,4 @@ integration/felix-cache/
 runner
 .DS_Store
 test-output
+*.md.html

@@ -37,21 +37,21 @@ public class GoogleSearchPage extends Page implements DetectsLoadCompletion {
     }
 
     public GoogleSearchPage doGoogleSearch(String searchString) {
-        findElement(Using.SEARCH_BOX.locator).sendKeys(searchString);
-        findElement(Using.SEARCH_BUTTON.locator).click();
+        findElement(Using.SEARCH_BOX).sendKeys(searchString);
+        findElement(Using.SEARCH_BUTTON).click();
         return new GoogleSearchPage(driver);   
     }
      
     @Override
     public boolean isLoadComplete() {
-        return findOptional(Using.RESULT_STATS.locator).hasReference();
+        return findOptional(Using.RESULT_STATS).hasReference();
     }
 }
 ```
 
 # Declaring Locator Enumerations
 
-
+To make your code more maintainable and readable, we recommend the use of locator enumerations. The <span style="color: rgb(0, 0, 255);">Using</span> enumeration in the previous example demonstrates this pattern. This example also demonstrates implementation of the <span style="color: rgb(0, 0, 255);">ByEnum</span> interface. By implementing this interface, we can utilize the web element location methods (e.g. - **`findElement()`**) that accept locator constants.
 
 # Declaring Web Application Page Path
 
