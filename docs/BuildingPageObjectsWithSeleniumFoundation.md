@@ -13,7 +13,7 @@ import com.nordstrom.automation.selenium.model.Page;
  
 @PageUrl("/")
 public class GoogleSearchPage extends Page implements DetectsLoadCompletion {
-     
+    
     public static final By googleSeachBox = By.name("q");
     public static final By googleSearchButton = By.name("btnG");
     public static final By googleResultStat = By.id("resultStats");
@@ -32,7 +32,6 @@ public class GoogleSearchPage extends Page implements DetectsLoadCompletion {
     public boolean isLoadComplete() {
         return findOptional(googleResultStat).hasReference();
     }
- 
 }
 ```
 
@@ -66,7 +65,7 @@ In this example, **<span style="color: rgb(0, 0, 0);">Selenium Foundation</span>
 
 # <span class="confluence-anchor-link conf-macro output-inline" id="BuildingPageObjectswithSeleniumFoundation-page-load-sync" data-macro-name="anchor" data-hasbody="false"></span>Page Transition Synchronization
 
-Whenever a page object method returns a new page object, this informs **Selenium Foundation** that the method triggered a page transition. In response, **Selenium Foundation**performs basic synchronization - waiting for a previously-acquired web element reference to go stale. This strategy is effective for basic web applications with simple page load behavior.
+Whenever a page object method returns a new page object, this informs **Selenium Foundation** that the method triggered a page transition. In response, **Selenium Foundation** performs basic synchronization - waiting for a previously-acquired web element reference to go stale. This strategy is effective for basic web applications with simple page load behavior.
 
 For web applications with more complex page load behavior (single-page, dynamic content, etc.), the <span style="color: rgb(0, 0, 255);">DetectsLoadCompletion</span> interface enables implementers to provide custom page-load completion detection:
 
@@ -85,7 +84,7 @@ public class OpctPage extends Page implements DetectsLoadCompletion {
 }
 ```
 
-In this example, the page is done loading when the value of the <span style="color: rgb(153, 204, 0);">**_cursor_**</span> CSS property of the **_<span style="color: rgb(153, 204, 0);">body</span>_** tag no longer equals _"<span style="color: rgb(255, 0, 0);">wait</span>"_. This method, which is declared by the new container object, will be called every 500 mS until it returns _'true'_ or the page load timeout interval expires. Any type of container class can implement <span style="color: rgb(0, 0, 255);">DetectsLoadCompletion</span> - page, page component, or frame.
+In this example, the page is done loading when the value of the <span style="color: rgb(153, 204, 0);">**_cursor_**</span> CSS property of the **_<span style="color: rgb(153, 204, 0);">body</span>_** tag no longer equals _"<span style="color: rgb(255, 0, 0);">wait</span>"_. This method, which is declared by the new container object, will be called every 500 mS until it returns _'true'_ or the page load timeout interval expires. Any type of container class can implement <span style="color: rgb(0, 0, 255);">DetectsLoadCompletion</span> - page, component, or frame.
 
 Note that automatic page load synchronization is activated by a method that returns a <span style="color: rgb(153, 204, 0);">**new**</span> page object. No synchronization is performed if a method returns the page object it's standing on (i.e. - 'this'). However, the <span style="color: rgb(0, 0, 255);">DetectsLoadCompletion</span> interface includes a static method to invoke the same page-load synchronization logic that **Selenium Foundation** would:
 
