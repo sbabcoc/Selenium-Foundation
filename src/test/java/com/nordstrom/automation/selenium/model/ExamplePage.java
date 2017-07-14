@@ -29,7 +29,7 @@ public class ExamplePage extends Page {
 	protected static final String FRAME_B_ID = "frame-b";
 	protected static final String FRAME_C_ID = "frame-c";
 	
-	protected enum Using implements ComponentContainer.ByEnum {
+	protected enum Using implements ByEnum {
 		FRAME(By.cssSelector("iframe[id^='frame-']")),
 		FRAME_A(By.cssSelector("iframe#frame-a")),
 		FRAME_B(By.cssSelector("iframe#frame-b")),

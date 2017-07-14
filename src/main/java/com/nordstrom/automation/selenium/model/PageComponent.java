@@ -188,5 +188,4 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 		if (context instanceof PageComponent) return (PageComponent) context;
 		throw new UnsupportedOperationException("Wait object search context is not a page component");
 	}
-	
 }
