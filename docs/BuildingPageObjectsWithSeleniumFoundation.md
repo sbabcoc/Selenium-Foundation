@@ -14,23 +14,36 @@ import com.nordstrom.automation.selenium.model.Page;
 @PageUrl("/")
 public class GoogleSearchPage extends Page implements DetectsLoadCompletion {
     
-    public static final By googleSeachBox = By.name("q");
-    public static final By googleSearchButton = By.name("btnG");
-    public static final By googleResultStat = By.id("resultStats");
-     
     public GoogleSearchPage(WebDriver driver) {
         super(driver);
     }
      
+    private enum Using implements ByEnum {
+        SEARCH_BOX(By.name("q")),
+        SEARCH_BUTTON(By.name("btnG")),
+        RESULT_STATS(By.id("resultStats"));
+        
+        private By locator;
+        
+        Using(By locator) {
+            this.locator = locator;
+        }
+        
+        @Override
+        public By locator() {
+            return locator;
+        }
+    }
+
     public GoogleSearchPage doGoogleSearch(String searchString) {
-        findElement(googleSeachBox).sendKeys(searchString);
-        findElement(googleSearchButton).click();
+        findElement(Using.SEARCH_BOX.locator).sendKeys(searchString);
+        findElement(Using.SEARCH_BUTTON.locator).click();
         return new GoogleSearchPage(driver);   
     }
      
     @Override
     public boolean isLoadComplete() {
-        return findOptional(googleResultStat).hasReference();
+        return findOptional(Using.RESULT_STATS.locator).hasReference();
     }
 }
 ```

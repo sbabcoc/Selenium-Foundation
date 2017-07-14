@@ -6,7 +6,20 @@
 
 ## Page Object Design Pattern
 
-A popular strategy to reduce duplication and accelerate development of automated web application tests is the **Page Object Design Pattern**. In this pattern, each web application page that automated tests will interact with is modeled as a class, with methods to access the functionality and content of the page. Instead of accessing the browser directly through the **WebDriver** API, tests interact with the web application through page objects. The benefit is that tests are isolated from changes to the structure, behavior, or content of pages with which they interact. Revisions needed to support such changes are typically contained within the page model implementation. While this pattern dramatically reduces the amount of boilerplate code in test methods, much of this ends up in the page object implementations.
+A popular strategy to reduce duplication and accelerate development of automated web application tests is the **Page Object Design Pattern**. In this pattern, each web application page that automated tests will interact with is modeled as a class, with methods to access the functionality and content of the page. Instead of accessing the browser directly through the **WebDriver** API, tests interact with the web application through page objects. The benefit is that tests are isolated from changes to the structure, behavior, or content of pages with which they interact. Revisions needed to support such changes are typically contained within the page model implementation.
+
+### Design Pattern References
+
+* [Getting started (including complete examples) from Kim Schiller](https://www.pluralsight.com/guides/software-engineering-best-practices/getting-started-with-page-object-pattern-for-your-selenium-tests)
+* [Pattern overview from Martin Fowler](https://martinfowler.com/bliki/PageObject.html)
+* [Pattern overview from SeleniumHQ](https://github.com/SeleniumHQ/selenium/wiki/PageObjects)
+* [In-depth pattern description from Guru99](https://www.guru99.com/page-object-model-pom-page-factory-in-selenium-ultimate-guide.html)
+
+### Page Object Pitfalls
+
+While the page object design pattern dramatically reduces the amount of boilerplate code in test methods, much of this ends up in the page object implementations. **Selenium Foundation** eliminates all of the common code that you'll find in typical page object implementations.
+
+We discourage the use of <span style="color: rgb(0, 0, 255);">PageFactory</span> and the <span style="color: rgb(0, 0, 255);">@FindBy</span> annotation, because these replace rely on "magic" behavior - replacing <span style="color: rgb(0, 0, 255);">WebElement</span> property references in your code with hidden **`findElement()`** method calls. These obscure the interactions of your page model with the driver session, and they can trigger unexpected <span style="color: rgb(0, 0, 255);">NoSuchElementException</span> and <span style="color: rgb(0, 0, 255);">StaleElementReferenceException</span> failures. **Selenium Foundation** doesn't support the <span style="color: rgb(0, 0, 255);">PageFactory</span> approach, but facilitates the use of locator enumeration through the <span style="color: rgb(0, 0, 255);">ByEnum</span> interface.
 
 # WebDriver Automation with Selenium Foundation
 

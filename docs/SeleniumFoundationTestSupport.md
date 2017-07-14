@@ -17,7 +17,7 @@ com.nordstrom.automation.testng.ListenerChain
 
 In a Maven project, the preceding file is stored in the <span style="color: rgb(0, 0, 255);">src/main/resources</span> package:
 
-![](images/META-INF.png)
+![com.testng.ITestNGListener](images/META-INF.png)
 
 Once this file is added to your project, <span style="color: rgb(0, 0, 255);">ListenerChain</span> will be loaded automatically whenever you run your tests. To request dynamic listener chaining, your test class implements the <span style="color: rgb(0, 0, 255);">ListenerChainable</span> interface:
 
