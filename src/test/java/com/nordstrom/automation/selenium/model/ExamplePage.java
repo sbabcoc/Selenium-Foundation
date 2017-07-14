@@ -9,8 +9,6 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.nordstrom.automation.selenium.core.ByType.ByEnum;
-
 public class ExamplePage extends Page {
 
 	public ExamplePage(WebDriver driver) {
@@ -31,7 +29,7 @@ public class ExamplePage extends Page {
 	protected static final String FRAME_B_ID = "frame-b";
 	protected static final String FRAME_C_ID = "frame-c";
 	
-	protected enum Using implements ByEnum {
+	protected enum Using implements ComponentContainer.ByEnum {
 		FRAME(By.cssSelector("iframe[id^='frame-']")),
 		FRAME_A(By.cssSelector("iframe#frame-a")),
 		FRAME_B(By.cssSelector("iframe#frame-b")),
@@ -73,7 +71,7 @@ public class ExamplePage extends Page {
 	}
 	
 	public List<String> getParagraphs() {
-		List<WebElement> paraList = findElements(Using.PARA.locator);
+		List<WebElement> paraList = findElements(Using.PARA);
 		return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
 	}
 	

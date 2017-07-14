@@ -40,6 +40,19 @@ import com.nordstrom.common.base.UncheckedThrow;
 
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
 	
+	/**
+	 * This interface provides common methods for collections of Selenium locators ({@link By} objects)
+	 */
+	public interface ByEnum {
+		
+		/**
+		 * Get the Selenium locator for this enumerated constant.
+		 * 
+		 * @return Selenium locator ({@link By} object) for this constant
+		 */
+		By locator();
+	}
+
 	protected WebDriver driver;
 	protected SearchContext context;
 	protected ComponentContainer parent;
@@ -253,6 +266,16 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	/**
+	 * Find all elements within the current context using the given locator constant.
+	 * 
+	 * @param constant the locator constant
+	 * @return a list of all WebElements, or an empty list if nothing matches
+	 */
+	public List<WebElement> findElements(ByEnum constant) {
+		return findElements(constant.locator());
+	}
+	
+	/**
 	 * Find all elements within the current context using the given mechanism.
 	 * 
 	 * @param by the locating mechanism
@@ -264,6 +287,16 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	/**
+	 * Find the first WebElement using the given locator constant.
+	 * 
+	 * @param constant the locator constant
+	 * @return the first matching element on the current context
+	 */
+	public WebElement findElement(ByEnum constant) {
+		return findElement(constant.locator());
+	}
+	
+	/**
 	 * Find the first WebElement using the given method.
 	 * 
 	 * @param by the locating mechanism
@@ -272,6 +305,18 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	@Override
 	public WebElement findElement(By by) {
 		return RobustWebElement.getElement(this, by);
+	}
+	
+	/**
+	 * Get a wrapped reference to the first element matching the specified locator constant.
+	 * <p>
+	 * <b>NOTE</b>: Use {@link RobustWebElement#hasReference()} to determine if a valid reference was acquired.
+	 * 
+	 * @param constant the locator constant
+	 * @return robust web element
+	 */
+	public RobustWebElement findOptional(ByEnum constant) {
+		return findOptional(constant.locator());
 	}
 	
 	/**
