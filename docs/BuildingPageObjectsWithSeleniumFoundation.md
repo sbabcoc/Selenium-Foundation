@@ -8,6 +8,7 @@ package sixth_example;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
+import com.nordstrom.automation.selenium.core.ByType.ByEnum;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.Page;
  
@@ -47,6 +48,10 @@ public class GoogleSearchPage extends Page implements DetectsLoadCompletion {
     }
 }
 ```
+
+# Declaring Locator Enumerations
+
+
 
 # Declaring Web Application Page Path
 
