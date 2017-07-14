@@ -26,18 +26,23 @@ public class FrameComponent extends Frame {
 		super(nameOrId, parent);
 	}
 	
-	private enum Using {
+	private enum Using implements ByEnum {
 		HEADING(By.cssSelector("h1"));
 		
-		private By selector;
+		private By locator;
 		
-		Using(By selector) {
-			this.selector = selector;
+		Using(By locator) {
+			this.locator = locator;
+		}
+
+		@Override
+		public By locator() {
+			return locator;
 		}
 	}
 	
 	public String getPageContent() {
-		return findElement(Using.HEADING.selector).getText();
+		return findElement(Using.HEADING).getText();
 	}
 
 	public static Object getKey(SearchContext context) {

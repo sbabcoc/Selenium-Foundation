@@ -17,13 +17,18 @@ public class TableRowComponent extends PageComponent {
 		super(element, parent);
 	}
 	
-	protected enum Using {
+	protected enum Using implements ByEnum {
 		TBL_CELL(By.cssSelector("th,td"));
 		
-		private By selector;
+		private By locator;
 		
-		Using(By selector) {
-			this.selector = selector;
+		Using(By locator) {
+			this.locator = locator;
+		}
+
+		@Override
+		public By locator() {
+			return locator;
 		}
 	}
 	
@@ -37,7 +42,7 @@ public class TableRowComponent extends PageComponent {
 	
 	private List<WebElement> getCells() {
 		if (cells == null) {
-			cells = findElements(Using.TBL_CELL.selector);
+			cells = findElements(Using.TBL_CELL);
 		}
 		return cells;
 	}
