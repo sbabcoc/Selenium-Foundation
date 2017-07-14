@@ -1,4 +1,4 @@
-﻿# Background
+# Background
 
 ## WebDriver API
 
