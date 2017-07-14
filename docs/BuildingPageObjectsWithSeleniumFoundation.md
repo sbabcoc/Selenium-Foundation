@@ -1,5 +1,4 @@
 ﻿# Introduction
-
 Using the page-model pattern to implement WebDriver automation provides many structural benefits. However, plain-vanilla Selenium doesn't provide much in the way of base-class support for building page objects. **Selenium Foundation** includes a whole range of building blocks to help you create efficient, reliable WebDriver automation.
 
 ###### Page-model class
