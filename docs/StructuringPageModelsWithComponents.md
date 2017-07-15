@@ -5,9 +5,7 @@ package com.nordstrom.automation.selenium.model;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -17,24 +15,12 @@ public class ExamplePage extends Page {
 		super(driver);
 	}
 	
-	private FrameComponent frameByElement;
-	private FrameComponent frameByIndex;
-	private FrameComponent frameById;
 	private TableComponent table;
 	private List<TableComponent> tableList;
-	private Map<Object, TableComponent> tableMap;
-	private List<FrameComponent> frameList;
 	private Map<Object, FrameComponent> frameMap;
 
-	protected static final String FRAME_A_ID = "frame-a";
-	protected static final String FRAME_B_ID = "frame-b";
-	protected static final String FRAME_C_ID = "frame-c";
-	
 	protected enum Using implements ByEnum {
 		FRAME(By.cssSelector("iframe[id^='frame-']")),
-		FRAME_A(By.cssSelector("iframe#frame-a")),
-		FRAME_B(By.cssSelector("iframe#frame-b")),
-		FRAME_C(By.cssSelector("iframe#frame-c")),
 		PARA(By.cssSelector("p[id^='para-']")),
 		TABLE(By.cssSelector("table#t1"));
 		
@@ -50,27 +36,6 @@ public class ExamplePage extends Page {
 		}
 	}
 	
-	public FrameComponent getFrameByElement() {
-		if (frameByElement == null) {
-			frameByElement = new FrameComponent(Using.FRAME_A.locator, this);
-		}
-		return frameByElement;
-	}
-	
-	public FrameComponent getFrameByIndex() {
-		if (frameByIndex == null) {
-			frameByIndex = new FrameComponent(1, this);
-		}
-		return frameByIndex;
-	}
-	
-	public FrameComponent getFrameById() {
-		if (frameById == null) {
-			frameById = new FrameComponent(FRAME_C_ID, this);
-		}
-		return frameById;
-	}
-	
 	public List<String> getParagraphs() {
 		List<WebElement> paraList = findElements(Using.PARA);
 		return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
@@ -81,27 +46,6 @@ public class ExamplePage extends Page {
 			table = new TableComponent(Using.TABLE.locator, this);
 		}
 		return table;
-	}
-	
-	public List<TableComponent> getTableList() {
-		if (tableList == null) {
-			tableList = newComponentList(TableComponent.class, Using.TABLE.locator);
-		}
-		return tableList;
-	}
-	
-	public Map<Object, TableComponent> getTableMap() {
-		if (tableMap == null) {
-			tableMap = newComponentMap(TableComponent.class, Using.TABLE.locator);
-		}
-		return tableMap;
-	}
-	
-	public List<FrameComponent> getFrameList() {
-		if (frameList == null) {
-			frameList = newFrameList(FrameComponent.class, Using.FRAME.locator);
-		}
-		return frameList;
 	}
 	
 	public Map<Object, FrameComponent> getFrameMap() {
@@ -119,10 +63,7 @@ package com.nordstrom.automation.selenium.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
 
 public class TableComponent extends PageComponent {
 
@@ -130,14 +71,10 @@ public class TableComponent extends PageComponent {
 		super(locator, parent);
 	}
 	
-	public TableComponent(RobustWebElement element, ComponentContainer parent) {
-		super(element, parent);
-	}
-	
 	private TableRowComponent tableHdr;
 	private List<TableRowComponent> tableRows;
 
-	protected enum Using implements ByEnum {
+	protected enum Using {
 		HDR_ROW(By.cssSelector("tr[id*='-h']")),
 		TBL_ROW(By.cssSelector("tr[id*='-r']"));
 		
@@ -145,11 +82,6 @@ public class TableComponent extends PageComponent {
 		
 		Using(By locator) {
 			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
 		}
 	}
 	
@@ -178,10 +110,6 @@ public class TableComponent extends PageComponent {
 		}
 		return tableRows;
 	}
-	
-	public static Object getKey(SearchContext context) {
-		return ((WebElement) context).getAttribute("id");
-	}
 }
 ```
 
@@ -191,9 +119,7 @@ package com.nordstrom.automation.selenium.model;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class TableRowComponent extends PageComponent {
@@ -251,20 +177,8 @@ public class FrameComponent extends Frame {
 		super(locator, parent);
 	}
 	
-	public FrameComponent(By locator, int index, ComponentContainer parent) {
-		super(locator, index, parent);
-	}
-	
 	public FrameComponent(RobustWebElement element, ComponentContainer parent) {
 		super(element, parent);
-	}
-	
-	public FrameComponent(int index, ComponentContainer parent) {
-		super(index, parent);
-	}
-	
-	public FrameComponent(String nameOrId, ComponentContainer parent) {
-		super(nameOrId, parent);
 	}
 	
 	private enum Using implements ByEnum {
