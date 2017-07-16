@@ -1,3 +1,11 @@
+# Introduction
+
+By applying the page-model pattern, you can produce a cohesive, behavior-based API that centralizes the nuts and bolts of interacting with the target application in your page classes. When the application under test changes (and it will), your tests will typically be unaffected; all of the updates will be isolated to the page classes.
+
+However, modeling an application based solely on its pages produces a very flat model. It's quite common for a web application page to contain groups of elements that are logically associated (e.g. - billing address on an order information page). It's also common to encounter pages with multiple occurrences of an element grouping (e.g. - item tiles on a search results page). Factoring these grouping out into **page components** can greatly enrich your models, presenting a conceptual framework that automation developers will recognize.
+
+If your target application uses frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead.
+
 ###### ExamplePage.java
 ```java
 package com.nordstrom.automation.selenium.model;
@@ -16,7 +24,6 @@ public class ExamplePage extends Page {
 	}
 	
 	private TableComponent table;
-	private List<TableComponent> tableList;
 	private Map<Object, FrameComponent> frameMap;
 
 	protected enum Using implements ByEnum {
@@ -56,6 +63,20 @@ public class ExamplePage extends Page {
 	}
 }
 ```
+
+In the preceding example page class, extracted from the **Selenium Foundation** unit tests, we see that subsets of page functionality have been factored out into two components - <span style="color: rgb(0, 0, 255);">TableComponent</span> and <span style="color: rgb(0, 0, 255);">FrameComponent</span>. The application page modeled by this class contains one table and three frames, which are represented by the model as a table component and a mapped collection of frame components.
+
+# Page Component Search Contexts
+
+## A word about XPath locators
+
+# Driver Focus with Frame-Based Components
+
+# Component Nesting and Aggregation
+
+# Component Collections (Lists and Maps)
+
+## Lazy initialization
 
 ###### TableComponent.java
 ```java
@@ -206,12 +227,3 @@ public class FrameComponent extends Frame {
 }
 ```
 
-# Page Component Search Contexts
-
-
-
-# Driver Focus with Frame-Based Components
-
-# Component Nesting and Aggregation
-
-# Component Collections (Lists and Maps)
