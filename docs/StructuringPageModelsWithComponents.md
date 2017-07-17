@@ -4,7 +4,7 @@ By applying the page-model pattern, you can produce a cohesive, behavior-based A
 
 However, modeling an application based solely on its pages produces a very flat model. It's quite common for a web application page to contain groups of elements that are logically associated (e.g. - billing address on an order information page). It's also common to encounter pages with multiple occurrences of an element grouping (e.g. - item tiles on a search results page). Factoring these grouping out into **page components** can greatly enrich your models, presenting a conceptual framework that automation developers will recognize.
 
-If your target application uses frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead.
+If your target application uses frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead. More on this later.
 
 ###### ExamplePage.java
 ```java
@@ -68,15 +68,23 @@ In the preceding example page class, extracted from the **Selenium Foundation** 
 
 # Page Component Search Contexts
 
+In the **Selenium WebDriver** API, a search context is defined by the range of elements that will be examined when searching for a specified locator. For a page object, the search context is the entire page. For a page component, the search context is all of the elements within the bounds of the component's container element. For a frame, the search context is all of the elements within the bounds of the frame element.
+
+The search context of a page component encompasses a subset of the elements of the context(s) in which it is contained. In other words, elements within the bounds of the component can be found by searches in encompassing contexts. However, the same cannot be said for frames, because...
+
+## Frames define distinct search contexts
+
+The preceding descriptions of search contexts omits one important detail - frames define distinct search contexts. Elements within the bounds of a frame **cannot** be found by searches in encompassing contexts. In the browser, frames are handled as separate documents. From a conceptual standpoint, a frame **IS-A** page, and the <span style="color: rgb(0, 0, 255);">Frame</span> class of **Selenium Foundation** models this concept by extending the <span style="color: rgb(0, 0, 255);">Page</span> class.
+
+The search context of a frame is completely isolated, and the driver target needs to be switched to this context to interact with it. Without **Selenium Foundation**, the task of frame driver targeting can be frustrating and confusing. Once you've modeled a frame as a <span style="color: rgb(0, 0, 255);">Frame</span> object, **Selenium Foundation** handles driver targeting for you automatically. More on this below.
+
 ## A word about XPath locators
+
+
 
 # Driver Focus with Frame-Based Components
 
 # Component Nesting and Aggregation
-
-# Component Collections (Lists and Maps)
-
-## Lazy initialization
 
 ###### TableComponent.java
 ```java
@@ -184,6 +192,8 @@ public class TableRowComponent extends PageComponent {
 }
 ```
 
+# Component Collections (Lists and Maps)
+
 ###### FrameComponent.java
 ```java
 package com.nordstrom.automation.selenium.model;
@@ -226,4 +236,6 @@ public class FrameComponent extends Frame {
 	}
 }
 ```
+
+## Lazy initialization
 
