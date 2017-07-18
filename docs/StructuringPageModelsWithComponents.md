@@ -64,7 +64,7 @@ public class ExamplePage extends Page {
 }
 ```
 
-In the preceding example page class, extracted from the **Selenium Foundation** unit tests, we see that subsets of page functionality have been factored out into two components - <span style="color: rgb(0, 0, 255);">TableComponent</span> and <span style="color: rgb(0, 0, 255);">FrameComponent</span>. The application page modeled by this class contains one table and three frames, which are represented by the model as a table component and a mapped collection of frame components.
+In the preceding example page class, extracted from the **Selenium Foundation** unit tests, we see that subsets of page functionality have been factored out into two components - <span style="color: rgb(0, 0, 255);">TableComponent</span> and <span style="color: rgb(0, 0, 255);">FrameComponent</span>. The application page modeled by this class contains one table and three frames, which are represented by the model as a table component and a mapped collection of frame components. Definitions and descriptions of these components appear below.
 
 # Page Component Search Contexts
 
