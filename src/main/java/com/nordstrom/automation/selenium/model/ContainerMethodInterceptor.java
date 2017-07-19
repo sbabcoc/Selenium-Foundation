@@ -76,8 +76,18 @@ public enum ContainerMethodInterceptor {
 			if (result == container) return result;
 			
 			if (parentPage.getWindowState() == WindowState.WILL_CLOSE) {
-				parentPage.getWait().until(Coordinators.windowIsClosed(parentPage.getWindowHandle()));
+				WaitType.WAIT.getWait(driver).until(Coordinators.windowIsClosed(parentPage.getWindowHandle()));
+				Page spawningPage = parentPage.getSpawningPage();
+				if (spawningPage != null) {
+					spawningPage.switchTo();
+					target.set(spawningPage);
+				} else {
+					String windowHandle = driver.getWindowHandles().iterator().next();
+					driver.switchTo().window(windowHandle);
+					target.set(null);
+				}
 				container.setVacater(method);
+				reference = null;
 			}
 			
 			if (returnsContainer) {
@@ -89,7 +99,8 @@ public enum ContainerMethodInterceptor {
 				if (returnsPage) {
 					Page newPage = (Page) result;
 					if (newPage.getWindowState() == WindowState.WILL_OPEN) {
-						newHandle = newPage.getWait().until(Coordinators.newWindowIsOpened(initialHandles));
+						newHandle = WaitType.WAIT.getWait(driver).until(Coordinators.newWindowIsOpened(initialHandles));
+						newPage.setSpawningPage(parentPage);
 						reference = null;
 					} else {
 						newHandle = parentPage.getWindowHandle();
@@ -100,7 +111,7 @@ public enum ContainerMethodInterceptor {
 				if (detectsCompletion) {
 					newChild.getWait(WaitType.PAGE_LOAD).until(DetectsLoadCompletion.pageLoadIsComplete());
 				} else if (reference != null) {
-					newChild.getWait(WaitType.PAGE_LOAD).until(Coordinators.stalenessOf(reference));
+					WaitType.PAGE_LOAD.getWait(driver).until(Coordinators.stalenessOf(reference));
 				}
 				
 				result = newChild.enhanceContainer(newChild);

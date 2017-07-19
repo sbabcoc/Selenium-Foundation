@@ -12,6 +12,7 @@ import com.nordstrom.automation.selenium.annotations.PageUrl;
 public class Page extends ComponentContainer {
 	
 	private String windowHandle;
+	private Page spawningPage;
 	private WindowState windowState;
 	protected Class<?>[] argumentTypes;
 	protected Object[] arguments;
@@ -82,6 +83,24 @@ public class Page extends ComponentContainer {
 	 */
 	public String getWindowHandle() {
 		return windowHandle;
+	}
+	
+	/**
+	 * Set the page from which this page was spawned.
+	 * 
+	 * @param page page from which this page was spawned
+	 */
+	public void setSpawningPage(Page page) {
+		this.spawningPage = page;
+	}
+	
+	/**
+	 * Get the page from which this page was spawned.
+	 * 
+	 * @return page from which this page was spawned
+	 */
+	public Page getSpawningPage() {
+		return spawningPage;
 	}
 	
 	/**
