@@ -9,9 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang3.StringUtils;
@@ -500,11 +497,6 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		String path = pageUrl.value();
 		String[] params = pageUrl.params();
 		
-		int len = Stream.of(scheme, userInfo, host, port, path, String.join("", params))
-				.filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining("")).length();
-		
-		if (len == 0) return null;
-	
 		UriBuilder builder = UriBuilder.fromUri(targetUri);
 		
 		if (scheme.length() > 0) builder.scheme(scheme);
