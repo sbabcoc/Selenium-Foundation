@@ -34,6 +34,7 @@ public class Page extends ComponentContainer {
 	 */
 	public Page(WebDriver driver) {
 		super(driver, null);
+		
 		argumentTypes = ARG_TYPES_1;
 		arguments = new Object[] {driver};
 	}
