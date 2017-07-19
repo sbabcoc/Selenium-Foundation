@@ -558,16 +558,17 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			
 			String pattern = pageUrl.pattern();
 			if (StringUtils.isNotBlank(pattern)) {
-				/*
-				 * TODO - This naive implementation will produce false negatives if the pattern specifies query params
-				 * and the position of any parameter in the actual query differs from its position in the pattern.
-				 */
 				actual = actualUri.getPath();
-				if (actualUri.getQuery() != null) {
-					actual += "?" + actualUri.getQuery();
-				}
-				if (actualUri.getFragment() != null) {
-					actual += "#" + actualUri.getFragment();
+				String target = targetUri.getPath();
+				if (StringUtils.isNotBlank(target)) {
+					int actualLen = actual.length();
+					int targetLen = target.length();
+					
+					if ((actualLen > targetLen) && (actual.startsWith(target)) && (actual.charAt(targetLen) == '/')) {
+						actual = actual.substring(targetLen + 1);
+					} else {
+						throw new LandingPageMismatchException(pageClass, "base path", actual, target);
+					}
 				}
 				
 				if ( ! actual.matches(pattern)) {
