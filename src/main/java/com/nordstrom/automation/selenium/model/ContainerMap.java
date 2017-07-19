@@ -140,7 +140,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
 		public V getValue() {
 			V v = value;
 			if (v == null) {
-				v = ComponentContainer.newContainer(map.containerType, map.getArgumentTypes(), map.getArguments(element));
+				Class<?>[] argumentTypes = map.getArgumentTypes();
+				Object[] arguments = map.getArguments(element);
+				v = ComponentContainer.newContainer(map.containerType, argumentTypes, arguments);
 				v = v.enhanceContainer(v);
 				value = v;
 			}
