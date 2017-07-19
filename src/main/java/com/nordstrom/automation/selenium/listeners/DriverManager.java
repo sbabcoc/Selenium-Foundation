@@ -111,6 +111,9 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 */
 	public static void setInitialPage(Page pageObj, ITestResult testResult) {
 		validateTestResult(testResult);
+		if (pageObj.getWindowHandle() == null) {
+			pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
+		}
 		testResult.setAttribute(INITIAL_PAGE, pageObj.enhanceContainer(pageObj));
 	}
 	

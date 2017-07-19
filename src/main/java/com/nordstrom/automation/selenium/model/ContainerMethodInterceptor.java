@@ -77,10 +77,10 @@ public enum ContainerMethodInterceptor {
 			
 			if (parentPage.getWindowState() == WindowState.WILL_CLOSE) {
 				WaitType.WAIT.getWait(driver).until(Coordinators.windowIsClosed(parentPage.getWindowHandle()));
-				Page spawningPage = parentPage.getSpawningPage();
-				if (spawningPage != null) {
-					spawningPage.switchTo();
-					target.set(spawningPage);
+				parentPage = parentPage.getSpawningPage();
+				if (parentPage != null) {
+					parentPage.switchTo();
+					target.set(parentPage);
 				} else {
 					String windowHandle = driver.getWindowHandles().iterator().next();
 					driver.switchTo().window(windowHandle);
@@ -103,7 +103,7 @@ public enum ContainerMethodInterceptor {
 						newPage.setSpawningPage(parentPage);
 						reference = null;
 					} else {
-						newHandle = parentPage.getWindowHandle();
+						newHandle = driver.getWindowHandle();
 						container.setVacater(method);
 					}
 				}
