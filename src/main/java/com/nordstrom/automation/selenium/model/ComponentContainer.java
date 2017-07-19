@@ -9,9 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang3.StringUtils;
@@ -500,11 +497,6 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		String path = pageUrl.value();
 		String[] params = pageUrl.params();
 		
-		int len = Stream.of(scheme, userInfo, host, port, path, String.join("", params))
-				.filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining("")).length();
-		
-		if (len == 0) return null;
-	
 		UriBuilder builder = UriBuilder.fromUri(targetUri);
 		
 		if (scheme.length() > 0) builder.scheme(scheme);
@@ -566,16 +558,17 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			
 			String pattern = pageUrl.pattern();
 			if (StringUtils.isNotBlank(pattern)) {
-				/*
-				 * TODO - This naive implementation will produce false negatives if the pattern specifies query params
-				 * and the position of any parameter in the actual query differs from its position in the pattern.
-				 */
 				actual = actualUri.getPath();
-				if (actualUri.getQuery() != null) {
-					actual += "?" + actualUri.getQuery();
-				}
-				if (actualUri.getFragment() != null) {
-					actual += "#" + actualUri.getFragment();
+				String target = targetUri.getPath();
+				if (StringUtils.isNotBlank(target)) {
+					int actualLen = actual.length();
+					int targetLen = target.length();
+					
+					if ((actualLen > targetLen) && (actual.startsWith(target)) && (actual.charAt(targetLen) == '/')) {
+						actual = actual.substring(targetLen + 1);
+					} else {
+						throw new LandingPageMismatchException(pageClass, "base path", actual, target);
+					}
 				}
 				
 				if ( ! actual.matches(pattern)) {
