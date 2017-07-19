@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.net.URI;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -12,6 +11,7 @@ import com.nordstrom.automation.selenium.annotations.PageUrl;
 public class Page extends ComponentContainer {
 	
 	private String windowHandle;
+	private Page spawningPage;
 	private WindowState windowState;
 	protected Class<?>[] argumentTypes;
 	protected Object[] arguments;
@@ -19,8 +19,8 @@ public class Page extends ComponentContainer {
 	private static final Class<?>[] ARG_TYPES_1 = {WebDriver.class};
 	private static final Class<?>[] ARG_TYPES_2 = {WebDriver.class, ComponentContainer.class};
 	
-	private static final String[] METHODS = {"setWindowHandle", "getWindowHandle", "setWindowState", "getWindowState",
-			"openInitialPage", "getInitialUrl", "getPageUrl"};
+	private static final String[] METHODS = {"setWindowHandle", "getWindowHandle", "setSpawningPage", "getSpawningPage",
+			"setWindowState", "getWindowState", "openInitialPage", "getInitialUrl", "getPageUrl"};
 	
 	public enum WindowState {
 		WILL_OPEN, 
@@ -34,7 +34,6 @@ public class Page extends ComponentContainer {
 	 */
 	public Page(WebDriver driver) {
 		super(driver, null);
-		windowHandle = driver.getWindowHandle();
 		
 		argumentTypes = ARG_TYPES_1;
 		arguments = new Object[] {driver};
@@ -82,6 +81,24 @@ public class Page extends ComponentContainer {
 	 */
 	public String getWindowHandle() {
 		return windowHandle;
+	}
+	
+	/**
+	 * Set the page from which this page was spawned.
+	 * 
+	 * @param pageObj page from which this page was spawned
+	 */
+	public void setSpawningPage(Page pageObj) {
+		this.spawningPage = pageObj;
+	}
+	
+	/**
+	 * Get the page from which this page was spawned.
+	 * 
+	 * @return page from which this page was spawned
+	 */
+	public Page getSpawningPage() {
+		return spawningPage;
 	}
 	
 	/**
@@ -182,5 +199,21 @@ public class Page extends ComponentContainer {
 	String[] bypassMethods() {
 		return ArrayUtils.addAll(super.bypassMethods(), METHODS);
 	}
-
+	
+	/**
+	 * Create an enhanced instance of the specified container.
+	 * 
+	 * @param <C> container type
+	 * @param container container object to be enhanced
+	 * @return enhanced container object
+	 */
+	@Override
+	public <C extends ComponentContainer> C enhanceContainer(C container) {
+		if (container instanceof Enhanced) return container;
+		C enhanced = super.enhanceContainer(container);
+		((Page) enhanced).setWindowHandle(((Page) container).getWindowHandle());
+		((Page) enhanced).setSpawningPage(((Page) container).getSpawningPage());
+		return enhanced;
+	}
+	
 }
