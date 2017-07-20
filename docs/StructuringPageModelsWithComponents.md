@@ -80,6 +80,8 @@ The search context of a frame is completely isolated, and the driver target need
 
 ## A word about XPath locators
 
+XPath locators differ from all other locator types in that they can traverse outside the scope of the target search context. For page and frame containers, this is purely academic, as their search contexts automatically encompass the entire document. For page component, however, you need to make sure you write your XPath expressions so they only evaluate element within the bounds of the page component search context.
+
 
 
 # Driver Focus with Frame-Based Components
