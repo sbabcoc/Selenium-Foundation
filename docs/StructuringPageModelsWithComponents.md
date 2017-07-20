@@ -82,7 +82,34 @@ The search context of a frame is completely isolated, and the driver target need
 
 XPath locators differ from all other locator types in that they can traverse outside the scope of the target search context. For page and frame containers, this is purely academic, as their search contexts automatically encompass the entire document. For page component, however, you need to make sure you write your XPath expressions so they only evaluate element within the bounds of the page component search context.
 
+Here are some examples of XPath expressions that select elements _within_ the bounds of the page component search context:
 
+* `para` selects **para** element children of the context node
+* `*` selects all element children of the context node
+* `para[1]` selects the first **para** child of the context node
+* `para[last()]` selects the last **para** child of the context node
+* `*/para` selects all **para** grandchildren of the context node
+* `chapter//para` selects the **para** element descendants of the **chapter** element children of the context node
+* `.` selects the context node
+* `.//para` selects the **para** element descendants of the context node
+
+This last expression demonstrates the form that most context-relative XPath locators should use.
+
+Because of their ability to traverse the element hierarchy vertically and horizontally, a subset of location-related XPath tokens and operators will produce expressions that can exceed the search context. Here are the tokens and operators to avoid or use cautiously:
+
+* Expressions that begin with `/`, `//`, or `..`
+* Ancestor or sibling axes: `parent`, `following-sibling`, `preceding-sibling`, `following`, `predecing`, `ancestor`, `ancestor-or-self`
+
+Here are some examples of XPath expressions that select elements _outside_ the bounds of the page component search context:
+
+* `//para` selects all **para** elements in the document that contains the context node
+* `../para` selects **para** element children of the parent of the context node
+* `parent::*` selects the parent of the context node
+* `ancestor::div` selects all ancestor **div** elements of the context node
+* `following-sibling::*` selects all siblings after the context node
+* `previous::chapter` selects all **chapter** elements that appear before the context node in the document, except ancestors
+
+Avoid expressions that start with either `/` or `//`, as these always traverse the entire document. There are legitimate applications for the other tokens 
 
 # Driver Focus with Frame-Based Components
 
