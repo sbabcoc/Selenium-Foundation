@@ -2,6 +2,8 @@ package com.nordstrom.automation.selenium.core;
 
 import org.openqa.selenium.By;
 
+import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
+
 /**
  * This utility class defines static methods and interfaces related to Selenium {@link By} objects.
  */
@@ -12,16 +14,13 @@ public class ByType {
 	}
 	
 	/**
-	 * This interface provides common methods for collections of Selenium locators ({@link By} objects)
+	 * Get the CSS locator string that reproduces the specified locator constant
+	 * 
+	 * @param constant locator constant
+	 * @return CSS locator string; 'null' if unconvertible
 	 */
-	public interface ByEnum {
-		
-		/**
-		 * Get the Selenium locator for this enumerated constant.
-		 * 
-		 * @return Selenium locator ({@link By} object) for this constant
-		 */
-		By locator();
+	public static String cssLocatorFor(ByEnum constant) {
+		return cssLocatorFor(constant.locator());
 	}
 	
 	/**
@@ -53,6 +52,16 @@ public class ByType {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Get the XPath locator string that reproduces the specified locator constant
+	 * 
+	 * @param constant locator constant
+	 * @return XPath locator string; 'null' if unconvertible
+	 */
+	public static String xpathLocatorFor(ByEnum constant) {
+		return xpathLocatorFor(constant.locator());
 	}
 	
 	/**

@@ -9,8 +9,6 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.nordstrom.automation.selenium.core.ByType.ByEnum;
-
 public class ExamplePage extends Page {
 
 	public ExamplePage(WebDriver driver) {
@@ -73,7 +71,7 @@ public class ExamplePage extends Page {
 	}
 	
 	public List<String> getParagraphs() {
-		List<WebElement> paraList = findElements(Using.PARA.locator);
+		List<WebElement> paraList = findElements(Using.PARA);
 		return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
 	}
 	

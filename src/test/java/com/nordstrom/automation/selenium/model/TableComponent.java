@@ -21,7 +21,7 @@ public class TableComponent extends PageComponent {
 	private List<TableRowComponent> tableRows;
 	private int refreshCount;
 	
-	protected enum Using {
+	protected enum Using implements ByEnum {
 		HDR_ROW(By.cssSelector("tr[id*='-h']")),
 		TBL_ROW(By.cssSelector("tr[id*='-r']"));
 		
@@ -29,6 +29,11 @@ public class TableComponent extends PageComponent {
 		
 		Using(By locator) {
 			this.locator = locator;
+		}
+
+		@Override
+		public By locator() {
+			return locator;
 		}
 	}
 	
