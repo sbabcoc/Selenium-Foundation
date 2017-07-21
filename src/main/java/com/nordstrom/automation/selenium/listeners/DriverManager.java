@@ -44,7 +44,7 @@ import com.nordstrom.automation.selenium.model.Page;
 public class DriverManager implements IInvokedMethodListener, ITestListener {
 
 	private static final String DRIVER = "Driver";
-	private static final String CLOSE_DRIVER = "QuitDriver";
+	private static final String CLOSE_DRIVER = "CloseDriver";
 	private static final String INITIAL_PAGE = "InitialPage";
 	
 	/**
