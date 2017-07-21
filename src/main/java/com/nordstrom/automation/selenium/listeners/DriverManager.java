@@ -16,6 +16,7 @@ import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.annotations.GetDriver;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
@@ -43,6 +44,7 @@ import com.nordstrom.automation.selenium.model.Page;
 public class DriverManager implements IInvokedMethodListener, ITestListener {
 
 	private static final String DRIVER = "Driver";
+	private static final String CLOSE_DRIVER = "QuitDriver";
 	private static final String INITIAL_PAGE = "InitialPage";
 	
 	/**
@@ -142,27 +144,36 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 */
 	@Override
 	public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
+		boolean getDriver = false;
 		ITestNGMethod testMethod = invokedMethod.getTestMethod();
+		Method method = testMethod.getConstructorOrMethod().getMethod();
+		
+		// if invoked method is @Test or @BeforeMethod
 		if (testMethod.isTest() || testMethod.isBeforeMethodConfiguration()) {
-			SeleniumConfig config = SeleniumConfig.getConfig(testResult);
-			Method method = testMethod.getConstructorOrMethod().getMethod();
+			// get driver if @NoDriver is absent
+			getDriver = (null == method.getAnnotation(NoDriver.class));
+		// otherwise, if invoked method is @Before... (other than @BeforeMethod)
+		} else if (testMethod.isBeforeClassConfiguration() || testMethod.isBeforeGroupsConfiguration()
+				|| testMethod.isBeforeSuiteConfiguration() || testMethod.isBeforeTestConfiguration()) {
+			// get driver if @GetDriver is present
+			getDriver = (null != method.getAnnotation(GetDriver.class));
+			// if getting a driver, close it after invocation
+			if (getDriver) testResult.setAttribute(CLOSE_DRIVER, "");
+		}
+		
+		if (getDriver) {
 			WebDriver driver = getDriver(testResult);
+			SeleniumConfig config = SeleniumConfig.getConfig(testResult);
+			
 			if (driver == null) {
-				NoDriver noDriver = method.getAnnotation(NoDriver.class);
-				if (noDriver == null) {
-					Object instance = testMethod.getInstance();
-					if (instance instanceof DriverProvider) {
-						driver = ((DriverProvider) instance).provideDriver(invokedMethod, testResult);
-					} else {
-						driver = GridUtility.getDriver(testResult);
-					}
-					Timeouts timeouts = driver.manage().timeouts();
-					timeouts.setScriptTimeout(WaitType.SCRIPT.getInterval(config), TimeUnit.SECONDS);
-					timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);
-					timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
-					
-					setDriver(driver, testResult);
+				Object instance = testMethod.getInstance();
+				if (instance instanceof DriverProvider) {
+					driver = ((DriverProvider) instance).provideDriver(invokedMethod, testResult);
+				} else {
+					driver = GridUtility.getDriver(testResult);
 				}
+				setDriverTimeouts(driver, config);
+				setDriver(driver, testResult);
 			}
 			if (driver != null) {
 				InitialPage initialPage = method.getAnnotation(InitialPage.class);
@@ -177,9 +188,20 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 		}
 	}
 
+	/**
+	 * Perform post-invocation processing:
+	 * <ul>
+	 *     <li>If indicated, close the driver that was acquired for this method.</li>
+	 * </ul>
+	 * 
+	 * @param invokedMethod an object representing the method that's just been invoked
+	 * @param testResult test result object for the method that's just been invoked
+	 */
 	@Override
-	public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
-		// no post-invocation processing
+	public void afterInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
+		if (testResult.getAttribute(CLOSE_DRIVER) != null) {
+			closeDriver(testResult);
+		}
 	}
 
 	/**
@@ -236,6 +258,19 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	}
 	
 	/**
+	 * Set configured timeout intervals in the specified driver.
+	 * 
+	 * @param driver driver object in which to configure timeout intervals
+	 * @param config configuration object that specifies timeout intervals
+	 */
+	public static void setDriverTimeouts(WebDriver driver, SeleniumConfig config) {
+		Timeouts timeouts = driver.manage().timeouts();
+		timeouts.setScriptTimeout(WaitType.SCRIPT.getInterval(config), TimeUnit.SECONDS);
+		timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);
+		timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
+	}
+
+	/**
 	 * Close the Selenium driver attached to the specified configuration context.
 	 * 
 	 * @param testResult configuration context (TestNG test result object)
@@ -259,6 +294,11 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 		}
 	}
 	
+	/**
+	 * Verify that the specified configuration context is non-null.
+	 * 
+	 * @param testResult configuration context (TestNG test result object)
+	 */
 	private static void validateTestResult(ITestResult testResult) {
 		if (testResult == null) throw new NullPointerException("Test result object must be non-null");
 	}
