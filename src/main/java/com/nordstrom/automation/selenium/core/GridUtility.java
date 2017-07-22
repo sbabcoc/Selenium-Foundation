@@ -146,21 +146,34 @@ public class GridUtility {
 	 * Determine if the specified Selenium Grid host (hub or node) is active.
 	 * 
 	 * @param host HTTP host connection to be checked
-	 * @param path path on the specified host to verify
+	 * @param request request path (may include parameters)
 	 * @return 'true' if specified host is active; otherwise 'false'
 	 * @throws MalformedURLException The specified host settings produce a malformed URL.
 	 */
-	private static boolean isHostActive(HttpHost host, String path) throws MalformedURLException {
-		HttpClient client = HttpClientBuilder.create().build();
-		URL sessionURL = new URL(host.toURI() + path);
-		BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
-				new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
+	private static boolean isHostActive(HttpHost host, String request) throws MalformedURLException {
 		try {
-			HttpResponse response = client.execute(host, basicHttpEntityEnclosingRequest);
+			HttpResponse response = getHttpResponse(host, request);
 			return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
 		} catch (IOException e) {
+			if (e instanceof MalformedURLException) throw (MalformedURLException) e;
 		}
 		return false;
+	}
+	
+	/**
+	 * Send the specified GET request to the indicated host.
+	 * 
+	 * @param host target HTTP host connection
+	 * @param request request path (may include parameters)
+	 * @return host response for the specified GET request
+	 * @throws IOException the request triggered an I/O exception
+	 */
+	public static HttpResponse getHttpResponse(HttpHost host, String request) throws IOException {
+		HttpClient client = HttpClientBuilder.create().build();
+		URL sessionURL = new URL(host.toURI() + request);
+		BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
+				new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
+		return client.execute(host, basicHttpEntityEnclosingRequest);
 	}
 	
 	/**
