@@ -36,8 +36,8 @@ public class GridUtility {
 	
 	private static final String GRID_HUB = "GridHub";
 	private static final String GRID_NODE = "GridNode";
-	private static final String HUB_PATH = "/grid/api/hub/";
-	private static final String NODE_PATH = "/wd/hub/status/";
+	private static final String HUB_REQUEST = "/grid/api/hub/";
+	private static final String NODE_REQUEST = "/wd/hub/status/";
 	
 	private GridUtility() {
 		throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
@@ -82,12 +82,12 @@ public class GridUtility {
 					// launch local Selenium Grid hub
 					Process gridHub = GridProcess.start(testResult, config.getHubArgs());
 					HttpHostWait hubWait = getWait(getHubHost(hubConfig), testResult);
-					hubWait.until(hostIsActive(HUB_PATH));
+					hubWait.until(hostIsActive(HUB_REQUEST));
 					testResult.getTestContext().setAttribute(GRID_HUB, gridHub);
 					// launch local Selenium Grid node
 					Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
 					HttpHostWait nodeWait = getWait(getNodeHost(config.getNodeConfig()), testResult);
-					nodeWait.until(hostIsActive(NODE_PATH));
+					nodeWait.until(hostIsActive(NODE_REQUEST));
 					testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
 					isActive = true;
 				} catch (Exception e) {
@@ -107,7 +107,7 @@ public class GridUtility {
 	 * @throws MalformedURLException The configured hub settings produce a malformed URL.
 	 */
 	static boolean isHubActive(GridHubConfiguration hubConfig) throws MalformedURLException {
-		return isHostActive(getHubHost(hubConfig), HUB_PATH);
+		return isHostActive(getHubHost(hubConfig), HUB_REQUEST);
 	}
 	
 	/**
@@ -128,7 +128,7 @@ public class GridUtility {
 	 * @throws MalformedURLException The configured node settings produce a malformed URL.
 	 */
 	static boolean isNodeActive(RegistrationRequest nodeConfig) throws MalformedURLException {
-		return isHostActive(getNodeHost(nodeConfig), NODE_PATH);
+		return isHostActive(getNodeHost(nodeConfig), NODE_REQUEST);
 	}
 	
 	/**
@@ -179,16 +179,16 @@ public class GridUtility {
 	/**
 	 * Returns a 'wait' proxy that determines if the context host is active.
 	 * 
-	 * @param path path on the context host to verify
+	 * @param request request path (may include parameters)
 	 * @return 'true' if specified host is active; otherwise 'false'
 	 */
-	public static Function<HttpHost, Boolean> hostIsActive(final String path) {
+	public static Function<HttpHost, Boolean> hostIsActive(final String request) {
 		return new Function<HttpHost, Boolean>() {
 
 			@Override
 			public Boolean apply(HttpHost host) {
 				try {
-					return Boolean.valueOf(isHostActive(host, path));
+					return Boolean.valueOf(isHostActive(host, request));
 				} catch (MalformedURLException e) {
 					throw UncheckedThrow.throwUnchecked(e);
 				}
