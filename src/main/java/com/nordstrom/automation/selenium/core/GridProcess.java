@@ -76,7 +76,7 @@ class GridProcess {
 		for (Class<?> clazz : dependencies) {
 			pathList.add(findPathJar(clazz));
 		}
-		return "\"" + String.join("\"" + File.pathSeparator + "\"", pathList) + "\"";
+		return String.join(File.pathSeparator, pathList);
 	}
 	
 	/**
