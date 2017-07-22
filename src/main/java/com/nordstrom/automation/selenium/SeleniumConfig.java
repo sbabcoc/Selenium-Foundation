@@ -240,9 +240,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 			String configPath = getNodeConfigPath();
 			RegistrationRequest nodeConfig = getNodeConfig();
 			Map<String, Object> config = nodeConfig.getConfiguration();
-			nodeArgs = new String[] {"-role", "node", "-nodeConfig", "\"" + configPath + "\"", 
-					"-host", (String) config.get("host"), "-port", config.get("port").toString(), 
-					"-hub", (String) config.get("hub")};
+			nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get("host"),
+					"-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
 		}
 		return nodeArgs;
 	}
@@ -305,8 +304,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		if (hubArgs == null) {
 			String configPath = getHubConfigPath();
 			GridHubConfiguration config = getHubConfig();
-			hubArgs = new String[] {"-role", "hub", "-hubConfig", "\"" + configPath + "\"", 
-					"-host", config.getHost(), "-port", Integer.toString(config.getPort())};
+			hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, "-host", config.getHost(),
+					"-port", Integer.toString(config.getPort())};
 		}
 		return hubArgs;
 	}
