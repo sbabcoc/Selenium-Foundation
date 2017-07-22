@@ -84,11 +84,13 @@ public class GridUtility {
 					HttpHostWait hubWait = getWait(getHubHost(hubConfig), testResult);
 					hubWait.until(hostIsActive(HUB_PATH));
 					testResult.getTestContext().setAttribute(GRID_HUB, gridHub);
+					Thread.sleep(1500);
 					// launch local Selenium Grid node
 					Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
 					HttpHostWait nodeWait = getWait(getNodeHost(config.getNodeConfig()), testResult);
 					nodeWait.until(hostIsActive(NODE_PATH));
 					testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
+					Thread.sleep(1500);
 					isActive = true;
 				} catch (Exception e) {
 					e.printStackTrace();
