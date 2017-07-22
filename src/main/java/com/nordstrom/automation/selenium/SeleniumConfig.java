@@ -304,8 +304,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		if (hubArgs == null) {
 			String configPath = getHubConfigPath();
 			GridHubConfiguration config = getHubConfig();
-			hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, "-host", config.getHost(),
-					"-port", Integer.toString(config.getPort())};
+			hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath,
+					"-host", config.getHost(), "-port", Integer.toString(config.getPort())};
 		}
 		return hubArgs;
 	}
