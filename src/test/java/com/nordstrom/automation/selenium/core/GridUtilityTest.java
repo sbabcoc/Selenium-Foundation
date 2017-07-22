@@ -82,7 +82,7 @@ public class GridUtilityTest implements ListenerChainable {
 	
 	@Test
 	@NoDriver
-	public void testIsActive() throws MalformedURLException, UnknownHostException {
+	public void testIsActive() throws UnknownHostException, MalformedURLException {
 		SeleniumConfig config = SeleniumConfig.getConfig();
 		GridHubConfiguration hubConfig = config.getHubConfig();
 		assertFalse(GridUtility.isHubActive(hubConfig), "Configured local hub should initially be inactive");
