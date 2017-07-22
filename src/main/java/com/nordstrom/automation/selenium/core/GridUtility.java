@@ -7,12 +7,15 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Map;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -20,7 +23,11 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.support.HttpHostWait;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
@@ -29,6 +36,8 @@ public class GridUtility {
 	
 	private static final String GRID_HUB = "GridHub";
 	private static final String GRID_NODE = "GridNode";
+	private static final String HUB_PATH = "/grid/api/hub/";
+	private static final String NODE_PATH = "/wd/hub/status/";
 	
 	private GridUtility() {
 		throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
@@ -72,12 +81,14 @@ public class GridUtility {
 				try {
 					// launch local Selenium Grid hub
 					Process gridHub = GridProcess.start(testResult, config.getHubArgs());
+					HttpHostWait hubWait = getWait(getHubHost(hubConfig), testResult);
+					hubWait.until(hostIsActive(HUB_PATH));
 					testResult.getTestContext().setAttribute(GRID_HUB, gridHub);
 					// launch local Selenium Grid node
 					Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
+					HttpHostWait nodeWait = getWait(getNodeHost(config.getNodeConfig()), testResult);
+					nodeWait.until(hostIsActive(NODE_PATH));
 					testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
-					// FIXME - Find method to confirm that Grid is ready
-					Thread.sleep(5000);
 					isActive = true;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -89,16 +100,59 @@ public class GridUtility {
 	}
 
 	/**
-	 * Determine if the configured Selenium Grid hub is active.<br>
+	 * Determine if the configured Selenium Grid hub is active.
 	 * 
 	 * @param hubConfig hub configuration object
 	 * @return 'true' if configured hub is active; otherwise 'false'
 	 * @throws MalformedURLException The configured hub settings produce a malformed URL.
 	 */
 	static boolean isHubActive(GridHubConfiguration hubConfig) throws MalformedURLException {
-		HttpHost host = new HttpHost(hubConfig.getHost(), hubConfig.getPort());
+		return isHostActive(getHubHost(hubConfig), HUB_PATH);
+	}
+	
+	/**
+	 * Get an {@link HttpHost} object for the configured Selenium Grid hub.
+	 * 
+	 * @param hubConfig hub configuration object
+	 * @return HttpHost object for configured hub
+	 */
+	static HttpHost getHubHost(GridHubConfiguration hubConfig) {
+		return new HttpHost(hubConfig.getHost(), hubConfig.getPort());
+	}
+
+	/**
+	 * Determine if the configured Selenium Grid node is active.
+	 * 
+	 * @param nodeConfig node configuration object
+	 * @return 'true' if configured node is active; otherwise 'false'
+	 * @throws MalformedURLException The configured node settings produce a malformed URL.
+	 */
+	static boolean isNodeActive(RegistrationRequest nodeConfig) throws MalformedURLException {
+		return isHostActive(getNodeHost(nodeConfig), NODE_PATH);
+	}
+	
+	/**
+	 * Get an {@link HttpHost} object for the configured Selenium Grid node.
+	 * 
+	 * @param nodeConfig node configuration object
+	 * @return HttpHost object for configured node
+	 */
+	static HttpHost getNodeHost(RegistrationRequest nodeConfig) {
+		Map<String, Object> config = nodeConfig.getConfiguration();
+		return new HttpHost((String) config.get("host"), (Integer) config.get("port"));
+	}
+	
+	/**
+	 * Determine if the specified Selenium Grid host (hub or node) is active.
+	 * 
+	 * @param host HTTP host connection to be checked
+	 * @param path path on the specified host to verify
+	 * @return 'true' if specified host is active; otherwise 'false'
+	 * @throws MalformedURLException The specified host settings produce a malformed URL.
+	 */
+	private static boolean isHostActive(HttpHost host, String path) throws MalformedURLException {
 		HttpClient client = HttpClientBuilder.create().build();
-		URL sessionURL = new URL("http://" + hubConfig.getHost() + ":" + hubConfig.getPort() + "/grid/api/hub/");
+		URL sessionURL = new URL(host.toURI() + path);
 		BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
 				new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
 		try {
@@ -107,6 +161,31 @@ public class GridUtility {
 		} catch (IOException e) {
 		}
 		return false;
+	}
+	
+	/**
+	 * Returns a 'wait' proxy that determines if the context host is active.
+	 * 
+	 * @param path path on the context host to verify
+	 * @return 'true' if specified host is active; otherwise 'false'
+	 */
+	public static Function<HttpHost, Boolean> hostIsActive(final String path) {
+		return new Function<HttpHost, Boolean>() {
+
+			@Override
+			public Boolean apply(HttpHost host) {
+				try {
+					return Boolean.valueOf(isHostActive(host, path));
+				} catch (MalformedURLException e) {
+					throw UncheckedThrow.throwUnchecked(e);
+				}
+			}
+			
+			@Override
+			public String toString() {
+				return "Selenium Grid host to be active";
+			}
+		};
 	}
 	
 	/**
@@ -197,5 +276,28 @@ public class GridUtility {
 		} catch (SocketException e) {
 			return false;
 		}
+	}
+	
+	/**
+	 * Get a {@link HttpHostWait} object for the specified host.
+	 * 
+	 * @param host wait object context (HTTP host connection)
+	 * @param testResult configuration context (TestNG test result object)
+	 * @return HttpHostWait object for the specified host
+	 */
+	public static HttpHostWait getWait(HttpHost host, ITestResult testResult) {
+		SeleniumConfig config = SeleniumConfig.getConfig(testResult);
+		return getWait(host, WaitType.HOST.getInterval(config));
+	}
+	
+	/**
+	 * Get a {@link HttpHostWait} object for the specified host.
+	 * 
+	 * @param host wait object context (HTTP host connection)
+	 * @param timeOutInSeconds timeout in seconds when an expectation is called
+	 * @return HttpHostWait object for the specified host
+	 */
+	public static HttpHostWait getWait(HttpHost host, long timeOutInSeconds) {
+		return new HttpHostWait(host, timeOutInSeconds);
 	}
 }
