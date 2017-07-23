@@ -26,9 +26,10 @@ import com.nordstrom.common.base.UncheckedThrow;
 @Listeners({ListenerChain.class})
 public class GridUtilityTest implements ListenerChainable {
 	
-	private static final String NODE_SHUTDOWN = "/selenium-server/driver/?cmd=shutDownSeleniumServer";
+	private static final int POLL_COUNT = 30;
+	private static final long POLL_DELAY = 500;
 	private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
-	private static final int SHUTDOWN_DELAY = 30;
+	private static final String NODE_SHUTDOWN = "/selenium-server/driver/?cmd=shutDownSeleniumServer";
 	
 	@BeforeClass
 	public void killLocalGrid() throws UnknownHostException, MalformedURLException, InterruptedException {
@@ -50,12 +51,11 @@ public class GridUtilityTest implements ListenerChainable {
 			try {
 				GridUtility.getHttpResponse(nodeHost, NODE_SHUTDOWN);
 				
-				int delay = SHUTDOWN_DELAY;
+				int count = POLL_COUNT;
 				do {
-					boolean isActive = GridUtility.isNodeActive(nodeConfig);
-					if (!isActive) break;
-					if (delay-- == 0) throw new IOException("Node still active after 15 seconds");
-					Thread.sleep(500);
+					if (!GridUtility.isNodeActive(nodeConfig)) break;
+					if (count-- == 0) throw new IOException("Node still active after 15 seconds");
+					Thread.sleep(POLL_DELAY);
 				} while (true);
 			} catch (IOException e) {
 				throw UncheckedThrow.throwUnchecked(e);
@@ -66,12 +66,11 @@ public class GridUtilityTest implements ListenerChainable {
 			try {
 				GridUtility.getHttpResponse(hubHost, HUB_SHUTDOWN);
 				
-				int delay = SHUTDOWN_DELAY;
+				int count = POLL_COUNT;
 				do {
-					boolean isActive = GridUtility.isHubActive(hubConfig);
-					if (!isActive) break;
-					if (delay-- == 0) throw new IOException("Hub still active after 15 seconds");
-					Thread.sleep(500);
+					if (!GridUtility.isHubActive(hubConfig)) break;
+					if (count-- == 0) throw new IOException("Hub still active after 15 seconds");
+					Thread.sleep(POLL_DELAY);
 				} while (true);
 			} catch (IOException e) {
 				throw UncheckedThrow.throwUnchecked(e);
