@@ -16,7 +16,6 @@ import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
-import com.nordstrom.automation.selenium.annotations.GetDriver;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
@@ -84,7 +83,11 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 */
 	public static void setDriver(WebDriver driver, ITestResult testResult) {
 		validateTestResult(testResult);
-		testResult.setAttribute(DRIVER, driver);
+		if (driver != null) {
+			testResult.setAttribute(DRIVER, driver);
+		} else {
+			testResult.removeAttribute(DRIVER);
+		}
 	}
 	
 	/**
@@ -148,25 +151,48 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 		ITestNGMethod testMethod = invokedMethod.getTestMethod();
 		Method method = testMethod.getConstructorOrMethod().getMethod();
 		
-		// if invoked method is @Test or @BeforeMethod
-		if (testMethod.isTest() || testMethod.isBeforeMethodConfiguration()) {
+		// get driver supplied by preceding phase
+		WebDriver driver = getDriver(testResult);
+		// get @InitialPage from invoked method
+		InitialPage initialPage = method.getAnnotation(InitialPage.class);
+		
+		// if invoked method is @Test
+		if (testMethod.isTest()) {
 			// get driver if @NoDriver is absent
 			getDriver = (null == method.getAnnotation(NoDriver.class));
-		// otherwise, if invoked method is @Before... (other than @BeforeMethod)
-		} else if (testMethod.isBeforeClassConfiguration() || testMethod.isBeforeGroupsConfiguration()
-				|| testMethod.isBeforeSuiteConfiguration() || testMethod.isBeforeTestConfiguration()) {
-			// get driver if @GetDriver is present
-			getDriver = (null != method.getAnnotation(GetDriver.class));
-			// if getting a driver, close it after invocation
-			if (getDriver) testResult.setAttribute(CLOSE_DRIVER, "");
+			
+			// if getting a driver
+			if (getDriver) {
+				// if method lacks @InitialPage and none specified by @BeforeMethod
+				if ((initialPage == null) && (getInitialPage(testResult) == null)) {
+					// get @InitialPage from class that declares invoked method
+					initialPage = method.getDeclaringClass().getAnnotation(InitialPage.class);
+				}
+			// otherwise, if driver supplied by @BeforeMethod
+			} else if (driver != null) {
+				// close active driver
+				closeDriver(testResult);
+				// dump reference
+				driver = null;
+			}
+		// otherwise, if invoked method is @Before...
+		} else if (testMethod.isBeforeMethodConfiguration() || testMethod.isBeforeClassConfiguration()
+				|| testMethod.isBeforeGroupsConfiguration() || testMethod.isBeforeTestConfiguration()
+				|| testMethod.isBeforeSuiteConfiguration()) {
+			// determine if driver is needed
+			getDriver = (initialPage != null);
+			// if getting a driver and invoked method isn't @BeforeMethod, close it after invocation
+			if (getDriver && (!testMethod.isBeforeMethodConfiguration())) testResult.setAttribute(CLOSE_DRIVER, "");
 		}
 		
+		// if getting a driver
 		if (getDriver) {
-			WebDriver driver = getDriver(testResult);
 			SeleniumConfig config = SeleniumConfig.getConfig(testResult);
 			
+			// if driver not yet acquired
 			if (driver == null) {
 				Object instance = testMethod.getInstance();
+				// if test class supplied its own drivers
 				if (instance instanceof DriverProvider) {
 					driver = ((DriverProvider) instance).provideDriver(invokedMethod, testResult);
 				} else {
@@ -175,15 +201,11 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 				setDriverTimeouts(driver, config);
 				setDriver(driver, testResult);
 			}
-			if (driver != null) {
-				InitialPage initialPage = method.getAnnotation(InitialPage.class);
-				if ((initialPage == null) && (getInitialPage(testResult) == null)) {
-					initialPage = method.getDeclaringClass().getAnnotation(InitialPage.class);
-				}
-				if (initialPage != null) {
-					Page page = Page.openInitialPage(initialPage, driver, config.getTargetUri());
-					setInitialPage(page, testResult);
-				}
+			
+			// if driver acquired and initial page specified
+			if ((driver != null) && (initialPage != null)) {
+				Page page = Page.openInitialPage(initialPage, driver, config.getTargetUri());
+				setInitialPage(page, testResult);
 			}
 		}
 	}
@@ -291,6 +313,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 			}
 			
 			driver.quit();
+			setDriver(null, testResult);
 		}
 	}
 	
