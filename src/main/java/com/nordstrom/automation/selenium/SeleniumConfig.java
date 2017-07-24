@@ -66,7 +66,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),
 		IMPLIED_TIMEOUT("selenium.timeout.implied", "15"),
 		SCRIPT_TIMEOUT("selenium.timeout.script", "30"),
-		WAIT_TIMEOUT("selenium.timeout.wait", "15");
+		WAIT_TIMEOUT("selenium.timeout.wait", "15"),
+		HOST_TIMEOUT("selenium.timeout.host", "30");
 		
 		private String propertyName;
 		private String defaultValue;
@@ -91,7 +92,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		PAGE_LOAD(SeleniumSettings.PAGE_LOAD_TIMEOUT),
 		IMPLIED(SeleniumSettings.IMPLIED_TIMEOUT),
 		SCRIPT(SeleniumSettings.SCRIPT_TIMEOUT),
-		WAIT(SeleniumSettings.WAIT_TIMEOUT);
+		WAIT(SeleniumSettings.WAIT_TIMEOUT),
+		HOST(SeleniumSettings.HOST_TIMEOUT);
 		
 		private SeleniumSettings timeoutSetting;
 		private Long timeoutInterval;
