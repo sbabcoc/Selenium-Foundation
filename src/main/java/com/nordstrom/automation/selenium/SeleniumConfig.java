@@ -50,23 +50,41 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	private static final String JSON_TAIL = "], \"configuration\": {} }";
 	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
+		/** name: <b>selenium.target.scheme</b> <br> default: <b>http</b> */
 		TARGET_SCHEME("selenium.target.scheme", "http"),
+		/** name: <b>selenium.target.creds</b> <br> default: {@code null} */
 		TARGET_CREDS("selenium.target.creds", null),
+		/** name: <b>selenium.target.host</b> <br> default: <b>localhost</b> */
 		TARGET_HOST("selenium.target.host", "localhost"),
+		/** name: <b>selenium.target.port</b> <br> default: {@code null} */
 		TARGET_PORT("selenium.target.port", null),
+		/** name: <b>selenium.target.path</b> <br> default: <b>/</b> */
 		TARGET_PATH("selenium.target.path", "/"),
+		/** name: <b>selenium.hub.config</b> <br> default: <b>hubConfig.json</b> */
 		HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
+		/** name: <b>selenium.hub.host</b> <br> default: {@code null} */
 		HUB_HOST("selenium.hub.host", null),
+		/** name: <b>selenium.hub.port</b> <br> default: {@code null} */
 		HUB_PORT("selenuim.hub.port", null),
+		/** name: <b>selenium.node.config</b> <br> default: <b>nodeConfig.json</b> */
 		NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
+		/** name: <b>selenium.node.host</b> <br> default: {@code null} */
 		NODE_HOST("selenium.node.host", null),
+		/** name: <b>selenium.node.port</b> <br> default: {@code null} */
 		NODE_PORT("selenium.node.port", null),
+		/** name: <b>selenium.browser.name</b> <br> default: {@code null} */
 		BROWSER_NAME("selenium.browser.name", null),
+		/** name: <b>selenium.browser.caps</b> <br> default: <b>{@link #DEFAULT_CAPS}</b> */
 		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
+		/** name: <b>selenium.timeout.pageload</b> <br> default: <b>30</b> */
 		PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),
+		/** name: <b>selenium.timeout.implied</b> <br> default: <b>15</b> */
 		IMPLIED_TIMEOUT("selenium.timeout.implied", "15"),
+		/** name: <b>selenium.timeout.script</b> <br> default: <b>30</b> */
 		SCRIPT_TIMEOUT("selenium.timeout.script", "30"),
+		/** name: <b>selenium.timeout.wait</b> <br> default: <b>15</b> */
 		WAIT_TIMEOUT("selenium.timeout.wait", "15"),
+		/** name: <b>selenium.timeout.host</b> <br> default: <b>30</b> */
 		HOST_TIMEOUT("selenium.timeout.host", "30");
 		
 		private String propertyName;
@@ -183,7 +201,12 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 	}
 	
 	/**
-	 * Get the target URI as specified by its component parts
+	 * Get the configured target URI as specified by its component parts.
+	 * <p>
+	 * <b>NOTE</b>: The target URI is assembled from following components: 
+	 *     {@link SeleniumSettings#TARGET_SCHEME scheme}, {@link SeleniumSettings#TARGET_CREDS credentials},
+	 *     {@link SeleniumSettings#TARGET_HOST host}, {@link SeleniumSettings#TARGET_PORT port}, and
+	 *     {@link SeleniumSettings#TARGET_PATH base path}
 	 * 
 	 * @return assembled target URI
 	 */

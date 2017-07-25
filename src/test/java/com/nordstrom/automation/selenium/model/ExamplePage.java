@@ -11,7 +11,7 @@ import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 
-@PageUrl(scheme="file", host="", port="", value="./ExamplePage.html")
+@PageUrl(scheme="file", value="ExamplePage.html")
 public class ExamplePage extends Page {
 
 	public ExamplePage(WebDriver driver) {

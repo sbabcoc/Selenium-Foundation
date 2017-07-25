@@ -1,12 +1,15 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.ClassLoader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
@@ -14,6 +17,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -528,6 +532,22 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	
 	/**
 	 * Get the URL defined by the specified {@link PageUrl} annotation.
+	 * <p>
+	 * <b>NOTES</b>: <ul>
+	 *     <li>If the {@code pageUrl} argument is {@code null} or the {@code value} element of the specified
+	 *         {@link PageUrl} annotation is unspecified, this method returns {@code null}.
+	 *     <li>If {@code scheme} of the specified {@code pageUrl} argument is unspecified or set to {@code http/https},
+	 *         the specified {@code targetUri} is overlaid by the elements of the {@link PageUrl} annotation to
+	 *         produce the fully-qualified <b>HTTP</b> target page URL.</li>
+	 *     <li>For <b>HTTP</b> URLs that require query parameters, these parameters must be included in the
+	 *         {@code value} element of the specified {@link PageUrl} annotation. The {@code params} element of the
+	 *         annotation is only used for pattern-based landing page verification.</li>
+	 *     <li>If {@code scheme} of the specified {@code pageUrl} is set to {@code file}, the value of the
+	 *         {@code targetUri} argument is ignored. The only element of the {@link PageUrl} annotation that
+	 *         is used to produce the fully-qualified <b>FILE</b> target page URL is {@code value}. The value of the
+	 *         {@code value} element specifies the relative path of a file within your project's resources, which is
+	 *         resolved via {@link ClassLoader#getResource}.</li>
+	 * </ul>
 	 * 
 	 * @param pageUrl page URL annotation
 	 * @param targetUri target URI
@@ -543,11 +563,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		String path = pageUrl.value();
 		
 		if ("file".equals(scheme)) {
-			if (path.startsWith("./")) {
-				return Thread.currentThread().getContextClassLoader().getResource(path.substring(2)).toString();
-			}
-			
-			builder = UriBuilder.fromPath(path).scheme(scheme);
+			return Thread.currentThread().getContextClassLoader().getResource(path).toString();
 		} else {
 			String userInfo = pageUrl.userInfo();
 			String host = pageUrl.host();
@@ -574,22 +590,28 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			if (!PLACEHOLDER.equals(port)) {
 				builder.port(port.isEmpty() ? -1 : Integer.parseInt(port));
 			}
-			
-			for (String param : pageUrl.params()) {
-				String[] bits = param.split("=");
-				if (bits.length == 2) {
-					builder.queryParam(bits[0], bits[1]);
-				} else {
-					throw new IllegalArgumentException("Unsupported format for declared parameter: " + param);
-				}
-			}
 		}
 		
 		return builder.build().toString();
 	}
 	
 	/**
-	 * Verify actual landing page against parameters in the {@link PageUrl} annotation of the specified page object.
+	 * Verify actual landing page against elements of the {@link PageUrl} annotation of the specified page object.
+	 * <p>
+	 * <b>NOTES</b>: <ul>
+	 *     <li>The values and patterns used to verify the actual landing page URL are provided by the {@link PageUrl}
+	 *         annotation of the specified page object combined with the configured {@link SeleniumConfig#getTargetUri
+	 *         target URI}.</li>
+	 *     <li>Expected path can be specified by either explicit value or pattern. If the {@code pattern} element of
+	 *         the {@link PageUrl} annotation is specified, its value provides a template to verify the actual path.
+	 *         Otherwise, the actual path must match the path component of the specified {@code value} element of the
+	 *         {@link PageUrl} annotation.</li>
+	 *     <li>Expected parameters can be specified by either explicit query or a collection of name/pattern pairs.
+	 *         If the {@code params} element of the {@link PageUrl} annotation is specified, its value provides the
+	 *         collection of name/pattern pairs used to verify the actual parameters. Otherwise, the actual query
+	 *         parameters must include all of the name/value pairs in the query component of the specified {@link
+	 *         value} element of the {@link PageUrl} annotation.</li>
+	 * </ul>
 	 * 
 	 * @param pageObj page object whose landing page is to be verified
 	 */
@@ -653,12 +675,41 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 					throw new LandingPageMismatchException(pageClass, "path", actual, expect);
 				}
 			}
-				
-			List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
-			for (NameValuePair expectPair : URLEncodedUtils.parse(expectUri, "UTF-8")) {
-				if ( ! actualParams.contains(expectPair)) {
-					throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
+			
+			List<NameValuePair> expectParams;
+			String[] params = pageUrl.params();
+			if (params.length > 0) {
+				expectParams = new ArrayList<>();
+				for (String param : params) {
+					String[] nameValueBits = param.split("=");
+					if (nameValueBits.length == 2) {
+						String name = nameValueBits[0].trim();
+						String value = nameValueBits[1].trim();
+						expectParams.add(new BasicNameValuePair(name, value));
+					} else {
+						throw new IllegalArgumentException("Format of PageUrl parameter '" + param
+								+ "' does not conform to template [name]=[pattern]");
+					}
 				}
+			} else {
+				expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
+			}
+			
+			List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
+			
+			expectLoop:
+			for (NameValuePair expectPair : expectParams) {
+				Iterator<NameValuePair> iterator = actualParams.iterator();
+				while (iterator.hasNext()) {
+					NameValuePair actualPair = iterator.next();
+					if (actualPair.getName().equals(expectPair.getName())) {
+						if (actualPair.getValue().matches(expectPair.getValue())) {
+							iterator.remove();
+							continue expectLoop;
+						}
+					}
+				}
+				throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
 			}
 		}
 		
