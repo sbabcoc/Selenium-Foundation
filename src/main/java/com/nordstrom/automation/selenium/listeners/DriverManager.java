@@ -120,6 +120,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 			pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
 		}
 		testResult.setAttribute(INITIAL_PAGE, pageObj.enhanceContainer(pageObj));
+		setDriver(pageObj.getDriver(), testResult);
 	}
 	
 	/**

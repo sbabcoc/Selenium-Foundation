@@ -2,24 +2,22 @@ package com.nordstrom.automation.selenium.model;
 
 import static org.testng.Assert.assertEquals;
 
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
-import org.openqa.selenium.WebDriver;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.ListenerChain;
 import com.nordstrom.automation.testng.ListenerChainable;
 
+@InitialPage(ExamplePage.class)
 @Listeners({ListenerChain.class})
 public class ModelTest implements ListenerChainable {
 	
-	private static final String DOC_NAME = "ExamplePage.html";
 	private static final String TITLE = "Example Page";
 	private static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
 	private static final String[] HEADINGS = {"Firstname", "Lastname", "Age"};
@@ -31,13 +29,6 @@ public class ModelTest implements ListenerChainable {
 	private static final String FRAME_C = "Frame C";
 	private static final String FRAME_C_ID = "frame-c";
 	private static final String TABLE_ID = "t1";
-	
-	@BeforeMethod
-	public void getPageDoc() throws URISyntaxException {
-		WebDriver driver = DriverManager.getDriver();
-		driver.get(getClass().getClassLoader().getResource(DOC_NAME).toString());
-		DriverManager.setInitialPage(new ExamplePage(driver));
-	}
 	
 	@Test
 	public void testBasicPage() {

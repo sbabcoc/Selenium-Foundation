@@ -9,6 +9,9 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.annotations.PageUrl;
+
+@PageUrl(scheme="file", host="", port="", value="./ExamplePage.html")
 public class ExamplePage extends Page {
 
 	public ExamplePage(WebDriver driver) {

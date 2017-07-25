@@ -59,6 +59,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	private List<String> methods;
 	
 	public static final By SELF = By.xpath(".");
+	private static final String PLACEHOLDER = "{}";
 	private static final Class<?>[] BYPASS = {Object.class, WrapsContext.class};
 	private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
 			"getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
@@ -534,27 +535,53 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 */
 	public static String getPageUrl(PageUrl pageUrl, URI targetUri) {
 		if (pageUrl == null) return null;
+		if (PLACEHOLDER.equals(pageUrl.value())) return null;
+		
+		UriBuilder builder = null;
 		
 		String scheme = pageUrl.scheme();
-		String userInfo = pageUrl.userInfo();
-		String host = pageUrl.host();
-		String port = pageUrl.port();
 		String path = pageUrl.value();
-		String[] params = pageUrl.params();
 		
-		UriBuilder builder = UriBuilder.fromUri(targetUri);
-		
-		if (scheme.length() > 0) builder.scheme(scheme);
-		if (userInfo.length() > 0) builder.userInfo(userInfo);
-		if (host.length() > 0) builder.host(host);
-		if (port.length() > 0) builder.port(Integer.parseInt(port));
-		if (path.length() > 0) builder.path(path);
-		for (String param : params) {
-			String[] bits = param.split("=");
-			if (bits.length == 2) {
-				builder.queryParam(bits[0], bits[1]);
-			} else {
-				throw new IllegalArgumentException("Unsupported format for declared parameter: " + param);
+		if ("file".equals(scheme)) {
+			if (path.startsWith("./")) {
+				return Thread.currentThread().getContextClassLoader().getResource(path.substring(2)).toString();
+			}
+			
+			builder = UriBuilder.fromPath(path).scheme(scheme);
+		} else {
+			String userInfo = pageUrl.userInfo();
+			String host = pageUrl.host();
+			String port = pageUrl.port();
+			
+			builder = UriBuilder.fromUri(targetUri);
+			
+			if (!PLACEHOLDER.equals(scheme)) {
+				builder.scheme(scheme.isEmpty() ? null : scheme);
+			}
+			
+			if (!path.isEmpty()) {
+				builder.path(path);
+			}
+			
+			if (!PLACEHOLDER.equals(userInfo)) {
+				builder.userInfo(userInfo.isEmpty() ? null : userInfo);
+			}
+			
+			if (!PLACEHOLDER.equals(host)) {
+				builder.host(host.isEmpty() ? null : host);
+			}
+			
+			if (!PLACEHOLDER.equals(port)) {
+				builder.port(port.isEmpty() ? -1 : Integer.parseInt(port));
+			}
+			
+			for (String param : pageUrl.params()) {
+				String[] bits = param.split("=");
+				if (bits.length == 2) {
+					builder.queryParam(bits[0], bits[1]);
+				} else {
+					throw new IllegalArgumentException("Unsupported format for declared parameter: " + param);
+				}
 			}
 		}
 		
@@ -625,12 +652,12 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				if ( ! StringUtils.equals(actual, expect)) {
 					throw new LandingPageMismatchException(pageClass, "path", actual, expect);
 				}
+			}
 				
-				List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
-				for (NameValuePair expectPair : URLEncodedUtils.parse(expectUri, "UTF-8")) {
-					if ( ! actualParams.contains(expectPair)) {
-						throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
-					}
+			List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
+			for (NameValuePair expectPair : URLEncodedUtils.parse(expectUri, "UTF-8")) {
+				if ( ! actualParams.contains(expectPair)) {
+					throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
 				}
 			}
 		}

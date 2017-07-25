@@ -15,13 +15,12 @@ import com.nordstrom.automation.testng.ListenerChainable;
 public class NoDriverManagerTest implements ListenerChainable {
 
 	@BeforeMethod(groups = {"NoDriverBefore"})
-	@NoDriver
 	public void beforeMethodNoDriver() {
 		Assert.assertNull(DriverManager.getDriver(), "Driver should not have been created");
 	}
 	
-	@Test(groups = {"NoBeforeNoDriver"})
 	@NoDriver
+	@Test(groups = {"NoBeforeNoDriver"})
 	public void testNoBeforeNoDriver() {
 		Assert.assertNull(DriverManager.getDriver(), "Driver should not have been created");
 	}
