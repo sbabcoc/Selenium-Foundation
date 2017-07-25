@@ -609,7 +609,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 *     <li>Expected parameters can be specified by either explicit query or a collection of name/pattern pairs.
 	 *         If the {@code params} element of the {@link PageUrl} annotation is specified, its value provides the
 	 *         collection of name/pattern pairs used to verify the actual parameters. Otherwise, the actual query
-	 *         parameters must include all of the name/value pairs in the query component of the specified {@link
+	 *         parameters must include all of the name/value pairs in the query component of the specified {@code
 	 *         value} element of the {@link PageUrl} annotation.</li>
 	 * </ul>
 	 * 
