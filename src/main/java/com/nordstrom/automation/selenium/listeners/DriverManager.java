@@ -193,7 +193,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 			// if driver not yet acquired
 			if (driver == null) {
 				Object instance = testMethod.getInstance();
-				// if test class supplied its own drivers
+				// if test class provides its own drivers
 				if (instance instanceof DriverProvider) {
 					driver = ((DriverProvider) instance).provideDriver(invokedMethod, testResult);
 				} else {
