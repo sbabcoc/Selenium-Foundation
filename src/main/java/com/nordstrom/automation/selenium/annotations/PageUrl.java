@@ -1,8 +1,8 @@
 package com.nordstrom.automation.selenium.annotations;
 
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -54,9 +54,9 @@ import com.nordstrom.automation.selenium.model.ComponentContainer;
  * </ul>
  */
 @Retention(RUNTIME)
-@Target({ElementType.TYPE})
+@Target({TYPE})
 public @interface PageUrl {
-	/** @return URL scheme (<b>http</b> or <b>https</b>) */
+	/** @return URL scheme (<b>http</b>, <b>https</b>, or <b>file</b>) */
 	String scheme() default "{}";
 	
 	/** @return URL user info as <b>user:password</b> */
