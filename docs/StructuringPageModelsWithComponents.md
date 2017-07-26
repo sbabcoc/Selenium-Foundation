@@ -8,7 +8,7 @@ If your target application uses frames to structure its content, you will be ama
 
 ###### ExamplePage.java
 ```java
-package com.nordstrom.automation.selenium.model;
+package com.nordstrom.example;
 
 import java.util.Arrays;
 import java.util.List;
@@ -109,15 +109,138 @@ Here are some examples of XPath expressions that select elements _outside_ the b
 * `following-sibling::*` selects all siblings after the context node
 * `previous::chapter` selects all **chapter** elements that appear before the context node in the document, except ancestors
 
-Avoid expressions that start with either `/` or `//`, as these always traverse the entire document. There are legitimate applications for the other tokens 
+Avoid expressions that start with either `/` or `//`, as these always traverse the entire document. There are legitimate applications for the other tokens, but you must exercise great care to avoid traversing outside the bounds of the page component search context.
 
 # Driver Focus with Frame-Based Components
 
+In traditional **Selenium WebDriver** automation, the task of working with frames is often difficult and confusing. You're forced to include ubiquitous boilerplate code to switch driver focus between the frames you need to interact with and the main page that contains them.
+
+With **Selenium Foundation**, the task of managing driver focus is handled for you automatically. The boilerplate code is entirely eliminated, allowing you to focus on modeling the behaviors of your application instead of the plumbing that connects your code to the browser.
+
+The following example demonstrates automatic driver targeting. Note that neither the test nor the frame-based component includes any code to switch the driver context to the frame.
+
+###### Automatic driver targeting
+```java
+package com.nordstrom.example;
+ 
+import static org.testng.Assert.assertEquals;
+
+import com.nordstrom.automation.selenium.listeners.DriverManager;
+import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.automation.testng.ListenerChainable;
+ 
+public class ExampleTest implements ListenerChainable {
+
+	private static final String FRAME_A = "Frame A";
+    
+	@Test
+	public void testFrameByElement() {
+		ExamplePage page = getPage();
+		FrameComponent component = page.getFrameByElement();
+		assertEquals(component.getPageContent(), FRAME_A);
+	}
+
+    ...
+  
+    @Override
+    public void attachListeners(ListenerChain listenerChain) {
+        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
+    }
+}
+```
+
+###### ExamplePage.java
+```java
+package com.nordstrom.example;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+
+public class ExamplePage extends Page {
+
+	public ExamplePage(WebDriver driver) {
+		super(driver);
+	}
+	
+	private FrameComponent frameByElement;
+
+	protected enum Using implements ByEnum {
+		FRAME_A(By.cssSelector("iframe#frame-a"));
+		
+		private By locator;
+		
+		Using(By locator) {
+			this.locator = locator;
+		}
+
+		@Override
+		public By locator() {
+			return locator;
+		}
+	}
+	
+	public FrameComponent getFrameByElement() {
+		if (frameByElement == null) {
+			frameByElement = new FrameComponent(Using.FRAME_A.locator, this);
+		}
+		return frameByElement;
+	}
+}
+```
+
+###### FrameComponent.java
+```java
+package com.nordstrom.example;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
+
+public class FrameComponent extends Frame {
+	
+	public FrameComponent(By locator, ComponentContainer parent) {
+		super(locator, parent);
+	}
+	
+	public FrameComponent(RobustWebElement element, ComponentContainer parent) {
+		super(element, parent);
+	}
+	
+	private enum Using implements ByEnum {
+		HEADING(By.cssSelector("h1"));
+		
+		private By locator;
+		
+		Using(By locator) {
+			this.locator = locator;
+		}
+
+		@Override
+		public By locator() {
+			return locator;
+		}
+	}
+	
+	public String getPageContent() {
+		return findElement(Using.HEADING).getText();
+	}
+
+	public static Object getKey(SearchContext context) {
+		return ((WebElement) context).getAttribute("id");
+	}
+}
+```
+
 # Component Nesting and Aggregation
+
+When modeling a web application, it's often useful to represent groups of associated elements as **page components**. It's quite common for a page component to be composed of one or more sub-components (e.g. - shipping address and delivery method in a shipping information section). You'll also encounter pages that contain multiple instances of particular component (e.g. - item tiles on a search results page).
+
+Each component retains a hierarchical association with the component that created it - the parent container. This hierarchy defines a sequence of nested search contexts, each represented by a page component, with the parent page as the outermost search context.
 
 ###### TableComponent.java
 ```java
-package com.nordstrom.automation.selenium.model;
+package com.nordstrom.example;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,7 +296,7 @@ public class TableComponent extends PageComponent {
 
 ###### TableRowComponent.java
 ```java
-package com.nordstrom.automation.selenium.model;
+package com.nordstrom.example;
 
 import java.util.Arrays;
 import java.util.List;
@@ -222,49 +345,6 @@ public class TableRowComponent extends PageComponent {
 ```
 
 # Component Collections (Lists and Maps)
-
-###### FrameComponent.java
-```java
-package com.nordstrom.automation.selenium.model;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
-
-public class FrameComponent extends Frame {
-	
-	public FrameComponent(By locator, ComponentContainer parent) {
-		super(locator, parent);
-	}
-	
-	public FrameComponent(RobustWebElement element, ComponentContainer parent) {
-		super(element, parent);
-	}
-	
-	private enum Using implements ByEnum {
-		HEADING(By.cssSelector("h1"));
-		
-		private By locator;
-		
-		Using(By locator) {
-			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
-		}
-	}
-	
-	public String getPageContent() {
-		return findElement(Using.HEADING).getText();
-	}
-
-	public static Object getKey(SearchContext context) {
-		return ((WebElement) context).getAttribute("id");
-	}
-}
-```
 
 ## Lazy initialization
 

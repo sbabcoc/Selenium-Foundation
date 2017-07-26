@@ -11,7 +11,6 @@ Many of the features provided by **Selenium Foundation** are driven by **TestNG*
 **Selenium Foundation** relies on **TestNG Foundation** for basic flow control. At the heart of it all is <span style="color: rgb(0, 0, 255);">ListenerChain. </span>To provide consistent behavior, we recommend that you activate <span style="color: rgb(0, 0, 255);">ListenerChain</span> via the **ServiceLoader** as described in the [**TestNG** documentation](http://testng.org/doc/documentation-main.html#listeners-service-loader):
 
 ###### org.testng.ITestNGListener
-
 ```
 com.nordstrom.automation.testng.ListenerChain
 ```
@@ -23,7 +22,6 @@ In a Maven project, the preceding file is stored in the <span style="color: rgb(
 Once this file is added to your project, <span style="color: rgb(0, 0, 255);">ListenerChain</span> will be loaded automatically whenever you run your tests. To request dynamic listener chaining, your test class implements the <span style="color: rgb(0, 0, 255);">ListenerChainable</span> interface:
 
 ###### Implementing ListenerChainable
-
 ```java
 package com.nordstrom.example;
  
@@ -83,7 +81,6 @@ Note that <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> pr
 If you've hooked up <span style="color: rgb(0, 0, 255);">DriverManager</span> as shown above, a driver will be instantiated for each test method automatically. To retrieve this instance, use one of the provided static methods:
 
 ###### Retrieving the WebDriver instance
-
 ```java
 package com.nordstrom.example;
  
@@ -123,7 +120,7 @@ public class ExampleTest implements ListenerChainable {
 }
 ```
 
-In the preceding example, <span style="color: rgb(0, 0, 255);">DriverManager</span> retrieves the driver attached to the _current_ test. Note that the driver acquired by `useDriverAfter()` was handed off from `testDriverAccess()`. For contexts in which the _current_ test is undetermined, the test context can be explicitly specified, as shown in the `doStuff()` method.
+In the preceding example, <span style="color: rgb(0, 0, 255);">DriverManager</span> retrieves the driver attached to the _current_ test. Note that the driver acquired by **`useDriverAfter()`** was handed off from **`testDriverAccess()`**. For contexts in which the _current_ test is undetermined, the test context can be explicitly specified, as shown in the **`doStuff()`** method.
 
 If your test requires a driver that is unavailable via **Selenium Grid**, or if your scenario requires browser setup that can't be established through the standard **Selenium WebDriver** API, **Selenium Foundation** provides two options:
 
@@ -131,7 +128,6 @@ If your test requires a driver that is unavailable via **Selenium Grid**, or if 
 2.  You can decline automatic driver instantiation for an individual test method by specifying the `@NoDriver` annotation. This is especially useful in `@BeforeMethod` methods, as it allows you to defer driver instantiation until the invocation of the test method itself.
 
 ###### Implementing the <span style="color: rgb(0, 0, 255);">DriverProvider</span> interface
-
 ```java
 package com.nordstrom.example;
  
@@ -162,7 +158,6 @@ public class ExampleTest implements ListenerChainable, DriverProvider {
 ```
 
 ###### Declining automatic driver instantiation with `@NoDriver`
-
 ```java
 package com.nordstrom.example;
  
@@ -192,7 +187,6 @@ public class ExampleTest implements ListenerChainable {
 If your scenario requires a driver in a `@Before...` configuration method, you can request one from <span style="color: rgb(0, 0, 255);">DriverManager</span> via the `@InitialPage` annotation:
 
 ###### Requesting automatic driver instantiation in `@BeforeMethod`
-
 ```java
 package com.nordstrom.example;
  
@@ -231,7 +225,7 @@ public class ExampleTest implements ListenerChainable {
 }
 ```
 
-In the preceding example, `initialPageFroManager()` acquires the initial page provided by 
+In the preceding example, the **`initialPageFroManager()`** method acquires the initial page provided by <span style="color: rgb(0, 0, 255);">DriverManager</span> and executes the **`performSetup()`** method, resulting in navigation to the next page. This state change is registered by calling **`setInitialPage()`**, and the **`initialPageFromBefore()`** method acquires this page when it starts. More on initial page in the next section.
 
 # Specifying Initial Page
 
@@ -280,8 +274,9 @@ public class ExampleTest implements ListenerChainable {
 }
 ```
 
+The preceding example demonstrates how to specify an initial page for all tests in a class, and how to override this specification on a per-test basis. The preceding section includes an example of specifying an initial page for a `@BeforeMethod` configuration method and recording a different initial page for tests that follow.
 
-# <span class="confluence-anchor-link conf-macro output-inline" id="SeleniumFoundationTestSupport-auto-driver-target" data-macro-name="anchor" data-hasbody="false"></span>Automatic Driver Targeting
+# Automatic Driver Targeting
 
 For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing.
 
