@@ -557,19 +557,18 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		if (pageUrl == null) return null;
 		if (PLACEHOLDER.equals(pageUrl.value())) return null;
 		
-		UriBuilder builder = null;
-		
+		String result = null;
 		String scheme = pageUrl.scheme();
 		String path = pageUrl.value();
 		
 		if ("file".equals(scheme)) {
-			return Thread.currentThread().getContextClassLoader().getResource(path).toString();
+			result = Thread.currentThread().getContextClassLoader().getResource(path).toString();
 		} else {
 			String userInfo = pageUrl.userInfo();
 			String host = pageUrl.host();
 			String port = pageUrl.port();
 			
-			builder = UriBuilder.fromUri(targetUri);
+			UriBuilder builder = UriBuilder.fromUri(targetUri);
 			
 			if (!PLACEHOLDER.equals(scheme)) {
 				builder.scheme(scheme.isEmpty() ? null : scheme);
@@ -590,9 +589,11 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			if (!PLACEHOLDER.equals(port)) {
 				builder.port(port.isEmpty() ? -1 : Integer.parseInt(port));
 			}
+			
+			result = builder.build().toString();
 		}
 		
-		return builder.build().toString();
+		return result;
 	}
 	
 	/**
