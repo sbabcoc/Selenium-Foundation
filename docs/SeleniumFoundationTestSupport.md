@@ -11,6 +11,7 @@ Many of the features provided by **Selenium Foundation** are driven by **TestNG*
 **Selenium Foundation** relies on **TestNG Foundation** for basic flow control. At the heart of it all is <span style="color: rgb(0, 0, 255);">ListenerChain. </span>To provide consistent behavior, we recommend that you activate <span style="color: rgb(0, 0, 255);">ListenerChain</span> via the **ServiceLoader** as described in the [**TestNG** documentation](http://testng.org/doc/documentation-main.html#listeners-service-loader):
 
 ###### org.testng.ITestNGListener
+
 ```
 com.nordstrom.automation.testng.ListenerChain
 ```
@@ -22,6 +23,7 @@ In a Maven project, the preceding file is stored in the <span style="color: rgb(
 Once this file is added to your project, <span style="color: rgb(0, 0, 255);">ListenerChain</span> will be loaded automatically whenever you run your tests. To request dynamic listener chaining, your test class implements the <span style="color: rgb(0, 0, 255);">ListenerChainable</span> interface:
 
 ###### Implementing ListenerChainable
+
 ```java
 package com.nordstrom.example;
  
@@ -41,18 +43,17 @@ public class ExampleTest implements ListenerChainable {
 }
 ```
 
-
 As shown above, we use the **`attachListeners()`** callback to attach <span style="color: rgb(0, 0, 255);">DriverManager</span> and <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span>. The order in which listener methods are invoked is determined by the order in which listener objects are added to the chain. Listener _before_ methods are invoked in <span style="color: rgb(153, 204, 0);">last-added-first-called</span> order. Listener _after_ methods are invoked in <span style="color: rgb(153, 204, 0);">first-added-first-called</span> order. Only one instance of any given listener class will be included in the chain.
 
 ## ExecutionFlowController
 
 To maintain its settings and state through all phases of each test, **Selenium Foundation** relies on the <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> listener. This **TestNG** listener propagates values stored as test attributes from one phase of test execution to the next. A bit of background about TestNG test attribute will be helpful in understanding the purpose of this listener.
 
-Each configuration method (i.e. - <span style="color: rgb(0, 0, 255);">`@BeforeMethod`</span> or <span style="color: rgb(0, 0, 255);">`@AfterMethod`</span>) and each test method executed by **TestNG** is given its own private data object to play with - the <span style="color: rgb(0, 0, 255);">ITestResult</span>object. Among its many responsibilities, the test result object maintains a collection of named values - the <span style="color: rgb(153, 204, 0);">attributes</span> collection. **Selenium Foundation** uses this **TestNG** feature to store test-specific values such as driver instance, initial page object, configuration object, and local Selenium Grid process objects.
+Each configuration method (i.e. - `@BeforeMethod` or `@AfterMethod`) and each test method executed by **TestNG** is given its own private data object to play with - the <span style="color: rgb(0, 0, 255);">ITestResult</span>object. Among its many responsibilities, the test result object maintains a collection of named values - the <span style="color: rgb(153, 204, 0);">attributes</span> collection. **Selenium Foundation** uses this **TestNG** feature to store test-specific values such as driver instance, initial page object, configuration object, and local Selenium Grid process objects.
 
-The <span style="color: rgb(153, 204, 0);">attributes</span> collections are only accessible from the test result object within which they're stored, and each phase of test execution only provides direct access to the "current" test result object - the one owned by the configuration method or test method that's currently being executed. Values stored in the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the <span style="color: rgb(0, 0, 255);">`@BeforeMethod`</span> method don't automatically get propagated to the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the <span style="color: rgb(0, 0, 255);">`@Test`</span> method. Values stored in the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the <span style="color: rgb(0, 0, 255);">`@Test`</span> method don't automatically get propagated to the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the <span style="color: rgb(0, 0, 255);">`@AfterMethod`</span> method.
+The <span style="color: rgb(153, 204, 0);">attributes</span> collections are only accessible from the test result object within which they're stored, and each phase of test execution only provides direct access to the "current" test result object - the one owned by the configuration method or test method that's currently being executed. Values stored in the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the `@BeforeMethod` method don't automatically get propagated to the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the `@Test` method. Values stored in the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the `@Test` method don't automatically get propagated to the <span style="color: rgb(153, 204, 0);">attributes</span> collection of the `@AfterMethod` method.
 
-For tests built on **Selenium Foundation**, we need all of the values stored during each phase of the test to be available to the subsequent phases. The task of propagating test attributes from one phase to the next is handled by <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span>. After a <span style="color: rgb(0, 0, 255);">`@BeforeMethod`</span> method or test method is invoked, <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> extracts the <span style="color: rgb(153, 204, 0);">attributes</span> collection from this method's result object into its own thread-local storage. Before a test method or <span style="color: rgb(0, 0, 255);">`@AfterMethod`</span> method is invoked, <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> injects the values it stored from the previous phase into the <span style="color: rgb(153, 204, 0);">attributes</span> collection of this method's result object.
+For tests built on **Selenium Foundation**, we need all of the values stored during each phase of the test to be available to the subsequent phases. The task of propagating test attributes from one phase to the next is handled by <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span>. After a `@BeforeMethod` method or test method is invoked, <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> extracts the <span style="color: rgb(153, 204, 0);">attributes</span> collection from this method's result object into its own thread-local storage. Before a test method or `@AfterMethod` method is invoked, <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> injects the values it stored from the previous phase into the <span style="color: rgb(153, 204, 0);">attributes</span> collection of this method's result object.
 
 Note that <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> propagates the entire <span style="color: rgb(153, 204, 0);">attributes</span> collection from phase to phase, not just the attributes created by **Selenium Foundation**. If your test code or page models create test attributes, these will be propagated as well. This provides a convenient, thread-safe way to persist values that are available through the entire test life cycle, which are only visible within the context of the test that created them.
 
@@ -60,30 +61,29 @@ Note that <span style="color: rgb(0, 0, 255);">ExecutionFlowController</span> pr
 
 **Selenium Foundation** includes a **TestNG** listener (<span style="color: rgb(0, 0, 255);">DriverManager</span>) and a static utility class (<span style="color: rgb(0, 0, 255);">GridUtility</span>) that perform several basic functions related to **Selenium** driver session management.
 
-*   Before each test method or <span style="color: rgb(0, 0, 255);">`@BeforeMethod`</span> configuration method is invoked, <span style="color: rgb(0, 0, 255);">DriverManager</span> performs the following tasks:
+*   Before each `@Test` method is invoked, <span style="color: rgb(0, 0, 255);">DriverManager</span> performs the following tasks:
     *   Ensure that a driver instance has been created for the test.
-
         *   **NOTE**: For local execution, this may spawn a local instance of **Selenium Grid**.
     *   Store the driver instance for subsequent dispensing.
-
     *   Manage configured driver timeout intervals.
-
     *   If specified, open the initial page, storing the page object for subsequent dispensing.
-
-*   When each test method finishes (including <span style="color: rgb(0, 0, 255);">`@AfterMethod`</span>, pass or fail), <span style="color: rgb(0, 0, 255);">DriverManager</span> performs the following tasks:
+*   `@Before...` configuration methods can request automatic driver instantiation by specifying an initial page.
+    *   **NOTE**: For all `@Before..` configuration methods that request automatic driver instantiation (except `@BeforeMethod`), <span style="color: rgb(0, 0, 255);">DriverManager</span> automatically closes the driver after the method is invoked.
+    *   For `@BeforeMethod` configuration methods, automatically instantiated drivers are retained and handed off to their respective `@Test` methods. 
+*   When each test method finishes (including `@AfterMethod`, pass or fail), <span style="color: rgb(0, 0, 255);">DriverManager</span> performs the following tasks:
     *   Terminate any page load operation that's still in progress.
     *   Dismiss any browser alert that's currently open.
     *   Quit the driver, which will close all open browser windows and end the session.
-
 *   After all tests in the entire suite have finished, <span style="color: rgb(0, 0, 255);">DriverManager</span> performs the following tasks:
     *   If a **Selenium Grid** node process was spawned, shut it down.
     *   If a **Selenium Grid** hub process was spawned, shut it down.
 
 # Obtaining a Driver
 
-If you've hooked up <span style="color: rgb(0, 0, 255);">DriverManager</span> as shown above, a driver will be instantiated for your test automatically. To retrieve this instance, use one of the provided static methods:
+If you've hooked up <span style="color: rgb(0, 0, 255);">DriverManager</span> as shown above, a driver will be instantiated for each test method automatically. To retrieve this instance, use one of the provided static methods:
 
 ###### Retrieving the WebDriver instance
+
 ```java
 package com.nordstrom.example;
  
@@ -100,14 +100,17 @@ public class ExampleTest implements ListenerChainable {
     @Test
     public void testDriverAccess() {
         WebDriver driver = DriverManager.getDriver();
-         
         ...
     }
      
     @AfterMethod
-    public void testDriverAccess(ITestResult testResult) {
+    public void useDriverAfter() {
+        WebDriver driver = DriverManager.getDriver();
+        ...
+    }
+    
+    private static void doStuff(ITestResult testResult) {
         WebDriver driver = DriverManager.getDriver(testResult);
-         
         ...
     }
      
@@ -120,14 +123,18 @@ public class ExampleTest implements ListenerChainable {
 }
 ```
 
+In the preceding example, <span style="color: rgb(0, 0, 255);">DriverManager</span> retrieves the driver attached to the _current_ test. Note that the driver acquired by `useDriverAfter()` was handed off from `testDriverAccess()`. For contexts in which the _current_ test is undetermined, the test context can be explicitly specified, as shown in the `doStuff()` method.
 
 If your test requires a driver that is unavailable via **Selenium Grid**, or if your scenario requires browser setup that can't be established through the standard **Selenium WebDriver** API, **Selenium Foundation** provides two options:
 
 1.  Your test class can implement the <span style="color: rgb(0, 0, 255);">DriverProvider</span> interface to replace the default driver instantiation method with one that meets your requirements.
-2.  You can decline automatic driver instantiation for an individual test method by specifying the <span style="color: rgb(0, 0, 255);">`@NoDriver`</span> annotation. This is especially useful in <span style="color: rgb(0, 0, 255);">`@BeforeMethod`</span> methods, as it allows you to defer driver instantiation until the invocation of the test method itself.
+2.  You can decline automatic driver instantiation for an individual test method by specifying the `@NoDriver` annotation. This is especially useful in `@BeforeMethod` methods, as it allows you to defer driver instantiation until the invocation of the test method itself.
 
-###### Implementing the DriverProvider interface
+###### Implementing the <span style="color: rgb(0, 0, 255);">DriverProvider</span> interface
+
 ```java
+package com.nordstrom.example;
+ 
 import org.openqa.selenium.WebDriver;
 import org.testng.IInvokedMethod;
 import org.testng.ITestResult;
@@ -154,12 +161,10 @@ public class ExampleTest implements ListenerChainable, DriverProvider {
 }
 ```
 
-###### Deferring driver instantiation with @NoDriver
+###### Declining automatic driver instantiation with `@NoDriver`
+
 ```java
 package com.nordstrom.example;
- 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
  
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
@@ -169,16 +174,51 @@ import com.nordstrom.automation.testng.ListenerChainable;
  
 public class ExampleTest implements ListenerChainable {
      
+    @Test
     @NoDriver
-    @BeforeMethod
-    public void noDriverBefore() {
+    public void noDriverTest() {
         ...
     }
      
+    ...
+     
+    @Override
+    public void attachListeners(ListenerChain listenerChain) {
+        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
+    }
+}
+```
+
+If your scenario requires a driver in a `@Before...` configuration method, you can request one from <span style="color: rgb(0, 0, 255);">DriverManager</span> via the `@InitialPage` annotation:
+
+###### Requesting automatic driver instantiation in `@BeforeMethod`
+
+```java
+package com.nordstrom.example;
+ 
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+ 
+import com.nordstrom.automation.selenium.annotations.InitialPage;
+import com.nordstrom.automation.selenium.listeners.DriverManager;
+import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.automation.testng.ListenerChainable;
+ 
+public class ExampleTest implements ListenerChainable {
+     
+    @BeforeMethod
+    @InitialPage(ExamplePage.class)
+    public void initialPageFromManager() {
+        ExamplePage examplePage = DriverManager.getInitialPage();
+        NextAppPage nextAppPage = examplePage.performSetup();
+        // set initial page for @Test methods
+        DriverManager.setInitialPage(nextAppPage);
+    }
+     
     @Test
-    public void testDriverAccess() {
-        WebDriver driver = DriverManager.getDriver();
-         
+    public void initialPageFromBefore() {
+        (NextAppPage) nextAppPage = DriverManager.getInitialPage();
         ...
     }
      
@@ -191,9 +231,11 @@ public class ExampleTest implements ListenerChainable {
 }
 ```
 
+In the preceding example, `initialPageFroManager()` acquires the initial page provided by 
+
 # Specifying Initial Page
 
-Through the <span style="color: rgb(0, 0, 255);">`@InitialPage`</span> annotation, **Selenium Foundation** enables you to specify an initial page that should be loaded after instantiating the driver, on either individual test methods or for an entire test class. Note that any page class specified as an initial page must declare its associated URL via the <span style="color: rgb(0, 0, 255);">`@PageUrl`</span> annotation.
+Through the `@InitialPage` annotation, **Selenium Foundation** enables you to specify an initial page that should be loaded after instantiating the driver, on either individual test methods or for an entire test class. Note that any page class specified as an initial page must declare its associated URL via the `@PageUrl` annotation.
 
 ###### Specifying initial page with @InitialPage
 ```java
@@ -262,7 +304,7 @@ As indicated previously, <span style="color: rgb(0, 0, 255);">DriverManager</spa
 *   **`onTestFailure(ITestResult testResult)`**
 *   **`onTestFailedButWithinSuccessPercentage(ITestResult testResult)`**
 
-If you need to perform any post-processing that requires interaction with the browser session (removing test data, logging out, etc.), you have two options - use an <span style="color: rgb(0, 0, 255);">`@AfterMethod`</span> configuration method or a listener that implements <span style="color: rgb(0, 0, 255);">ITestListener</span> attached to the listener chain prior to <span style="color: rgb(0, 0, 255);">DriverManager</span>.
+If you need to perform any post-processing that requires interaction with the browser session (removing test data, logging out, etc.), you have two options - use an `@AfterMethod` configuration method or a listener that implements <span style="color: rgb(0, 0, 255);">ITestListener</span> attached to the listener chain prior to <span style="color: rgb(0, 0, 255);">DriverManager</span>.
 
 ###### Scenario-specific post-processing
 ```java
@@ -302,7 +344,6 @@ public class ExampleTest implements ListenerChainable {
 }
 ```
 
-
 In the example above, the <span style="color: rgb(0, 0, 255);">ScenarioCleanup</span> listener is attached to the listener chain prior to <span style="color: rgb(0, 0, 255);">DriverManager</span>. Consequently, the <span style="color: rgb(0, 0, 255);">ITestListener</span> _after_ methods of <span style="color: rgb(0, 0, 255);">ScenarioCleanup</span> are invoked prior to those of <span style="color: rgb(0, 0, 255);">DriverManager</span>. At this point, the driver will still be open, allowing interactions with the browser session.
 
-The <span style="color: rgb(0, 0, 255);">`@AfterMethod`</span> configuration method in this example is also able to interact with the browser session. Depending on your scenario, you may need to add conditional logic to check the completion status of the test method, but this is easily done through the various status-related methods of the <span style="color: rgb(0, 0, 255);">ITestResult</span> object.
+The `@AfterMethod` configuration method in this example is also able to interact with the browser session. Depending on your scenario, you may need to add conditional logic to check the completion status of the test method, but this is easily done through the various status-related methods of the <span style="color: rgb(0, 0, 255);">ITestResult</span> object.
