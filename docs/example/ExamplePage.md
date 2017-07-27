@@ -1,11 +1,8 @@
+| [ModelTest.java](ModelTest.md) | **ExamplePage.java** | [TableComponent.java](TableComponent.md) | [TableRowComponent.java](TableRowComponent.md) | [FrameComponent.java](FrameComponent.md) |
+
 # Sample Code
 
-* [ModelTest.java](ModelTest.md)
-* **ExamplePage.java**
-* [TableComponent.java](TableComponent.md)
-* [TableRowComponent.java](TableRowComponent.md)
-* [FrameComponent.java](FrameComponent.md)
-
+###### ExamplePage.java
 ```java
 package com.nordstrom.automation.selenium.model;
 
