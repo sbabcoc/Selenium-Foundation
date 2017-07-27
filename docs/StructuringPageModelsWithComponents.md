@@ -32,9 +32,7 @@ public Map<Object, FrameComponent> getFrameMap() {
 ...
 ```
 
-<a href="SeleniumFoundationSampleCode.md">ModelTest.java</a>
-
-In the preceding example page class, extracted from the **Selenium Foundation** unit tests, we see that subsets of page functionality have been factored out into two components - <span style="color: rgb(0, 0, 255);">TableComponent</span> and <span style="color: rgb(0, 0, 255);">FrameComponent</span>. The application page modeled by this class contains one table and three frames, which are represented by the model as a table component and a mapped collection of frame components. Definitions and descriptions of these components appear below.
+In the preceding sample code, extracted from the **Selenium Foundation** unit tests, we see that subsets of page functionality have been factored out into two components - [TableComponent](examples/TableComponent.md) and [FrameComponent](examples/FrameComponent.md). The web application content modeled by this code contains one table and three frames, which are represented by the model as a table component and a mapped collection of frame components.
 
 # Page Component Search Contexts
 
