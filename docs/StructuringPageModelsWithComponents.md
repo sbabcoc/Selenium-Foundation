@@ -6,7 +6,7 @@ However, modeling an application based solely on its pages produces a very flat 
 
 If your target application uses frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead. More on this later.
 
-###### Excerpt from [ExamplePage.java](SeleniumFoundationSampleCode.md#example-page)
+###### Excerpt from [ExamplePage.java](example/ExamplePage.md)
 ```java
 ...
 
