@@ -6,63 +6,33 @@ However, modeling an application based solely on its pages produces a very flat 
 
 If your target application uses frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead. More on this later.
 
-###### ExamplePage.java
+###### Excerpt from [ExamplePage.java](SeleniumFoundationSampleCode.md#example-page)
 ```java
-package com.nordstrom.example;
+...
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+private TableComponent table;
+private Map<Object, FrameComponent> frameMap;
 
-public class ExamplePage extends Page {
+...
 
-	public ExamplePage(WebDriver driver) {
-		super(driver);
+public TableComponent getTable() {
+	if (table == null) {
+		table = new TableComponent(Using.TABLE.locator, this);
 	}
-	
-	private TableComponent table;
-	private Map<Object, FrameComponent> frameMap;
-
-	protected enum Using implements ByEnum {
-		FRAME(By.cssSelector("iframe[id^='frame-']")),
-		PARA(By.cssSelector("p[id^='para-']")),
-		TABLE(By.cssSelector("table#t1"));
-		
-		private By locator;
-		
-		Using(By locator) {
-			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
-		}
-	}
-	
-	public List<String> getParagraphs() {
-		List<WebElement> paraList = findElements(Using.PARA);
-		return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
-	}
-	
-	public TableComponent getTable() {
-		if (table == null) {
-			table = new TableComponent(Using.TABLE.locator, this);
-		}
-		return table;
-	}
-	
-	public Map<Object, FrameComponent> getFrameMap() {
-		if (frameMap == null) {
-			frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
-		}
-		return frameMap;
-	}
+	return table;
 }
+
+public Map<Object, FrameComponent> getFrameMap() {
+	if (frameMap == null) {
+		frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
+	}
+	return frameMap;
+}
+
+...
 ```
+
+<a href="SeleniumFoundationSampleCode.md">ModelTest.java</a>
 
 In the preceding example page class, extracted from the **Selenium Foundation** unit tests, we see that subsets of page functionality have been factored out into two components - <span style="color: rgb(0, 0, 255);">TableComponent</span> and <span style="color: rgb(0, 0, 255);">FrameComponent</span>. The application page modeled by this class contains one table and three frames, which are represented by the model as a table component and a mapped collection of frame components. Definitions and descriptions of these components appear below.
 
@@ -236,7 +206,13 @@ public class FrameComponent extends Frame {
 
 When modeling a web application, it's often useful to represent groups of associated elements as **page components**. It's quite common for a page component to be composed of one or more sub-components (e.g. - shipping address and delivery method in a shipping information section). You'll also encounter pages that contain multiple instances of particular component (e.g. - item tiles on a search results page).
 
+You're also likely to encounter web applications that use **frames** to aggregate multiple documents into a single page. With **Selenium Foundation**, interactions with frame-based components are essentially identical to interactions with more conventional element-based components.
+
 Each component retains a hierarchical association with the component that created it - the parent container. This hierarchy defines a sequence of nested search contexts, each represented by a page component, with the parent page as the outermost search context.
+
+For scenarios with collections of the same component, **Selenium Foundation** provides the ability to aggregate these as either ordered lists or keyed maps. **Selenium Foundation** component collections employ a lazy-initialization strategy, allocating slots for the items in the collection, but deferring instantiation of the components themselves until they're accessed. More on this later.
+
+The following example demonstrates a table component that includes a list of table row components.
 
 ###### TableComponent.java
 ```java
@@ -340,6 +316,51 @@ public class TableRowComponent extends PageComponent {
 			cells = findElements(Using.TBL_CELL);
 		}
 		return cells;
+	}
+}
+```
+
+The following example
+
+###### ExamplePage.java
+```java
+package com.nordstrom.example;
+
+import java.util.Map;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+public class ExamplePage extends Page {
+
+	public ExamplePage(WebDriver driver) {
+		super(driver);
+	}
+	
+	private Map<Object, FrameComponent> frameMap;
+
+	protected enum Using implements ByEnum {
+		FRAME(By.cssSelector("iframe[id^='frame-']"));
+
+		private By locator;
+		
+		Using(By locator) {
+			this.locator = locator;
+		}
+
+		@Override
+		public By locator() {
+			return locator;
+		}
+	}
+	
+	public Map<Object, FrameComponent> getFrameMap() {
+		if (frameMap == null) {
+			frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
+		}
+		return frameMap;
 	}
 }
 ```
