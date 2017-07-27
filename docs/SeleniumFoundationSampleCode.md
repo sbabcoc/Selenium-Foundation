@@ -2,7 +2,7 @@
 
 The following 
 
-###### ModelTest.java <a name="model-test"></a>
+###### ModelTest.java <a id="model-test"></a>
 ```java
 package com.nordstrom.automation.selenium.model;
 
@@ -137,7 +137,7 @@ public class ModelTest implements ListenerChainable {
 }
 ```
 
-###### ExamplePage.java <a name="example-page"></a>
+###### ExamplePage.java <a id="example-page"></a>
 ```java
 package com.nordstrom.automation.selenium.model;
 
