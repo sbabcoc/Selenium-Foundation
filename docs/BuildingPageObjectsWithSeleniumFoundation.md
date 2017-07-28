@@ -81,7 +81,7 @@ ProductPage productPage = someOtherPage.openAnnotatedPage(ProductPage.class, fal
 
 In this example, **Selenium Foundation** navigates to the path specified by the <span style="color:yellowgreen">**_value_**</span> attribute of the <span style="color:blue">@PageUrl</span> annotation of the <span style="color:blue">ProductPage</span> class. This is the exemplar page for this class.
 
-# <span class="confluence-anchor-link conf-macro output-inline" id="BuildingPageObjectswithSeleniumFoundation-page-load-sync" data-macro-name="anchor" data-hasbody="false"></span>Page Transition Synchronization
+# Page Transition Synchronization
 
 Whenever a page object method returns a new page object, this informs **Selenium Foundation** that the method triggered a page transition. In response, **Selenium Foundation** performs basic synchronization - waiting for a previously-acquired web element reference to go stale. This strategy is effective for basic web applications with simple page load behavior.
 
@@ -126,7 +126,7 @@ In this scenario, the <span style="color:blue">Dialog</span> class doesn't imple
 
 # Automatic Driver Targeting
 
-For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing. For more details, see [Selenium Foundation Test Support](https://confluence.nordstrom.net/display/MTEC/Selenium+Foundation+Test+Support#SeleniumFoundationTestSupport-auto-driver-target)
+For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing. For more details, see the **Automatic Driver Targeting** section on [Selenium Foundation Test Support](SeleniumFoundationTestSupport.md)
 
 # Wrapped Element References
 
