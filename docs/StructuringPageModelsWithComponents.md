@@ -81,7 +81,7 @@ In traditional **Selenium WebDriver** automation, the task of working with frame
 
 With **Selenium Foundation**, the task of managing driver focus is handled for you automatically. The boilerplate code is entirely eliminated, allowing you to focus on modeling the behaviors of your application instead of the plumbing that connects your code to the browser.
 
-The following example demonstrates automatic driver targeting. Note that neither the test nor the frame-based component includes any code to switch the driver context to the frame. **Selenium Foundation** automatically switches the driver's focus to the frame context when the `getPageContent()` method is called.
+The following example demonstrates automatic driver targeting. Note that neither the test nor the frame-based component includes any code to switch the driver context to the frame. **Selenium Foundation** automatically switches the driver's focus to the frame context when the **`getPageContent()`** method is called.
 
 ###### Driver Targeting Demonstration from [ExampleTest.java](example/ExampleTest.md)
 ```java
@@ -131,7 +131,7 @@ private List<TableRowComponent> getTableRows() {
 ...
 ```
 
-The following example demonstrates a [page](example/ExamplePage.md) that includes a keyed map of [frame component](example/FrameComponent.md)s. The keys are supplied by a static `getKey()` method declared by the component itself. More details of this method can be found in the next section. 
+The following example demonstrates a [page](example/ExamplePage.md) that includes a keyed map of [frame component](example/FrameComponent.md)s. The keys are supplied by a static **`getKey()`** method declared by the component itself. More details of this method can be found in the next section. 
 
 ###### Frame Map Aggregation from [ExamplePage.java](example/ExamplePage.md)
 ```java
@@ -151,7 +151,7 @@ public Map<Object, FrameComponent> getFrameMap() {
 
 As shown in the previous section, **Selenium Foundation** provides the ability to collect groups of page components into either ordered lists or keyed maps. The collection types provided by **Selenium Foundation** implement the standard [List](https://docs.oracle.com/javase/8/docs/api/java/util/List.html) and [Map](https://docs.oracle.com/javase/8/docs/api/java/util/Map.html) interfaces, making them suitable for any scenario that takes a list or a map as input.
 
-##### Required constructor for collectible components
+#### Required constructor for collectible components
 
 To be grouped into a component collection (either list or map), page components and frames must declare a constructor with signature:
 
@@ -161,7 +161,7 @@ public <component-classname>(RobustWebElement element, ComponentContainer parent
 
 This constructor is required to enable lazy initialization of the items in the collection. More details on this in the next section.
 
-##### Required method for mappable components
+#### Required method for mappable components
 
 In addition, to be grouped as a component map, page components and frames must declare a method with signature:
 
@@ -171,10 +171,33 @@ public static Object getKey(SearchContext context)
 
 This method is required to supply the keys that uniquely identify each item in the map.
 
-Full examples of both of these requirements can be seen in [TableComponent.java](example/TableComponent.md), [TableRowComponent.java](example/TableRowComponent.md), and [FrameComponent.java](example/FrameComponent.md).
+Full examples of both of these required elements can be seen in [TableComponent.java](example/TableComponent.md), [TableRowComponent.java](example/TableRowComponent.md), and [FrameComponent.java](example/FrameComponent.md).
 
-## Lazy initialization
+#### Search context for frame map item keys
+
+Switching the driver focus to a frame context is an expensive process, so **Selenium Foundation** doesn't do this automatically when creating the skeleton of a frame map. If you can derive a unique key from each frame's container element, this is strongly recommended. If you need to access the content of the frame to generate its key, your code needs to switch to the frame's context, then back to the parent frame:
+
+###### Producing map keys with frame content (from [FrameComponent.java](example/FrameComponent.md))
+```java
+...
+	public static Object getKey(SearchContext context) {
+		RobustWebElement element = (RobustWebElement) context;
+		WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
+		Object key = driver.findElement(Using.HEADING.selector).getText();
+		driver.switchTo().parentFrame();
+		return key;
+	}
+...
+```
+
+Note that the search context passed into the **`getKey()`** method is, in fact, a <span style="color: rgb(0, 0, 255);">RobustWebElement</span> object. This example implementation switches the driver to the frame context, extracts unique text from a heading element, and switches the driver back to the parent frame. This last step is **_critical_**, because leaving the driver focused on the frame context is likely to cause downstream failures.
+
+## Lazy initialization of Component Collections
+
+As indicated previously, **Selenium Foundation** component collections employ a lazy-initialization strategy, allocating slots for the items in the collection, but deferring instantiation of the components themselves until they're accessed. This strategy provides provides an enormous performance benefit by eliminating unnecessary interactions with the browser.
+
+When a component collection is initially created, the only details **Selenium Foundation** captures about the actual content behind each item in the collection is the component's search context - its container element. When an item is accessed for the first time, **Selenium Foundation** uses the container element and parent search context to create the corresponding instance of the component, which is why collectible components are required to declare the specific constructor described in the previous section.
 
 ## Immutability of Component Collections
 
-Component lists and maps are immutable. These collections are derived from the content of the web application page they 
+Component lists and maps are immutable. These collections are derived from the content of the web application page they represent. Allowing the composition of these collections to be altered by adding, removing, or replacing items would break the one-to-one relationship between the actual page content and the model evinced by the collection.

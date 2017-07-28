@@ -25,11 +25,8 @@ public class ModelTest implements ListenerChainable {
 	private static final String[] HEADINGS = {"Firstname", "Lastname", "Age"};
 	private static final String[][] CONTENT = {{"Jill", "Smith", "50"}, {"Eve", "Jackson", "94"}, {"John", "Doe", "80"}};
 	private static final String FRAME_A = "Frame A";
-	private static final String FRAME_A_ID = "frame-a";
 	private static final String FRAME_B = "Frame B";
-	private static final String FRAME_B_ID = "frame-b";
 	private static final String FRAME_C = "Frame C";
-	private static final String FRAME_C_ID = "frame-c";
 	private static final String TABLE_ID = "t1";
 	
 	@BeforeMethod
@@ -124,9 +121,9 @@ public class ModelTest implements ListenerChainable {
 		ExamplePage page = getPage();
 		Map<Object, FrameComponent> frameMap = page.getFrameMap();
 		assertEquals(frameMap.size(), 3);
-		assertEquals(frameMap.get(FRAME_A_ID).getPageContent(), FRAME_A);
-		assertEquals(frameMap.get(FRAME_B_ID).getPageContent(), FRAME_B);
-		assertEquals(frameMap.get(FRAME_C_ID).getPageContent(), FRAME_C);
+		assertEquals(frameMap.get(FRAME_A).getPageContent(), FRAME_A);
+		assertEquals(frameMap.get(FRAME_B).getPageContent(), FRAME_B);
+		assertEquals(frameMap.get(FRAME_C).getPageContent(), FRAME_C);
 	}
 
 	/**

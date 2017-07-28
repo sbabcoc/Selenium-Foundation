@@ -2,7 +2,7 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver;
 
 public class FrameComponent extends Frame {
 	
@@ -41,7 +41,11 @@ public class FrameComponent extends Frame {
 	}
 
 	public static Object getKey(SearchContext context) {
-		return ((WebElement) context).getAttribute("id");
+		RobustWebElement element = (RobustWebElement) context;
+		WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
+		Object key = driver.findElement(Using.HEADING.selector).getText();
+		driver.switchTo().parentFrame();
+		return key;
 	}
 
 }
