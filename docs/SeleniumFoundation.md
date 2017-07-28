@@ -37,7 +37,7 @@ Another disadvantage to this approach is the difficulty it creates in limiting t
 
 ## Selenium Foundation Test Support
 
-Toeliminate unnecessary boilerplate code, **Selenium Foundation** performs many common set-up and tear-down operations automatically.
+To eliminate unnecessary boilerplate code, **Selenium Foundation** performs many common set-up and tear-down operations automatically.
 
 *   By default, each test has a browser session created for it automatically. For scenarios with unique requirements, this behavior can be overridden with a simple annotation.
 *   Test classes and test methods can declare the initial page class that should be loaded prior to the start of the test.
