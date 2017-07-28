@@ -65,4 +65,4 @@ To eliminate unnecessary boilerplate code, **Selenium Foundation** performs m
 *   The search context for a component can be either a standard element or a frame.
 *   For frame-based components, driver focus is managed automatically. 
 *   Components can be nested and aggregated to create models that accurately reflect the conceptual structure of the pages being modeled.
-*   For grouping of elements that are repeated (e.g. - item summary tiles on a search results page), components can be  collected into indexed lists and keyed maps.
+*   For grouping of elements that are repeated (e.g. - item summary tiles on a search results page), components can be collected into indexed lists and keyed maps.
