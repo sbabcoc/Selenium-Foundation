@@ -32,7 +32,7 @@ In the preceding sample code, extracted from the **Selenium Foundation** unit te
 
 # Page Component Search Contexts
 
-In the **Selenium WebDriver** API, a search context is defined by the range of elements that will be examined when searching for a specified locator. For a page object, the search context is the entire page. For a page component, the search context is all of the elements within the bounds of the component's container element. For a frame, the search context is all of the elements within the bounds of the frame element.
+In the **Selenium WebDriver** API, a search context is defined by the range of elements that will be examined when searching for an element that matches a specified locator. For a page object, the search context is the entire page. For a page component, the search context is all of the elements within the bounds of the component's container element. For a frame, the search context is all of the elements within the bounds of the frame element.
 
 The search context of a page component encompasses a subset of the elements of the context(s) in which it is contained. In other words, elements within the bounds of the component can be found by searches in encompassing contexts. However, the same cannot be said for frames, because...
 
@@ -61,7 +61,8 @@ This last expression demonstrates the form that most context-relative XPath loca
 
 Because of their ability to traverse the element hierarchy vertically and horizontally, a subset of location-related XPath tokens and operators will produce expressions that can exceed the search context. Here are the tokens and operators to avoid or use cautiously:
 
-* Expressions that begin with `/`, `//`, or `..`
+* Expressions that begin with `/` or `//`
+* Expressions that begin with or include `..`
 * Ancestor or sibling axes: `parent`, `following-sibling`, `preceding-sibling`, `following`, `predecing`, `ancestor`, `ancestor-or-self`
 
 Here are some examples of XPath expressions that select elements _outside_ the bounds of the page component search context:
@@ -73,11 +74,11 @@ Here are some examples of XPath expressions that select elements _outside_ the b
 * `following-sibling::*` selects all siblings after the context node
 * `previous::chapter` selects all **chapter** elements that appear before the context node in the document, except ancestors
 
-Avoid expressions that start with either `/` or `//`, as these always traverse the entire document. There are legitimate applications for the other tokens, but you must exercise great care to avoid traversing outside the bounds of the page component search context.
+Avoid expressions that start with either `/` or `//`, as these always traverse the entire document. Expressions that begin with `..` will always traverse _outside_ the page component search context. There are legitimate applications for all of these tokens, but you must exercise great care to avoid traversing outside the bounds of the page component search context.
 
 # Driver Focus with Frame-Based Components
 
-In traditional **Selenium WebDriver** automation, the task of working with frames is often difficult and confusing. You're forced to include ubiquitous boilerplate code to switch driver focus between the frames you need to interact with and the main page that contains them.
+In traditional **Selenium WebDriver** automation, the task of working with frames is often difficult and confusing. You're forced to include ubiquitous boilerplate code to switch driver focus between the frames you need to interact with and the contexts that contains them.
 
 With **Selenium Foundation**, the task of managing driver focus is handled for you automatically. The boilerplate code is entirely eliminated, allowing you to focus on modeling the behaviors of your application instead of the plumbing that connects your code to the browser.
 
@@ -103,7 +104,7 @@ When modeling a web application, it's often useful to represent groups of associ
 
 You're also likely to encounter web applications that use **frames** to aggregate multiple documents into a single page. With **Selenium Foundation**, interactions with frame-based components are essentially identical to interactions with more conventional element-based components.
 
-Each component retains a hierarchical association with the component that created it - the parent container. This hierarchy defines a sequence of nested search contexts, each represented by a page component, with the parent page as the outermost search context.
+Each component retains a hierarchical association with the component that created it - the parent container. This hierarchy defines a sequence of nested search contexts, each represented by a page component or frame, with the parent page as the outermost search context.
 
 For scenarios with collections of the same component, **Selenium Foundation** provides the ability to aggregate these as either ordered lists or keyed maps. **Selenium Foundation** component collections employ a lazy-initialization strategy, allocating slots for the items in the collection, but deferring instantiation of the components themselves until they're accessed. More on this later.
 
@@ -194,7 +195,7 @@ Note that the search context passed into the **`getKey()`** method is, in fact, 
 
 ## Lazy initialization of Component Collections
 
-As indicated previously, **Selenium Foundation** component collections employ a lazy-initialization strategy, allocating slots for the items in the collection, but deferring instantiation of the components themselves until they're accessed. This strategy provides provides an enormous performance benefit by eliminating unnecessary interactions with the browser.
+As indicated previously, **Selenium Foundation** component collections employ a lazy-initialization strategy, allocating slots for the items in the collection, but deferring instantiation of the components themselves until they're accessed. This strategy provides an enormous performance benefit by eliminating unnecessary interactions with the browser.
 
 When a component collection is initially created, the only details **Selenium Foundation** captures about the actual content behind each item in the collection is the component's search context - its container element. When an item is accessed for the first time, **Selenium Foundation** uses the container element and parent search context to create the corresponding instance of the component, which is why collectible components are required to declare the specific constructor described in the previous section.
 
