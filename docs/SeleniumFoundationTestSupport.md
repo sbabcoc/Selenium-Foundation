@@ -125,7 +125,7 @@ In the preceding example, <span style="color:blue">DriverManager</span> retrieve
 If your test requires a driver that is unavailable via **Selenium Grid**, or if your scenario requires browser setup that can't be established through the standard **Selenium WebDriver** API, **Selenium Foundation** provides two options:
 
 1.  Your test class can implement the <span style="color:blue">DriverProvider</span> interface to replace the default driver instantiation method with one that meets your requirements.
-2.  You can decline automatic driver instantiation for an individual test method by specifying the `@NoDriver` annotation. This is especially useful in `@BeforeMethod` methods, as it allows you to defer driver instantiation until the invocation of the test method itself.
+2.  You can decline automatic driver instantiation for an individual test method by specifying the `@NoDriver` annotation.
 
 ###### Implementing the <span style="color:blue">DriverProvider</span> interface
 ```java
