@@ -6,29 +6,25 @@ However, modeling an application based solely on its pages produces a very flat 
 
 If your target application uses frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead. More on this later.
 
-###### Excerpt from [ExamplePage.java](example/ExamplePage.md)
+###### Page Component and Frame Map from  [ExamplePage.java](example/ExamplePage.md)
 ```java
 ...
-
 private TableComponent table;
 private Map<Object, FrameComponent> frameMap;
-
 ...
-
 public TableComponent getTable() {
 	if (table == null) {
 		table = new TableComponent(Using.TABLE.locator, this);
 	}
 	return table;
 }
-
+...
 public Map<Object, FrameComponent> getFrameMap() {
 	if (frameMap == null) {
 		frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
 	}
 	return frameMap;
 }
-
 ...
 ```
 
@@ -85,119 +81,20 @@ In traditional **Selenium WebDriver** automation, the task of working with frame
 
 With **Selenium Foundation**, the task of managing driver focus is handled for you automatically. The boilerplate code is entirely eliminated, allowing you to focus on modeling the behaviors of your application instead of the plumbing that connects your code to the browser.
 
-The following example demonstrates automatic driver targeting. Note that neither the test nor the frame-based component includes any code to switch the driver context to the frame.
+The following example demonstrates automatic driver targeting. Note that neither the test nor the frame-based component includes any code to switch the driver context to the frame. **Selenium Foundation** automatically switches the driver's focus to the frame context when the `getPageContent()` method is called.
 
-###### Automatic driver targeting
+###### Driver Targeting Demonstration from [ExampleTest.java](example/ExampleTest.md)
 ```java
-package com.nordstrom.example;
- 
-import static org.testng.Assert.assertEquals;
+...
+private static final String FRAME_A = "Frame A";
 
-import com.nordstrom.automation.selenium.listeners.DriverManager;
-import com.nordstrom.automation.testng.ExecutionFlowController;
-import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
- 
-public class ExampleTest implements ListenerChainable {
-
-	private static final String FRAME_A = "Frame A";
-    
-	@Test
-	public void testFrameByElement() {
-		ExamplePage page = getPage();
-		FrameComponent component = page.getFrameByElement();
-		assertEquals(component.getPageContent(), FRAME_A);
-	}
-
-    ...
-  
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-    }
+@Test
+public void testFrameByElement() {
+	ExamplePage page = getPage();
+	FrameComponent component = page.getFrameByElement();
+	assertEquals(component.getPageContent(), FRAME_A);
 }
-```
-
-###### ExamplePage.java
-```java
-package com.nordstrom.example;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-
-public class ExamplePage extends Page {
-
-	public ExamplePage(WebDriver driver) {
-		super(driver);
-	}
-	
-	private FrameComponent frameByElement;
-
-	protected enum Using implements ByEnum {
-		FRAME_A(By.cssSelector("iframe#frame-a"));
-		
-		private By locator;
-		
-		Using(By locator) {
-			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
-		}
-	}
-	
-	public FrameComponent getFrameByElement() {
-		if (frameByElement == null) {
-			frameByElement = new FrameComponent(Using.FRAME_A.locator, this);
-		}
-		return frameByElement;
-	}
-}
-```
-
-###### FrameComponent.java
-```java
-package com.nordstrom.example;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
-
-public class FrameComponent extends Frame {
-	
-	public FrameComponent(By locator, ComponentContainer parent) {
-		super(locator, parent);
-	}
-	
-	public FrameComponent(RobustWebElement element, ComponentContainer parent) {
-		super(element, parent);
-	}
-	
-	private enum Using implements ByEnum {
-		HEADING(By.cssSelector("h1"));
-		
-		private By locator;
-		
-		Using(By locator) {
-			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
-		}
-	}
-	
-	public String getPageContent() {
-		return findElement(Using.HEADING).getText();
-	}
-
-	public static Object getKey(SearchContext context) {
-		return ((WebElement) context).getAttribute("id");
-	}
-}
+...
 ```
 
 # Component Nesting and Aggregation
@@ -210,160 +107,74 @@ Each component retains a hierarchical association with the component that create
 
 For scenarios with collections of the same component, **Selenium Foundation** provides the ability to aggregate these as either ordered lists or keyed maps. **Selenium Foundation** component collections employ a lazy-initialization strategy, allocating slots for the items in the collection, but deferring instantiation of the components themselves until they're accessed. More on this later.
 
-The following example demonstrates a table component that includes a list of table row components.
+The following example demonstrates a [table component](example/TableComponent.md) that includes a [table row component](example/TableRowComponent.md) for the headings and a list of [table row component](example/TableRowComponent.md)s for the data rows.
 
-###### TableComponent.java
+###### Nested Component and List Aggregation from [TableComponent.java](example/TableComponent.md)
 ```java
-package com.nordstrom.example;
+...
+private TableRowComponent tableHdr;
+private List<TableRowComponent> tableRows;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.openqa.selenium.By;
-
-public class TableComponent extends PageComponent {
-
-	public TableComponent(By locator, ComponentContainer parent) {
-		super(locator, parent);
+private TableRowComponent getTableHdr() {
+	if (tableHdr == null) {
+		tableHdr = new TableRowComponent(Using.HDR_ROW.locator, this);
 	}
-	
-	private TableRowComponent tableHdr;
-	private List<TableRowComponent> tableRows;
-
-	protected enum Using {
-		HDR_ROW(By.cssSelector("tr[id*='-h']")),
-		TBL_ROW(By.cssSelector("tr[id*='-r']"));
-		
-		private By locator;
-		
-		Using(By locator) {
-			this.locator = locator;
-		}
-	}
-	
-	public List<String> getHeadings() {
-		return getTableHdr().getContent();
-	}
-	
-	public List<List<String>> getContent() {
-		List<List<String>> result = new ArrayList<>();
-		for (TableRowComponent row : getTableRows()) {
-			result.add(row.getContent());
-		}
-		return result;
-	}
-	
-	private TableRowComponent getTableHdr() {
-		if (tableHdr == null) {
-			tableHdr = new TableRowComponent(Using.HDR_ROW.locator, this);
-		}
-		return tableHdr;
-	}
-	
-	private List<TableRowComponent> getTableRows() {
-		if (tableRows == null) {
-			tableRows = new ComponentList<>(this, TableRowComponent.class, Using.TBL_ROW.locator);
-		}
-		return tableRows;
-	}
+	return tableHdr;
 }
+
+private List<TableRowComponent> getTableRows() {
+	if (tableRows == null) {
+		tableRows = new ComponentList<>(this, TableRowComponent.class, Using.TBL_ROW.locator);
+	}
+	return tableRows;
+}
+...
 ```
 
-###### TableRowComponent.java
+The following example demonstrates a [page](example/ExamplePage.md) that includes a keyed map of [frame component](example/FrameComponent.md)s. The keys are supplied by a static `getKey()` method declared by the component itself. More details of this method can be found in the next section. 
+
+###### Frame Map Aggregation from [ExamplePage.java](example/ExamplePage.md)
 ```java
-package com.nordstrom.example;
+...
+private Map<Object, FrameComponent> frameMap;
 
-import java.util.Arrays;
-import java.util.List;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-
-public class TableRowComponent extends PageComponent {
-
-	public TableRowComponent(By locator, ComponentContainer parent) {
-		super(locator, parent);
+public Map<Object, FrameComponent> getFrameMap() {
+	if (frameMap == null) {
+		frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
 	}
-	
-	public TableRowComponent(RobustWebElement element, ComponentContainer parent) {
-		super(element, parent);
-	}
-	
-	protected enum Using implements ByEnum {
-		TBL_CELL(By.cssSelector("th,td"));
-		
-		private By locator;
-		
-		Using(By locator) {
-			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
-		}
-	}
-	
-	private List<WebElement> cells;
-
-	public List<String> getContent() {
-		List<WebElement> cells = getCells();
-		return Arrays.asList(cells.get(0).getText(), cells.get(1).getText(), cells.get(2).getText());
-	}
-	
-	private List<WebElement> getCells() {
-		if (cells == null) {
-			cells = findElements(Using.TBL_CELL);
-		}
-		return cells;
-	}
+	return frameMap;
 }
-```
-
-The following example
-
-###### ExamplePage.java
-```java
-package com.nordstrom.example;
-
-import java.util.Map;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
-public class ExamplePage extends Page {
-
-	public ExamplePage(WebDriver driver) {
-		super(driver);
-	}
-	
-	private Map<Object, FrameComponent> frameMap;
-
-	protected enum Using implements ByEnum {
-		FRAME(By.cssSelector("iframe[id^='frame-']"));
-
-		private By locator;
-		
-		Using(By locator) {
-			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
-		}
-	}
-	
-	public Map<Object, FrameComponent> getFrameMap() {
-		if (frameMap == null) {
-			frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
-		}
-		return frameMap;
-	}
-}
+...
 ```
 
 # Component Collections (Lists and Maps)
 
+As shown in the previous section, **Selenium Foundation** provides the ability to collect groups of page components into either ordered lists or keyed maps. The collection types provided by **Selenium Foundation** implement the standard [List](https://docs.oracle.com/javase/8/docs/api/java/util/List.html) and [Map](https://docs.oracle.com/javase/8/docs/api/java/util/Map.html) interfaces, making them suitable for any scenario that takes a list or a map as input.
+
+##### Required constructor for collectible components
+
+To be grouped into a component collection (either list or map), page components and frames must declare a constructor with signature:
+
+```java
+public <component-classname>(RobustWebElement element, ComponentContainer parent)
+```
+
+This constructor is required to enable lazy initialization of the items in the collection. More details on this in the next section.
+
+##### Required method for mappable components
+
+In addition, to be grouped as a component map, page components and frames must declare a method with signature:
+
+```java
+public static Object getKey(SearchContext context)
+```
+
+This method is required to supply the keys that uniquely identify each item in the map.
+
+Full examples of both of these requirements can be seen in [TableComponent.java](example/TableComponent.md), [TableRowComponent.java](example/TableRowComponent.md), and [FrameComponent.java](example/FrameComponent.md).
+
 ## Lazy initialization
 
+## Immutability of Component Collections
+
+Component lists and maps are immutable. These collections are derived from the content of the web application page they 
