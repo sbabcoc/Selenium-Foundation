@@ -19,7 +19,7 @@ A popular strategy to reduce duplication and accelerate development of automated
 
 While the page object design pattern dramatically reduces the amount of boilerplate code in test methods, much of this ends up in the page object implementations. **Selenium Foundation** eliminates all of the common code that you'll find in typical page object implementations.
 
-We discourage the use of <span style="color: rgb(0, 0, 255);">PageFactory</span> and the <span style="color: rgb(0, 0, 255);">@FindBy</span> annotation, because these replace rely on "magic" behavior - replacing <span style="color: rgb(0, 0, 255);">WebElement</span> property references in your code with hidden **`findElement()`** method calls. These obscure the interactions of your page model with the driver session, and they can trigger unexpected <span style="color: rgb(0, 0, 255);">NoSuchElementException</span> and <span style="color: rgb(0, 0, 255);">StaleElementReferenceException</span> failures. **Selenium Foundation** doesn't support the <span style="color: rgb(0, 0, 255);">PageFactory</span> approach, but facilitates the use of locator enumeration through the <span style="color: rgb(0, 0, 255);">ByEnum</span> interface.
+We discourage the use of <span style="color:blue">PageFactory</span> and the <span style="color:blue">@FindBy</span> annotation, because these replace rely on "magic" behavior - replacing <span style="color:blue">WebElement</span> property references in your code with hidden **`findElement()`** method calls. These obscure the interactions of your page model with the driver session, and they can trigger unexpected <span style="color:blue">NoSuchElementException</span> and <span style="color:blue">StaleElementReferenceException</span> failures. **Selenium Foundation** doesn't support the <span style="color:blue">PageFactory</span> approach, but facilitates the use of locator enumeration through the <span style="color:blue">ByEnum</span> interface.
 
 # WebDriver Automation with Selenium Foundation
 
@@ -55,12 +55,12 @@ Toeliminate unnecessary boilerplate code, **Selenium Foundation** performs ma
 *   Out of the box, you get basic page transition synchronization. 
 *   For scenarios with more intricate behavior (e.g. - single-page applications), a facility is provided for page models to define custom page load completion logic.
 *   Each page object is associated with the browser window for which it was created, and driver focus is managed automatically. With this support, testing multi-window applications is greatly simplified.
-*   Element references returned by the foundation API are wrapped to provide automatic recovery from <span style="color: rgb(0, 0, 255);">_stale element reference exceptions_</span>. This makes it easy to test applications with dynamic content.
+*   Element references returned by the foundation API are wrapped to provide automatic recovery from <span style="color:blue">_stale element reference exceptions_</span>. This makes it easy to test applications with dynamic content.
 *   Efficient support is provided for optional elements - controls and content that are present in some scenarios and absent in others.
 
 ### Structuring Page Models with Components
 
-**Selenium Foundation** facilitates the implementation of well-structured page models through the use of <span style="color: rgb(0, 0, 255);">_page components_</span>, which enable you to model groups of functionally related elements as discrete objects. Page components are provided with a broad range of basic facilities:
+**Selenium Foundation** facilitates the implementation of well-structured page models through the use of <span style="color:blue">_page components_</span>, which enable you to model groups of functionally related elements as discrete objects. Page components are provided with a broad range of basic facilities:
 
 *   The search context for a component can be either a standard element or a frame.
 *   For frame-based components, driver focus is managed automatically. 

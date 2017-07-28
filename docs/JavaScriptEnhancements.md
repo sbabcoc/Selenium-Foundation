@@ -1,4 +1,4 @@
-**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the <span style="color: rgb(0, 0, 255);">_com.nordstrom.automation.selenium.core_</span> package, and the script files are found in <span style="color: rgb(0, 0, 255);">_src/main/resources_</span>. **JsUtility** and its supporting scripts provide the following capabilities:
+**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the <span style="color:blue">_com.nordstrom.automation.selenium.core_</span> package, and the script files are found in <span style="color:blue">_src/main/resources_</span>. **JsUtility** and its supporting scripts provide the following capabilities:
 
 *   Run JavaScript (with or without result)
 *   Load script files as strings
@@ -8,9 +8,9 @@
 
 **Selenium Foundation** enables you to execute JavaScript in the context of the currently selected frame or window. The script fragment provided will be executed as the body of an anonymous function.
 
-Within the script, use <span style="color: rgb(0, 0, 255);">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
+Within the script, use <span style="color:blue">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
 
-If the script has a return value (i.e. if the script contains a <span style="color: rgb(0, 0, 255);">**`return`**</span> statement), then the following steps will be taken:
+If the script has a return value (i.e. if the script contains a <span style="color:blue">**`return`**</span> statement), then the following steps will be taken:
 
 *   For an HTML element, a WebElement is returned
 *   For a decimal, a Double is returned

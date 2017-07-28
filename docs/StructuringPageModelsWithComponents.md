@@ -38,9 +38,9 @@ The search context of a page component encompasses a subset of the elements of t
 
 ## Frames define distinct search contexts
 
-The preceding descriptions of search contexts omits one important detail - frames define distinct search contexts. Elements within the bounds of a frame **cannot** be found by searches in encompassing contexts. In the browser, frames are handled as separate documents. From a conceptual standpoint, a frame **IS-A** page, and the <span style="color: rgb(0, 0, 255);">Frame</span> class of **Selenium Foundation** models this concept by extending the <span style="color: rgb(0, 0, 255);">Page</span> class.
+The preceding descriptions of search contexts omits one important detail - frames define distinct search contexts. Elements within the bounds of a frame **cannot** be found by searches in encompassing contexts. In the browser, frames are handled as separate documents. From a conceptual standpoint, a frame **IS-A** page, and the <span style="color:blue">Frame</span> class of **Selenium Foundation** models this concept by extending the <span style="color:blue">Page</span> class.
 
-The search context of a frame is completely isolated, and the driver target needs to be switched to this context to interact with it. Without **Selenium Foundation**, the task of frame driver targeting can be frustrating and confusing. Once you've modeled a frame as a <span style="color: rgb(0, 0, 255);">Frame</span> object, **Selenium Foundation** handles driver targeting for you automatically. More on this below.
+The search context of a frame is completely isolated, and the driver target needs to be switched to this context to interact with it. Without **Selenium Foundation**, the task of frame driver targeting can be frustrating and confusing. Once you've modeled a frame as a <span style="color:blue">Frame</span> object, **Selenium Foundation** handles driver targeting for you automatically. More on this below.
 
 ## A word about XPath locators
 
@@ -190,7 +190,7 @@ Switching the driver focus to a frame context is an expensive process, so **Sele
 ...
 ```
 
-Note that the search context passed into the **`getKey()`** method is, in fact, a <span style="color: rgb(0, 0, 255);">RobustWebElement</span> object. This example implementation switches the driver to the frame context, extracts unique text from a heading element, and switches the driver back to the parent frame. This last step is **_critical_**, because leaving the driver focused on the frame context is likely to cause downstream failures.
+Note that the search context passed into the **`getKey()`** method is, in fact, a <span style="color:blue">RobustWebElement</span> object. This example implementation switches the driver to the frame context, extracts unique text from a heading element, and switches the driver back to the parent frame. This last step is **_critical_**, because leaving the driver focused on the frame context is likely to cause downstream failures.
 
 ## Lazy initialization of Component Collections
 
