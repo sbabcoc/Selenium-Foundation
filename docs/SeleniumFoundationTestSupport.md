@@ -288,7 +288,7 @@ For web applications that use frames or multiple windows, a major source of boil
 
 # Page Load Synchronization
 
-**Selenium Foundation** provides both implicit and explicit page load synchronization. For basic plain-vanilla web applications, implicit synchronization is often all you need. For more complex applications with dynamic content (AJAX, single-page applications, etc.), **Selenium Foundation** defines an interface you can implement to provide scenario-specific detection of page load completion. For more details, see [Building Page Objects with Selenium Foundation](https://confluence.nordstrom.net/display/MTEC/Building+Page+Objects+with+Selenium+Foundation#BuildingPageObjectswithSeleniumFoundation-page-load-sync).
+**Selenium Foundation** provides both implicit and explicit page load synchronization. For basic plain-vanilla web applications, implicit synchronization is often all you need. For more complex applications with dynamic content (AJAX, single-page applications, etc.), **Selenium Foundation** defines an interface you can implement to provide scenario-specific detection of page load completion. For more details, see the **Page Transition Synchronization** section on [Building Page Objects with Selenium Foundation](BuildingPageObjectsWithSeleniumFoundation.md).
 
 # Driver Lifetime Management and Scenario-Specific Post-Processing
 
