@@ -1,8 +1,14 @@
+| [ModelTest.java](ModelTest.md) | [ExamplePage.java](ExamplePage.md) | [TableComponent.java](TableComponent.md) | [TableRowComponent.java](TableRowComponent.md) | **FrameComponent.java** |
+
+# Sample Code
+
+###### FrameComponent.java
+```java
 package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class FrameComponent extends Frame {
 	
@@ -26,23 +32,18 @@ public class FrameComponent extends Frame {
 		super(nameOrId, parent);
 	}
 	
-	private enum Using implements ByEnum {
+	private enum Using {
 		HEADING(By.cssSelector("h1"));
 		
-		private By locator;
+		private By selector;
 		
-		Using(By locator) {
-			this.locator = locator;
-		}
-
-		@Override
-		public By locator() {
-			return locator;
+		Using(By selector) {
+			this.selector = selector;
 		}
 	}
 	
 	public String getPageContent() {
-		return findElement(Using.HEADING).getText();
+		return findElement(Using.HEADING.selector).getText();
 	}
 
 	public static Object getKey(SearchContext context) {
@@ -52,5 +53,5 @@ public class FrameComponent extends Frame {
 		driver.switchTo().parentFrame();
 		return key;
 	}
-
 }
+```
