@@ -683,10 +683,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				}
 			}
 			
-			List<NameValuePair> expectParams;
+			List<NameValuePair> expectParams = new ArrayList<>();
 			String[] params = pageUrl.params();
 			if (params.length > 0) {
-				expectParams = new ArrayList<>();
 				for (String param : params) {
 					String[] nameValueBits = param.split("=");
 					if (nameValueBits.length == 2) {
@@ -700,8 +699,6 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				}
 			} else if (expectUri != null) {
 				expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
-			} else {
-				expectParams = new ArrayList<>();
 			}
 			
 			List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
