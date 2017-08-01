@@ -492,8 +492,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 */
 	public <T extends Page> T openAnnotatedPage(Class<T> pageClass, boolean newWindow) {
 		PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
-		if (pageUrl == null) throw new IllegalArgumentException(pageClass.toString() + " has no @PageUrl annotation");
 		String url = getPageUrl(pageUrl, SeleniumConfig.getConfig().getTargetUri());
+		if (url == null) throw new IllegalArgumentException(pageClass.toString() + " has no @PageUrl annotation or path is unspecified");
 		return openPageAtUrl(pageClass, url, newWindow);
 	}
 	
@@ -521,6 +521,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * @return new instance of the specified page class
 	 */
 	public <T extends Page> T openPageAtUrl(Class<T> pageClass, String url, boolean newWindow) {
+		if (pageClass == null) throw new IllegalArgumentException("[pageClass] must be non-null");
+		if (url == null) throw new IllegalArgumentException("[url] must be non-null");
+		
 		T pageObj = newContainer(pageClass, new Class<?>[] {WebDriver.class}, new Object[] {driver});
 		if (newWindow) {
 			pageObj.setWindowState(WindowState.WILL_OPEN);
@@ -622,34 +625,36 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 		PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
 		if (pageUrl != null) {
 			String actual, expect;
-			String url = pageObj.getCurrentUrl();
+			String currentUrl = pageObj.getCurrentUrl();
 			
-			URI actualUri = URI.create(url);
+			URI actualUri = URI.create(currentUrl);
 			URI targetUri = SeleniumConfig.getConfig().getTargetUri();
-			URI expectUri = URI.create(ComponentContainer.getPageUrl(pageUrl, targetUri));
-			
-			actual = actualUri.getScheme();
-			expect = expectUri.getScheme();
-			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException(pageClass, "scheme", actual, expect);
-			}
-			
-			actual = actualUri.getHost();
-			expect = expectUri.getHost();
-			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException(pageClass, "host", actual, expect);
-			}
-			
-			actual = actualUri.getUserInfo();
-			expect = expectUri.getUserInfo();
-			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException(pageClass, "user info", actual, expect);
-			}
-			
-			actual = Integer.toString(actualUri.getPort());
-			expect = Integer.toString(expectUri.getPort());
-			if ( ! StringUtils.equals(actual, expect)) {
-				throw new LandingPageMismatchException(pageClass, "port", actual, expect);
+			String expectUrl = getPageUrl(pageUrl, targetUri);
+			URI expectUri = (expectUrl != null) ? URI.create(expectUrl) : null;
+			if (expectUri != null) {
+				actual = actualUri.getScheme();
+				expect = expectUri.getScheme();
+				if ( ! StringUtils.equals(actual, expect)) {
+					throw new LandingPageMismatchException(pageClass, "scheme", actual, expect);
+				}
+				
+				actual = actualUri.getHost();
+				expect = expectUri.getHost();
+				if ( ! StringUtils.equals(actual, expect)) {
+					throw new LandingPageMismatchException(pageClass, "host", actual, expect);
+				}
+				
+				actual = actualUri.getUserInfo();
+				expect = expectUri.getUserInfo();
+				if ( ! StringUtils.equals(actual, expect)) {
+					throw new LandingPageMismatchException(pageClass, "user info", actual, expect);
+				}
+				
+				actual = Integer.toString(actualUri.getPort());
+				expect = Integer.toString(expectUri.getPort());
+				if ( ! StringUtils.equals(actual, expect)) {
+					throw new LandingPageMismatchException(pageClass, "port", actual, expect);
+				}
 			}
 			
 			String pattern = pageUrl.pattern();
@@ -668,9 +673,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				}
 				
 				if ( ! actual.matches(pattern)) {
-					throw new LandingPageMismatchException(pageClass, url);
+					throw new LandingPageMismatchException(pageClass, currentUrl);
 				}
-			} else {
+			} else if (expectUri != null) {
 				actual = actualUri.getPath();
 				expect = expectUri.getPath();
 				if ( ! StringUtils.equals(actual, expect)) {
@@ -693,8 +698,10 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 								+ "' does not conform to template [name]=[pattern]");
 					}
 				}
-			} else {
+			} else if (expectUri != null) {
 				expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
+			} else {
+				expectParams = new ArrayList<>();
 			}
 			
 			List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
@@ -714,7 +721,6 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 				throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
 			}
 		}
-		
 	}
 	
 	/**

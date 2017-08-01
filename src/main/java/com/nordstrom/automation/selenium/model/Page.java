@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
+import com.nordstrom.automation.selenium.exceptions.InitialPageUnspecifiedException;
 
 public class Page extends ComponentContainer {
 	
@@ -141,7 +142,10 @@ public class Page extends ComponentContainer {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Page> T openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
-		driver.get(getInitialUrl(initialPage, targetUri));
+		String url = getInitialUrl(initialPage, targetUri);
+		if (url == null) throw new InitialPageUnspecifiedException("No initial page has been specified");
+		
+		driver.get(url);
 		return newContainer((Class<T>) initialPage.value(), ARG_TYPES_1, new Object[] {driver});
 	}
 	
