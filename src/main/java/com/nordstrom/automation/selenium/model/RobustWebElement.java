@@ -588,5 +588,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
 		throw (NullPointerException) new NullPointerException("Unable to acquire reference for optional element")
 				.initCause(deferredException);
 	}
-	
+
+	@Override
+	public SearchContext switchTo() {
+		return context.switchTo();
+	}
 }
