@@ -12,14 +12,21 @@ import org.openqa.selenium.internal.WrapsDriver;
 public interface WrapsContext extends WrapsDriver {
 	
 	/**
-	 * Get the underlying search context for this object
+	 * Switch the driver to the context that underlies this object.
+	 * 
+	 * @return this object's underlying search context
+	 */
+	public SearchContext switchTo();
+	
+	/**
+	 * Get the underlying search context for this object.
 	 * 
 	 * @return object search context
 	 */
 	public SearchContext getWrappedContext();
 	
 	/**
-	 * Refresh the underlying search context for this object
+	 * Refresh the underlying search context for this object.
 	 * 
 	 * @param expiration expiration time of context chain
 	 * @return object search context
@@ -27,7 +34,7 @@ public interface WrapsContext extends WrapsDriver {
 	public SearchContext refreshContext(Long expiration);
 	
 	/**
-	 * Determine when the underlying search context for this object was acquired
+	 * Determine when the underlying search context for this object was acquired.
 	 * 
 	 * @return search context acquisition time (from {@link System#currentTimeMillis()})
 	 */

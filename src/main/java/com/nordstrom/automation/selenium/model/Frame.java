@@ -2,6 +2,9 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.UnsupportedCommandException;
+
+import com.google.common.base.Throwables;
 
 public class Frame extends Page {
 	
@@ -14,6 +17,8 @@ public class Frame extends Page {
 	private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_4 = {Integer.TYPE, ComponentContainer.class};
 	private static final Class<?>[] ARG_TYPES_5 = {String.class, ComponentContainer.class};
+	
+	private static boolean canSwitchToParentFrame = true;
 	
 	private enum FrameSelect {
 		ELEMENT,
@@ -111,6 +116,30 @@ public class Frame extends Page {
 			break;
 		}
 		return this;
+	}
+	
+	/**
+	 * Switch driver focus to the parent of the specified frame context element.
+	 * <p>
+	 * <b>NOTE</b> This method initially invokes {@code driver.switchTo().parentFrame()}. If that fails with
+	 * {@link UnsupportedCommandException}, it invokes {@code element.switchTo()} as a fallback.
+	 * 
+	 * @param element frame context element
+	 * @return parent search context
+	 */
+	public static SearchContext switchToParentFrame(RobustWebElement element) {
+		if (canSwitchToParentFrame) {
+			try {
+				return element.getWrappedDriver().switchTo().parentFrame();
+			} catch (Throwable t) {
+				if (Throwables.getRootCause(t) instanceof UnsupportedCommandException) {
+					canSwitchToParentFrame = false;
+				} else {
+					throw t;
+				}
+			}
+		}
+		return element.switchTo();
 	}
 	
 	@Override

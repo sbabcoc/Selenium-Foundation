@@ -192,6 +192,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * 
 	 * @return this container's context
 	 */
+	@Override
 	public SearchContext switchTo() {
 		return getWait().until(contextIsSwitched(this));
 	}
