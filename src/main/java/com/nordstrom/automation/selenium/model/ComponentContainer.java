@@ -653,7 +653,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 			}
 			
 			String pattern = pageUrl.pattern();
-			if (StringUtils.isNotBlank(pattern)) {
+			if (!PLACEHOLDER.equals(pattern)) {
 				actual = actualUri.getPath();
 				String target = targetUri.getPath();
 				if (StringUtils.isNotBlank(target)) {
