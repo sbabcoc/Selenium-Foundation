@@ -185,13 +185,13 @@ Switching the driver focus to a frame context is an expensive process, so **Sele
 		RobustWebElement element = (RobustWebElement) context;
 		WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
 		Object key = driver.findElement(Using.HEADING.selector).getText();
-		driver.switchTo().parentFrame();
+		switchToParentFrame(element);
 		return key;
 	}
 ...
 ```
 
-Note that the search context passed into the **`getKey()`** method is, in fact, a <span style="color:blue">RobustWebElement</span> object. This example implementation switches the driver to the frame context, extracts unique text from a heading element, and switches the driver back to the parent frame. This last step is **_critical_**, because leaving the driver focused on the frame context is likely to cause downstream failures.
+Note that the search context passed into the **`getKey()`** method is, in fact, a <span style="color:blue">RobustWebElement</span> object. This example implementation switches the driver to the frame context, extracts unique text from a heading element, and switches the driver back to the parent frame. This last step is **_critical_**, because leaving the driver focused on the frame context is likely to cause downstream failures. This implementation invokes **`switchToParentFrame()`** instead of using the **WebDriver** API directly. This <span style="color:blue">Frame</span>-class method provides fallback handling for drivers that don't support **`switchTo().parentFrame()`**.
 
 ## Lazy initialization of Component Collections
 
