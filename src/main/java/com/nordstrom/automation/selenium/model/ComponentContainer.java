@@ -493,7 +493,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	public <T extends Page> T openAnnotatedPage(Class<T> pageClass, boolean newWindow) {
 		PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
 		String url = getPageUrl(pageUrl, SeleniumConfig.getConfig().getTargetUri());
-		if (url == null) throw new IllegalArgumentException(pageClass.toString() + " has no @PageUrl annotation or path is unspecified");
+		if (url == null) throw new IllegalArgumentException(pageClass.toString() + " has no @PageUrl annotation, or specified @PageUrl has no value");
 		return openPageAtUrl(pageClass, url, newWindow);
 	}
 	
