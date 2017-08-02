@@ -117,7 +117,7 @@ public enum ContainerMethodInterceptor {
 				result = newChild.enhanceContainer(newChild);
 				if (newHandle != null) {
 					((Page) result).setWindowHandle(newHandle);
-					ComponentContainer.verifyLandingPage((Page) result);
+					ComponentContainer.waitForLandingPage((Page) result);
 				}
 			}
 			
