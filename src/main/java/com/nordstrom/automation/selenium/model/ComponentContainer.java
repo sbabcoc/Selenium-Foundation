@@ -601,6 +601,38 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	}
 	
 	/**
+	 * Wait for the expected landing page to appear in the target browser window.
+	 * 
+	 * @param pageObj target page object
+	 */
+	static void waitForLandingPage(Page pageObj) {
+		SearchContextWait wait = (SearchContextWait)
+				pageObj.getWait(WaitType.PAGE_LOAD).ignoring(LandingPageMismatchException.class);
+		wait.until(landingPageAppears());
+	}
+	
+	/**
+	 * Returns a 'wait' proxy that determines if the expected landing page has appeared.
+	 * 
+	 * @return 'true' if the expected landing page has appeared
+	 */
+	private static Coordinator<Boolean> landingPageAppears() {
+		return new Coordinator<Boolean>() {
+
+			@Override
+			public Boolean apply(SearchContext context) {
+				verifyLandingPage((Page) context);
+				return Boolean.TRUE;
+			}
+			
+			@Override
+			public String toString() {
+				return "expected panding page to appear";
+			}
+		};
+	}
+	
+	/**
 	 * Verify actual landing page against elements of the {@link PageUrl} annotation of the specified page object.
 	 * <p>
 	 * <b>NOTES</b>: <ul>
@@ -620,7 +652,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * 
 	 * @param pageObj page object whose landing page is to be verified
 	 */
-	static void verifyLandingPage(Page pageObj) {
+	private static void verifyLandingPage(Page pageObj) {
 		Class<?> pageClass = getContainerClass(pageObj);
 		PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
 		if (pageUrl != null) {
