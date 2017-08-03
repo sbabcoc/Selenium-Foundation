@@ -15,7 +15,7 @@ Many of the features provided by **Selenium Foundation** are driven by **TestNG*
 com.nordstrom.automation.testng.ListenerChain
 ```
 
-In a Maven project, the preceding file is stored in the <span style="color:blue">src/main/resources</span> package:
+In a Maven project, the preceding file is stored in the <span style="color:blue">src/main/resources</span> folder:
 
 ![com.testng.ITestNGListener](images/META-INF.png)
 
