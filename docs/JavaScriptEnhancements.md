@@ -8,11 +8,11 @@ If the script has a return value (i.e. - if the script contains a <span style="c
 *   For a decimal, a Double is returned
 *   For a non-decimal number, a Long is returned
 *   For a boolean, a Boolean is returned
-*   For all other cases, a String is returned.
-*   For an array, return a List<Object> with each object following the rules above. We support nested lists.
-*   Unless the value is null or there is no return value, in which null is returned
+*   For all other non-null values, a String is returned.
+*   For an array, return a List&lt;Object&gt; with each object following the rules above. Nested lists are supported.
+*   If the value is 'null' or absent, a 'null' is returned.
 
-Each argument must be a number, a boolean, a String, WebElement, or a List of any combination of the above. An exception will be thrown if the arguments do not meet these criteria. The arguments will be made available to the JavaScript via the "arguments" magic variable, as if the function were called via "Function.apply".
+Each argument must be a number, a boolean, a String, a WebElement, or a List of any combination of the above. An exception will be thrown if the arguments do not meet these criteria. The arguments will be made available to the JavaScript via the "arguments" magic variable, as if the function were called via "Function.apply".
 
 Within the script, use <span style="color:blue">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
 
