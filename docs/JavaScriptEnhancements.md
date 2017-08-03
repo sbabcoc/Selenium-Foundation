@@ -1,14 +1,6 @@
-**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the <span style="color:blue">_com.nordstrom.automation.selenium.core_</span> package, and the script files are found in <span style="color:blue">_src/main/resources_</span>. **JsUtility** and its supporting scripts provide the following capabilities:
+# The basics (what **WebDriver** provides)
 
-*   Run JavaScript (with or without result)
-*   Load script files as strings
-*   Throw Java exceptions from JavaScript functions
-
-# Run JavaScript (with or without result)
-
-**Selenium Foundation** enables you to execute JavaScript in the context of the currently selected frame or window. The script fragment provided will be executed as the body of an anonymous function.
-
-Within the script, use <span style="color:blue">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
+**WebDriver** provides the core functionality that enables automated tests to execute arbitrary chunks of JavaScript code in the browser. Execution is either synchronous or asynchronous, and returned results (if any) are automatically converted to Java data types.
 
 If the script has a return value (i.e. - if the script contains a <span style="color:blue">**`return`**</span> statement), the following rules are applied:
 
@@ -20,7 +12,21 @@ If the script has a return value (i.e. - if the script contains a <span style="c
 *   For an array, return a List<Object> with each object following the rules above. We support nested lists.
 *   Unless the value is null or there is no return value, in which null is returned
 
-Arguments must be a number, a boolean, a String, WebElement, or a List of any combination of the above. An exception will be thrown if the arguments do not meet these criteria. The arguments will be made available to the JavaScript via the "arguments" magic variable, as if the function were called via "Function.apply".
+Each argument must be a number, a boolean, a String, WebElement, or a List of any combination of the above. An exception will be thrown if the arguments do not meet these criteria. The arguments will be made available to the JavaScript via the "arguments" magic variable, as if the function were called via "Function.apply".
+
+Within the script, use <span style="color:blue">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
+
+# Extensions (what **JsUtility** adds)
+
+**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the <span style="color:blue">_com.nordstrom.automation.selenium.core_</span> package, and the script files are found in <span style="color:blue">_src/main/resources_</span>. **JsUtility** and its supporting scripts provide the following capabilities:
+
+*   Run JavaScript (with or without result)
+*   Load script files as strings
+*   Throw Java exceptions from JavaScript functions
+
+# Run JavaScript (with or without result)
+
+**Selenium Foundation** enables you to execute JavaScript in the context of the currently selected frame or window. The script fragment provided will be executed as the body of an anonymous function.
 
 ###### Run JavaScript with Result
 ```java
