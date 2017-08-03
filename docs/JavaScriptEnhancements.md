@@ -16,7 +16,7 @@ Each argument must be a number, a boolean, a String, WebElement, or a List of an
 
 Within the script, use <span style="color:blue">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
 
-# Extensions (what **JsUtility** adds)
+# Extended capabilities from **Selenium Foundation**
 
 **Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the <span style="color:blue">_com.nordstrom.automation.selenium.core_</span> package, and the script files are found in <span style="color:blue">_src/main/resources_</span>. **JsUtility** and its supporting scripts provide the following capabilities:
 
