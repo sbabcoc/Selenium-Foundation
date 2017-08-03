@@ -10,7 +10,7 @@
 
 Within the script, use <span style="color:blue">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
 
-If the script has a return value (i.e. if the script contains a <span style="color:blue">**`return`**</span> statement), then the following steps will be taken:
+If the script has a return value (i.e. - if the script contains a <span style="color:blue">**`return`**</span> statement), then the following steps will be taken:
 
 *   For an HTML element, a WebElement is returned
 *   For a decimal, a Double is returned
