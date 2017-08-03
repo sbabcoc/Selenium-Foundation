@@ -758,7 +758,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * @param <T> component container type
 	 * @param containerType target container type
 	 * @return method object for getKey(SearchContext) 
-	 * @throws UnsupportedOperationException if the required method is missing
+	 * @throws UnsupportedOperationException The required method is missing
 	 */
 	static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
 		try {
@@ -773,7 +773,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 	 * 
 	 * @param <T> component container type
 	 * @param containerType target container type
-	 * @throws UnsupportedOperationException if the required constructor is missing
+	 * @throws UnsupportedOperationException The required constructor is missing
 	 */
 	static <T extends ComponentContainer> void verifyCollectible(Class<T> containerType) {
 		try {
