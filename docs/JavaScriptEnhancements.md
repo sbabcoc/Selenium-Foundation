@@ -24,7 +24,7 @@ Within the script, use <span style="color:blue">**`document`**</span> to refer t
 *   Load script files as strings
 *   Throw Java exceptions from JavaScript functions
 
-# Run JavaScript (with or without result)
+## Run JavaScript (with or without result)
 
 **Selenium Foundation** enables you to execute JavaScript in the context of the currently selected frame or window. The script fragment provided will be executed as the body of an anonymous function.
 
@@ -66,7 +66,7 @@ for (var i = 0; i < found.length; i++) {
 return null;
 ```
 
-# Load script files as strings
+## Load script files as strings
 
 **JsUtility** includes the **`getScriptResource()`** method that enables you to load the contents of files in your project as strings. These files can be stored anywhere on the class path, typically a 'resources' folder within the project hierarchy. The following snippet is an excerpt from the previous example: 
 
@@ -78,7 +78,7 @@ return null;
         ...
 ```
 
-# Throw Java exceptions from JavaScript functions
+## Throw Java exceptions from JavaScript functions
 
 This snippet of Java code injects the glue library into the current page and invokes a JavaScript function that may throw an exception.
 
