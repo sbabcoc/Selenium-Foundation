@@ -55,7 +55,7 @@ public class JavaScriptExample {
 }
 ```
 
-This is sample JavaScript file &lt;getMetaTagByName.js&gt;. This file can be stored anywhere on the class path, typically a 'resources' folder within the project hierarchy.
+The following code is sample JavaScript file &lt;getMetaTagByName.js&gt;. This file can be stored anywhere on the class path, typically a 'resources' folder within the project hierarchy.
 
 ###### getMetaTabByName.js
 ```javascript
@@ -80,7 +80,7 @@ return null;
 
 ## Throw Java exceptions from JavaScript functions
 
-This snippet of Java code injects the glue library into the current page and invokes a JavaScript function that may throw an exception.
+The following snippet of Java code injects the glue library into the current page and invokes a JavaScript function that may throw an exception.
 
 ###### Invoke JavaScript that throws an exception
 ```java
@@ -118,7 +118,7 @@ public class AnotherJavaScriptExample {
 }
 ```
 
-This is the sample JavaScript file &lt;requireMetaTagByName.js&gt;. This file can be stored anywhere on the class path, typically a 'resources' folder within the project hierarchy.
+The following code is the sample JavaScript file &lt;requireMetaTagByName.js&gt;. This file can be stored anywhere on the class path, typically a 'resources' folder within the project hierarchy.
 
 ###### requireMetaTabByName.js
 ```javascript
