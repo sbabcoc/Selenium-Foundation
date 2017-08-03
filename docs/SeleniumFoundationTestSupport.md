@@ -204,7 +204,7 @@ public class ExampleTest implements ListenerChainable {
     @BeforeMethod
     @InitialPage(ExamplePage.class)
     public void initialPageFromManager() {
-        ExamplePage examplePage = DriverManager.getInitialPage();
+        ExamplePage examplePage = (ExamplePage) DriverManager.getInitialPage();
         NextAppPage nextAppPage = examplePage.performSetup();
         // set initial page for @Test methods
         DriverManager.setInitialPage(nextAppPage);
@@ -212,7 +212,7 @@ public class ExampleTest implements ListenerChainable {
      
     @Test
     public void initialPageFromBefore() {
-        (NextAppPage) nextAppPage = DriverManager.getInitialPage();
+        (NextAppPage) nextAppPage = (NextAppPage) DriverManager.getInitialPage();
         ...
     }
      
