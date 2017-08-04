@@ -20,6 +20,7 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
@@ -51,9 +52,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 * Get the driver for the current test
 	 * 
 	 * @return driver for the current test
+	 * @throws DriverNotAvailableException No driver was found in the current test context
 	 */
 	public static WebDriver getDriver() {
-		return getDriver(Reporter.getCurrentTestResult());
+		WebDriver driver = getDriver(Reporter.getCurrentTestResult());
+		if (driver == null) throw new DriverNotAvailableException("No driver was found in the current test context");
+		return driver;
 	}
 	
 	/**
@@ -69,7 +73,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 * Get the driver for the specified test result
 	 * 
  	 * @param testResult configuration context (TestNG test result object)
-	 * @return driver from the specified test result
+	 * @return driver from the specified test result (may be 'null')
 	 */
 	public static WebDriver getDriver(ITestResult testResult) {
 		validateTestResult(testResult);
