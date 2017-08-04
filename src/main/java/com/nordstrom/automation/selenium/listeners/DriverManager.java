@@ -51,6 +51,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 * Get the driver for the current test
 	 * 
 	 * @return driver for the current test
+	 * @throws DriverNotAvailableException No driver was found in the current test context
 	 */
 	public static WebDriver getDriver() {
 		WebDriver driver = getDriver(Reporter.getCurrentTestResult());
