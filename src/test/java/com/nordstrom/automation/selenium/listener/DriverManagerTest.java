@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.listener;
 
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -19,18 +20,18 @@ public class DriverManagerTest implements ListenerChainable {
 	@InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
 	@BeforeMethod(groups = {"WithDriverBefore"})
 	public void beforeMethodWithDriver() {
-		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
+		Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
 	}
 	
 	@Test(groups = {"WithDriverBefore"})
 	public void testWithDriverBefore() {
-		Assert.assertNotNull(DriverManager.getDriver(), "Driver should have been created");
+		Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
 	}
 	
 	@NoDriver
 	@Test(groups = {"WithDriverBefore"})
 	public void testCloseDriverBefore() {
-		Assert.assertNull(DriverManager.getDriver(), "Driver should have been closed");
+		Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been closed");
 	}
 	
 	@Override
