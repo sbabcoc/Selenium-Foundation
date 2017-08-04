@@ -38,7 +38,6 @@ public class NoDriverManagerTest implements ListenerChainable {
 		DriverManager.getDriver();
 	}
 	
-	
 	@Override
 	public void attachListeners(ListenerChain listenerChain) {
 		listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
