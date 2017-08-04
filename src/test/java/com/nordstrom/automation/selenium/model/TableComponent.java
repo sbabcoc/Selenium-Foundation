@@ -58,7 +58,7 @@ public class TableComponent extends PageComponent {
 	
 	private List<TableRowComponent> getTableRows() {
 		if (tableRows == null) {
-			tableRows = new ComponentList<>(this, TableRowComponent.class, Using.TBL_ROW.locator);
+			tableRows = newComponentList(TableRowComponent.class, Using.TBL_ROW.locator);
 		}
 		return tableRows;
 	}
