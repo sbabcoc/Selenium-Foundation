@@ -21,6 +21,7 @@ import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
+import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
 
@@ -107,9 +108,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 * Get the initial page object for the current test
 	 * 
 	 * @return page object for the current test
+	 * @throws InitialPageNotSpecifiedException No initial page has been specified
 	 */
 	public static Page getInitialPage() {
-		return (Page) getInitialPage(Reporter.getCurrentTestResult());
+		Page initialPage = (Page) getInitialPage(Reporter.getCurrentTestResult());
+		if (initialPage == null) throw new InitialPageNotSpecifiedException("No initial page was specified");
+		return initialPage;
 	}
 	
 	/**
@@ -124,6 +128,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 			pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
 		}
 		testResult.setAttribute(INITIAL_PAGE, pageObj.enhanceContainer(pageObj));
+		// required when initial page is local file
 		setDriver(pageObj.getDriver(), testResult);
 	}
 	
@@ -131,7 +136,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 	 * Get the initial page object for the specified test result
 	 * 
 	 * @param testResult configuration context (TestNG test result object)
-	 * @return page object for the specified test result
+	 * @return page object for the specified test result (may be 'null')
 	 */
 	public static Page getInitialPage(ITestResult testResult) {
 		validateTestResult(testResult);
