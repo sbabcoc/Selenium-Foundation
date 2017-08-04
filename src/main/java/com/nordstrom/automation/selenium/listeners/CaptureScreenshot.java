@@ -143,7 +143,7 @@ public class CaptureScreenshot implements ITestListener {
      * 
      * @param memoryScreenshot
      * @param fsTarget
-     * @throws IOException if an error occurs while creating or writing the screenshot to a file.
+     * @throws IOException An error occured while creating or writing the screenshot to a file.
      */
     private void putScreenshotInStorage(byte[] memoryScreenshot, Path fsTarget) throws IOException {
         String messageTemplate = "Placing a screenshot of the event at (%s).";

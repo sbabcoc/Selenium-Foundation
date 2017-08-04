@@ -166,7 +166,7 @@ public class GridUtility {
 	 * @param host target HTTP host connection
 	 * @param request request path (may include parameters)
 	 * @return host response for the specified GET request
-	 * @throws IOException the request triggered an I/O exception
+	 * @throws IOException The request triggered an I/O exception
 	 */
 	public static HttpResponse getHttpResponse(HttpHost host, String request) throws IOException {
 		HttpClient client = HttpClientBuilder.create().build();
