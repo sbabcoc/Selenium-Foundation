@@ -35,19 +35,20 @@ import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
- * This class contains declarations and methods related to Selenium WebDriver and Grid configuration.
+ * This class declares settings and methods related to Selenium WebDriver and Grid configuration.
  * 
  * @see SettingsCore
  */
 public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings> {
 	
-	private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
-	
 	private static final String SETTINGS_FILE = "settings.properties";
 	private static final String CONFIG = "CONFIG";
 	private static final String JSON_HEAD = "{ \"capabilities\": [";
-	private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "phantomjs");
 	private static final String JSON_TAIL = "], \"configuration\": {} }";
+	private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
+	
+	/** value: {"browserName": "phantomjs"} */
+	private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "phantomjs");
 	
 	public enum SeleniumSettings implements SettingsCore.SettingsAPI {
 		/** name: <b>selenium.target.scheme</b> <br> default: <b>http</b> */
@@ -74,7 +75,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 		NODE_PORT("selenium.node.port", null),
 		/** name: <b>selenium.browser.name</b> <br> default: {@code null} */
 		BROWSER_NAME("selenium.browser.name", null),
-		/** name: <b>selenium.browser.caps</b> <br> default: <b>{@link #DEFAULT_CAPS}</b> */
+		/** name: <b>selenium.browser.caps</b> <br> default: {@link SeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
 		BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
 		/** name: <b>selenium.timeout.pageload</b> <br> default: <b>30</b> */
 		PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),
@@ -373,7 +374,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
 			String jsonStr = null;
 			String nameStr = getString(SeleniumSettings.BROWSER_NAME.key());
 			if (nameStr != null) {
-				InputStream inputStream = getClass().getClassLoader().getResourceAsStream(nameStr + "Caps.json");
+				InputStream inputStream = 
+						Thread.currentThread().getContextClassLoader().getResourceAsStream(nameStr + "Caps.json");
 				if (inputStream != null) {
 					try {
 						jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
