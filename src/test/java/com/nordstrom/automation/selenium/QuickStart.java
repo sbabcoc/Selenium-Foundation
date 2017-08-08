@@ -139,12 +139,17 @@ import com.nordstrom.automation.testng.ListenerChainable;
  * configuration details via scenario-specific means.
  * <p>
  * Here are the official homes for several of the major drivers: <ul>
- *     <li>GhostDriver (PhantomJS) - <a href="http://phantomjs.org/download.html">http://phantomjs.org/download.html</a></li>
- *     <li>ChromeDriver - <a href="https://sites.google.com/a/chromium.org/chromedriver/downloads">https://sites.google.com/a/chromium.org/chromedriver/downloads</a></li>
- *     <li></li>
- *     <li></li>
- *     <li></li>
+ *     <li>GhostDriver (PhantomJS) - <a href="http://phantomjs.org/download.html">
+ *     http://phantomjs.org/download.html</a></li>
+ *     <li>ChromeDriver - <a href="https://sites.google.com/a/chromium.org/chromedriver/downloads">
+ *     https://sites.google.com/a/chromium.org/chromedriver/downloads</a></li>
+ *     <li>IEDriver - <a href="http://selenium-release.storage.googleapis.com/index.html?path=2.53/">
+ *     http://selenium-release.storage.googleapis.com/index.html?path=2.53/</a></li>
  * </ul>
+ * <b>NOTE</b>: GhostDriver and ChromeDriver are simple binary installations, but several system configuration changes
+ * must be applied for IEDriver to work properly. For details, visit the InternetExplorerDriver project Wiki on GitHub
+ * and follow the <a href="https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration">
+ * Required Configuration</a> procedure.
  */
 @Listeners({ListenerChain.class})
 @InitialPage(ExamplePage.class)
