@@ -61,6 +61,9 @@ import com.nordstrom.automation.testng.ListenerChainable;
  *     file in your user "home" directory. See <b>ESSENTIAL SETTINGS</b> below for more details.</li>
  *     </li>
  *     <li>{@link ReporterAppender}: <br>
+ *     <b>ReporterAppender</b> is a <b>Logback</b> appender for TestNG Reporter. The <b>Selenium Foundation</b> project
+ *     ships with a <i>logback.xml</i> file that attaches this appender. See the complete <b>logback-testng</b> README
+ *     page <a href="https://github.com/sbabcoc/logback-testng">here</a>.
  *     </li>
  * </ul>
  * <p>
@@ -83,12 +86,12 @@ import com.nordstrom.automation.testng.ListenerChainable;
  *         <td style="text-align: center; border: 1px solid black;">(none) *</td>
  *     </tr>
  *     <tr>
- *         <td style="text-align: left; border: 1px solid black;">{@link SeleniumSettings#TARGET_HOST TARGET_HOST</td>
+ *         <td style="text-align: left; border: 1px solid black;">{@link SeleniumSettings#TARGET_HOST TARGET_HOST}</td>
  *         <td style="text-align: left; border: 1px solid black;">selenium.target.host</td>
  *         <td style="text-align: center; border: 1px solid black;">localhost</td>
  *     </tr>
  *     <tr>
- *         <td style="text-align: left; border: 1px solid black;">{@link SeleniumSettings#TARGET_PATH TARGET_PATH</td>
+ *         <td style="text-align: left; border: 1px solid black;">{@link SeleniumSettings#TARGET_PATH TARGET_PATH}</td>
  *         <td style="text-align: left; border: 1px solid black;">selenium.target.path</td>
  *         <td style="text-align: center; border: 1px solid black;">/</td>
  *     </tr>
