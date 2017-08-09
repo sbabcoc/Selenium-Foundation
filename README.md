@@ -56,7 +56,7 @@ You'll probably find that the defaults assigned to most settings will suffice in
     </tr>
 </table>
 
-\* NOTE: By default, PhantonJS is selected as the browser. For easier override, this is specified through **BROWSER\_CAPS** instead of **BROWSER\_NAME**. For details, see [Manipulate Settings with SeleniumConfig](docs/ManipulatingSettingsWithSeleniumConfig.md). 
+\* NOTE: By default, PhantomJS is selected as the browser. For easier override, this is specified through **BROWSER\_CAPS** instead of **BROWSER\_NAME**. For details, see [Manipulate Settings with SeleniumConfig](docs/ManipulatingSettingsWithSeleniumConfig.md). 
 
 ## OVERRIDING DEFAULTS 
 

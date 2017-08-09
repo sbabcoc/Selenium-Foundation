@@ -97,7 +97,7 @@ import com.nordstrom.automation.testng.ListenerChainable;
  *     </tr>
  * </table>
  * <p>
- * * <b>NOTE</b>: By default, PhantonJS is selected as the browser. For easier override, this is specified through
+ * * <b>NOTE</b>: By default, PhantomJS is selected as the browser. For easier override, this is specified through
  * {@link SeleniumSettings#BROWSER_CAPS BROWSER_CAPS} instead of {@link SeleniumSettings#BROWSER_NAME BROWSER_NAME}.
  * For details, see <a href="../../../../../../../docs/ManipulateSettingsWithSeleniumConfig.md">Manipulate Settings
  * with SeleniumConfig</a>. 
