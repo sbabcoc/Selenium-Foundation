@@ -29,6 +29,36 @@ The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundat
 * [ReporterAppender](https://github.com/sbabcoc/logback-testng/blob/master/src/main/java/com/github/sbabcoc/logback/testng/ReporterAppender.java):  
 **ReporterAppender** is a **Logback** appender for TestNG Reporter. The **Selenium Foundation** project ships with a _logback.xml_ file that attaches this appender. See the complete **logback-testng** information page [here](https://github.com/sbabcoc/logback-testng).
 
+## DRIVER ACQUISITION AND HAND-OFF
+
+In the preceding section, driver sessions are acquired automatically for each test or requested implicitly by applying the **@InitialPage** annotation. The core functionality used to initiate driver sessions implicitly can also be invoked ad hoc to acquire drivers explicitly:
+
+```java
+WebDriver driver = GridUtility.getDriver();
+```
+
+This method uses the configured settings for Selenium Grid and desired browser from the current test execution context to instantiate a new driver session.
+
+If the **@InitialPage** annotation is applied to a **@BeforeMethod** configuration method, the driver instantiated for this method is automatically handed off to the test that follows. The initial page as specified for the configuration method is handed off as well. If actions performed by your configuration method trigger page transitions, you need to store the final page accessed by the configuration method as the initial page for the test method:
+
+```java
+@BeforeMethod
+@InitialPage(LoginPage.class)
+public void logInBeforeTest() {
+    LoginPage loginPage = (LoginPage) DriverManager.getInitialPage();
+    MainMenuPage mainMenuPage = loginPage.logInAs(USER.StandardUser);
+    // update initial page for test method
+    DriverManager.setInitialPage(mainMenuPage);
+}
+
+@Test
+public void testMenuFeatures() {
+    MainMenuPage mainMenuPage = (MainMenuPage) DriverManager.getInitialPage();
+    ...
+}
+
+```
+
 ## ESSENTIAL SETTINGS 
 
 You'll probably find that the defaults assigned to most settings will suffice in most basic scenarios. However, it's likely that you'll need to override one or more of the following. The **Property Name** column indicates the name of the System property associated with the setting. To override a setting, you can either add a line for the setting to your _settings.properties_ file or define a System property. 
@@ -56,7 +86,7 @@ You'll probably find that the defaults assigned to most settings will suffice in
     </tr>
 </table>
 
-\* NOTE: By default, PhantomJS is selected as the browser. For easier override, this is specified through **BROWSER\_CAPS** instead of **BROWSER\_NAME**. For details, see [Manipulate Settings with SeleniumConfig](docs/ManipulatingSettingsWithSeleniumConfig.md). 
+\* NOTE: By default, PhantomJS is selected as the browser. For easier override, this is specified through **BROWSER_CAPS** instead of **BROWSER_NAME**. For details, see [Manipulate Settings with SeleniumConfig](docs/ManipulatingSettingsWithSeleniumConfig.md). 
 
 ## OVERRIDING DEFAULTS 
 
@@ -74,7 +104,7 @@ You'll probably find that the defaults assigned to most settings will suffice in
     </tr>
 </table>
 
-This sample _settings.properties_ file overrides the values of **TARGET\_HOST** and **BROWSER\_NAME**. The latter can be overridden by System property declaration: 
+This sample _settings.properties_ file overrides the values of **TARGET_HOST** and **BROWSER_NAME**. The latter can be overridden by System property declaration: 
 
 > `-Dselenium.browser.name=firefox`
 
