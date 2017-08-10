@@ -17,6 +17,8 @@ The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundat
   * [ExecutionFlowController](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/ExecutionFlowController.java):  
 **ExecutionFlowController** is a TestNG listener that propagates test context attributes:  
  [_before_ method] → [test method] → [_after_ method]
+ 
+**ListenerChain** must be activated so that the other core listeners will be connected and active. The **QuickStart** class uses the standard TestNG **@Listeners** annotation to activate **ListenerChain**, but we recommend that you use the **ServiceLoader** mechanism for this purpose in your actual project. For details, see [Selenium Foundation Test Support](docs/SeleniumFoundationTestSupport.md).
 
 ## DEMONSTRATED FEATURES
 
