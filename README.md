@@ -2,7 +2,7 @@
 
 **Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium 2.0** (_WebDriver_). The last stable release of Selenium 2.0 is **2.53.1**.
 
-The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium.QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**, **TestNG Foundation**, and the **Settings API**. It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
+The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**, **TestNG Foundation**, and the **Settings API**. It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
 
 ## REQUIRED ELEMENTS
 
@@ -11,7 +11,7 @@ The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundat
 * The [ListenerChainable](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/ListenerChainable.java) interface:  
  Test classes that implement the **ListenerChainable** interface get the opportunity to attach listeners to the chain before the **SuiteRunner** starts.
 * The `attachListeners` method:  
- The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium.QuickStart.java) class includes a reference implementation of the `attachListeners` method of the **ListenerChainable** interface which attaches two listeners that manage several core features of **Selenium Foundation**:
+ The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class includes a reference implementation of the `attachListeners` method of the **ListenerChainable** interface which attaches two listeners that manage several core features of **Selenium Foundation**:
   * [DriverManager](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/listeners/DriverManager.java):  
 **DriverManager** is a TestNG listener that manages driver sessions and local Selenium Grid servers.
   * [ExecutionFlowController](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/ExecutionFlowController.java):  
