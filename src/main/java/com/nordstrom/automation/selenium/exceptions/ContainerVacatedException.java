@@ -6,11 +6,11 @@ import com.nordstrom.automation.selenium.utility.ReflectUtil;
 
 public class ContainerVacatedException extends RuntimeException {
 
-	private static final long serialVersionUID = 2043877560841903084L;
-	
-	private Method vacater;
-	private static final String PREAMBLE = "Container object was vacated by invocation of method: ";
-	
+    private static final long serialVersionUID = 2043877560841903084L;
+    
+    private Method vacater;
+    private static final String PREAMBLE = "Container object was vacated by invocation of method: ";
+    
     /**
      * Constructs a new container vacated exception with the specified vacater.
      *
@@ -27,7 +27,7 @@ public class ContainerVacatedException extends RuntimeException {
      * @return method that vacated the target object
      */
     public Method getVacater() {
-    	return vacater;
+        return vacater;
     }
     
     /**
@@ -37,9 +37,9 @@ public class ContainerVacatedException extends RuntimeException {
      * @return message for this exception
      */
     private static String getMessage(Method method) {
-    	String className = method.getDeclaringClass().getSimpleName();
-    	String signature = ReflectUtil.getSignature(method);
-    	return PREAMBLE + className + ":" + signature;
+        String className = method.getDeclaringClass().getSimpleName();
+        String signature = ReflectUtil.getSignature(method);
+        return PREAMBLE + className + ":" + signature;
     }
     
 }

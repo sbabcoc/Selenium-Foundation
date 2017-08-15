@@ -16,31 +16,31 @@ import com.nordstrom.automation.testng.ListenerChainable;
 @Listeners({ListenerChain.class})
 public class NoDriverManagerTest implements ListenerChainable {
 
-	@BeforeMethod(groups = {"NoDriverBefore"})
-	public void beforeMethodNoDriver() {
-		Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should not have been created");
-	}
-	
-	@NoDriver
-	@Test(groups = {"NoBeforeNoDriver"})
-	public void testNoBeforeNoDriver() {
-		Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should not have been created");
-	}
-	
-	@Test(groups = {"NoDriverBefore"})
-	public void testNoDriverBefore() {
-		Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
-	}
-	
-	@NoDriver
-	@Test(groups = {"NoBeforeNoDriver"}, expectedExceptions = {DriverNotAvailableException.class})
-	public void testNoDriverException() {
-		DriverManager.getDriver();
-	}
-	
-	@Override
-	public void attachListeners(ListenerChain listenerChain) {
-		listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-	}
-	
+    @BeforeMethod(groups = {"NoDriverBefore"})
+    public void beforeMethodNoDriver() {
+        Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should not have been created");
+    }
+    
+    @NoDriver
+    @Test(groups = {"NoBeforeNoDriver"})
+    public void testNoBeforeNoDriver() {
+        Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should not have been created");
+    }
+    
+    @Test(groups = {"NoDriverBefore"})
+    public void testNoDriverBefore() {
+        Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
+    }
+    
+    @NoDriver
+    @Test(groups = {"NoBeforeNoDriver"}, expectedExceptions = {DriverNotAvailableException.class})
+    public void testNoDriverException() {
+        DriverManager.getDriver();
+    }
+    
+    @Override
+    public void attachListeners(ListenerChain listenerChain) {
+        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
+    }
+    
 }

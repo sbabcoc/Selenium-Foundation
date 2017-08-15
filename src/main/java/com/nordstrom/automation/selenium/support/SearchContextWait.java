@@ -16,78 +16,78 @@ import org.openqa.selenium.support.ui.SystemClock;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 public class SearchContextWait extends FluentWait<SearchContext> {
-	public final static long DEFAULT_SLEEP_TIMEOUT = 500;
-	private final SearchContext context;
+    public final static long DEFAULT_SLEEP_TIMEOUT = 500;
+    private final SearchContext context;
 
-	/**
-	 * Wait will ignore instances of NotFoundException that are encountered
-	 * (thrown) by default in the 'until' condition, and immediately propagate
-	 * all others. You can add more to the ignore list by calling
-	 * ignoring(exceptions to add).
-	 *
-	 * @param context
-	 *            The SearchContext instance to pass to the expected conditions
-	 * @param timeOutInSeconds
-	 *            The timeout in seconds when an expectation is called
-	 * @see SearchContextWait#ignoring(java.lang.Class)
-	 */
-	public SearchContextWait(SearchContext context, long timeOutInSeconds) {
-		this(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER, timeOutInSeconds, DEFAULT_SLEEP_TIMEOUT);
-	}
+    /**
+     * Wait will ignore instances of NotFoundException that are encountered
+     * (thrown) by default in the 'until' condition, and immediately propagate
+     * all others. You can add more to the ignore list by calling
+     * ignoring(exceptions to add).
+     *
+     * @param context
+     *            The SearchContext instance to pass to the expected conditions
+     * @param timeOutInSeconds
+     *            The timeout in seconds when an expectation is called
+     * @see SearchContextWait#ignoring(java.lang.Class)
+     */
+    public SearchContextWait(SearchContext context, long timeOutInSeconds) {
+        this(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER, timeOutInSeconds, DEFAULT_SLEEP_TIMEOUT);
+    }
 
-	/**
-	 * Wait will ignore instances of NotFoundException that are encountered
-	 * (thrown) by default in the 'until' condition, and immediately propagate
-	 * all others. You can add more to the ignore list by calling
-	 * ignoring(exceptions to add).
-	 *
-	 * @param context
-	 *            The SearchContext instance to pass to the expected conditions
-	 * @param timeOutInSeconds
-	 *            The timeout in seconds when an expectation is called
-	 * @param sleepInMillis
-	 *            The duration in milliseconds to sleep between polls.
-	 * @see SearchContextWait#ignoring(java.lang.Class)
-	 */
-	public SearchContextWait(SearchContext context, long timeOutInSeconds, long sleepInMillis) {
-		this(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER, timeOutInSeconds, sleepInMillis);
-	}
+    /**
+     * Wait will ignore instances of NotFoundException that are encountered
+     * (thrown) by default in the 'until' condition, and immediately propagate
+     * all others. You can add more to the ignore list by calling
+     * ignoring(exceptions to add).
+     *
+     * @param context
+     *            The SearchContext instance to pass to the expected conditions
+     * @param timeOutInSeconds
+     *            The timeout in seconds when an expectation is called
+     * @param sleepInMillis
+     *            The duration in milliseconds to sleep between polls.
+     * @see SearchContextWait#ignoring(java.lang.Class)
+     */
+    public SearchContextWait(SearchContext context, long timeOutInSeconds, long sleepInMillis) {
+        this(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER, timeOutInSeconds, sleepInMillis);
+    }
 
-	/**
-	 * @param context
-	 *            The SearchContext instance to pass to the expected conditions
-	 * @param clock
-	 *            The clock to use when measuring the timeout
-	 * @param sleeper
-	 *            Object used to make the current thread go to sleep.
-	 * @param timeOutInSeconds
-	 *            The timeout in seconds when an expectation is
-	 * @param sleepTimeOut
-	 *            The timeout used whilst sleeping. Defaults to 500ms called.
-	 */
-	public SearchContextWait(SearchContext context, Clock clock, Sleeper sleeper, long timeOutInSeconds,
-			long sleepTimeOut) {
-		super(context, clock, sleeper);
-		withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
-		pollingEvery(sleepTimeOut, TimeUnit.MILLISECONDS);
-		ignoring(NotFoundException.class);
-		this.context = context;
-	}
+    /**
+     * @param context
+     *            The SearchContext instance to pass to the expected conditions
+     * @param clock
+     *            The clock to use when measuring the timeout
+     * @param sleeper
+     *            Object used to make the current thread go to sleep.
+     * @param timeOutInSeconds
+     *            The timeout in seconds when an expectation is
+     * @param sleepTimeOut
+     *            The timeout used whilst sleeping. Defaults to 500ms called.
+     */
+    public SearchContextWait(SearchContext context, Clock clock, Sleeper sleeper, long timeOutInSeconds,
+            long sleepTimeOut) {
+        super(context, clock, sleeper);
+        withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
+        pollingEvery(sleepTimeOut, TimeUnit.MILLISECONDS);
+        ignoring(NotFoundException.class);
+        this.context = context;
+    }
 
-	@Override
-	protected RuntimeException timeoutException(String message, Throwable lastException) {
-		TimeoutException ex = new TimeoutException(message, lastException);
-		ex.addInfo(WebDriverException.DRIVER_INFO, context.getClass().getName());
-		WebDriver driver = WebDriverUtils.getDriver(context);
-		if (driver instanceof RemoteWebDriver) {
-			RemoteWebDriver remote = (RemoteWebDriver) driver;
-			if (remote.getSessionId() != null) {
-				ex.addInfo(WebDriverException.SESSION_ID, remote.getSessionId().toString());
-			}
-			if (remote.getCapabilities() != null) {
-				ex.addInfo("Capabilities", remote.getCapabilities().toString());
-			}
-		}
-		throw ex;
-	}
+    @Override
+    protected RuntimeException timeoutException(String message, Throwable lastException) {
+        TimeoutException ex = new TimeoutException(message, lastException);
+        ex.addInfo(WebDriverException.DRIVER_INFO, context.getClass().getName());
+        WebDriver driver = WebDriverUtils.getDriver(context);
+        if (driver instanceof RemoteWebDriver) {
+            RemoteWebDriver remote = (RemoteWebDriver) driver;
+            if (remote.getSessionId() != null) {
+                ex.addInfo(WebDriverException.SESSION_ID, remote.getSessionId().toString());
+            }
+            if (remote.getCapabilities() != null) {
+                ex.addInfo("Capabilities", remote.getCapabilities().toString());
+            }
+        }
+        throw ex;
+    }
 }

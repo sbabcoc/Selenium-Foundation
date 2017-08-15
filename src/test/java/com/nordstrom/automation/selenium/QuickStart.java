@@ -157,20 +157,20 @@ import com.nordstrom.automation.testng.ListenerChainable;
 @Listeners({ListenerChain.class})
 @InitialPage(ExamplePage.class)
 public class QuickStart implements ListenerChainable {
-	
-	private static final String PAGE_TITLE = "Example Page";
-	private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);
-	
-	@Test
-	public void dummyTest() {
-		SeleniumConfig config = SeleniumConfig.getConfig();
-		LOGGER.info("The configured browser is: " + config.getString(SeleniumSettings.BROWSER_NAME.key()));
-		ExamplePage examplePage = (ExamplePage) DriverManager.getInitialPage();
-		assertEquals(examplePage.getTitle(), PAGE_TITLE, "Unexpeced page title");
-	}
+    
+    private static final String PAGE_TITLE = "Example Page";
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);
+    
+    @Test
+    public void dummyTest() {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        LOGGER.info("The configured browser is: " + config.getString(SeleniumSettings.BROWSER_NAME.key()));
+        ExamplePage examplePage = (ExamplePage) DriverManager.getInitialPage();
+        assertEquals(examplePage.getTitle(), PAGE_TITLE, "Unexpeced page title");
+    }
 
-	@Override
-	public void attachListeners(ListenerChain listenerChain) {
-		listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-	}
+    @Override
+    public void attachListeners(ListenerChain listenerChain) {
+        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
+    }
 }

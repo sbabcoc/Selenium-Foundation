@@ -12,6 +12,6 @@ import com.nordstrom.automation.selenium.model.Page;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 public @interface InitialPage {
-	Class<? extends Page> value() default Page.class;
-	PageUrl pageUrl() default @PageUrl();
+    Class<? extends Page> value() default Page.class;
+    PageUrl pageUrl() default @PageUrl();
 }

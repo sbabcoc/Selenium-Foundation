@@ -62,10 +62,10 @@ public final class JsUtility {
     private static final String CLASS_NAME_KEY = "className";
     private static final String MESSAGE_KEY = "message";
     
-	private JsUtility() {
-		throw new AssertionError("JsUtility is a static utility class that cannot be instantiated");
-	}
-	
+    private JsUtility() {
+        throw new AssertionError("JsUtility is a static utility class that cannot be instantiated");
+    }
+    
     /**
      * Executes JavaScript in the context of the currently selected frame or window. The script
      * fragment provided will be executed as the body of an anonymous function.
@@ -87,10 +87,10 @@ public final class JsUtility {
      * @see JavascriptExecutor#executeScript(String, Object...)
      */
     public static void run(WebDriver driver, String js, Object... args) {
-		Object result = WebDriverUtils.getExecutor(driver).executeScript(js, args);
-		if (result != null) {
-		    LOGGER.warn("The specified JavaScript returned a non-null result");
-		}
+        Object result = WebDriverUtils.getExecutor(driver).executeScript(js, args);
+        if (result != null) {
+            LOGGER.warn("The specified JavaScript returned a non-null result");
+        }
     }
     
     /**
@@ -133,7 +133,7 @@ public final class JsUtility {
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
     public static <T> T runAndReturn(WebDriver driver, String js, Class<T> resultType, Object... args) {
-		return (T) WebDriverUtils.getExecutor(driver).executeScript(js, args);
+        return (T) WebDriverUtils.getExecutor(driver).executeScript(js, args);
     }
     
     /**
@@ -142,10 +142,10 @@ public final class JsUtility {
      * @param driver A handle to the currently running Selenium test window.
      */
     public static void injectGlueLib(WebDriver driver) {
-    	JavascriptExecutor executor = WebDriverUtils.getExecutor(driver);
-    	if ((boolean) executor.executeScript("return (typeof isObject != 'function');")) {
-    		executor.executeScript(getScriptResource(JsUtility.JAVA_GLUE_LIB));
-    	}
+        JavascriptExecutor executor = WebDriverUtils.getExecutor(driver);
+        if ((boolean) executor.executeScript("return (typeof isObject != 'function');")) {
+            executor.executeScript(getScriptResource(JsUtility.JAVA_GLUE_LIB));
+        }
     }
     
     /**
@@ -169,29 +169,29 @@ public final class JsUtility {
      * @param exception web driver exception to propagate
      * @return nothing (this method always throws the specified exception)
      */
-	public static RuntimeException propagate(WebDriverException exception) {
-		Throwable thrown = exception;
-		if (exception.getClass().equals(WebDriverException.class)) { 
-			String message = exception.getMessage();
-			int index = message.indexOf(':');
-			if ((index != -1) && ERROR_PREFIX.equals(message.substring(0, index))) {
-				String encodedException = message.substring(index + 1).trim();
-				if (encodedException.contains("\"" + CLASS_NAME_KEY + "\"")
-						&& encodedException.contains("\"" + MESSAGE_KEY + "\"")) {
-					JsonObject obj = DataUtils.deserializeObject(encodedException);
-					if (obj != null) {
-						try {
-							Class<?> clazz = Class.forName(obj.get(CLASS_NAME_KEY).toString());
-							Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
-							thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).toString(), exception);
-							thrown.setStackTrace(new Throwable().getStackTrace());
-						} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-								| IllegalAccessException | IllegalArgumentException | InvocationTargetException eaten) {
-						}
-					}
-				}
-			}
-		}
-		throw UncheckedThrow.throwUnchecked(thrown);
-	}
+    public static RuntimeException propagate(WebDriverException exception) {
+        Throwable thrown = exception;
+        if (exception.getClass().equals(WebDriverException.class)) { 
+            String message = exception.getMessage();
+            int index = message.indexOf(':');
+            if ((index != -1) && ERROR_PREFIX.equals(message.substring(0, index))) {
+                String encodedException = message.substring(index + 1).trim();
+                if (encodedException.contains("\"" + CLASS_NAME_KEY + "\"")
+                        && encodedException.contains("\"" + MESSAGE_KEY + "\"")) {
+                    JsonObject obj = DataUtils.deserializeObject(encodedException);
+                    if (obj != null) {
+                        try {
+                            Class<?> clazz = Class.forName(obj.get(CLASS_NAME_KEY).toString());
+                            Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
+                            thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).toString(), exception);
+                            thrown.setStackTrace(new Throwable().getStackTrace());
+                        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+                                | IllegalAccessException | IllegalArgumentException | InvocationTargetException eaten) {
+                        }
+                    }
+                }
+            }
+        }
+        throw UncheckedThrow.throwUnchecked(thrown);
+    }
 }

@@ -16,27 +16,27 @@ import com.nordstrom.automation.testng.ListenerChainable;
 
 @Listeners({ListenerChain.class})
 public class DriverManagerTest implements ListenerChainable {
-	
-	@InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
-	@BeforeMethod(groups = {"WithDriverBefore"})
-	public void beforeMethodWithDriver() {
-		Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
-	}
-	
-	@Test(groups = {"WithDriverBefore"})
-	public void testWithDriverBefore() {
-		Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
-	}
-	
-	@NoDriver
-	@Test(groups = {"WithDriverBefore"})
-	public void testCloseDriverBefore() {
-		Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been closed");
-	}
-	
-	@Override
-	public void attachListeners(ListenerChain listenerChain) {
-		listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-	}
-	
+    
+    @InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
+    @BeforeMethod(groups = {"WithDriverBefore"})
+    public void beforeMethodWithDriver() {
+        Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
+    }
+    
+    @Test(groups = {"WithDriverBefore"})
+    public void testWithDriverBefore() {
+        Assert.assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
+    }
+    
+    @NoDriver
+    @Test(groups = {"WithDriverBefore"})
+    public void testCloseDriverBefore() {
+        Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been closed");
+    }
+    
+    @Override
+    public void attachListeners(ListenerChain listenerChain) {
+        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
+    }
+    
 }
