@@ -24,6 +24,7 @@ import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
+import com.nordstrom.automation.testng.ExecutionFlowController;
 
 /**
  * This TestNG listener performs several basic functions related to driver session management:
@@ -201,6 +202,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             
             // if driver not yet acquired
             if (driver == null) {
+                long prior = System.currentTimeMillis();
                 Object instance = testMethod.getInstance();
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
@@ -210,6 +212,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
                 }
                 setDriverTimeouts(driver, config);
                 setDriver(driver, testResult);
+                if (testMethod.isTest()) {
+                    long after = System.currentTimeMillis();
+                	ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                }
             }
             
             // if driver acquired and initial page specified
