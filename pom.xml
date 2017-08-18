@@ -26,6 +26,7 @@
     <logback.version>1.2.2</logback.version>
     <logback-testng.version>1.0.0</logback-testng.version>
     <sonar.language>java</sonar.language>
+    <jacoco.version>0.7.9</jacoco.version>
   </properties>
   
   <distributionManagement>
@@ -126,6 +127,25 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
