@@ -19,7 +19,7 @@ In a Maven project, the preceding file is stored in the <span style="color:blue"
 
 ![com.testng.ITestNGListener](images/META-INF.png)
 
-Once this file is added to your project, <span style="color:blue">ListenerChain</span> will be loaded automatically whenever you run your tests. To link listeners into the chain, mark your test class with the <span style="color:blue">LinkedListeners</span> annotation:
+Once this file is added to your project, <span style="color:blue">ListenerChain</span> will be loaded automatically whenever you run your tests. To attach listeners to the chain, mark your test class with the <span style="color:blue">LinkedListeners</span> annotation:
 
 ###### LinkedListeners annotation
 ```java
