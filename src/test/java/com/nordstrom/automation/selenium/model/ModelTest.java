@@ -11,12 +11,13 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
 
 @InitialPage(ExamplePage.class)
 @Listeners({ListenerChain.class})
-public class ModelTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ModelTest {
     
     private static final String TITLE = "Example Page";
     private static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
@@ -181,11 +182,6 @@ public class ModelTest implements ListenerChainable {
 
     private ExamplePage getPage() {
         return (ExamplePage) DriverManager.getInitialPage();
-    }
-    
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
     }
     
 }

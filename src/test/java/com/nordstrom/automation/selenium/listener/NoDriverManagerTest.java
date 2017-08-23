@@ -10,11 +10,12 @@ import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
 
 @Listeners({ListenerChain.class})
-public class NoDriverManagerTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class NoDriverManagerTest {
 
     @BeforeMethod(groups = {"NoDriverBefore"})
     public void beforeMethodNoDriver() {
@@ -36,11 +37,6 @@ public class NoDriverManagerTest implements ListenerChainable {
     @Test(groups = {"NoBeforeNoDriver"}, expectedExceptions = {DriverNotAvailableException.class})
     public void testNoDriverException() {
         DriverManager.getDriver();
-    }
-    
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
     }
     
 }

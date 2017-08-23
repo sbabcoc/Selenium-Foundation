@@ -11,11 +11,12 @@ import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
 
 @Listeners({ListenerChain.class})
-public class DriverManagerTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class DriverManagerTest {
     
     @InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
     @BeforeMethod(groups = {"WithDriverBefore"})
@@ -32,11 +33,6 @@ public class DriverManagerTest implements ListenerChainable {
     @Test(groups = {"WithDriverBefore"})
     public void testCloseDriverBefore() {
         Assert.assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been closed");
-    }
-    
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
     }
     
 }

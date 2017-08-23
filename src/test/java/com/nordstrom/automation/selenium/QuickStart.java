@@ -13,8 +13,8 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
 
 /**
  * <b>INTRODUCTION</b>
@@ -31,12 +31,10 @@ import com.nordstrom.automation.testng.ListenerChainable;
  *     <li>{@link ListenerChain}: <br>
  *     <b>ListenerChain</b> is a TestNG listener that enables you to add other listeners at runtime and guarantees the
  *     order in which they're invoked. This is similar in behavior to a JUnit rule chain.</li>
- *     <li>The {@link ListenerChainable} interface: <br>
- *     Test classes that implement the <b>ListenerChainable</b> interface get the opportunity to attach listeners to
- *     the chain before the <b>SuiteRunner</b> starts.</li>
- *     <li>The {@link #attachListeners} method: <br>
- *     This reference implementation of the {@code attachListeners} method declared by the <b>ListenerChainable</b>
- *     interface attaches two listeners that manage several core features of <b>Selenium Foundation</b>: <ul>
+ *     <li>The {@link LinkedListeners} annotation: <br>
+ *     To attach listeners to an active <b>ListenerChain</b>, mark your test class with the <b>LinkedListeners</b>
+ *     annotation. This <b>QuickStart</b> class is marked with a <b>LinkedListeners</b> annotation that specifies two
+ *     listeners that manage several core features of <b>Selenium Foundation</b>: <ul>
  *         <li>{@link DriverManager}: <br>
  *         <b>DriverManager</b> is a TestNG listener that manages driver sessions and local Selenium Grid servers.</li>
  *         <li>{@link ExecutionFlowController}: <br>
@@ -155,8 +153,9 @@ import com.nordstrom.automation.testng.ListenerChainable;
  * Required Configuration</a> procedure.
  */
 @Listeners({ListenerChain.class})
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
 @InitialPage(ExamplePage.class)
-public class QuickStart implements ListenerChainable {
+public class QuickStart {
     
     private static final String PAGE_TITLE = "Example Page";
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);
@@ -167,10 +166,5 @@ public class QuickStart implements ListenerChainable {
         LOGGER.info("The configured browser is: " + config.getString(SeleniumSettings.BROWSER_NAME.key()));
         ExamplePage examplePage = (ExamplePage) DriverManager.getInitialPage();
         assertEquals(examplePage.getTitle(), PAGE_TITLE, "Unexpeced page title");
-    }
-
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
     }
 }
