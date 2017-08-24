@@ -157,6 +157,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         
     }
 
+    private static final ThreadLocal<SeleniumConfig> seleniumConfig = new ThreadLocal<>();
+    
     private URI targetUri;
     private String nodeConfigPath;
     private RegistrationRequest nodeConfig;
@@ -186,19 +188,28 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @return Selenium configuration object
      */
     public static SeleniumConfig getConfig(ITestResult testResult) {
-        if (testResult == null) throw new NullPointerException("Test result object must be non-null");
+        if (testResult == null) {
+            return getSeleniumConfig();
+        }
         if (testResult.getAttribute(CONFIG) == null) {
             synchronized (CONFIG) {
                 if (testResult.getAttribute(CONFIG) == null) {
-                    try {
-                        testResult.setAttribute(CONFIG, new SeleniumConfig());
-                    } catch (ConfigurationException | IOException e) {
-                        throw new RuntimeException("Failed to instantiate settings", e);
-                    }
+                    testResult.setAttribute(CONFIG, getSeleniumConfig());
                 }
             }
         }
         return (SeleniumConfig) testResult.getAttribute(CONFIG);
+    }
+    
+    private static SeleniumConfig getSeleniumConfig() {
+        if (seleniumConfig.get() == null) {
+            try {
+                seleniumConfig.set(new SeleniumConfig());
+            } catch (ConfigurationException | IOException e) {
+                throw new RuntimeException("Failed to instantiate settings", e);
+            }
+        }
+        return seleniumConfig.get();
     }
     
     /**

@@ -12,7 +12,6 @@ import org.apache.http.HttpHost;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -20,10 +19,8 @@ import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
-import com.nordstrom.automation.testng.ListenerChain;
 import com.nordstrom.common.base.UncheckedThrow;
 
-@Listeners({ListenerChain.class})
 @LinkedListeners({DriverManager.class, ExecutionFlowController.class})
 public class GridUtilityTest {
     

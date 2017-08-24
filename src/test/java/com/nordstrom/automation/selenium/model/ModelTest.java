@@ -5,17 +5,14 @@ import static org.testng.Assert.assertEquals;
 import java.util.List;
 import java.util.Map;
 
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
-import com.nordstrom.automation.testng.ListenerChain;
 
 @InitialPage(ExamplePage.class)
-@Listeners({ListenerChain.class})
 @LinkedListeners({DriverManager.class, ExecutionFlowController.class})
 public class ModelTest {
     

@@ -4,7 +4,6 @@ import static org.testng.Assert.assertEquals;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.github.sbabcoc.logback.testng.ReporterAppender;
@@ -152,7 +151,6 @@ import com.nordstrom.automation.testng.ListenerChain;
  * and follow the <a href="https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration">
  * Required Configuration</a> procedure.
  */
-@Listeners({ListenerChain.class})
 @LinkedListeners({DriverManager.class, ExecutionFlowController.class})
 @InitialPage(ExamplePage.class)
 public class QuickStart {
