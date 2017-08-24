@@ -8,10 +8,8 @@ The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundat
 
 * [ListenerChain](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/ListenerChain.java):  
 **ListenerChain** is a TestNG listener that enables you to add other listeners at runtime and guarantees the order in which they're invoked. This is similar in behavior to a JUnit rule chain.
-* The [ListenerChainable](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/ListenerChainable.java) interface:  
- Test classes that implement the **ListenerChainable** interface get the opportunity to attach listeners to the chain before the **SuiteRunner** starts.
-* The `attachListeners` method:  
- The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class includes a reference implementation of the `attachListeners` method of the **ListenerChainable** interface which attaches two listeners that manage several core features of **Selenium Foundation**:
+* The [LinkedListeners](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/LinkedListeners.java) annotation:  
+ To attach listeners to an active **ListenerChain**, mark your test class with the **LinkedListeners** annotation. The [QuickStart](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class is marked with a **LinkedListeners** annotation that specifies two listeners that manage several core features of **Selenium Foundation**:
   * [DriverManager](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/listeners/DriverManager.java):  
 **DriverManager** is a TestNG listener that manages driver sessions and local Selenium Grid servers.
   * [ExecutionFlowController](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/ExecutionFlowController.java):  

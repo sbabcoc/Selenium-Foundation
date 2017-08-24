@@ -19,29 +19,26 @@ In a Maven project, the preceding file is stored in the <span style="color:blue"
 
 ![com.testng.ITestNGListener](images/META-INF.png)
 
-Once this file is added to your project, <span style="color:blue">ListenerChain</span> will be loaded automatically whenever you run your tests. To request dynamic listener chaining, your test class implements the <span style="color:blue">ListenerChainable</span> interface:
+Once this file is added to your project, <span style="color:blue">ListenerChain</span> will be loaded automatically whenever you run your tests. To attach listeners to the chain, mark your test class with the <span style="color:blue">LinkedListeners</span> annotation:
 
-###### Implementing ListenerChainable
+###### LinkedListeners annotation
 ```java
 package com.nordstrom.example;
  
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
  
-public class ExampleTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ExampleTest {
      
     ...
   
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-    }
 }
 ```
 
-As shown above, we use the **`attachListeners()`** callback to attach <span style="color:blue">DriverManager</span> and <span style="color:blue">ExecutionFlowController</span>. The order in which listener methods are invoked is determined by the order in which listener objects are added to the chain. Listener _before_ methods are invoked in <span style="color:yellowgreen">last-added-first-called</span> order. Listener _after_ methods are invoked in <span style="color:yellowgreen">first-added-first-called</span> order. Only one instance of any given listener class will be included in the chain.
+As shown above, we use the **`@LinkedListeners`** annotation to attach <span style="color:blue">DriverManager</span> and <span style="color:blue">ExecutionFlowController</span>. The order in which listener methods are invoked is determined by the order in which listener objects are added to the chain. Listener _before_ methods are invoked in <span style="color:yellowgreen">last-added-first-called</span> order. Listener _after_ methods are invoked in <span style="color:yellowgreen">first-added-first-called</span> order. Only one instance of any given listener class will be included in the chain.
 
 ## ExecutionFlowController
 
@@ -89,10 +86,11 @@ import org.testng.annotations.Test;
  
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
  
-public class ExampleTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ExampleTest {
      
     @Test
     public void testDriverAccess() {
@@ -109,13 +107,6 @@ public class ExampleTest implements ListenerChainable {
     private static void doStuff(ITestResult testResult) {
         WebDriver driver = DriverManager.getDriver(testResult);
         ...
-    }
-     
-    ...
-  
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
     }
 }
 ```
@@ -138,21 +129,17 @@ import org.testng.ITestResult;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
  
-public class ExampleTest implements ListenerChainable, DriverProvider {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ExampleTest implements DriverProvider {
      
     ...
      
     @Override
     public WebDriver provideDriver(IInvokedMethod method, ITestResult testResult) {
         return new VivaldiDriver();
-    }
-     
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
     }
 }
 ```
@@ -164,10 +151,11 @@ package com.nordstrom.example;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
  
-public class ExampleTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ExampleTest {
      
     @Test
     @NoDriver
@@ -177,10 +165,6 @@ public class ExampleTest implements ListenerChainable {
      
     ...
      
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-    }
 }
 ```
 
@@ -196,10 +180,11 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
  
-public class ExampleTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ExampleTest {
      
     @BeforeMethod
     @InitialPage(ExamplePage.class)
@@ -218,10 +203,6 @@ public class ExampleTest implements ListenerChainable {
      
     ...
   
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-    }
 }
 ```
 
@@ -241,14 +222,15 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
-  
+ 
 import com.nordstrom.example.model.HelpPage;
 import com.nordstrom.example.model.LoginPage;
  
 @InitialPage(LoginPage.class)
-public class ExampleTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ExampleTest {
      
     @Test
     public void testLoginPage() {
@@ -267,10 +249,6 @@ public class ExampleTest implements ListenerChainable {
      
     ...
   
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
-    }
 }
 ```
 
@@ -310,13 +288,14 @@ import org.testng.annotations.Test;
  
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
-  
+ 
 import com.nordstrom.example.listeners.ScenarioCleanup;
  
-public class ExampleTest implements ListenerChainable {
-     
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class ExampleTest {
+  
     @Test
     public void testSomething() {
         ...
@@ -332,10 +311,6 @@ public class ExampleTest implements ListenerChainable {
      
     ...
   
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(ScenarioCleanup.class).around(DriverManager.class).around(ExecutionFlowController.class);
-    }
 }
 ```
 

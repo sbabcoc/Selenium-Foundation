@@ -12,19 +12,17 @@ import org.apache.http.HttpHost;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
-import com.nordstrom.automation.testng.ListenerChain;
-import com.nordstrom.automation.testng.ListenerChainable;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.common.base.UncheckedThrow;
 
-@Listeners({ListenerChain.class})
-public class GridUtilityTest implements ListenerChainable {
+@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
+public class GridUtilityTest {
     
     private static final int POLL_COUNT = 30;
     private static final long POLL_DELAY = 500;
@@ -86,11 +84,6 @@ public class GridUtilityTest implements ListenerChainable {
         GridHubConfiguration hubConfig = config.getHubConfig();
         assertFalse(GridUtility.isHubActive(hubConfig), "Configured local hub should initially be inactive");
         assertTrue(GridUtility.isHubActive(), "Configured local hub should have been activated");
-    }
-
-    @Override
-    public void attachListeners(ListenerChain listenerChain) {
-        listenerChain.around(DriverManager.class).around(ExecutionFlowController.class);
     }
 
 }
