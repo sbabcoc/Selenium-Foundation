@@ -68,8 +68,10 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     
     @Override
     public Set<Map.Entry<Object, V>> entrySet() {
-        Set<Map.Entry<Object, V>> es;
-        return (es = entrySet) == null ? (entrySet = new EntrySet()) : es;
+        if (entrySet == null) {
+            entrySet = new EntrySet();
+        }
+        return entrySet;
     }
     
     /**
@@ -227,13 +229,17 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
          * @return next table entry
          */
         final Entry<V> nextEntry() {
-            Entry<V>[] t;
-            Entry<V> e = next;
-            if (e == null) throw new NoSuchElementException();
-            if ((next = (current = e).next) == null && (t = table) != null) {
-                do {} while (index < t.length && (next = t[index++]) == null);
+            if (next == null) throw new NoSuchElementException();
+            
+            current = next;
+            next = next.next;
+            if (table != null) {
+                while ((next == null) && (index < table.length)) {
+                    next = table[index++];
+                }
             }
-            return e;
+            
+            return current;
         }
     }
 }
