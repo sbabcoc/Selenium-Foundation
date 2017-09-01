@@ -111,8 +111,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         this.locator = locator;
         this.index = index;
         
-        Objects.requireNonNull(context, "[context] cannot be null");
-        Objects.requireNonNull(locator, "[locator] cannot be null");
+        Objects.requireNonNull(context, "[context] must be non-null");
+        Objects.requireNonNull(locator, "[locator] must be non-null");
         if (index < OPTIONAL) throw new IndexOutOfBoundsException("Specified index is invalid");
         
         driver = WebDriverUtils.getDriver(context.getWrappedContext());
