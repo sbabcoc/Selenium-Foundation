@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -66,7 +67,7 @@ public class GridUtility {
      */
     public static boolean isHubActive(ITestResult testResult) throws UnknownHostException, MalformedURLException {
         
-        if (testResult == null) throw new NullPointerException("Test result object must be non-null");
+        Objects.requireNonNull(testResult, "Test result object must be non-null");
         
         SeleniumConfig config = SeleniumConfig.getConfig(testResult);
         GridHubConfiguration hubConfig = config.getHubConfig();
@@ -217,7 +218,7 @@ public class GridUtility {
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver(ITestResult testResult) {
-        if (testResult == null) throw new NullPointerException("Test result object must be non-null");
+        Objects.requireNonNull(testResult, "Test result object must be non-null");
         
         SeleniumConfig config = SeleniumConfig.getConfig(testResult);
         GridHubConfiguration hubConfig = config.getHubConfig();

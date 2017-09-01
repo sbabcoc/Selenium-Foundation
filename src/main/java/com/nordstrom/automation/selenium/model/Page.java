@@ -20,8 +20,8 @@ public class Page extends ComponentContainer {
     private static final Class<?>[] ARG_TYPES_1 = {WebDriver.class};
     private static final Class<?>[] ARG_TYPES_2 = {WebDriver.class, ComponentContainer.class};
     
-    private static final String[] METHODS = {"setWindowHandle", "getWindowHandle", "setSpawningPage", "getSpawningPage",
-            "setWindowState", "getWindowState", "openInitialPage", "getInitialUrl", "getPageUrl"};
+    private static final String[] BYPASS_METHODS = {"setWindowHandle", "getWindowHandle", "setSpawningPage",
+            "getSpawningPage", "setWindowState", "getWindowState", "openInitialPage", "getInitialUrl", "getPageUrl"};
     
     public enum WindowState {
         WILL_OPEN, 
@@ -200,8 +200,8 @@ public class Page extends ComponentContainer {
     }
     
     @Override
-    String[] bypassMethods() {
-        return ArrayUtils.addAll(super.bypassMethods(), METHODS);
+    String[] myBypassMethods() {
+        return ArrayUtils.addAll(super.myBypassMethods(), BYPASS_METHODS);
     }
     
     /**

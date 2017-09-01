@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import org.openqa.selenium.By;
@@ -31,9 +32,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     
     @SuppressWarnings("unchecked")
     ContainerMap(ComponentContainer parent, Class<V> containerType, By locator) {
-        if (parent == null) throw new IllegalArgumentException("Parent must be non-null");
-        if (containerType == null) throw new IllegalArgumentException("Container type must be non-null");
-        if (locator == null) throw new IllegalArgumentException("Locator must be non-null");
+        Objects.requireNonNull(parent, "parent must be non-null");
+        Objects.requireNonNull(containerType, "[containerType] must be non-null");
+        Objects.requireNonNull(locator, "[locator] must be non-null");
         
         ComponentContainer.verifyCollectible(containerType);
         

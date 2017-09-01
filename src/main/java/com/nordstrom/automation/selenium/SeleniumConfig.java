@@ -192,7 +192,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             return getSeleniumConfig();
         }
         if (testResult.getAttribute(CONFIG) == null) {
-            synchronized (CONFIG) {
+            synchronized (testResult) {
                 if (testResult.getAttribute(CONFIG) == null) {
                     testResult.setAttribute(CONFIG, getSeleniumConfig());
                 }
