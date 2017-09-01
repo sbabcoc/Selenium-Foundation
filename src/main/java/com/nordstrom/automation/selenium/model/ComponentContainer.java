@@ -406,6 +406,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return 'true' if element has the desired value; otherwise 'false'
      */
     private static boolean valueEquals(WebElement element, String value) {
+        Objects.requireNonNull(element, "[element] must be non-null");
+        
         String exist = element.getAttribute("value");
         return (exist != null) ? exist.equals(value) : (value == null);
     }
