@@ -19,7 +19,7 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
     protected List<E> immutableView;
     
     ContainerList(ComponentContainer parent, Class<E> containerType, By locator) {
-        Objects.requireNonNull(parent, "parent must be non-null");
+        Objects.requireNonNull(parent, "[parent] must be non-null");
         Objects.requireNonNull(containerType, "[containerType] must be non-null");
         Objects.requireNonNull(locator, "[locator] must be non-null");
         

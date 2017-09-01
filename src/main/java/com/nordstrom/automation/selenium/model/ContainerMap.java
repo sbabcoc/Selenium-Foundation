@@ -32,7 +32,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     
     @SuppressWarnings("unchecked")
     ContainerMap(ComponentContainer parent, Class<V> containerType, By locator) {
-        Objects.requireNonNull(parent, "parent must be non-null");
+        Objects.requireNonNull(parent, "[parent] must be non-null");
         Objects.requireNonNull(containerType, "[containerType] must be non-null");
         Objects.requireNonNull(locator, "[locator] must be non-null");
         
