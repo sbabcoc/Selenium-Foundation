@@ -358,13 +358,14 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         
         String tagName = element.getTagName().toLowerCase();
         if ("input".equals(tagName) && "checkbox".equals(element.getAttribute("type"))) {
-            if (value == element.isSelected()) {
-                return false;
-            } else {
+            if (element.isSelected() != value) {
                 element.click();
                 return true;
+            } else {
+                return false;
             }
         }
+        
         return updateValue(element, Boolean.toString(value));
     }
     
