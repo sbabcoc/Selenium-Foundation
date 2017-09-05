@@ -27,6 +27,7 @@
     <logback-testng.version>1.0.0</logback-testng.version>
     <sonar.language>java</sonar.language>
     <jacoco.version>0.7.9</jacoco.version>
+    <mockito.version>1.10.19</mockito.version>
   </properties>
   
   <distributionManagement>
@@ -83,6 +84,11 @@
         <artifactId>logback-testng</artifactId>
         <version>${logback-testng.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -121,6 +127,11 @@
     <dependency>
       <groupId>com.github.sbabcoc</groupId>
       <artifactId>logback-testng</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   
