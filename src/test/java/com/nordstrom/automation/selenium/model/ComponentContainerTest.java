@@ -82,14 +82,10 @@ public class ComponentContainerTest {
             Method method = ComponentContainer.class.getDeclaredMethod("valueEquals", WebElement.class, String.class);
             method.setAccessible(true);
             method.invoke(null, null, "");
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException | SecurityException e) {
             throw new AssertionError("Unable to acquire reference to: valueEquals(WebElement, String)", e);
-        } catch (SecurityException e) {
-            throw new AssertionError("Security violation acquiring reference to: valueEquals(WebElement, String)", e);
-        } catch (IllegalAccessException e) {
-            throw new AssertionError("Illegal access invoking: valueEquals(WebElement, String)", e);
-        } catch (IllegalArgumentException e) {
-            throw new AssertionError("Illegal argument invoking: valueEquals(WebElement, String)", e);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new AssertionError("Failure to invoke reference to: valueEquals(WebElement, String)", e);
         } catch (InvocationTargetException e) {
             throw e.getTargetException();
         }
