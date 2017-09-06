@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import org.openqa.selenium.By;
@@ -31,9 +32,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     
     @SuppressWarnings("unchecked")
     ContainerMap(ComponentContainer parent, Class<V> containerType, By locator) {
-        if (parent == null) throw new IllegalArgumentException("Parent must be non-null");
-        if (containerType == null) throw new IllegalArgumentException("Container type must be non-null");
-        if (locator == null) throw new IllegalArgumentException("Locator must be non-null");
+        Objects.requireNonNull(parent, "[parent] must be non-null");
+        Objects.requireNonNull(containerType, "[containerType] must be non-null");
+        Objects.requireNonNull(locator, "[locator] must be non-null");
         
         ComponentContainer.verifyCollectible(containerType);
         
@@ -67,8 +68,10 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     
     @Override
     public Set<Map.Entry<Object, V>> entrySet() {
-        Set<Map.Entry<Object, V>> es;
-        return (es = entrySet) == null ? (entrySet = new EntrySet()) : es;
+        if (entrySet == null) {
+            entrySet = new EntrySet();
+        }
+        return entrySet;
     }
     
     /**
@@ -226,13 +229,17 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
          * @return next table entry
          */
         final Entry<V> nextEntry() {
-            Entry<V>[] t;
-            Entry<V> e = next;
-            if (e == null) throw new NoSuchElementException();
-            if ((next = (current = e).next) == null && (t = table) != null) {
-                do {} while (index < t.length && (next = t[index++]) == null);
+            if (next == null) throw new NoSuchElementException();
+            
+            current = next;
+            next = next.next;
+            if (table != null) {
+                while ((next == null) && (index < table.length)) {
+                    next = table[index++];
+                }
             }
-            return e;
+            
+            return current;
         }
     }
 }

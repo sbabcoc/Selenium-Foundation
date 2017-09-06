@@ -1,6 +1,5 @@
 package com.nordstrom.automation.selenium.model;
 
-import java.lang.ClassLoader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -12,6 +11,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,15 +60,16 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     protected ComponentContainer parent;
     protected Method vacater;
     protected SearchContextWait wait;
-    private List<Class<?>> bypass;
-    private List<String> methods;
+    private List<Class<?>> bypassClasses;
+    private List<String> bypassMethods;
     
     public static final By SELF = By.xpath(".");
     private static final String PLACEHOLDER = "{}";
-    private static final Class<?>[] BYPASS = {Object.class, WrapsContext.class};
-    private static final String[] METHODS = {"validateParent", "getDriver", "getContext", "getParent", "getParentPage", 
-            "getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated", "enhanceContainer",
-            "bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes", "getArguments"};
+    private static final Class<?>[] BYPASS_CLASSES = {Object.class, WrapsContext.class};
+    private static final String[] BYPASS_METHODS = {"validateParent", "getDriver", "getContext", "getParent",
+            "getParentPage", "getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated",
+            "enhanceContainer", "bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes",
+            "getArguments"};
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     static final Class<?>[] SIGNATURE = {RobustWebElement.class, ComponentContainer.class};
@@ -81,7 +83,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @param parent container parent (may be {@code null} for {@link Page} objects
      */
     public ComponentContainer(SearchContext context, ComponentContainer parent) {
-        if (context == null) throw new IllegalArgumentException("Context must be non-null");
+        Objects.requireNonNull(context, "[context] must be non-null");
         validateParent(parent);
         
         this.context = context;
@@ -122,7 +124,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @param parent container parent
      */
     protected void validateParent(ComponentContainer parent) {
-        if (parent == null) throw new IllegalArgumentException("Parent must be non-null");
+        Objects.requireNonNull(parent, "[parent] must be non-null");
     }
 
     /**
@@ -352,19 +354,19 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return 'true' if element value changed; otherwise 'false'
      */
     public static boolean updateValue(WebElement element, boolean value) {
+        Objects.requireNonNull(element, "[element] must be non-null");
+        
         String tagName = element.getTagName().toLowerCase();
-        if ("input".equals(tagName)) {
-            if ("checkbox".equals(element.getAttribute("type"))) {
-                boolean exist = element.isSelected();
-                if (exist == value) {
-                    return false;
-                } else {
-                    element.click();
-                    return true;
-                }
+        if ("input".equals(tagName) && "checkbox".equals(element.getAttribute("type"))) {
+            if (element.isSelected() != value) {
+                element.click();
+                return true;
+            } else {
+                return false;
             }
         }
-        return updateValue(element, Boolean.valueOf(value).toString());
+        
+        return updateValue(element, Boolean.toString(value));
     }
     
     /**
@@ -375,26 +377,24 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return 'true' if element value changed; otherwise 'false'
      */
     public static boolean updateValue(WebElement element, String value) {
+        Objects.requireNonNull(element, "[element] must be non-null");
+        
         String tagName = element.getTagName().toLowerCase();
         if ("input".equals(tagName)) {
             if ("checkbox".equals(element.getAttribute("type"))) {
                 return updateValue(element, Boolean.parseBoolean(value));
-            } else {
-                if (!valueEquals(element, value)) {
-                    if (value == null) {
-                        element.clear();
-                    } else {
-                        WebDriverUtils.getExecutor(element).executeScript("arguments[0].select();", element);
-                        element.sendKeys(value);
-                    }
-                    return true;
+            } else if (!valueEquals(element, value)) {
+                if (value == null) {
+                    element.clear();
+                } else {
+                    WebDriverUtils.getExecutor(element).executeScript("arguments[0].select();", element);
+                    element.sendKeys(value);
                 }
-            }
-        } else if ("select".equals(tagName)) {
-            if (!valueEquals(element, value)) {
-                new Select(element).selectByValue(value);
                 return true;
             }
+        } else if ("select".equals(tagName) && !valueEquals(element, value)) {
+            new Select(element).selectByValue(value);
+            return true;
         }
         return false;
     }
@@ -407,13 +407,10 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return 'true' if element has the desired value; otherwise 'false'
      */
     private static boolean valueEquals(WebElement element, String value) {
+        Objects.requireNonNull(element, "[element] must be non-null");
+        
         String exist = element.getAttribute("value");
-        if (exist == null) {
-            if (value == null) {
-                return true;
-            }
-        }
-        return (exist.equals(value));
+        return (exist != null) ? exist.equals(value) : (value == null);
     }
     
     /**
@@ -439,11 +436,11 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 
     @Override
     protected List<Class<?>> getBypassClasses() {
-        if (bypass == null) {
-            bypass = super.getBypassClasses();
-            Collections.addAll(bypass, bypassClasses());
+        if (bypassClasses == null) {
+            bypassClasses = super.getBypassClasses();
+            Collections.addAll(bypassClasses, myBypassClasses());
         }
-        return bypass;
+        return bypassClasses;
     }
     
     /**
@@ -451,17 +448,17 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * 
      * @return array of bypass classes
      */
-    Class<?>[] bypassClasses() {
-        return BYPASS;
+    Class<?>[] myBypassClasses() {
+        return BYPASS_CLASSES;
     }
     
     @Override
     protected List<String> getBypassMethods() {
-        if (methods == null) {
-            methods = super.getBypassMethods();
-            Collections.addAll(methods, bypassMethods());
+        if (bypassMethods == null) {
+            bypassMethods = super.getBypassMethods();
+            Collections.addAll(bypassMethods, myBypassMethods());
         }
-        return methods;
+        return bypassMethods;
     }
     
     /**
@@ -469,8 +466,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * 
      * @return array of bypass method names
      */
-    String[] bypassMethods() {
-        return METHODS;
+    String[] myBypassMethods() {
+        return BYPASS_METHODS;
     }
     
     /**
@@ -493,7 +490,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     public <T extends Page> T openAnnotatedPage(Class<T> pageClass, boolean newWindow) {
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
         String url = getPageUrl(pageUrl, SeleniumConfig.getConfig().getTargetUri());
-        if (url == null) throw new IllegalArgumentException(pageClass.toString() + " has no @PageUrl annotation, or specified @PageUrl has no value");
+        Objects.requireNonNull(url, pageClass.toString() + " has no @PageUrl annotation, or specified @PageUrl has no value");
         return openPageAtUrl(pageClass, url, newWindow);
     }
     
@@ -521,8 +518,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return new instance of the specified page class
      */
     public <T extends Page> T openPageAtUrl(Class<T> pageClass, String url, boolean newWindow) {
-        if (pageClass == null) throw new IllegalArgumentException("[pageClass] must be non-null");
-        if (url == null) throw new IllegalArgumentException("[url] must be non-null");
+        Objects.requireNonNull(pageClass, "[pageClass] must be non-null");
+        Objects.requireNonNull(url, "[url] must be non-null");
         
         T pageObj = newContainer(pageClass, new Class<?>[] {WebDriver.class}, new Object[] {driver});
         if (newWindow) {

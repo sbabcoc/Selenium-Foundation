@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.model;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -18,9 +19,9 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
     protected List<E> immutableView;
     
     ContainerList(ComponentContainer parent, Class<E> containerType, By locator) {
-        if (parent == null) throw new IllegalArgumentException("Parent must be non-null");
-        if (containerType == null) throw new IllegalArgumentException("Container type must be non-null");
-        if (locator == null) throw new IllegalArgumentException("Locator must be non-null");
+        Objects.requireNonNull(parent, "[parent] must be non-null");
+        Objects.requireNonNull(containerType, "[containerType] must be non-null");
+        Objects.requireNonNull(locator, "[locator] must be non-null");
         
         ComponentContainer.verifyCollectible(containerType);
         

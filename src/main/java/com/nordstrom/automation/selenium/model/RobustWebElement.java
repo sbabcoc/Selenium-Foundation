@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -110,8 +111,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         this.locator = locator;
         this.index = index;
         
-        if (context == null) throw new IllegalArgumentException("Context cannot be null");
-        if (locator == null) throw new IllegalArgumentException("Locator cannot be null");
+        Objects.requireNonNull(context, "[context] must be non-null");
+        Objects.requireNonNull(locator, "[locator] must be non-null");
         if (index < OPTIONAL) throw new IndexOutOfBoundsException("Specified index is invalid");
         
         driver = WebDriverUtils.getDriver(context.getWrappedContext());
