@@ -37,9 +37,10 @@ class GridProcess {
      * @param testResult TestNG test results object (may be 'null')
      * @param args Selenium server command line arguments (check {@code See Also} below)
      * @return Java {@link Process} object for managing the server process
+     * @throws IOException 
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
      */
-    static Process start(ITestResult testResult, String[] args) {
+    static Process start(ITestResult testResult, String[] args) throws IOException {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
@@ -61,7 +62,7 @@ class GridProcess {
             Files.createDirectories(outputFile.toPath().getParent());
             return builder.start();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to start grid " + gridRole + " process", e);
+            throw new IOException("Failed to start grid " + gridRole + " process", e);
         }
     }
     

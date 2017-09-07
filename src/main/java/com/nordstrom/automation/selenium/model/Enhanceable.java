@@ -27,7 +27,18 @@ public abstract class Enhanceable<T> {
     
     private static final List<Class<?>> BYPASS = Arrays.asList(Enhanceable.class);
     
+    /**
+     * Get the types of the arguments used to instantiate this object.
+     * 
+     * @return an array of constructor argument types
+     */
     abstract Class<?>[] getArgumentTypes();
+    
+    /**
+     * Get the actual arguments used to instantiate this object.
+     * 
+     * @return an array of constructor arguments
+     */
     abstract Object[]   getArguments();
     
     /**

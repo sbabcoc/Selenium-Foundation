@@ -171,7 +171,7 @@ public class Coordinators {
      */
     public static Coordinator<Boolean> stalenessOf(final WebElement element) {
         return new Coordinator<Boolean>() {
-            final ExpectedCondition<Boolean> condition;
+            private final ExpectedCondition<Boolean> condition;
 
             {
                 if (element instanceof WrapsElement) {

@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.model;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.UnsupportedCommandException;
+import org.openqa.selenium.WebDriverException;
 
 import com.google.common.base.Throwables;
 
@@ -65,7 +66,7 @@ public class Frame extends Page {
         this.element = element;
         this.index = element.getIndex();
         
-        argumentTypes = SIGNATURE;
+        argumentTypes = ComponentContainer.getCollectibleArgs();
         arguments = new Object[] {element, parent};
     }
     
@@ -131,11 +132,11 @@ public class Frame extends Page {
         if (canSwitchToParentFrame) {
             try {
                 return element.getWrappedDriver().switchTo().parentFrame();
-            } catch (Throwable t) {
-                if (Throwables.getRootCause(t) instanceof UnsupportedCommandException) {
+            } catch (WebDriverException e) {
+                if (Throwables.getRootCause(e) instanceof UnsupportedCommandException) {
                     canSwitchToParentFrame = false;
                 } else {
-                    throw t;
+                    throw e;
                 }
             }
         }

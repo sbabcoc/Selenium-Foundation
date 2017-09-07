@@ -113,7 +113,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         
         Objects.requireNonNull(context, "[context] must be non-null");
         Objects.requireNonNull(locator, "[locator] must be non-null");
-        if (index < OPTIONAL) throw new IndexOutOfBoundsException("Specified index is invalid");
+        if (index < OPTIONAL) {
+            throw new IndexOutOfBoundsException("Specified index is invalid");
+        }
         
         driver = WebDriverUtils.getDriver(context.getWrappedContext());
         boolean findsByCss = (driver instanceof FindsByCssSelector);
@@ -405,14 +407,18 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
      * @param e {@link StaleElementReferenceException} that necessitates reference refresh
      * @return this robust web element with refreshed reference
      */
-    WebElement refreshReference(StaleElementReferenceException e) {
+    WebElement refreshReference(final StaleElementReferenceException e) {
         try {
             WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
             return this;
-        } catch (Throwable t) {
-            if (e != null) throw UncheckedThrow.throwUnchecked(e);
-            if (t instanceof TimeoutException) throw UncheckedThrow.throwUnchecked(t.getCause());
-            throw UncheckedThrow.throwUnchecked(t);
+        } catch (WebDriverException t) {
+            if (e != null) {
+                throw e;
+            }
+            if (t instanceof TimeoutException) {
+                throw UncheckedThrow.throwUnchecked(t.getCause());
+            }
+            throw t;
         }
     }
     

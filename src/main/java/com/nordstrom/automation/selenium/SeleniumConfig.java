@@ -14,6 +14,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
@@ -284,7 +285,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get("host"),
                     "-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
         }
-        return nodeArgs;
+        return Arrays.copyOf(nodeArgs, nodeArgs.length);
     }
 
     /**
@@ -348,7 +349,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
                     "-host", config.getHost(), "-port", Integer.toString(config.getPort())};
         }
-        return hubArgs;
+        return Arrays.copyOf(hubArgs, hubArgs.length);
     }
     
     /**

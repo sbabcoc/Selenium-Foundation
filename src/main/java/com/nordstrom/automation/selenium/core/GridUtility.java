@@ -18,8 +18,11 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -39,6 +42,8 @@ public class GridUtility {
     private static final String GRID_NODE = "GridNode";
     private static final String HUB_REQUEST = "/grid/api/hub/";
     private static final String NODE_REQUEST = "/wd/hub/status/";
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
     
     private GridUtility() {
         throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
@@ -91,8 +96,10 @@ public class GridUtility {
                     nodeWait.until(hostIsActive(NODE_REQUEST));
                     testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
                     isActive = true;
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (IOException e) {
+                    LOGGER.warn("Unable to launch Grid component", e);
+                } catch (TimeoutException e) {
+                    LOGGER.warn("Timeout waiting for Grid component to be active", e);
                 }
             }
         }

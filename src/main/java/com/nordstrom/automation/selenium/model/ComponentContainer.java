@@ -69,10 +69,10 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     private static final String[] BYPASS_METHODS = {"validateParent", "getDriver", "getContext", "getParent",
             "getParentPage", "getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated",
             "enhanceContainer", "bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes",
-            "getArguments"};
+            "getArguments", "getCollectibleArgs"};
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
-    static final Class<?>[] SIGNATURE = {RobustWebElement.class, ComponentContainer.class};
+    private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
     
     private final Logger logger;
     
@@ -426,7 +426,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 
     @Override
     Class<?>[] getArgumentTypes() {
-        return ARG_TYPES;
+        return Arrays.copyOf(ARG_TYPES, ARG_TYPES.length);
     }
 
     @Override
@@ -440,7 +440,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
             bypassClasses = super.getBypassClasses();
             Collections.addAll(bypassClasses, myBypassClasses());
         }
-        return bypassClasses;
+        return Collections.unmodifiableList(bypassClasses);
     }
     
     /**
@@ -449,7 +449,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return array of bypass classes
      */
     Class<?>[] myBypassClasses() {
-        return BYPASS_CLASSES;
+        return Arrays.copyOf(BYPASS_CLASSES, BYPASS_CLASSES.length);
     }
     
     @Override
@@ -458,7 +458,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
             bypassMethods = super.getBypassMethods();
             Collections.addAll(bypassMethods, myBypassMethods());
         }
-        return bypassMethods;
+        return Collections.unmodifiableList(bypassMethods);
     }
     
     /**
@@ -467,7 +467,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return array of bypass method names
      */
     String[] myBypassMethods() {
-        return BYPASS_METHODS;
+        return Arrays.copyOf(BYPASS_METHODS, BYPASS_METHODS.length);
     }
     
     /**
@@ -774,11 +774,20 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      */
     static <T extends ComponentContainer> void verifyCollectible(Class<T> containerType) {
         try {
-            containerType.getConstructor(SIGNATURE);
+            containerType.getConstructor(COLLECTIBLE_ARGS);
         } catch (NoSuchMethodException | SecurityException e) {
             String format = "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
             throw new UnsupportedOperationException(String.format(format, containerType.getSimpleName()));
         }
+    }
+    
+    /**
+     * Get the types of the arguments used to instantiate collectible containers.
+     * 
+     * @return an array of constructor argument types
+     */
+    static Class<?>[] getCollectibleArgs() {
+        return Arrays.copyOf(COLLECTIBLE_ARGS, COLLECTIBLE_ARGS.length);
     }
     
     /**

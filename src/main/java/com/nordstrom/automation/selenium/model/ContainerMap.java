@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         if (entrySet == null) {
             entrySet = new EntrySet();
         }
-        return entrySet;
+        return Collections.unmodifiableSet(entrySet);
     }
     
     /**
@@ -102,7 +103,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @return array of constructor argument types
      */
     Class<?>[] getArgumentTypes() {
-        return ComponentContainer.SIGNATURE;
+        return ComponentContainer.getCollectibleArgs();
     }
     
     /**
@@ -116,11 +117,11 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     }
     
     static class Entry<V extends ComponentContainer> implements Map.Entry<Object, V> {
-        ContainerMap<V> map;
-        RobustWebElement element;
-        Entry<V> next;
-        Object key;
-        V value;
+        private ContainerMap<V> map;
+        private RobustWebElement element;
+        private Entry<V> next;
+        private Object key;
+        private V value;
 
         Entry(ContainerMap<V> map, RobustWebElement element, Entry<V> next) {
             this.map = map;
@@ -197,9 +198,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     }
     
     class EntryIterator implements Iterator<Map.Entry<Object, V>> {
-        Entry<V> next;
-        Entry<V> current;
-        int index;
+        private Entry<V> next;
+        private Entry<V> current;
+        private int index;
         
         EntryIterator() {
             Entry<V>[] t = table;

@@ -4,8 +4,10 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
+import org.openqa.selenium.WebDriverException;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestContext;
@@ -57,7 +59,9 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     public static WebDriver getDriver() {
         WebDriver driver = getDriver(Reporter.getCurrentTestResult());
-        if (driver == null) throw new DriverNotAvailableException("No driver was found in the current test context");
+        if (driver == null) {
+            throw new DriverNotAvailableException("No driver was found in the current test context");
+        }
         return driver;
     }
     
@@ -113,7 +117,9 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     public static Page getInitialPage() {
         Page initialPage = (Page) getInitialPage(Reporter.getCurrentTestResult());
-        if (initialPage == null) throw new InitialPageNotSpecifiedException("No initial page was specified");
+        if (initialPage == null) {
+            throw new InitialPageNotSpecifiedException("No initial page was specified");
+        }
         return initialPage;
     }
     
@@ -318,13 +324,13 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         if (driver != null) {
             try {
                 ((JavascriptExecutor) driver).executeScript("return window.stop");
-            } catch (Exception e) {
+            } catch (WebDriverException | UnsupportedOperationException e) {
                 // Let's make sure our graceful shutdown process doesn't cause failures.
             }
             
             try {
                 driver.switchTo().alert().dismiss();
-            } catch (Exception e) {
+            } catch (NoAlertPresentException e) {
                 // The driver throws an exception if no alert is present. This is normal and unavoidable.
             }
             

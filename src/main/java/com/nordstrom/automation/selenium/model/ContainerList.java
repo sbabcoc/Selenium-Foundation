@@ -58,7 +58,7 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
      * @return array of constructor argument types
      */
     Class<?>[] getArgumentTypes() {
-        return ComponentContainer.SIGNATURE;
+        return ComponentContainer.getCollectibleArgs();
     }
     
     /**
