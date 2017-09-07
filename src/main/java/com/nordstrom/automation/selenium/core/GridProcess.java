@@ -37,7 +37,7 @@ class GridProcess {
      * @param testResult TestNG test results object (may be 'null')
      * @param args Selenium server command line arguments (check {@code See Also} below)
      * @return Java {@link Process} object for managing the server process
-     * @throws IOException 
+     * @throws IOException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
      */
     static Process start(ITestResult testResult, String[] args) throws IOException {
