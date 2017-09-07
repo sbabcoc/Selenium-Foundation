@@ -69,7 +69,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     private static final String[] BYPASS_METHODS = {"validateParent", "getDriver", "getContext", "getParent",
             "getParentPage", "getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated",
             "enhanceContainer", "bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes",
-            "getArguments", "getCollectibleArgs"};
+            "getArguments"};
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
