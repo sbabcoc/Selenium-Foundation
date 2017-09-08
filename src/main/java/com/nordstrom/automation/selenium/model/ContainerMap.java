@@ -87,8 +87,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
         ContainerEntry<V> e;
         for (e = table[0]; e != null; e = e.next) {
-            Object k = e.key;
-            if (k == key || (key != null && key.equals(k))) {
+            if (e.key == key || (key != null && key.equals(e.key))) {
                 break;
             }
         }
@@ -171,8 +170,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         
         @Override
         public final boolean contains(Object o) {
-            if (!(o instanceof Map.Entry))
+            if (!(o instanceof Map.Entry)) {
                 return false;
+            }
             Map.Entry<?,?> e = (Map.Entry<?,?>) o;
             Object key = e.getKey();
             ContainerEntry<V> candidate = getEntry(key);
