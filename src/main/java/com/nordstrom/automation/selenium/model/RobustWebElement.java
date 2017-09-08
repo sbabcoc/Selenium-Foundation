@@ -497,7 +497,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
                 args.add(element.index);
             }
             
-            element.wrapped = JsUtility.runAndReturn(element.driver, js, WebElement.class, args.toArray());
+            element.wrapped = JsUtility.runAndReturn(element.driver, js, args.toArray());
         }
         
         if (element.wrapped != null) {
