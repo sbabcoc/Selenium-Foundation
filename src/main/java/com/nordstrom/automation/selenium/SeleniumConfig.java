@@ -237,10 +237,14 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                     .host(getString(SeleniumSettings.TARGET_HOST.key()));
             
             String creds = getString(SeleniumSettings.TARGET_CREDS.key());
-            if (creds != null) builder.userInfo(creds);
+            if (creds != null) {
+                builder.userInfo(creds);
+            }
             
             String port = getString(SeleniumSettings.TARGET_PORT.key());
-            if (port != null) builder.port(Integer.parseInt(port));
+            if (port != null) {
+                builder.port(Integer.parseInt(port));
+            }
             
             targetUri = builder.build();
         }
@@ -298,12 +302,20 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         Map<String, Object> config = nodeConfig.getConfiguration();
         
         String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
-        if (nodeHost != null) config.put("host", nodeHost);
-        if (config.get("host") == null) config.put("host", getLocalHost());
+        if (nodeHost != null) {
+            config.put("host", nodeHost);
+        }
+        if (config.get("host") == null) {
+            config.put("host", getLocalHost());
+        }
         
         Integer nodePort = getInteger(SeleniumSettings.NODE_PORT.key(), null);
-        if (nodePort != null) config.put("port", nodePort);
-        if (config.get("port") == null) config.put("port", Integer.valueOf(5555));
+        if (nodePort != null) {
+            config.put("port", nodePort);
+        }
+        if (config.get("port") == null) {
+            config.put("port", Integer.valueOf(5555));
+        }
         
         config.put("hub", "http://" + getHubConfig().getHost() + ":" + getHubConfig().getPort() + "/grid/register/");
         
@@ -359,11 +371,17 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      */
     private GridHubConfiguration resolveHubSettings(GridHubConfiguration hubConfig) {
         String hubHost = getString(SeleniumSettings.HUB_HOST.key());
-        if (hubHost != null)  hubConfig.setHost(hubHost);
-        if (hubConfig.getHost() == null) hubConfig.setHost(getLocalHost());
+        if (hubHost != null) {
+            hubConfig.setHost(hubHost);
+        }
+        if (hubConfig.getHost() == null) {
+            hubConfig.setHost(getLocalHost());
+        }
         
         Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), null);
-        if (hubPort != null) hubConfig.setPort(hubPort.intValue());
+        if (hubPort != null) {
+            hubConfig.setPort(hubPort.intValue());
+        }
         
         return hubConfig;
     }

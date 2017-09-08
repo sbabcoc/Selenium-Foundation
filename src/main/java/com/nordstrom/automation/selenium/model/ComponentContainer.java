@@ -555,8 +555,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return defined page URL as a string (may be 'null')
      */
     public static String getPageUrl(PageUrl pageUrl, URI targetUri) {
-        if (pageUrl == null) return null;
-        if (PLACEHOLDER.equals(pageUrl.value())) return null;
+        if (pageUrl == null || PLACEHOLDER.equals(pageUrl.value())) {
+            return null;
+        }
         
         String result = null;
         String scheme = pageUrl.scheme();
