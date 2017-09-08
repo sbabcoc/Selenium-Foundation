@@ -17,6 +17,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
+
 import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
@@ -128,19 +130,18 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
          * @return wait type timeout interval
          */
         public long getInterval() {
-            return getInterval(null);
+            return getInterval(getConfig());
         }
         
         /**
          * Get the timeout interval for this wait type.<br>
-         * <b>NOTE</b>: If {@code config} is 'null', this object will be acquired from the current configuration context. 
          * 
-         * @param config {@link SeleniumConfig} object to interrogate; may be 'null' (see <b>NOTE</b>)
+         * @param config {@link SeleniumConfig} object to interrogate
          * @return wait type timeout interval
          */
         public long getInterval(SeleniumConfig config) {
             if (timeoutInterval == null) {
-                if (config == null) config = getConfig();
+                Objects.requireNonNull(config, "[config] must be non-null");
                 timeoutInterval = config.getLong(timeoutSetting.key());
             }
             return timeoutInterval;
@@ -280,8 +281,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     public String[] getNodeArgs() {
         if (nodeArgs == null) {
             String configPath = getNodeConfigPath();
-            RegistrationRequest nodeConfig = getNodeConfig();
-            Map<String, Object> config = nodeConfig.getConfiguration();
+            Map<String, Object> config = getNodeConfig().getConfiguration();
             nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get("host"),
                     "-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
         }
@@ -305,8 +305,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         if (nodePort != null) config.put("port", nodePort);
         if (config.get("port") == null) config.put("port", Integer.valueOf(5555));
         
-        GridHubConfiguration hubConfig = getHubConfig();
-        config.put("hub", "http://" + hubConfig.getHost() + ":" + hubConfig.getPort() + "/grid/register/");
+        config.put("hub", "http://" + getHubConfig().getHost() + ":" + getHubConfig().getPort() + "/grid/register/");
         
         return nodeConfig;
     }
@@ -377,7 +376,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     private static String getLocalHost() {
         try {
             return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
+        } catch (UnknownHostException eaten) {
+            // nothing to do here
         }
         return "localhost";
     }
@@ -397,7 +397,9 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                 if (inputStream != null) {
                     try {
                         jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                    } catch (IOException e) { }
+                    } catch (IOException eaten) {
+                        // nothing to do here
+                    }
                 }
                 
                 if (jsonStr == null) {
@@ -436,19 +438,23 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                 if ("jar".equals(uri.getScheme())) {
                     try {
                         FileSystems.newFileSystem(uri, Collections.emptyMap());
-                    } catch (FileSystemAlreadyExistsException e) { } 
+                    } catch (FileSystemAlreadyExistsException eaten) {
+                        // nothing to do here
+                    } 
                     
                     String outputDir = getOutputDir();
                     File outputFile = new File(outputDir, path);
                     Path outputPath = outputFile.toPath();
-                    if (Files.notExists(outputPath)) {
+                    if (!outputPath.toFile().exists()) {
                         Files.copy(Paths.get(uri), outputPath);
                     }
                     uri = outputPath.toUri();
                 }
                 File file = new File(uri);
                 return file.getAbsolutePath();
-            } catch (URISyntaxException | IOException e) { }
+            } catch (URISyntaxException | IOException eaten) {
+                // nothing to do here
+            }
         }
         return null;
     }

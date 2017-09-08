@@ -132,7 +132,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
         if (element.hasReference()) {
             try {
                 return ! element.getWrappedElement().isDisplayed();
-            } catch (StaleElementReferenceException e) { }
+            } catch (StaleElementReferenceException eaten) {
+                // nothing to do here
+            }
         }
         return true;
     }

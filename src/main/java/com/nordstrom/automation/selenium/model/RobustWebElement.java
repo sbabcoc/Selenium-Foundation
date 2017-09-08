@@ -46,8 +46,8 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     /** wraps an optional reference */
     public static final int OPTIONAL = -2;
     
-    private static String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
-    private static String LOCATE_BY_XPATH = JsUtility.getScriptResource("locateByXpath.js");
+    private static final String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
+    private static final String LOCATE_BY_XPATH = JsUtility.getScriptResource("locateByXpath.js");
     
     private enum Strategy { LOCATOR, JS_XPATH, JS_CSS }
     
@@ -100,44 +100,44 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
             RobustWebElement robust = (RobustWebElement) element;
             this.acquiredAt = robust.acquiredAt;
             
-            element = robust.wrapped;
-            context = robust.context;
-            locator = robust.locator;
-            index = robust.index;
+            this.wrapped = robust.wrapped;
+            this.context = robust.context;
+            this.locator = robust.locator;
+            this.index = robust.index;
+        } else {
+            Objects.requireNonNull(context, "[context] must be non-null");
+            Objects.requireNonNull(locator, "[locator] must be non-null");
+            if (index < OPTIONAL) {
+                throw new IndexOutOfBoundsException("Specified index is invalid");
+            }
+            
+            this.wrapped = element;
+            this.context = context;
+            this.locator = locator;
+            this.index = index;
         }
         
-        this.wrapped = element;
-        this.context = context;
-        this.locator = locator;
-        this.index = index;
-        
-        Objects.requireNonNull(context, "[context] must be non-null");
-        Objects.requireNonNull(locator, "[locator] must be non-null");
-        if (index < OPTIONAL) {
-            throw new IndexOutOfBoundsException("Specified index is invalid");
-        }
-        
-        driver = WebDriverUtils.getDriver(context.getWrappedContext());
+        driver = WebDriverUtils.getDriver(this.context.getWrappedContext());
         boolean findsByCss = (driver instanceof FindsByCssSelector);
         boolean findsByXPath = (driver instanceof FindsByXPath);
         
-        if ((index == OPTIONAL) || (index > 0)) {
-            if (findsByXPath && ( ! (locator instanceof By.ByCssSelector))) {
-                selector = ByType.xpathLocatorFor(locator);
-                if (index > 0) selector += "[" + (index + 1) + "]";
+        if ((this.index == OPTIONAL) || (this.index > 0)) {
+            if (findsByXPath && ( ! (this.locator instanceof By.ByCssSelector))) {
+                selector = ByType.xpathLocatorFor(this.locator);
+                if (this.index > 0) selector += "[" + (this.index + 1) + "]";
                 strategy = Strategy.JS_XPATH;
                 
                 this.locator = By.xpath(this.selector);
             } else if (findsByCss) {
-                selector = ByType.cssLocatorFor(locator);
+                selector = ByType.cssLocatorFor(this.locator);
                 if (selector != null) {
                     strategy = Strategy.JS_CSS;
                 }
             }
         }
         
-        if (element == null) {
-            if (index == OPTIONAL) {
+        if (this.wrapped == null) {
+            if (this.index == OPTIONAL) {
                 acquireReference(this);
             } else {
                 refreshReference(null);
@@ -176,7 +176,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     }
 
     @Override
-    public <X> X getScreenshotAs(final OutputType<X> arg0) throws WebDriverException {
+    public <X> X getScreenshotAs(final OutputType<X> arg0) {
         try {
             return getWrappedElement().getScreenshotAs(arg0);
         } catch (StaleElementReferenceException e) {
@@ -404,22 +404,23 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     /**
      * Refresh the wrapped element reference.
      * 
-     * @param e {@link StaleElementReferenceException} that necessitates reference refresh
+     * @param refreshTrigger {@link StaleElementReferenceException} that necessitates reference refresh
      * @return this robust web element with refreshed reference
      */
-    WebElement refreshReference(final StaleElementReferenceException e) {
+    WebElement refreshReference(final StaleElementReferenceException refreshTrigger) {
         try {
             WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
             return this;
-        } catch (WebDriverException t) {
-            if (e != null) {
+        } catch (TimeoutException e) {
+            if (refreshTrigger == null) {
+                throw UncheckedThrow.throwUnchecked(e.getCause());
+            }
+        } catch (WebDriverException e) {
+            if (refreshTrigger == null) {
                 throw e;
             }
-            if (t instanceof TimeoutException) {
-                throw UncheckedThrow.throwUnchecked(t.getCause());
-            }
-            throw t;
         }
+        throw refreshTrigger;
     }
     
     /**

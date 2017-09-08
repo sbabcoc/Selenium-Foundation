@@ -653,10 +653,10 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         Class<?> pageClass = getContainerClass(pageObj);
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
         if (pageUrl != null) {
-            String actual, expect;
-            String currentUrl = pageObj.getCurrentUrl();
+            String actual;
+            String expect;
             
-            URI actualUri = URI.create(currentUrl);
+            URI actualUri = URI.create(pageObj.getCurrentUrl());
             URI targetUri = SeleniumConfig.getConfig().getTargetUri();
             String expectUrl = getPageUrl(pageUrl, targetUri);
             URI expectUri = (expectUrl != null) ? URI.create(expectUrl) : null;
@@ -702,7 +702,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
                 }
                 
                 if ( ! actual.matches(pattern)) {
-                    throw new LandingPageMismatchException(pageClass, currentUrl);
+                    throw new LandingPageMismatchException(pageClass, pageObj.getCurrentUrl());
                 }
             } else if (expectUri != null) {
                 actual = actualUri.getPath();
@@ -712,41 +712,50 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
                 }
             }
             
-            List<NameValuePair> expectParams = new ArrayList<>();
-            String[] params = pageUrl.params();
-            if (params.length > 0) {
-                for (String param : params) {
-                    String[] nameValueBits = param.split("=");
-                    if (nameValueBits.length == 2) {
-                        String name = nameValueBits[0].trim();
-                        String value = nameValueBits[1].trim();
-                        expectParams.add(new BasicNameValuePair(name, value));
-                    } else {
-                        throw new IllegalArgumentException("Format of PageUrl parameter '" + param
-                                + "' does not conform to template [name]=[pattern]");
-                    }
-                }
-            } else if (expectUri != null) {
-                expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
-            }
-            
             List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
             
-            expectLoop:
-            for (NameValuePair expectPair : expectParams) {
-                Iterator<NameValuePair> iterator = actualParams.iterator();
-                while (iterator.hasNext()) {
-                    NameValuePair actualPair = iterator.next();
-                    if (actualPair.getName().equals(expectPair.getName())) {
-                        if (actualPair.getValue().matches(expectPair.getValue())) {
-                            iterator.remove();
-                            continue expectLoop;
-                        }
-                    }
+            for (NameValuePair expectPair : getExpectedParams(pageUrl, expectUri)) {
+                if (!hasExpectedParam(actualParams, expectPair)) {
+                    throw new LandingPageMismatchException(
+                                    pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
                 }
-                throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
             }
         }
+    }
+
+    private static List<NameValuePair> getExpectedParams(PageUrl pageUrl, URI expectUri) {
+        List<NameValuePair> expectParams = new ArrayList<>();
+        String[] params = pageUrl.params();
+        if (params.length > 0) {
+            for (String param : params) {
+                String[] nameValueBits = param.split("=");
+                if (nameValueBits.length == 2) {
+                    String name = nameValueBits[0].trim();
+                    String value = nameValueBits[1].trim();
+                    expectParams.add(new BasicNameValuePair(name, value));
+                } else {
+                    throw new IllegalArgumentException("Format of PageUrl parameter '" + param
+                            + "' does not conform to template [name]=[pattern]");
+                }
+            }
+        } else if (expectUri != null) {
+            expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
+        }
+        return expectParams;
+    }
+    
+    private static boolean hasExpectedParam(List<NameValuePair> actualParams, NameValuePair expectPair) {
+        Iterator<NameValuePair> iterator = actualParams.iterator();
+        while (iterator.hasNext()) {
+            NameValuePair actualPair = iterator.next();
+            if ((actualPair.getName().equals(expectPair.getName())) && 
+                (actualPair.getValue().matches(expectPair.getValue())))
+            {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -761,7 +770,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         try {
             Method method = containerType.getMethod("getKey", SearchContext.class);
             if (Modifier.isStatic(method.getModifiers())) return method;
-        } catch (NoSuchMethodException e) { }
+        } catch (NoSuchMethodException e) {
+            // fall through to 'throw' statement below
+        }
         throw new UnsupportedOperationException("Container class must declare method: public static Object getKey(SearchContext)");
     }
     

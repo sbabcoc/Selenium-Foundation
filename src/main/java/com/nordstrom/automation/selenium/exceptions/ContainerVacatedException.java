@@ -8,7 +8,7 @@ public class ContainerVacatedException extends RuntimeException {
 
     private static final long serialVersionUID = 2043877560841903084L;
     
-    private transient Method vacater;
+    private final transient Method vacater;
     private static final String PREAMBLE = "Container object was vacated by invocation of method: ";
     
     /**

@@ -136,12 +136,9 @@ public class Coordinators {
             public Boolean apply(SearchContext context) {
                 try {
                     return !(context.findElement(locator).isDisplayed());
-                } catch (NoSuchElementException e) {
-                    // Returns 'true' because the element is not present in DOM.
-                    return true;
-                } catch (StaleElementReferenceException e) {
-                    // Returns 'true' because stale element reference implies that
-                    // element no longer exists in the DOM.
+                } catch (NoSuchElementException | StaleElementReferenceException e) {
+                    // NoSuchElementException: The element is not present in DOM.
+                    // StaleElementReferenceException: Implies that element no longer exists in the DOM.
                     return true;
                 }
             }
@@ -173,6 +170,7 @@ public class Coordinators {
         return new Coordinator<Boolean>() {
             private final ExpectedCondition<Boolean> condition;
 
+            // initializer block for [condition] field
             {
                 if (element instanceof WrapsElement) {
                     condition = ExpectedConditions.stalenessOf(((WrapsElement) element).getWrappedElement());

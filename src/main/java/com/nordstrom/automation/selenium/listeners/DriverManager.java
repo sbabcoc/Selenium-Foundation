@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
@@ -116,7 +115,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @throws InitialPageNotSpecifiedException No initial page has been specified
      */
     public static Page getInitialPage() {
-        Page initialPage = (Page) getInitialPage(Reporter.getCurrentTestResult());
+        Page initialPage = getInitialPage(Reporter.getCurrentTestResult());
         if (initialPage == null) {
             throw new InitialPageNotSpecifiedException("No initial page was specified");
         }
@@ -216,11 +215,14 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
                 } else {
                     driver = GridUtility.getDriver(testResult);
                 }
-                setDriverTimeouts(driver, config);
-                setDriver(driver, testResult);
-                if (testMethod.isTest()) {
-                    long after = System.currentTimeMillis();
-                	ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                
+                if (driver != null) {
+                    setDriverTimeouts(driver, config);
+                    setDriver(driver, testResult);
+                    if (testMethod.isTest()) {
+                        long after = System.currentTimeMillis();
+                    	ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                    }
                 }
             }
             
@@ -330,7 +332,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             
             try {
                 driver.switchTo().alert().dismiss();
-            } catch (NoAlertPresentException e) {
+            } catch (WebDriverException e) {
                 // The driver throws an exception if no alert is present. This is normal and unavoidable.
             }
             

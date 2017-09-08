@@ -105,9 +105,9 @@ public abstract class Enhanceable<T> {
             
         } catch (InvocationTargetException e) {
             throw UncheckedThrow.throwUnchecked(e.getCause());
-        } catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
-            throw UncheckedThrow.throwUnchecked(e);
-        } catch (NoSuchMethodException | InstantiationException e) {
+        } catch (SecurityException | IllegalAccessException | IllegalArgumentException
+                        | NoSuchMethodException | InstantiationException e)
+        {
             throw UncheckedThrow.throwUnchecked(e);
         }
     }
