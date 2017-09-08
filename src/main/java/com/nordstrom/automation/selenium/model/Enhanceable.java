@@ -27,7 +27,18 @@ public abstract class Enhanceable<T> {
     
     private static final List<Class<?>> BYPASS = Arrays.asList(Enhanceable.class);
     
+    /**
+     * Get the types of the arguments used to instantiate this object.
+     * 
+     * @return an array of constructor argument types
+     */
     abstract Class<?>[] getArgumentTypes();
+    
+    /**
+     * Get the actual arguments used to instantiate this object.
+     * 
+     * @return an array of constructor arguments
+     */
     abstract Object[]   getArguments();
     
     /**
@@ -94,9 +105,9 @@ public abstract class Enhanceable<T> {
             
         } catch (InvocationTargetException e) {
             throw UncheckedThrow.throwUnchecked(e.getCause());
-        } catch (SecurityException | IllegalAccessException | IllegalArgumentException e) {
-            throw UncheckedThrow.throwUnchecked(e);
-        } catch (NoSuchMethodException | InstantiationException e) {
+        } catch (SecurityException | IllegalAccessException | IllegalArgumentException
+                        | NoSuchMethodException | InstantiationException e)
+        {
             throw UncheckedThrow.throwUnchecked(e);
         }
     }

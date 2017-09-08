@@ -24,22 +24,25 @@ import org.testng.Reporter;
  */
 public class CaptureScreenshot implements ITestListener {
 
-    private final static String SCREENSHOT_FILE_EXTENSION = "png";
-    private final static String SCREENSHOT_STORAGE_NAME = "screenshots";
-    private final static String HTML_LINK_TEMPLATE = "<br /> <img src=\"%s\" /> <br />";
+    private static final String SCREENSHOT_FILE_EXTENSION = "png";
+    private static final String SCREENSHOT_STORAGE_NAME = "screenshots";
+    private static final String HTML_LINK_TEMPLATE = "<br /> <img src=\"%s\" /> <br />";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CaptureScreenshot.class);
 
     @Override
     public void onFinish(ITestContext testContext) {
+        // nothing to do here
     }
 
     @Override
     public void onStart(ITestContext testContext) {
+        // nothing to do here
     }
 
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
+        // nothing to do here
     }
 
     @Override
@@ -62,7 +65,7 @@ public class CaptureScreenshot implements ITestListener {
         }
 
         Path storageLocation = getStorageLocation(context);
-        if (!(Files.exists(storageLocation))) {
+        if (!storageLocation.toFile().exists()) {
             try {
                 Files.createDirectory(storageLocation);
             } catch (IOException e) {
@@ -86,14 +89,17 @@ public class CaptureScreenshot implements ITestListener {
 
     @Override
     public void onTestSkipped(ITestResult testResult) {
+        // nothing to do here
     }
 
     @Override
     public void onTestStart(ITestResult testResult) {
+        // nothing to do here
     }
 
     @Override
     public void onTestSuccess(ITestResult testResult) {
+        // nothing to do here
     }
 
     /**
@@ -133,9 +139,7 @@ public class CaptureScreenshot implements ITestListener {
     private Path getStorageLocation(ITestContext testContext) {
         String outputDirectoryLocation = testContext.getOutputDirectory();
         Path outputDirectory = Paths.get(outputDirectoryLocation);
-        Path screenshotStorage = outputDirectory.resolve(SCREENSHOT_STORAGE_NAME);
-
-        return screenshotStorage;
+        return outputDirectory.resolve(SCREENSHOT_STORAGE_NAME);
     }
 
     /**
@@ -170,9 +174,7 @@ public class CaptureScreenshot implements ITestListener {
      */
     private Path getPathToTargetScreenshotFile(ITestResult testResult) {
         Path screenshotStorage = getStorageLocation(testResult.getTestContext());
-        Path fsScreenshot = screenshotStorage.resolve(getTargetFilename(testResult));
-
-        return fsScreenshot;
+        return screenshotStorage.resolve(getTargetFilename(testResult));
     }
 
     /**

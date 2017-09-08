@@ -16,7 +16,7 @@ import org.openqa.selenium.support.ui.SystemClock;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 public class SearchContextWait extends FluentWait<SearchContext> {
-    public final static long DEFAULT_SLEEP_TIMEOUT = 500;
+    public static final long DEFAULT_SLEEP_TIMEOUT = 500;
     private final SearchContext context;
 
     /**

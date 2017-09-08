@@ -5,10 +5,12 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -19,7 +21,11 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.net.UrlChecker;
+import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -27,7 +33,6 @@ import org.testng.Reporter;
 import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
-import com.nordstrom.automation.selenium.support.HttpHostWait;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -39,6 +44,8 @@ public class GridUtility {
     private static final String GRID_NODE = "GridNode";
     private static final String HUB_REQUEST = "/grid/api/hub/";
     private static final String NODE_REQUEST = "/wd/hub/status/";
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
     
     private GridUtility() {
         throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
@@ -80,19 +87,26 @@ public class GridUtility {
             // if configured for local hub
             if (isThisMyIpAddress(addr)) {
                 try {
+                    UrlChecker urlChecker = new UrlChecker();
+                    long startupDelay = WaitType.HOST.getInterval();
+                    
                     // launch local Selenium Grid hub
                     Process gridHub = GridProcess.start(testResult, config.getHubArgs());
-                    HttpHostWait hubWait = getWait(getHubHost(hubConfig), testResult);
-                    hubWait.until(hostIsActive(HUB_REQUEST));
+                    HttpHost hubHost = getHubHost(config.getHubConfig());
+                    URI hubUri = URI.create(hubHost.toURI() + HUB_REQUEST);
+                    urlChecker.waitUntilAvailable(startupDelay, TimeUnit.SECONDS, hubUri.toURL());
                     testResult.getTestContext().setAttribute(GRID_HUB, gridHub);
                     // launch local Selenium Grid node
                     Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
-                    HttpHostWait nodeWait = getWait(getNodeHost(config.getNodeConfig()), testResult);
-                    nodeWait.until(hostIsActive(NODE_REQUEST));
+                    HttpHost nodeHost = getNodeHost(config.getNodeConfig());
+                    URI nodeUri = URI.create(nodeHost.toURI() + NODE_REQUEST);
+                    urlChecker.waitUntilAvailable(startupDelay, TimeUnit.SECONDS, nodeUri.toURL());
                     testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
                     isActive = true;
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (IOException e) {
+                    LOGGER.warn("Unable to launch Grid component", e);
+                } catch (TimeoutException e) {
+                    LOGGER.warn("Timeout waiting for Grid component to be active", e);
                 }
             }
         }
@@ -155,10 +169,11 @@ public class GridUtility {
         try {
             HttpResponse response = getHttpResponse(host, request);
             return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
+        } catch (MalformedURLException e) {
+            throw e;
         } catch (IOException e) {
-            if (e instanceof MalformedURLException) throw (MalformedURLException) e;
+            return false;
         }
-        return false;
     }
     
     /**
@@ -290,28 +305,5 @@ public class GridUtility {
         } catch (SocketException e) {
             return false;
         }
-    }
-    
-    /**
-     * Get a {@link HttpHostWait} object for the specified host.
-     * 
-     * @param host wait object context (HTTP host connection)
-     * @param testResult configuration context (TestNG test result object)
-     * @return HttpHostWait object for the specified host
-     */
-    public static HttpHostWait getWait(HttpHost host, ITestResult testResult) {
-        SeleniumConfig config = SeleniumConfig.getConfig(testResult);
-        return getWait(host, WaitType.HOST.getInterval(config));
-    }
-    
-    /**
-     * Get a {@link HttpHostWait} object for the specified host.
-     * 
-     * @param host wait object context (HTTP host connection)
-     * @param timeOutInSeconds timeout in seconds when an expectation is called
-     * @return HttpHostWait object for the specified host
-     */
-    public static HttpHostWait getWait(HttpHost host, long timeOutInSeconds) {
-        return new HttpHostWait(host, timeOutInSeconds);
     }
 }

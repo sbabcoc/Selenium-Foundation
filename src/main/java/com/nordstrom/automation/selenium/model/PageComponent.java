@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.util.Arrays;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -52,7 +54,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
     public PageComponent(RobustWebElement element, ComponentContainer parent) {
         super(element, parent);
         
-        argumentTypes = SIGNATURE;
+        argumentTypes = ComponentContainer.getCollectibleArgs();
         arguments = new Object[] {element, parent};
     }
 
@@ -85,12 +87,12 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
 
     @Override
     public Class<?>[] getArgumentTypes() {
-        return argumentTypes;
+        return Arrays.copyOf(argumentTypes, argumentTypes.length);
     }
 
     @Override
     public Object[] getArguments() {
-        return arguments;
+        return Arrays.copyOf(arguments, arguments.length);
     }
     
     @Override
@@ -130,7 +132,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
         if (element.hasReference()) {
             try {
                 return ! element.getWrappedElement().isDisplayed();
-            } catch (StaleElementReferenceException e) { }
+            } catch (StaleElementReferenceException eaten) {
+                // nothing to do here
+            }
         }
         return true;
     }

@@ -31,15 +31,20 @@ class GridProcess {
     private static final String OPT_ROLE = "-role";
     private static final Class<?>[] dependencies = { GridLauncher.class };
     
+    private GridProcess() {
+        throw new AssertionError("GridProcess is a static utility class that cannot be instantiated");
+    }
+    
     /**
      * Start a Selenium Grid server with the specified arguments in a separate process.
      * 
      * @param testResult TestNG test results object (may be 'null')
      * @param args Selenium server command line arguments (check {@code See Also} below)
      * @return Java {@link Process} object for managing the server process
+     * @throws IOException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
      */
-    static Process start(ITestResult testResult, String[] args) {
+    static Process start(ITestResult testResult, String[] args) throws IOException {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
@@ -61,7 +66,7 @@ class GridProcess {
             Files.createDirectories(outputFile.toPath().getParent());
             return builder.start();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to start grid " + gridRole + " process", e);
+            throw new IOException("Failed to start grid " + gridRole + " process", e);
         }
     }
     
@@ -91,32 +96,40 @@ class GridProcess {
      *             other way (such as via HTTP, from a database, or some other
      *             custom class-loading device).
      */
-    public static String findPathJar(Class<?> context) throws IllegalStateException {
+    public static String findPathJar(Class<?> context) {
         String rawName = context.getName();
-        String classFileName;
-        /* rawName is something like package.name.ContainingClass$ClassName. We need to turn this into ContainingClass$ClassName.class. */ {
-            int idx = rawName.lastIndexOf('.');
-            classFileName = (idx == -1 ? rawName : rawName.substring(idx+1)) + ".class";
+        int idx = rawName.lastIndexOf('.');
+        
+        if (idx > -1) {
+            rawName = rawName.substring(idx + 1);
         }
-
-        String uri = context.getResource(classFileName).toString();
-        if (uri.startsWith("file:")) throw new IllegalStateException("This class has been loaded from a directory and not from a jar file.");
+        
+        String uri = context.getResource(rawName + ".class").toString();
+        
+        if (uri.startsWith("file:")) {
+            throw new IllegalStateException("This class has been loaded from a directory and not from a jar file.");
+        }
+        
         if (!uri.startsWith("jar:file:")) {
-            int idx = uri.indexOf(':');
-            String protocol = idx == -1 ? "(unknown)" : uri.substring(0, idx);
+            idx = uri.indexOf(':');
+            String protocol = (idx > -1) ? uri.substring(0, idx) : "(unknown)";
             throw new IllegalStateException("This class has been loaded remotely via the " + protocol +
                     " protocol. Only loading from a jar on the local file system is supported.");
         }
 
-        int idx = uri.indexOf('!');
-        //As far as I know, the if statement below can't ever trigger, so it's more of a sanity check thing.
-        if (idx == -1) throw new IllegalStateException("You appear to have loaded this class from a local jar file, but I can't make sense of the URL!");
+        idx = uri.indexOf('!');
 
-        try {
-            String fileName = URLDecoder.decode(uri.substring("jar:file:".length(), idx), Charset.defaultCharset().name());
-            return new File(fileName).getAbsolutePath();
-        } catch (UnsupportedEncodingException e) {
-            throw new InternalError("default charset doesn't exist. Your VM is borked.");
+        if (idx > -1) {
+            try {
+                String fileName = URLDecoder.decode(uri.substring("jar:file:".length(), idx),
+                                Charset.defaultCharset().name());
+                return new File(fileName).getAbsolutePath();
+            } catch (UnsupportedEncodingException e) {
+                throw new InternalError("default charset doesn't exist. Your VM is borked.");
+            }
         }
+        
+        throw new IllegalStateException(
+                "You appear to have loaded this class from a local jar file, but I can't make sense of the URL!");
     }
 }

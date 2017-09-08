@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,8 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     protected By locator;
     protected Method method;
     
-    private List<WebElement> elementList;
-    private Entry<V>[] table;
+    private List<WebElement> elements;
+    private ContainerEntry<V>[] table;
     private Set<Map.Entry<Object, V>> entrySet;
     private int size;
     
@@ -44,14 +45,14 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         
         method = ComponentContainer.getKeyMethod(containerType);
         
-        elementList = parent.findElements(locator);
-        size = elementList.size();
-        table = new Entry[size];
+        elements = parent.findElements(locator);
+        size = elements.size();
+        table = new ContainerEntry[size];
         
         int i = size;
-        Entry<V> next = null;
+        ContainerEntry<V> next = null;
         while (i-- > 0) {
-            next = table[i] = new Entry<V>(this, (RobustWebElement) elementList.get(i), next);
+            next = table[i] = new ContainerEntry<>(this, (RobustWebElement) elements.get(i), next);
         }
     }
     
@@ -61,7 +62,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         if (value.getClass() == containerType) {
             V container = (V) value;
             SearchContext context = container.getContext();
-            return elementList.contains(context);
+            return elements.contains(context);
         }
         return false;
     }
@@ -69,9 +70,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     @Override
     public Set<Map.Entry<Object, V>> entrySet() {
         if (entrySet == null) {
-            entrySet = new EntrySet();
+            entrySet = new ContainerEntrySet();
         }
-        return entrySet;
+        return Collections.unmodifiableSet(entrySet);
     }
     
     /**
@@ -80,20 +81,17 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @param key key of desired entry
      * @return entry for the specified key; 'null' if not found
      */
-    final Entry<V> getEntry(Object key) {
-        Entry<V>[] tab; Entry<V> first, e; Object k;
-        if ((tab = table) != null && tab.length > 0 &&
-            (first = tab[0]) != null) {
-            if ((k = first.key) == key || (key != null && key.equals(k)))
-                return first;
-            if ((e = first.next) != null) {
-                do {
-                    if ((k = e.key) == key || (key != null && key.equals(k)))
-                        return e;
-                } while ((e = e.next) != null);
+    final ContainerEntry<V> getEntry(Object key) {
+        if (table.length == 0) {
+            return null;
+        }
+        ContainerEntry<V> e;
+        for (e = table[0]; e != null; e = e.next) {
+            if (e.key == key || (key != null && key.equals(e.key))) {
+                break;
             }
         }
-        return null;
+        return e;
     }
     
     /**
@@ -102,7 +100,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @return array of constructor argument types
      */
     Class<?>[] getArgumentTypes() {
-        return ComponentContainer.SIGNATURE;
+        return ComponentContainer.getCollectibleArgs();
     }
     
     /**
@@ -115,14 +113,14 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         return new Object[] {(RobustWebElement) element, parent};
     }
     
-    static class Entry<V extends ComponentContainer> implements Map.Entry<Object, V> {
-        ContainerMap<V> map;
-        RobustWebElement element;
-        Entry<V> next;
-        Object key;
-        V value;
+    static class ContainerEntry<V extends ComponentContainer> implements Map.Entry<Object, V> {
+        private ContainerMap<V> map;
+        private RobustWebElement element;
+        private ContainerEntry<V> next;
+        private Object key;
+        private V value;
 
-        Entry(ContainerMap<V> map, RobustWebElement element, Entry<V> next) {
+        ContainerEntry(ContainerMap<V> map, RobustWebElement element, ContainerEntry<V> next) {
             this.map = map;
             this.element = element;
             this.next = next;
@@ -158,7 +156,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
     }
     
-    class EntrySet extends AbstractSet<Map.Entry<Object, V>> {
+    class ContainerEntrySet extends AbstractSet<Map.Entry<Object, V>> {
         
         @Override
         public final int size()                 {
@@ -167,16 +165,17 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         
         @Override
         public final Iterator<Map.Entry<Object, V>> iterator() {
-            return new EntryIterator();
+            return new ContainerEntryIterator();
         }
         
         @Override
         public final boolean contains(Object o) {
-            if (!(o instanceof Map.Entry))
+            if (!(o instanceof Map.Entry)) {
                 return false;
+            }
             Map.Entry<?,?> e = (Map.Entry<?,?>) o;
             Object key = e.getKey();
-            Entry<V> candidate = getEntry(key);
+            ContainerEntry<V> candidate = getEntry(key);
             return candidate != null && candidate.equals(e);
         }
         
@@ -196,26 +195,30 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
     }
     
-    class EntryIterator implements Iterator<Map.Entry<Object, V>> {
-        Entry<V> next;
-        Entry<V> current;
-        int index;
+    class ContainerEntryIterator implements Iterator<Map.Entry<Object, V>> {
+        private ContainerEntry<V> next;
+        private int index;
         
-        EntryIterator() {
-            Entry<V>[] t = table;
-            if (t != null && size > 0) {
-                do {} while (index < t.length && (next = t[index++]) == null);
-            }
+        ContainerEntryIterator() {
+            findNextEntry();
         }
-        
+
         @Override
         public final boolean hasNext() {
             return next != null;
         }
 
         @Override
-        public Entry<V> next() {
-            return nextEntry();
+        public ContainerEntry<V> next() {
+            if (next == null) {
+                throw new NoSuchElementException();
+            }
+            
+            ContainerEntry<V> current = next;
+            next = next.next;
+            findNextEntry();
+            
+            return current;
         }
         
         @Override
@@ -224,22 +227,16 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
         
         /**
-         * Get the next table entry.
-         * 
-         * @return next table entry
+         * Find the next non-null entry (if one exists).
+         * <p>
+         * If [next] is initially 'null' and [index] is still within bounds, this method performs an index-based walk
+         * of the table to find the next non-null entry. Upon completion, [index] will point one position beyond the
+         * the last evaluated entry.
          */
-        final Entry<V> nextEntry() {
-            if (next == null) throw new NoSuchElementException();
-            
-            current = next;
-            next = next.next;
-            if (table != null) {
-                while ((next == null) && (index < table.length)) {
-                    next = table[index++];
-                }
+        private void findNextEntry() {
+            while (next == null && index < table.length) {
+                next = table[index++];
             }
-            
-            return current;
         }
     }
 }

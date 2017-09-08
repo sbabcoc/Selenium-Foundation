@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
+import org.openqa.selenium.WebDriverException;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestContext;
@@ -57,7 +58,9 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     public static WebDriver getDriver() {
         WebDriver driver = getDriver(Reporter.getCurrentTestResult());
-        if (driver == null) throw new DriverNotAvailableException("No driver was found in the current test context");
+        if (driver == null) {
+            throw new DriverNotAvailableException("No driver was found in the current test context");
+        }
         return driver;
     }
     
@@ -112,8 +115,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @throws InitialPageNotSpecifiedException No initial page has been specified
      */
     public static Page getInitialPage() {
-        Page initialPage = (Page) getInitialPage(Reporter.getCurrentTestResult());
-        if (initialPage == null) throw new InitialPageNotSpecifiedException("No initial page was specified");
+        Page initialPage = getInitialPage(Reporter.getCurrentTestResult());
+        if (initialPage == null) {
+            throw new InitialPageNotSpecifiedException("No initial page was specified");
+        }
         return initialPage;
     }
     
@@ -210,11 +215,14 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
                 } else {
                     driver = GridUtility.getDriver(testResult);
                 }
-                setDriverTimeouts(driver, config);
-                setDriver(driver, testResult);
-                if (testMethod.isTest()) {
-                    long after = System.currentTimeMillis();
-                	ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                
+                if (driver != null) {
+                    setDriverTimeouts(driver, config);
+                    setDriver(driver, testResult);
+                    if (testMethod.isTest()) {
+                        long after = System.currentTimeMillis();
+                    	ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                    }
                 }
             }
             
@@ -318,13 +326,13 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         if (driver != null) {
             try {
                 ((JavascriptExecutor) driver).executeScript("return window.stop");
-            } catch (Exception e) {
+            } catch (WebDriverException | UnsupportedOperationException e) {
                 // Let's make sure our graceful shutdown process doesn't cause failures.
             }
             
             try {
                 driver.switchTo().alert().dismiss();
-            } catch (Exception e) {
+            } catch (WebDriverException e) {
                 // The driver throws an exception if no alert is present. This is normal and unavoidable.
             }
             

@@ -72,7 +72,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
             "getArguments"};
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
-    static final Class<?>[] SIGNATURE = {RobustWebElement.class, ComponentContainer.class};
+    private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
     
     private final Logger logger;
     
@@ -426,7 +426,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 
     @Override
     Class<?>[] getArgumentTypes() {
-        return ARG_TYPES;
+        return Arrays.copyOf(ARG_TYPES, ARG_TYPES.length);
     }
 
     @Override
@@ -440,7 +440,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
             bypassClasses = super.getBypassClasses();
             Collections.addAll(bypassClasses, myBypassClasses());
         }
-        return bypassClasses;
+        return Collections.unmodifiableList(bypassClasses);
     }
     
     /**
@@ -449,7 +449,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return array of bypass classes
      */
     Class<?>[] myBypassClasses() {
-        return BYPASS_CLASSES;
+        return Arrays.copyOf(BYPASS_CLASSES, BYPASS_CLASSES.length);
     }
     
     @Override
@@ -458,7 +458,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
             bypassMethods = super.getBypassMethods();
             Collections.addAll(bypassMethods, myBypassMethods());
         }
-        return bypassMethods;
+        return Collections.unmodifiableList(bypassMethods);
     }
     
     /**
@@ -467,7 +467,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return array of bypass method names
      */
     String[] myBypassMethods() {
-        return BYPASS_METHODS;
+        return Arrays.copyOf(BYPASS_METHODS, BYPASS_METHODS.length);
     }
     
     /**
@@ -555,8 +555,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return defined page URL as a string (may be 'null')
      */
     public static String getPageUrl(PageUrl pageUrl, URI targetUri) {
-        if (pageUrl == null) return null;
-        if (PLACEHOLDER.equals(pageUrl.value())) return null;
+        if (pageUrl == null || PLACEHOLDER.equals(pageUrl.value())) {
+            return null;
+        }
         
         String result = null;
         String scheme = pageUrl.scheme();
@@ -653,10 +654,10 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         Class<?> pageClass = getContainerClass(pageObj);
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
         if (pageUrl != null) {
-            String actual, expect;
-            String currentUrl = pageObj.getCurrentUrl();
+            String actual;
+            String expect;
             
-            URI actualUri = URI.create(currentUrl);
+            URI actualUri = URI.create(pageObj.getCurrentUrl());
             URI targetUri = SeleniumConfig.getConfig().getTargetUri();
             String expectUrl = getPageUrl(pageUrl, targetUri);
             URI expectUri = (expectUrl != null) ? URI.create(expectUrl) : null;
@@ -702,7 +703,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
                 }
                 
                 if ( ! actual.matches(pattern)) {
-                    throw new LandingPageMismatchException(pageClass, currentUrl);
+                    throw new LandingPageMismatchException(pageClass, pageObj.getCurrentUrl());
                 }
             } else if (expectUri != null) {
                 actual = actualUri.getPath();
@@ -712,41 +713,64 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
                 }
             }
             
-            List<NameValuePair> expectParams = new ArrayList<>();
-            String[] params = pageUrl.params();
-            if (params.length > 0) {
-                for (String param : params) {
-                    String[] nameValueBits = param.split("=");
-                    if (nameValueBits.length == 2) {
-                        String name = nameValueBits[0].trim();
-                        String value = nameValueBits[1].trim();
-                        expectParams.add(new BasicNameValuePair(name, value));
-                    } else {
-                        throw new IllegalArgumentException("Format of PageUrl parameter '" + param
-                                + "' does not conform to template [name]=[pattern]");
-                    }
-                }
-            } else if (expectUri != null) {
-                expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
-            }
-            
             List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
             
-            expectLoop:
-            for (NameValuePair expectPair : expectParams) {
-                Iterator<NameValuePair> iterator = actualParams.iterator();
-                while (iterator.hasNext()) {
-                    NameValuePair actualPair = iterator.next();
-                    if (actualPair.getName().equals(expectPair.getName())) {
-                        if (actualPair.getValue().matches(expectPair.getValue())) {
-                            iterator.remove();
-                            continue expectLoop;
-                        }
-                    }
+            for (NameValuePair expectPair : getExpectedParams(pageUrl, expectUri)) {
+                if (!hasExpectedParam(actualParams, expectPair)) {
+                    throw new LandingPageMismatchException(
+                                    pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
                 }
-                throw new LandingPageMismatchException(pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
             }
         }
+    }
+
+    /**
+     * Get list of expected query parameters.
+     * 
+     * @param pageUrl page URL annotation
+     * @param expectUri expected landing page URI
+     * @return list of expected query parameters
+     */
+    private static List<NameValuePair> getExpectedParams(PageUrl pageUrl, URI expectUri) {
+        List<NameValuePair> expectParams = new ArrayList<>();
+        String[] params = pageUrl.params();
+        if (params.length > 0) {
+            for (String param : params) {
+                String[] nameValueBits = param.split("=");
+                if (nameValueBits.length == 2) {
+                    String name = nameValueBits[0].trim();
+                    String value = nameValueBits[1].trim();
+                    expectParams.add(new BasicNameValuePair(name, value));
+                } else {
+                    throw new IllegalArgumentException("Format of PageUrl parameter '" + param
+                            + "' does not conform to template [name]=[pattern]");
+                }
+            }
+        } else if (expectUri != null) {
+            expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
+        }
+        return expectParams;
+    }
+    
+    /**
+     * Determine if actual query parameters include all expected name/value pairs.
+     * 
+     * @param actualParams actual query parameters of landing page
+     * @param expectPair expected query parameters
+     * @return 'true' of actual query parameters include all expected name/value pairs; otherwise 'false'
+     */
+    private static boolean hasExpectedParam(List<NameValuePair> actualParams, NameValuePair expectPair) {
+        Iterator<NameValuePair> iterator = actualParams.iterator();
+        while (iterator.hasNext()) {
+            NameValuePair actualPair = iterator.next();
+            if ((actualPair.getName().equals(expectPair.getName())) && 
+                (actualPair.getValue().matches(expectPair.getValue())))
+            {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -761,7 +785,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         try {
             Method method = containerType.getMethod("getKey", SearchContext.class);
             if (Modifier.isStatic(method.getModifiers())) return method;
-        } catch (NoSuchMethodException e) { }
+        } catch (NoSuchMethodException e) {
+            // fall through to 'throw' statement below
+        }
         throw new UnsupportedOperationException("Container class must declare method: public static Object getKey(SearchContext)");
     }
     
@@ -774,11 +800,20 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      */
     static <T extends ComponentContainer> void verifyCollectible(Class<T> containerType) {
         try {
-            containerType.getConstructor(SIGNATURE);
+            containerType.getConstructor(COLLECTIBLE_ARGS);
         } catch (NoSuchMethodException | SecurityException e) {
             String format = "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
             throw new UnsupportedOperationException(String.format(format, containerType.getSimpleName()));
         }
+    }
+    
+    /**
+     * Get the types of the arguments used to instantiate collectible containers.
+     * 
+     * @return an array of constructor argument types
+     */
+    static Class<?>[] getCollectibleArgs() {
+        return Arrays.copyOf(COLLECTIBLE_ARGS, COLLECTIBLE_ARGS.length);
     }
     
     /**

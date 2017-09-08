@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -34,12 +35,14 @@ public enum ContainerMethodInterceptor {
      * @param args method invocation arguments
      * @param proxy call-able proxy for the intercepted method
      * @return {@code anything} (the result of invoking the intercepted method)
-     * @throws Throwable {@code anything} (exception thrown by the intercepted method)
+     * @throws Exception {@code anything} (exception thrown by the intercepted method)
      */
     @RuntimeType
-    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Throwable {
+    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Exception {
         
-        if ( ! (obj instanceof ComponentContainer)) return proxy.call();
+        if ( ! (obj instanceof ComponentContainer)) {
+            return proxy.call();
+        }
         
         depth++;
         long initialTime = System.currentTimeMillis();
@@ -73,7 +76,9 @@ public enum ContainerMethodInterceptor {
             Object result = proxy.call();
             
             // if result is container, we're done
-            if (result == container) return result;
+            if (result == container) {
+                return result;
+            }
             
             if (parentPage.getWindowState() == WindowState.WILL_CLOSE) {
                 WaitType.WAIT.getWait(driver).until(Coordinators.windowIsClosed(parentPage.getWindowHandle()));
@@ -91,7 +96,7 @@ public enum ContainerMethodInterceptor {
             }
             
             if (returnsContainer) {
-                if (result == null) throw new NullPointerException("A method that returns container objects cannot produce a null result");
+                Objects.requireNonNull(result, "A method that returns container objects cannot produce a null result");
                 
                 String newHandle = null;
                 ComponentContainer newChild = (ComponentContainer) result;

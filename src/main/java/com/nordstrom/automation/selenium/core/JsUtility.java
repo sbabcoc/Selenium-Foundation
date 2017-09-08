@@ -126,13 +126,12 @@ public final class JsUtility {
      * @param <T> return type
      * @param driver A handle to the currently running Selenium test window.
      * @param js The JavaScript to execute
-     * @param resultType Data type returned by the script
      * @param args The arguments to the script. May be empty
      * @return The result of the execution
      * @see JavascriptExecutor#executeScript(String, Object...)
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
-    public static <T> T runAndReturn(WebDriver driver, String js, Class<T> resultType, Object... args) {
+    public static <T> T runAndReturn(WebDriver driver, String js, Object... args) {
         return (T) WebDriverUtils.getExecutor(driver).executeScript(js, args);
     }
     
@@ -180,13 +179,16 @@ public final class JsUtility {
                         && encodedException.contains("\"" + MESSAGE_KEY + "\"")) {
                     JsonObject obj = DataUtils.deserializeObject(encodedException);
                     if (obj != null) {
+                        String className = obj.get(CLASS_NAME_KEY).toString();
                         try {
-                            Class<?> clazz = Class.forName(obj.get(CLASS_NAME_KEY).toString());
+                            Class<?> clazz = Class.forName(className);
                             Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
                             thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).toString(), exception);
                             thrown.setStackTrace(new Throwable().getStackTrace());
                         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-                                | IllegalAccessException | IllegalArgumentException | InvocationTargetException eaten) {
+                                | IllegalAccessException | IllegalArgumentException | InvocationTargetException eaten)
+                        {
+                            LOGGER.warn("Unable to instantiate exception: " + className, eaten);
                         }
                     }
                 }
