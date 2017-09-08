@@ -723,6 +723,13 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         }
     }
 
+    /**
+     * Get list of expected query parameters.
+     * 
+     * @param pageUrl page URL annotation
+     * @param expectUri expected landing page URI
+     * @return list of expected query parameters
+     */
     private static List<NameValuePair> getExpectedParams(PageUrl pageUrl, URI expectUri) {
         List<NameValuePair> expectParams = new ArrayList<>();
         String[] params = pageUrl.params();
@@ -744,6 +751,13 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         return expectParams;
     }
     
+    /**
+     * Determine if actual query parameters include all expected name/value pairs.
+     * 
+     * @param actualParams actual query parameters of landing page
+     * @param expectPair expected query parameters
+     * @return 'true' of actual query parameters include all expected name/value pairs; otherwise 'false'
+     */
     private static boolean hasExpectedParam(List<NameValuePair> actualParams, NameValuePair expectPair) {
         Iterator<NameValuePair> iterator = actualParams.iterator();
         while (iterator.hasNext()) {
