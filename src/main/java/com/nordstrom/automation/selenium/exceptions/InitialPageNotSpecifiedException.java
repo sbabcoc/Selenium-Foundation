@@ -1,9 +1,7 @@
 package com.nordstrom.automation.selenium.exceptions;
 
-import com.nordstrom.automation.selenium.listeners.DriverManager;
-
 /**
- * This exception is thrown by {@link DriverManager#getInitialPage} if no initial page was specified.
+ * This exception is thrown if no initial page was specified.
  */
 public class InitialPageNotSpecifiedException extends RuntimeException {
 
