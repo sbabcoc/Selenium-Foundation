@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.listeners;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -198,7 +199,9 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             // determine if driver is needed
             getDriver = (initialPage != null);
             // if getting a driver and invoked method isn't @BeforeMethod, close it after invocation
-            if (getDriver && (!testMethod.isBeforeMethodConfiguration())) testResult.setAttribute(CLOSE_DRIVER, "");
+            if (getDriver && (!testMethod.isBeforeMethodConfiguration())) {
+                testResult.setAttribute(CLOSE_DRIVER, "");
+            }
         }
         
         // if getting a driver
@@ -221,7 +224,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
                     setDriver(driver, testResult);
                     if (testMethod.isTest()) {
                         long after = System.currentTimeMillis();
-                    	ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                        ExecutionFlowController.adjustTimeout(after - prior, testResult);
                     }
                 }
             }
@@ -321,7 +324,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * 
      * @param testResult configuration context (TestNG test result object)
      */
-    private void closeDriver(ITestResult testResult) {
+    private static void closeDriver(ITestResult testResult) {
         WebDriver driver = getDriver(testResult);
         if (driver != null) {
             try {
@@ -347,6 +350,6 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @param testResult configuration context (TestNG test result object)
      */
     private static void validateTestResult(ITestResult testResult) {
-        if (testResult == null) throw new NullPointerException("Test result object must be non-null");
+        Objects.requireNonNull(testResult, "Test result object must be non-null");
     }
 }

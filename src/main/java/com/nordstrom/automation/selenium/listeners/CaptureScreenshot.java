@@ -125,7 +125,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param driver
      * @return
      */
-    private byte[] getScreenshot(WebDriver driver) {
+    private static byte[] getScreenshot(WebDriver driver) {
         return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
     }
 
@@ -136,7 +136,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param testContext
      * @return the location where screenshots should be stored.
      */
-    private Path getStorageLocation(ITestContext testContext) {
+    private static Path getStorageLocation(ITestContext testContext) {
         String outputDirectoryLocation = testContext.getOutputDirectory();
         Path outputDirectory = Paths.get(outputDirectoryLocation);
         return outputDirectory.resolve(SCREENSHOT_STORAGE_NAME);
@@ -149,7 +149,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param fsTarget
      * @throws IOException An error occured while creating or writing the screenshot to a file.
      */
-    private void putScreenshotInStorage(byte[] memoryScreenshot, Path fsTarget) throws IOException {
+    private static void putScreenshotInStorage(byte[] memoryScreenshot, Path fsTarget) throws IOException {
         String messageTemplate = "Placing a screenshot of the event at (%s).";
         LOGGER.info(String.format(messageTemplate, fsTarget.toString()));
         
@@ -162,7 +162,7 @@ public class CaptureScreenshot implements ITestListener {
      * 
      * @param target
      */
-    private void createReportLinkToScreenshot(Path target) {
+    private static void createReportLinkToScreenshot(Path target) {
         Reporter.log(String.format(HTML_LINK_TEMPLATE, target.toString()));
     }
 
@@ -205,7 +205,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param testResult
      * @return the name of the testcase
      */
-    private String getTestName(ITestResult testResult) {
+    private static String getTestName(ITestResult testResult) {
         // TODO What does `getTestName' return if @Test(testName=...) is not used, but the testcase
         //      implements ITest?  Documentation is not clear.  The worst case scenario is that we have a
         //      redundant method call (because it might just call getName).  If it doesn't call getName,

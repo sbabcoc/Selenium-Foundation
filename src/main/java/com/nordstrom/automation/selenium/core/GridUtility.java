@@ -279,12 +279,15 @@ public final class GridUtility {
      */
     public static boolean isThisMyIpAddress(InetAddress addr) {
         // Check if the address is a valid special local or loop back
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) return true;
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
+            return true;
+        }
 
         // Check if the address is defined on any interface
         try {
             return NetworkInterface.getByInetAddress(addr) != null;
         } catch (SocketException e) {
+            LOGGER.warn("Attempt to associate IP address with adapter triggered I/O exception: {}", e.getMessage());
             return false;
         }
     }

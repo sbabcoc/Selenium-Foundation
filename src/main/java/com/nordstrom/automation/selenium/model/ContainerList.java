@@ -8,6 +8,11 @@ import java.util.Objects;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+/**
+ * This is the abstract base class for all of the container list classes defined by <b>Selenium Foundation</b>.
+ *
+ * @param <E> the class of container objects collected by this list
+ */
 abstract class ContainerList<E extends ComponentContainer> extends AbstractList<E> {
 
     protected ComponentContainer parent;

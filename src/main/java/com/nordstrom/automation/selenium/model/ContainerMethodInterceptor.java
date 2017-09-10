@@ -21,6 +21,29 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
 
+/**
+ * This enumeration implements the method interceptor for <b>Selenium Foundation</b> component container objects.
+ * This interceptor is implemented as a standard Java enumeration singleton and performs the following tasks: <ul>
+ *     <li>Block calls to objects that have been superseded (vacated) by prior actions.</li>
+ *     <li>Switch driver focus to the window/frame associated with the target object.</li>
+ *     <li>If informed that actions of the invoked method will cause the associated window to close: <ul>
+ *         <li>Wait for the window to close.</li>
+ *         <li>If the target object was spawned by another object, switch focus to this object...</li>
+ *         <li>... otherwise, switch focus to the first window in the driver's collection.</li>
+ *         <li>Mark the target object as vacated to block further method calls.</li>
+ *     </ul></li>
+ *     <li>If the invoked method returns a new container object: <ul>
+ *         <li>If the new object is a page: <ul>
+ *             <li>If the page object is associated with a new window, wait for the window to appear...</li>
+ *             <li>... otherwise, mark the target object as vacated to block further method calls.</li>
+ *         </ul></li>
+ *         <li>Wait for browser to rebuild its DOM.</li>
+ *         <li>Create an "enhanced" version of the new container object, which installs the interceptor.</li>
+ *         <li>If the new object is a page, verify that the browser has landed on the expected URL.</li>
+ *     </ul></li>
+ *     <li>Return the result of the invoked method.</li>
+ * </ul>
+ */
 public enum ContainerMethodInterceptor {
     INSTANCE;
     
@@ -65,9 +88,9 @@ public enum ContainerMethodInterceptor {
             Page parentPage = container.getParentPage();
             Set<String> initialHandles = driver.getWindowHandles();
             
-            boolean returnsContainer = (ComponentContainer.class.isAssignableFrom(returnType));
-            boolean returnsPage = (Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType));
-            boolean detectsCompletion = (returnsContainer && (DetectsLoadCompletion.class.isAssignableFrom(returnType)));
+            boolean returnsContainer = ComponentContainer.class.isAssignableFrom(returnType);
+            boolean returnsPage = Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType);
+            boolean detectsCompletion = returnsContainer && DetectsLoadCompletion.class.isAssignableFrom(returnType);
             
             if (returnsPage && !detectsCompletion) {
                 reference = driver.findElement(By.tagName("*"));

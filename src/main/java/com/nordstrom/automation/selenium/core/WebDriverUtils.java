@@ -13,7 +13,11 @@ import org.openqa.selenium.internal.WrapsDriver;
 
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
 
-public class WebDriverUtils {
+/**
+ * This static utility class contains a collection of methods primarily focused on extracting useful interfaces from
+ * search contexts. It also includes a method that removes hidden elements from lists of elements.
+ */
+public final class WebDriverUtils {
     
     private WebDriverUtils() {
         throw new UnsupportedOperationException("WebDriverUtils is a static utility class that cannot be instantiated");
@@ -85,7 +89,9 @@ public class WebDriverUtils {
     public static boolean filterHidden(List<WebElement> elements) {
         Iterator<WebElement> iter = elements.iterator();
         while (iter.hasNext()) {
-            if ( ! iter.next().isDisplayed()) iter.remove();
+            if ( ! iter.next().isDisplayed()) {
+                iter.remove();
+            }
         }
         return elements.isEmpty();
     }

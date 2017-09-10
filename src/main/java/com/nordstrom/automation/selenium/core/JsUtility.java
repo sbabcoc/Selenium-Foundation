@@ -158,7 +158,7 @@ public final class JsUtility {
         try {
             return Resources.toString(url, Charsets.UTF_8);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to load JavaScript resource '" + resource + "'");
+            throw new IllegalArgumentException("Failed to load JavaScript resource '" + resource + "'", e);
         }
     }
     
@@ -185,8 +185,9 @@ public final class JsUtility {
                             Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
                             thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).toString(), exception);
                             thrown.setStackTrace(new Throwable().getStackTrace());
-                        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-                                | IllegalAccessException | IllegalArgumentException | InvocationTargetException eaten)
+                        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
+                                | InstantiationException | IllegalAccessException | IllegalArgumentException
+                                | InvocationTargetException eaten)
                         {
                             LOGGER.warn("Unable to instantiate exception: " + className, eaten);
                         }

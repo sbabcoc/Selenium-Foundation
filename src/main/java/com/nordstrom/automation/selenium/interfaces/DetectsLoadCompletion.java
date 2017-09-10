@@ -16,14 +16,14 @@ public interface DetectsLoadCompletion {
      * 
      * @return 'true' if the page has finished loading; otherwise 'false'
      */
-    public boolean isLoadComplete();
+    boolean isLoadComplete();
     
     /**
      * Returns a 'wait' proxy that determines if the page has finished loading.
      * 
      * @return 'true' if the page has finished loading; otherwise 'false'
      */
-    public static Coordinator<Boolean> pageLoadIsComplete() {
+    static Coordinator<Boolean> pageLoadIsComplete() {
         return new Coordinator<Boolean>() {
 
             @Override

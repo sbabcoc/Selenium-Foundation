@@ -19,6 +19,11 @@ import org.openqa.selenium.WebElement;
 
 import com.nordstrom.common.base.UncheckedThrow;
 
+/**
+ * This is the abstract base class for all of the container map classes defined by <b>Selenium Foundation</b>.
+ *
+ * @param <V> the class of container objects collected by this map
+ */
 abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Object, V> {
     
     protected ComponentContainer parent;

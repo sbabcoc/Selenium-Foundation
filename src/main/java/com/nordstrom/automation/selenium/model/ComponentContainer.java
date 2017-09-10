@@ -40,6 +40,9 @@ import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.common.base.UncheckedThrow;
 
+/**
+ * This is a abstract base class for all of the container classes defined by <b>Selenium Foundation</b>.
+ */
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
     
     /**
@@ -95,10 +98,10 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     
     @Override
     public int hashCode() {
-        final int prime = 31;
+        final int PRIME = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(getArgumentTypes());
-        result = prime * result + Arrays.hashCode(getArguments());
+        result = PRIME * result + Arrays.hashCode(getArgumentTypes());
+        result = PRIME * result + Arrays.hashCode(getArguments());
         return result;
     }
 
@@ -160,7 +163,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return container parent page
      */
     public Page getParentPage() {
-        if (parent != null) return parent.getParentPage();
+        if (parent != null) {
+            return parent.getParentPage();
+        }
         return (Page) this;
     }
     
@@ -210,7 +215,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
 
             @Override
             public SearchContext apply(SearchContext ignore) {
-                if (context.parent != null) context.parent.switchTo();
+                if (context.parent != null) {
+                    context.parent.switchTo();
+                }
                 
                 try {
                     return context.switchToContext();
@@ -258,7 +265,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      */
     void setVacater(Method vacater) {
         this.vacater = vacater;
-        if (parent != null) parent.setVacater(vacater);
+        if (parent != null) {
+            parent.setVacater(vacater);
+        }
     }
     
     /**
@@ -784,7 +793,9 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
         try {
             Method method = containerType.getMethod("getKey", SearchContext.class);
-            if (Modifier.isStatic(method.getModifiers())) return method;
+            if (Modifier.isStatic(method.getModifiers())) {
+                return method;
+            }
         } catch (NoSuchMethodException e) {
             // fall through to 'throw' statement below
         }
