@@ -56,24 +56,52 @@ import com.nordstrom.automation.selenium.model.ComponentContainer;
 @Retention(RUNTIME)
 @Target({TYPE})
 public @interface PageUrl {
-    /** @return URL scheme (<b>http</b>, <b>https</b>, or <b>file</b>) */
+    /**
+     * Get the page URL scheme.
+     * 
+     * @return URL scheme (<b>http</b>, <b>https</b>, or <b>file</b>)
+     */
     String scheme() default "{}";
     
-    /** @return URL user info as <b>user:password</b> */
+    /**
+     * Get the page URL user info.
+     * 
+     * @return URL user info as <b>user:password</b>
+     */
     String userInfo() default "{}";
     
-    /** @return URL host name */
+    /**
+     * Get the page URL host name.
+     * 
+     * @return URL host name
+     */
     String host() default "{}";
     
-    /** @return URL port number */
+    /**
+     * Get the page URL port number.
+     * 
+     * @return URL port number
+     */
     String port() default "{}";
     
-    /** @return URL path */
+    /**
+     * Get the page URL path.
+     * 
+     * @return URL path
+     */
     String value() default "{}";
     
-    /** @return array of URL query parameters as <b>name=value</b> */
+    /**
+     * Get the page URL query parameters.
+     * 
+     * @return array of URL query parameters as <b>name=value</b>
+     */
     String[] params() default {};
     
-    /** @return regular expression to validate path/parameters */
+    /**
+     * Get the regular expression to validate path/parameters.
+     * 
+     * @return regular expression to validate path/parameters
+     */
     String pattern() default "{}";
 }

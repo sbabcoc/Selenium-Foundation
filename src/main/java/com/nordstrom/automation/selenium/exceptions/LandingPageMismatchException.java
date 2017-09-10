@@ -4,6 +4,9 @@ import org.openqa.selenium.WebDriverException;
 
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 
+/**
+ * 
+ */
 public class LandingPageMismatchException extends WebDriverException {
 
     private static final long serialVersionUID = -2375529252543798864L;
