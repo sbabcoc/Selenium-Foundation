@@ -59,7 +59,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
     public static WebDriver getDriver() {
         WebDriver driver = getDriver(Reporter.getCurrentTestResult());
         if (driver == null) {
-            throw new DriverNotAvailableException("No driver was found in the current test context");
+            throw new DriverNotAvailableException();
         }
         return driver;
     }
@@ -117,7 +117,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
     public static Page getInitialPage() {
         Page initialPage = getInitialPage(Reporter.getCurrentTestResult());
         if (initialPage == null) {
-            throw new InitialPageNotSpecifiedException("No initial page was specified");
+            throw new InitialPageNotSpecifiedException();
         }
         return initialPage;
     }

@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriverException;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 
 /**
- * 
+ * This exception is thrown when page load verification detects that the actual landing page differs from expectations.
  */
 public class LandingPageMismatchException extends WebDriverException {
 

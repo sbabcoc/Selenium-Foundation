@@ -144,7 +144,7 @@ public class Page extends ComponentContainer {
     public static <T extends Page> T openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
         String url = getInitialUrl(initialPage, targetUri);
         if (url == null) {
-            throw new InitialPageNotSpecifiedException("No initial page has been specified");
+            throw new InitialPageNotSpecifiedException();
         }
         
         driver.get(url);

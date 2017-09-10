@@ -67,7 +67,7 @@ final class GridProcess {
             Files.createDirectories(outputFile.toPath().getParent());
             return builder.start();
         } catch (IOException e) {
-            throw new GridServerLaunchFailedException("Failed to start grid " + gridRole + " process", e);
+            throw new GridServerLaunchFailedException(gridRole, e);
         }
     }
     

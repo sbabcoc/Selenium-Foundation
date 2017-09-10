@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import com.nordstrom.automation.selenium.utility.ReflectUtil;
 
 /**
- * 
+ * This exception is thrown when a client calls a method of a container object that's no longer valid.
  */
 public class ContainerVacatedException extends RuntimeException {
 
