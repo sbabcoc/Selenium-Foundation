@@ -91,24 +91,25 @@ public final class GridUtility {
         } catch (UnknownHostException e) {
             throw new UnknownGridHostException("hub", hubConfig.getHost(), e);
         } catch (GridServerLaunchFailedException e) {
-            LOGGER.warn("Unable to launch Grid component", e);
+            LOGGER.warn("Unable to launch Selenium Grid server", e);
         } catch (TimeoutException e) {
-            LOGGER.warn("Timeout waiting for Grid component to be active", e);
+            LOGGER.warn("Timeout waiting for Selenium Grid server to be active", e);
         }
         
         return isActive;
     }
 
     /**
+     * Start the specified Selenium Grid server.
      * 
-     * @param testResult
-     * @param hubParms
-     * @throws TimeoutException
+     * @param testResult configuration context (TestNG test result object)
+     * @param serverParms Selenium Grid server parameters
+     * @throws TimeoutException If Grid server took too long to activate.
      */
-    private static void startGridServer(ITestResult testResult, GridServerParms hubParms) throws TimeoutException {
-        Process gridHub = GridProcess.start(testResult, hubParms.processArgs);
-        new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, hubParms.statusUrl);
-        testResult.getTestContext().setAttribute(hubParms.propertyKey, gridHub);
+    private static void startGridServer(ITestResult testResult, GridServerParms serverParms) throws TimeoutException {
+        Process serverProcess = GridProcess.start(testResult, serverParms.processArgs);
+        new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
+        testResult.getTestContext().setAttribute(serverParms.propertyKey, serverProcess);
     }
 
     /**
@@ -288,6 +289,9 @@ public final class GridUtility {
         }
     }
     
+    /**
+     * This private class encapsulated the parameters for a Selenium Grid server.
+     */
     private static class GridServerParms {
         
         private String propertyKey;
@@ -297,9 +301,10 @@ public final class GridUtility {
         private URL statusUrl;
 
         /**
+         * Assemble parameters object for the configured Selenium Grid hub.
          * 
-         * @param config
-         * @return
+         * @param config WebDriver/Grid configuration
+         * @return Grid hub parameters object
          */
         public static GridServerParms getHubParms(SeleniumConfig config) {
                 GridServerParms parms = new GridServerParms();
@@ -318,9 +323,10 @@ public final class GridUtility {
         }
         
         /**
+         * Assemble parameters object for the configured Selenium Grid node.
          * 
-         * @param config
-         * @return
+         * @param config WebDriver/Grid configuration
+         * @return Grid node parameters object
          */
         public static GridServerParms getNodeParms(SeleniumConfig config) {
             GridServerParms parms = new GridServerParms();

@@ -152,7 +152,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         WAIT(SeleniumSettings.WAIT_TIMEOUT),
         
         /**
-         * purpose: The maximum amount of time to wait for a Grid component to launch. <br>
+         * purpose: The maximum amount of time to wait for a Grid server to launch. <br>
          * setting: {@link SeleniumSettings#HOST_TIMEOUT host timeout}
          */
         HOST(SeleniumSettings.HOST_TIMEOUT);
