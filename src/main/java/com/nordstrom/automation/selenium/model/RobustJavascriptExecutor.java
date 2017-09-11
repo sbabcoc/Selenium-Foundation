@@ -27,6 +27,11 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
     
     private JavascriptExecutor executor;
     
+    /**
+     * Constructor for robust JavaScript executor
+     * 
+     * @param driver driver object
+     */
     public RobustJavascriptExecutor(WebDriver driver) {
         if (driver instanceof JavascriptExecutor) {
             executor = (JavascriptExecutor) driver;

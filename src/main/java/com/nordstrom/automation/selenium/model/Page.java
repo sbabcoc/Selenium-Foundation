@@ -11,6 +11,17 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 
+/**
+ * Extend this class when modeling a browser page.
+ * <p>
+ * This class defines two constructors:
+ * <ol>
+ *     <li>Instantiate {@link #Page(WebDriver) browser page}.</li>
+ *     <li>Instantiate {@link #Page(WebDriver, ComponentContainer) frame element}.</li>
+ * </ol>
+ * Your page class must implement #1, which is the sole public constructor. The second constructor is package-private,
+ * used by the {@link Frame} class to perform superclass initialization.
+ */
 public class Page extends ComponentContainer {
     
     @Override
@@ -65,8 +76,14 @@ public class Page extends ComponentContainer {
     private static final String[] BYPASS_METHODS = {"setWindowHandle", "getWindowHandle", "setSpawningPage",
             "getSpawningPage", "setWindowState", "getWindowState", "openInitialPage", "getInitialUrl", "getPageUrl"};
     
+    /**
+     * This enumeration enables container methods to inform the {@link ContainerMethodInterceptor} that action they've
+     * performed will cause a browser window to open or close.
+     */
     public enum WindowState {
-        WILL_OPEN, 
+        /** This state is set on a new page object to indicate that it will be associated with a new window. */
+        WILL_OPEN,
+        /** This state is set on an existing page object to indicate that its associated window will close. */
         WILL_CLOSE
     }
     
@@ -257,7 +274,10 @@ public class Page extends ComponentContainer {
      */
     @Override
     public <C extends ComponentContainer> C enhanceContainer(C container) {
-        if (container instanceof Enhanced) return container;
+        if (container instanceof Enhanced) {
+            return container;
+        }
+        
         C enhanced = super.enhanceContainer(container);
         ((Page) enhanced).setWindowHandle(((Page) container).getWindowHandle());
         ((Page) enhanced).setSpawningPage(((Page) container).getSpawningPage());

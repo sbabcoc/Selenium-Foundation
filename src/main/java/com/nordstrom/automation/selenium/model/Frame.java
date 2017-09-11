@@ -12,15 +12,15 @@ import com.google.common.base.Throwables;
  * <p>
  * This class defines five constructors:
  * <ol>
- *     <li>{@link #Frame(By, ComponentContainer) Frame by locator}</li>
- *     <li>{@link #Frame(By, int, ComponentContainer) Frame by locator and index}</li>
- *     <li>{@link #Frame(RobustWebElement, ComponentContainer) Frame by context element}</li>
- *     <li>{@link #Frame(int, ComponentContainer) Frame by index}</li>
- *     <li>{@link #Frame(String, ComponentContainer) Frame by name or ID}</li>
+ *     <li>Create {@link #Frame(By, ComponentContainer) frame by locator}.</li>
+ *     <li>Create {@link #Frame(By, int, ComponentContainer) frame by locator and index}.</li>
+ *     <li>Create {@link #Frame(RobustWebElement, ComponentContainer) frame by context element}.</li>
+ *     <li>Create {@link #Frame(int, ComponentContainer) frame by index}.</li>
+ *     <li>Create {@link #Frame(String, ComponentContainer) frame by name or ID}.</li>
  * </ol>
- * Your class can implement any of these constructors, but #3 ({@code frame with context element}) is required if you
- * wish to collect multiple instances in a {@link FrameList} or {@link FrameMap}. Also note that you must override
- * {@link #hashCode()} and {@link #equals(Object)}.
+ * Your frame class can implement any of these constructors, but #3 ({@code frame by context element}) is required if
+ * you wish to collect multiple instances in a {@link FrameList} or {@link FrameMap}. Also note that you must override
+ * {@link #hashCode()} and {@link #equals(Object)} if you add significant fields.
  */
 public class Frame extends Page {
     

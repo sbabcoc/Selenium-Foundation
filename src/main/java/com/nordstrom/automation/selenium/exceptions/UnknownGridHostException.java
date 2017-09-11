@@ -9,7 +9,7 @@ public class UnknownGridHostException extends RuntimeException {
     private static final String TEMPLATE = "Specified Selenium Grid %s host '%s' was not found";
 
     /**
-     * Constructor for {@code unknown host} exception for the specified role and host name.
+     * Constructor for {@code unknown host} exception with the specified role and host name.
      * 
      * @param role Grid server role specifier ({@code hub} or {@code node})
      * @param hostName Grid server host name

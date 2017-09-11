@@ -49,7 +49,6 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + driver.hashCode();
         result = PRIME * result + context.hashCode();
         result = PRIME * result + ((parent == null) ? 0 : parent.hashCode());
         result = PRIME * result + ((bypassClasses == null) ? 0 : bypassClasses.hashCode());
@@ -66,8 +65,6 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         if (getClass() != obj.getClass())
             return false;
         ComponentContainer other = (ComponentContainer) obj;
-        if (!driver.equals(other.driver))
-            return false;
         if (!context.equals(other.context))
             return false;
         if (parent == null) {

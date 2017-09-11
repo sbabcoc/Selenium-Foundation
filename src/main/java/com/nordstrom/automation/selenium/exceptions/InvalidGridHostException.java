@@ -11,7 +11,7 @@ public class InvalidGridHostException extends RuntimeException {
     private static final String TEMPLATE = "Specified Selenium Grid %s host '%s' is malformed";
 
     /**
-     * Constructor for {@code invalid host} exception for the specified role and host.
+     * Constructor for {@code invalid host} exception with the specified role and host.
      * 
      * @param role Grid server role specifier ({@code hub} or {@code node})
      * @param host Grid server host specifier
