@@ -59,9 +59,8 @@ public final class GridUtility {
      * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
      * 
      * @return 'true' if configured hub is active; otherwise 'false'
-     * @throws UnknownHostException No response was received from the configured hub host.
      */
-    public static boolean isHubActive() throws UnknownHostException {
+    public static boolean isHubActive() {
         return isHubActive(Reporter.getCurrentTestResult());
     }
     

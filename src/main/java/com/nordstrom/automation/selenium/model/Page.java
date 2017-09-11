@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.net.URI;
+import java.util.Arrays;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -11,6 +13,46 @@ import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedExcep
 
 public class Page extends ComponentContainer {
     
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = super.hashCode();
+        result = PRIME * result + Arrays.hashCode(argumentTypes);
+        result = PRIME * result + Arrays.hashCode(arguments);
+        result = PRIME * result + ((windowHandle == null) ? 0 : windowHandle.hashCode());
+        result = PRIME * result + ((windowState == null) ? 0 : windowState.hashCode());
+        result = PRIME * result + ((spawningPage == null) ? 0 : spawningPage.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Page other = (Page) obj;
+        if (!Arrays.equals(argumentTypes, other.argumentTypes))
+            return false;
+        if (!Arrays.equals(arguments, other.arguments))
+            return false;
+        if (windowHandle == null) {
+            if (other.windowHandle != null)
+                return false;
+        } else if (!windowHandle.equals(other.windowHandle))
+            return false;
+        if (windowState != other.windowState)
+            return false;
+        if (spawningPage == null) {
+            if (other.spawningPage != null)
+                return false;
+        } else if (!spawningPage.equals(other.spawningPage))
+            return false;
+        return true;
+    }
+
     private String windowHandle;
     private Page spawningPage;
     private WindowState windowState;

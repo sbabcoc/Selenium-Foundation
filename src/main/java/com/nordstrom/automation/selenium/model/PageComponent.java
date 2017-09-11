@@ -12,6 +12,31 @@ import com.nordstrom.automation.selenium.support.Coordinator;
 
 public class PageComponent extends ComponentContainer implements WrapsElement {
     
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Arrays.hashCode(argumentTypes);
+        result = prime * result + Arrays.hashCode(arguments);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PageComponent other = (PageComponent) obj;
+        if (!Arrays.equals(argumentTypes, other.argumentTypes))
+            return false;
+        if (!Arrays.equals(arguments, other.arguments))
+            return false;
+        return true;
+    }
+
     private Class<?>[] argumentTypes;
     private Object[] arguments;
     

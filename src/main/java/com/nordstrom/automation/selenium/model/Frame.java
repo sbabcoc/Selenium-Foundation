@@ -9,9 +9,58 @@ import com.google.common.base.Throwables;
 
 /**
  * Extend this class when modeling a browser frame element.
+ * <p>
+ * This class defines five constructors:
+ * <ol>
+ *     <li>{@link #Frame(By, ComponentContainer) Frame by locator}</li>
+ *     <li>{@link #Frame(By, int, ComponentContainer) Frame by locator and index}</li>
+ *     <li>{@link #Frame(RobustWebElement, ComponentContainer) Frame by context element}</li>
+ *     <li>{@link #Frame(int, ComponentContainer) Frame by index}</li>
+ *     <li>{@link #Frame(String, ComponentContainer) Frame by name or ID}</li>
+ * </ol>
+ * Your class can implement any of these constructors, but #3 ({@code frame with context element}) is required if you
+ * wish to collect multiple instances in a {@link FrameList} or {@link FrameMap}. Also note that you must override
+ * {@link #hashCode()} and {@link #equals(Object)}.
  */
 public class Frame extends Page {
     
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = super.hashCode();
+        result = PRIME * result + frameSelect.hashCode();
+        result = PRIME * result + ((element == null) ? 0 : element.hashCode());
+        result = PRIME * result + index;
+        result = PRIME * result + ((nameOrId == null) ? 0 : nameOrId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Frame other = (Frame) obj;
+        if (frameSelect != other.frameSelect)
+            return false;
+        if (element == null) {
+            if (other.element != null)
+                return false;
+        } else if (!element.equals(other.element))
+            return false;
+        if (index != other.index)
+            return false;
+        if (nameOrId == null) {
+            if (other.nameOrId != null)
+                return false;
+        } else if (!nameOrId.equals(other.nameOrId))
+            return false;
+        return true;
+    }
+
     private FrameSelect frameSelect;
     private RobustWebElement element;
     private int index;
@@ -107,17 +156,17 @@ public class Frame extends Page {
     @Override
     protected SearchContext switchToContext() {
         switch (frameSelect) {
-        case ELEMENT:
-            driver.switchTo().frame(element.getWrappedElement());
-            break;
-            
-        case INDEX:
-            driver.switchTo().frame(index);
-            break;
-            
-        case NAME_OR_ID:
-            driver.switchTo().frame(nameOrId);
-            break;
+            case ELEMENT:
+                driver.switchTo().frame(element.getWrappedElement());
+                break;
+
+            case INDEX:
+                driver.switchTo().frame(index);
+                break;
+
+            case NAME_OR_ID:
+                driver.switchTo().frame(nameOrId);
+                break;
         }
         return this;
     }

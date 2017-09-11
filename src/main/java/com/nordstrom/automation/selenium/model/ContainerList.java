@@ -15,6 +15,37 @@ import org.openqa.selenium.WebElement;
  */
 abstract class ContainerList<E extends ComponentContainer> extends AbstractList<E> {
 
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = super.hashCode();
+        result = PRIME * result + parent.hashCode();
+        result = PRIME * result + containerType.hashCode();
+        result = PRIME * result + locator.hashCode();
+        result = PRIME * result + elements.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ContainerList<?> other = (ContainerList<?>) obj;
+        if (!parent.equals(other.parent))
+            return false;
+        if (!containerType.equals(other.containerType))
+            return false;
+        if (!locator.equals(other.locator))
+            return false;
+        if (!elements.equals(other.elements))
+            return false;
+        return true;
+    }
+
     protected ComponentContainer parent;
     protected Class<E> containerType;
     protected By locator;

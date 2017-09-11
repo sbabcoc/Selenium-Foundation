@@ -23,7 +23,8 @@ import net.bytebuddy.implementation.bind.annotation.This;
 
 /**
  * This enumeration implements the method interceptor for <b>Selenium Foundation</b> component container objects.
- * This interceptor is implemented as a standard Java enumeration singleton and performs the following tasks: <ul>
+ * This interceptor is implemented as a standard Java enumeration singleton and performs the following tasks:
+ * <ul>
  *     <li>Block calls to objects that have been superseded (vacated) by prior actions.</li>
  *     <li>Switch driver focus to the window/frame associated with the target object.</li>
  *     <li>If informed that actions of the invoked method will cause the associated window to close: <ul>
