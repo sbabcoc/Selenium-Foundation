@@ -47,7 +47,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
 public enum ContainerMethodInterceptor {
     INSTANCE;
     
-    private int depth = 0;
+    private int depth;
     private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
     /**
@@ -61,8 +61,9 @@ public enum ContainerMethodInterceptor {
      * @throws Exception {@code anything} (exception thrown by the intercepted method)
      */
     @RuntimeType
-    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperCall Callable<?> proxy) throws Exception {
-        
+    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
+                    @SuperCall Callable<?> proxy) throws Exception
+    {
         if ( ! (obj instanceof ComponentContainer)) {
             return proxy.call();
         }

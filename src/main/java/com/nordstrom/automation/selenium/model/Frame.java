@@ -7,6 +7,9 @@ import org.openqa.selenium.WebDriverException;
 
 import com.google.common.base.Throwables;
 
+/**
+ * Extend this class when modeling a browser frame element.
+ */
 public class Frame extends Page {
     
     private FrameSelect frameSelect;

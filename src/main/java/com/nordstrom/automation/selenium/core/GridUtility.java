@@ -71,7 +71,6 @@ public final class GridUtility {
      * 
      * @param testResult configuration context (TestNG test result object)
      * @return 'true' if configured hub is active; otherwise 'false'
-     * @throws UnknownHostException No response was received from the configured hub host.
      */
     public static boolean isHubActive(ITestResult testResult) {
         
