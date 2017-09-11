@@ -8,7 +8,7 @@ import org.apache.http.HttpHost;
 public class InvalidGridHostException extends RuntimeException {
 
     private static final long serialVersionUID = -3037697283479571401L;
-    private static final String TEMPLATE = "Specified Selenium Grid %s host '%s' is malformed";
+    private static final String TEMPLATE = "Specified Selenium Grid %s host URI '%s' is malformed";
 
     /**
      * Constructor for {@code invalid host} exception with the specified role and host.
