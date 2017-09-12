@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.exceptions;
 
+import java.net.UnknownHostException;
+
 /**
  * This exception indicates that the configured Selenium Grid server host name couldn't be resolved to an IP address.
  */
@@ -15,7 +17,7 @@ public class UnknownGridHostException extends RuntimeException {
      * @param hostName Grid server host name
      * @param cause the cause of this exception
      */
-    public UnknownGridHostException(String role, String hostName, Throwable cause) {
+    public UnknownGridHostException(String role, String hostName, UnknownHostException cause) {
         super(getMessage(role, hostName), cause);
     }
     

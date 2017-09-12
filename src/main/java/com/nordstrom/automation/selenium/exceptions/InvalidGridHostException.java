@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.exceptions;
 
+import java.net.MalformedURLException;
+
 import org.apache.http.HttpHost;
 
 /**
@@ -17,7 +19,7 @@ public class InvalidGridHostException extends RuntimeException {
      * @param host Grid server host specifier
      * @param cause the cause of this exception
      */
-    public InvalidGridHostException(String role, HttpHost host, Throwable cause) {
+    public InvalidGridHostException(String role, HttpHost host, MalformedURLException cause) {
         super(getMessage(role, host), cause);
     }
     
