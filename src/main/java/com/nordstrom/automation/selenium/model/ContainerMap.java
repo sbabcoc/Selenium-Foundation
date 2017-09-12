@@ -21,6 +21,9 @@ import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This is the abstract base class for all of the container map classes defined by <b>Selenium Foundation</b>.
+ * <p>
+ * <b>NOTE</b>: This class implements a read-only map; all methods that would alter the composition of the collection
+ * (e.g. - {@link #put(Object, Object)}) result in {@link UnsupportOperationException}.
  *
  * @param <V> the class of container objects collected by this map
  */
@@ -67,6 +70,13 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     private Set<Map.Entry<Object, V>> entrySet;
     private int size;
     
+    /**
+     * Constructor for container map with parent, type, and locator
+     * 
+     * @param parent parent container
+     * @param containerType container type
+     * @param locator container context element locator
+     */
     @SuppressWarnings("unchecked")
     ContainerMap(ComponentContainer parent, Class<V> containerType, By locator) {
         Objects.requireNonNull(parent, "[parent] must be non-null");
@@ -149,6 +159,14 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         return new Object[] {(RobustWebElement) element, parent};
     }
     
+    /**
+     * This class implements a container map entry.
+     * <p>
+     * The {@link ContainerMap#entrySet()} method returns a collection-view of the map, whose elements are of this
+     * class. The only way to obtain a reference to a container map entry is from the iterator of this collection-view.
+     * 
+     * @param <V> the class of container object held by this entry
+     */
     static class ContainerEntry<V extends ComponentContainer> implements Map.Entry<Object, V> {
         @Override
         public int hashCode() {
@@ -194,10 +212,11 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         private V value;
 
         /**
+         * Constructor for container map entry
          * 
-         * @param map
-         * @param element
-         * @param next
+         * @param map container map to which this entry belongs
+         * @param element container context element
+         * @param next link to the next container entry ('null' for final entry)
          */
         ContainerEntry(ContainerMap<V> map, RobustWebElement element, ContainerEntry<V> next) {
             this.map = map;
@@ -235,6 +254,12 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
     }
     
+    /**
+     * This class defines an unordered collection of container map entries - a {@code set}.
+     * <p>
+     * <b>NOTE</b>: This class implements a read-only set; all methods that would alter the composition of the
+     * collection (e.g. - {@link #remove}) result in {@link UnsupportOperationException}.
+     */
     class ContainerEntrySet extends AbstractSet<Map.Entry<Object, V>> {
         
         @Override
@@ -274,6 +299,12 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
     }
     
+    /**
+     * This class implements a container map entry iterator.
+     * <p>
+     * <b>NOTE</b>: This class implements a read-only iterator; all methods that would alter the composition of the
+     * collection (e.g. - {@link #remove}) result in {@link UnsupportOperationException}.
+     */
     class ContainerEntryIterator implements Iterator<Map.Entry<Object, V>> {
         
         @Override
@@ -311,6 +342,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         private ContainerEntry<V> next;
         private int index;
         
+        /**
+         * Constructor for a container map entry iterator.
+         */
         ContainerEntryIterator() {
             findNextEntry();
         }

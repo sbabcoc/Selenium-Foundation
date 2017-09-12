@@ -10,6 +10,9 @@ import org.openqa.selenium.WebElement;
 
 /**
  * This is the abstract base class for all of the container list classes defined by <b>Selenium Foundation</b>.
+ * <p>
+ * <b>NOTE</b>: This class implements a read-only list; all methods that would alter the composition of the collection
+ * (e.g. - {@link #add(Object)}) result in {@link UnsupportOperationException}.
  *
  * @param <E> the class of container objects collected by this list
  */
@@ -53,6 +56,13 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
     protected List<WebElement> elements;
     protected List<E> containers;
     
+    /**
+     * Constructor for container list with parent, type, and locator
+     * 
+     * @param parent parent container
+     * @param containerType container type
+     * @param locator container context element locator
+     */
     ContainerList(ComponentContainer parent, Class<E> containerType, By locator) {
         Objects.requireNonNull(parent, "[parent] must be non-null");
         Objects.requireNonNull(containerType, "[containerType] must be non-null");
