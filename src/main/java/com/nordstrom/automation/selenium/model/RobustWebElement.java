@@ -149,34 +149,6 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
             acquiredAt = Long.valueOf(System.currentTimeMillis());
         }
     }
-    
-    @Override
-    public int hashCode() {
-        final int PRIME = 31;
-        int result = 1;
-        result = PRIME * result + context.hashCode();
-        result = PRIME * result + locator.hashCode();
-        result = PRIME * result + index;
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        RobustWebElement other = (RobustWebElement) obj;
-        if (!context.equals(other.context))
-            return false;
-        if (!locator.equals(other.locator))
-            return false;
-        if (index != other.index)
-            return false;
-        return true;
-    }
 
     @Override
     public <X> X getScreenshotAs(final OutputType<X> arg0) {
@@ -610,5 +582,33 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     @Override
     public SearchContext switchTo() {
         return context.switchTo();
+    }
+    
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + context.hashCode();
+        result = PRIME * result + locator.hashCode();
+        result = PRIME * result + index;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RobustWebElement other = (RobustWebElement) obj;
+        if (!context.equals(other.context))
+            return false;
+        if (!locator.equals(other.locator))
+            return false;
+        if (index != other.index)
+            return false;
+        return true;
     }
 }

@@ -45,46 +45,6 @@ import com.nordstrom.common.base.UncheckedThrow;
  */
 public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
     
-    @Override
-    public int hashCode() {
-        final int PRIME = 31;
-        int result = 1;
-        result = PRIME * result + context.hashCode();
-        result = PRIME * result + ((parent == null) ? 0 : parent.hashCode());
-        result = PRIME * result + ((bypassClasses == null) ? 0 : bypassClasses.hashCode());
-        result = PRIME * result + ((bypassMethods == null) ? 0 : bypassMethods.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ComponentContainer other = (ComponentContainer) obj;
-        if (!context.equals(other.context))
-            return false;
-        if (parent == null) {
-            if (other.parent != null)
-                return false;
-        } else if (!parent.equals(other.parent))
-            return false;
-        if (bypassClasses == null) {
-            if (other.bypassClasses != null)
-                return false;
-        } else if (!bypassClasses.equals(other.bypassClasses))
-            return false;
-        if (bypassMethods == null) {
-            if (other.bypassMethods != null)
-                return false;
-        } else if (!bypassMethods.equals(other.bypassMethods))
-            return false;
-        return true;
-    }
-
     /**
      * This interface provides common methods for collections of Selenium locators ({@link By} objects)
      */
@@ -929,4 +889,43 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         return new FrameMap<>(this, frameType, locator);
     }
     
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + context.hashCode();
+        result = PRIME * result + ((parent == null) ? 0 : parent.hashCode());
+        result = PRIME * result + ((bypassClasses == null) ? 0 : bypassClasses.hashCode());
+        result = PRIME * result + ((bypassMethods == null) ? 0 : bypassMethods.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ComponentContainer other = (ComponentContainer) obj;
+        if (!context.equals(other.context))
+            return false;
+        if (parent == null) {
+            if (other.parent != null)
+                return false;
+        } else if (!parent.equals(other.parent))
+            return false;
+        if (bypassClasses == null) {
+            if (other.bypassClasses != null)
+                return false;
+        } else if (!bypassClasses.equals(other.bypassClasses))
+            return false;
+        if (bypassMethods == null) {
+            if (other.bypassMethods != null)
+                return false;
+        } else if (!bypassMethods.equals(other.bypassMethods))
+            return false;
+        return true;
+    }
 }
