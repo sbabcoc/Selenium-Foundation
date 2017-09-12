@@ -28,37 +28,6 @@ import com.nordstrom.common.base.UncheckedThrow;
  * @param <V> the class of container objects collected by this map
  */
 abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Object, V> {
-    
-    @Override
-    public int hashCode() {
-        final int PRIME = 31;
-        int result = super.hashCode();
-        result = PRIME * result + parent.hashCode();
-        result = PRIME * result + containerType.hashCode();
-        result = PRIME * result + locator.hashCode();
-        result = PRIME * result + elements.hashCode();
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ContainerMap<?> other = (ContainerMap<?>) obj;
-        if (!parent.equals(other.parent))
-            return false;
-        if (!containerType.equals(other.containerType))
-            return false;
-        if (!locator.equals(other.locator))
-            return false;
-        if (!elements.equals(other.elements))
-            return false;
-        return true;
-    }
 
     protected ComponentContainer parent;
     protected Class<V> containerType;
@@ -159,6 +128,38 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         return new Object[] {(RobustWebElement) element, parent};
     }
     
+    
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = super.hashCode();
+        result = PRIME * result + parent.hashCode();
+        result = PRIME * result + containerType.hashCode();
+        result = PRIME * result + locator.hashCode();
+        result = PRIME * result + elements.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ContainerMap<?> other = (ContainerMap<?>) obj;
+        if (!parent.equals(other.parent))
+            return false;
+        if (!containerType.equals(other.containerType))
+            return false;
+        if (!locator.equals(other.locator))
+            return false;
+        if (!elements.equals(other.elements))
+            return false;
+        return true;
+    }
+    
     /**
      * This class implements a container map entry.
      * <p>
@@ -168,37 +169,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @param <V> the class of container object held by this entry
      */
     static class ContainerEntry<V extends ComponentContainer> implements Map.Entry<Object, V> {
-        
-        @Override
-        public int hashCode() {
-            final int PRIME = 31;
-            int result = 1;
-            result = PRIME * result + map.hashCode();
-            result = PRIME * result + element.hashCode();
-            result = PRIME * result + ((key == null) ? 0 : key.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            ContainerEntry<?> other = (ContainerEntry<?>) obj;
-            if (!map.equals(other.map))
-                return false;
-            if (!element.equals(other.element))
-                return false;
-            if (key == null) {
-                if (other.key != null)
-                    return false;
-            } else if (!key.equals(other.key))
-                return false;
-            return true;
-        }
 
         private ContainerMap<V> map;
         private RobustWebElement element;
@@ -246,6 +216,37 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         @Override
         public V setValue(V value) {
             throw new UnsupportedOperationException();
+        }
+        
+        @Override
+        public int hashCode() {
+            final int PRIME = 31;
+            int result = 1;
+            result = PRIME * result + map.hashCode();
+            result = PRIME * result + element.hashCode();
+            result = PRIME * result + ((key == null) ? 0 : key.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ContainerEntry<?> other = (ContainerEntry<?>) obj;
+            if (!map.equals(other.map))
+                return false;
+            if (!element.equals(other.element))
+                return false;
+            if (key == null) {
+                if (other.key != null)
+                    return false;
+            } else if (!key.equals(other.key))
+                return false;
+            return true;
         }
     }
     

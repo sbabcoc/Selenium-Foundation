@@ -94,5 +94,4 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
         
         return didRefresh;
     }
-    
 }

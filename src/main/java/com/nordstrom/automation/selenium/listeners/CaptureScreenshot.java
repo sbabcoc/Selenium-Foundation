@@ -108,7 +108,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param driver
      * @return true if it supports screenshots
      */
-    private boolean isScreenshotCapable(WebDriver driver) {
+    private static boolean isScreenshotCapable(WebDriver driver) {
         Boolean isScreenshotCapable = driver instanceof TakesScreenshot;
         if (!(isScreenshotCapable)) {
             String messageTemplate =
@@ -172,7 +172,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param testResult
      * @return the ideal location where the screenshot should be stored.
      */
-    private Path getPathToTargetScreenshotFile(ITestResult testResult) {
+    private static Path getPathToTargetScreenshotFile(ITestResult testResult) {
         Path screenshotStorage = getStorageLocation(testResult.getTestContext());
         return screenshotStorage.resolve(getTargetFilename(testResult));
     }
@@ -187,7 +187,7 @@ public class CaptureScreenshot implements ITestListener {
      * @param testResult
      * @return an identifying name for the screenshot file
      */
-    private String getTargetFilename(ITestResult testResult) {
+    private static String getTargetFilename(ITestResult testResult) {
         int hashcode = Arrays.deepHashCode(testResult.getParameters());
         
         StringBuilder builder = new StringBuilder();
