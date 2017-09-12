@@ -308,19 +308,19 @@ public final class GridUtility {
          * @return Grid hub parameters object
          */
         public static GridServerParms getHubParms(SeleniumConfig config) {
-                GridServerParms parms = new GridServerParms();
-                parms.propertyKey = GRID_HUB;
-                parms.processArgs = config.getHubArgs();
-                parms.serverHost = GridUtility.getHubHost(config.getHubConfig());
-                
-                try {
-                    parms.endpointUrl = URI.create(parms.serverHost.toURI() + GRID_ENDPOINT).toURL();
-                    parms.statusUrl = URI.create(parms.serverHost.toURI() + HUB_STATUS).toURL();
-                } catch (MalformedURLException e) {
-                    throw new InvalidGridHostException("hub", parms.serverHost, e);
-                }
-                
-                return parms;
+            GridServerParms parms = new GridServerParms();
+            parms.propertyKey = GRID_HUB;
+            parms.processArgs = config.getHubArgs();
+            parms.serverHost = GridUtility.getHubHost(config.getHubConfig());
+            
+            try {
+                parms.endpointUrl = URI.create(parms.serverHost.toURI() + GRID_ENDPOINT).toURL();
+                parms.statusUrl = URI.create(parms.serverHost.toURI() + HUB_STATUS).toURL();
+            } catch (MalformedURLException e) {
+                throw new InvalidGridHostException("hub", parms.serverHost, e);
+            }
+            
+            return parms;
         }
         
         /**
