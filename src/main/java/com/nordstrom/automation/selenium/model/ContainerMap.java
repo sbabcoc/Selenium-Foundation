@@ -23,7 +23,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  * This is the abstract base class for all of the container map classes defined by <b>Selenium Foundation</b>.
  * <p>
  * <b>NOTE</b>: This class implements a read-only map; all methods that would alter the composition of the collection
- * (e.g. - {@link #put(Object, Object)}) result in {@link UnsupportOperationException}.
+ * (e.g. - {@link #put(Object, Object)}) result in {@link UnsupportedOperationException}.
  *
  * @param <V> the class of container objects collected by this map
  */

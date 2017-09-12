@@ -12,7 +12,7 @@ import org.openqa.selenium.WebElement;
  * This is the abstract base class for all of the container list classes defined by <b>Selenium Foundation</b>.
  * <p>
  * <b>NOTE</b>: This class implements a read-only list; all methods that would alter the composition of the collection
- * (e.g. - {@link #add(Object)}) result in {@link UnsupportOperationException}.
+ * (e.g. - {@link #add(Object)}) result in {@link UnsupportedOperationException}.
  *
  * @param <E> the class of container objects collected by this list
  */
