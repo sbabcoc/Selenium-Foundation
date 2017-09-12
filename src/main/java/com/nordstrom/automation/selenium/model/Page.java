@@ -77,7 +77,7 @@ public class Page extends ComponentContainer {
             "getSpawningPage", "setWindowState", "getWindowState", "openInitialPage", "getInitialUrl", "getPageUrl"};
     
     /**
-     * This enumeration enables container methods to inform the {@link ContainerMethodInterceptor} that action they've
+     * This enumeration enables container methods to inform the {@link ContainerMethodInterceptor} that actions they've
      * performed will cause a browser window to open or close.
      */
     public enum WindowState {
