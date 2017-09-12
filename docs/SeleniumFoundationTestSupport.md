@@ -320,7 +320,7 @@ The `@AfterMethod` configuration method in this example is also able to interact
 
 # Component Container Logging
 
-In **Selenium Foundation**, component containers are _enhanced_ - additional facilities are added at runtime to improve performance and eliminate boilerplate code. The enhancement process produces a variant of the original class with an augmented name. If you use the standard technique to obtain an SLF4J **`Logger`**, it will be assigned this augmented name instead of the what you might expect:
+In **Selenium Foundation**, component containers are _enhanced_ - additional facilities are added at runtime to improve performance and eliminate boilerplate code. The enhancement process produces a variant of the original class with an augmented name. If you use the standard technique to obtain an SLF4J **`Logger`**, it will be assigned this augmented name instead of the unadorned name you might expect:
 
 ```java
 
