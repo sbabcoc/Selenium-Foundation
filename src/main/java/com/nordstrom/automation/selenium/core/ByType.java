@@ -7,7 +7,7 @@ import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
 /**
  * This utility class defines static methods and interfaces related to Selenium {@link By} objects.
  */
-public class ByType {
+public final class ByType {
     
     private ByType() {
         throw new AssertionError("ByType is a static utility class that cannot be instantiated");

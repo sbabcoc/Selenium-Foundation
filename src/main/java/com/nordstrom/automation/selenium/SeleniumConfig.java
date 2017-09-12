@@ -31,6 +31,8 @@ import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -49,10 +51,21 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
     /** value: {"browserName": "phantomjs"} */
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "phantomjs");
+    /** value: 5555 */
+    private static final Integer DEFAULT_NODE_PORT = Integer.valueOf(5555);
     
+    /**
+     * This enumeration declares the settings that enable you to control the parameters used by
+     * <b>Selenium Foundation</b>.
+     * <p>
+     * Each setting is defined by a constant name and System property key. Many settings also define
+     * default values. Note that all of these settings can be overridden via the
+     * {@code settings.properties} file and System property declarations.
+     */
     public enum SeleniumSettings implements SettingsCore.SettingsAPI {
         /** name: <b>selenium.target.scheme</b> <br> default: <b>http</b> */
         TARGET_SCHEME("selenium.target.scheme", "http"),
@@ -74,8 +87,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
         /** name: <b>selenium.node.host</b> <br> default: {@code null} */
         NODE_HOST("selenium.node.host", null),
-        /** name: <b>selenium.node.port</b> <br> default: {@code null} */
-        NODE_PORT("selenium.node.port", null),
+        /** name: <b>selenium.node.port</b> <br> default: <b>5555</b> */
+        NODE_PORT("selenium.node.port", "5555"),
         /** name: <b>selenium.browser.name</b> <br> default: {@code null} */
         BROWSER_NAME("selenium.browser.name", null),
         /** name: <b>selenium.browser.caps</b> <br> default: {@link SeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
@@ -110,11 +123,38 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         }
     }
     
+    /**
+     * This enumeration provides easy access to the timeout intervals defined in {@link SeleniumSettings}.
+     */
     public enum WaitType {
+        /**
+         * purpose: The maximum allowed interval for a page to finish loading. <br>
+         * setting: {@link SeleniumSettings#PAGE_LOAD_TIMEOUT page load timeout}
+         */
         PAGE_LOAD(SeleniumSettings.PAGE_LOAD_TIMEOUT),
+        
+        /**
+         * purpose: The maximum amount of time the driver will search for an element. <br>
+         * setting: {@link SeleniumSettings#IMPLIED_TIMEOUT implicit timeout}
+         */
         IMPLIED(SeleniumSettings.IMPLIED_TIMEOUT),
+        
+        /**
+         * purpose: The maximum allowed interval for an asynchronous script to finish. <br>
+         * setting: {@link SeleniumSettings#SCRIPT_TIMEOUT script timeout}
+         */
         SCRIPT(SeleniumSettings.SCRIPT_TIMEOUT),
+        
+        /**
+         * purpose: The maximum amount of time to wait for a search context event. <br> 
+         * setting: {@link SeleniumSettings#WAIT_TIMEOUT wait timeout}
+         */
         WAIT(SeleniumSettings.WAIT_TIMEOUT),
+        
+        /**
+         * purpose: The maximum amount of time to wait for a Grid server to launch. <br>
+         * setting: {@link SeleniumSettings#HOST_TIMEOUT host timeout}
+         */
         HOST(SeleniumSettings.HOST_TIMEOUT);
         
         private SeleniumSettings timeoutSetting;
@@ -170,6 +210,12 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     private String[] hubArgs;
     private Capabilities browserCaps;
     
+    /**
+     * Instantiate a <b>Selenium Foundation</b> configuration object.
+     * 
+     * @throws ConfigurationException If a failure is encountered while initializing this configuration object.
+     * @throws IOException If a failure is encountered while reading from a configuration input stream.
+     */
     public SeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
     }
@@ -309,14 +355,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             config.put("host", getLocalHost());
         }
         
-        Integer nodePort = getInteger(SeleniumSettings.NODE_PORT.key(), null);
-        if (nodePort != null) {
-            config.put("port", nodePort);
-        }
-        if (config.get("port") == null) {
-            config.put("port", Integer.valueOf(5555));
-        }
-        
+        config.put("port", getInteger(SeleniumSettings.NODE_PORT.key(), DEFAULT_NODE_PORT));
         config.put("hub", "http://" + getHubConfig().getHost() + ":" + getHubConfig().getPort() + "/grid/register/");
         
         return nodeConfig;
@@ -387,7 +426,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     }
 
     /**
-     * Get Internet protocol IP address for the machine we're running on.
+     * Get Internet protocol (IP) address for the machine we're running on.
      * 
      * @return IP address for the machine we're running on (a.k.a. - 'localhost')
      */
@@ -395,9 +434,9 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException eaten) {
-            // nothing to do here
+            LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
+            return "localhost";
         }
-        return "localhost";
     }
 
     /**
@@ -416,7 +455,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                     try {
                         jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                     } catch (IOException eaten) {
-                        // nothing to do here
+                        LOGGER.warn("Unable to get browser configuration file contents: {}", eaten.getMessage());
                     }
                 }
                 
@@ -441,7 +480,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @param path configuration file path (absolute, relative, or simple filename)
      * @return resolved absolute path of specified file; 'null' if file not found
      */
-    private String getConfigPath(String path) {
+    private static String getConfigPath(String path) {
         FileHandler handler = new FileHandler();
         handler.setPath(path);
         
@@ -457,7 +496,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                     try {
                         FileSystems.newFileSystem(uri, Collections.emptyMap());
                     } catch (FileSystemAlreadyExistsException eaten) {
-                        // nothing to do here
+                        LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
                     } 
                     
                     String outputDir = getOutputDir();
@@ -470,8 +509,10 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                 }
                 File file = new File(uri);
                 return file.getAbsolutePath();
-            } catch (URISyntaxException | IOException eaten) {
-                // nothing to do here
+            } catch (URISyntaxException eaten) {
+                LOGGER.warn("Invalid URL returned by file locator: {}", eaten.getMessage());
+            } catch (IOException eaten) {
+                LOGGER.warn("Failed to construct file system or extract configuration file: {}", eaten.getMessage());
             }
         }
         return null;

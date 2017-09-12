@@ -12,9 +12,15 @@ import org.openqa.selenium.support.ui.Clock;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Sleeper;
 import org.openqa.selenium.support.ui.SystemClock;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
+/**
+ * This class extends {@link FluentWait}, specifying {@link SearchContext} as the type parameter. This enables you to
+ * specify 'wait' operations within a specific search context. By contrast, the standard {@link WebDriverWait} class
+ * always operates within the context of the driver, which encompasses the entire page. 
+ */
 public class SearchContextWait extends FluentWait<SearchContext> {
     public static final long DEFAULT_SLEEP_TIMEOUT = 500;
     private final SearchContext context;
@@ -54,6 +60,11 @@ public class SearchContextWait extends FluentWait<SearchContext> {
     }
 
     /**
+     * Wait will ignore instances of NotFoundException that are encountered
+     * (thrown) by default in the 'until' condition, and immediately propagate
+     * all others. You can add more to the ignore list by calling
+     * ignoring(exceptions to add).
+     * 
      * @param context
      *            The SearchContext instance to pass to the expected conditions
      * @param clock

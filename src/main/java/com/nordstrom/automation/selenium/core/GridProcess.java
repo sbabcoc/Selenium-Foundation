@@ -14,6 +14,7 @@ import org.openqa.grid.selenium.GridLauncher;
 import org.testng.ITestResult;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -26,7 +27,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
  * <b>NOTE</b>: If no test context is specified, the log file will be stored in the "current" directory of the parent
  * Java process.  
  */
-class GridProcess {
+final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
     private static final Class<?>[] dependencies = { GridLauncher.class };
@@ -41,10 +42,10 @@ class GridProcess {
      * @param testResult TestNG test results object (may be 'null')
      * @param args Selenium server command line arguments (check {@code See Also} below)
      * @return Java {@link Process} object for managing the server process
-     * @throws IOException If a Grid component process failed to start
+     * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
      */
-    static Process start(ITestResult testResult, String[] args) throws IOException {
+    static Process start(ITestResult testResult, String[] args) {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
@@ -66,7 +67,7 @@ class GridProcess {
             Files.createDirectories(outputFile.toPath().getParent());
             return builder.start();
         } catch (IOException e) {
-            throw new IOException("Failed to start grid " + gridRole + " process", e);
+            throw new GridServerLaunchFailedException(gridRole, e);
         }
     }
     
@@ -79,24 +80,26 @@ class GridProcess {
     private static String getClasspath(Class<?>[] dependencies) {
         List<String> pathList = new ArrayList<>();
         for (Class<?> clazz : dependencies) {
-            pathList.add(findPathJar(clazz));
+            pathList.add(findJarPathFor(clazz));
         }
         return String.join(File.pathSeparator, pathList);
     }
     
     /**
-     * If the provided class has been loaded from a jar file that is on the
-     * local file system, will find the absolute path to that jar file.
+     * If the provided class has been loaded from a JAR file that is on the
+     * local file system, will find the absolute path to that JAR file.
      * 
      * @param context
-     *            The jar file that contained the class file that represents
+     *            The JAR file that contained the class file that represents
      *            this class will be found.
+     * @return absolute path to the JAR file from which the specified class was
+     *            loaded
      * @throws IllegalStateException
-     *             If the specified class was loaded from a directory or in some
-     *             other way (such as via HTTP, from a database, or some other
-     *             custom class-loading device).
+     *           If the specified class was loaded from a directory or in some
+     *           other way (such as via HTTP, from a database, or some other
+     *           custom class-loading device).
      */
-    public static String findPathJar(Class<?> context) {
+    public static String findJarPathFor(Class<?> context) {
         String rawName = context.getName();
         int idx = rawName.lastIndexOf('.');
         
@@ -125,7 +128,7 @@ class GridProcess {
                                 Charset.defaultCharset().name());
                 return new File(fileName).getAbsolutePath();
             } catch (UnsupportedEncodingException e) {
-                throw new InternalError("default charset doesn't exist. Your VM is borked.");
+                throw new InternalError("Default charset doesn't exist. Your VM is borked.", e);
             }
         }
         

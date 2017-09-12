@@ -317,3 +317,25 @@ public class ExampleTest {
 In the example above, the <span style="color:blue">ScenarioCleanup</span> listener is attached to the listener chain prior to <span style="color:blue">DriverManager</span>. Consequently, the <span style="color:blue">ITestListener</span> _after_ methods of <span style="color:blue">ScenarioCleanup</span> are invoked prior to those of <span style="color:blue">DriverManager</span>. At this point, the driver will still be open, allowing interactions with the browser session.
 
 The `@AfterMethod` configuration method in this example is also able to interact with the browser session. Depending on your scenario, you may need to add conditional logic to check the completion status of the test method, but this is easily done through the various status-related methods of the <span style="color:blue">ITestResult</span> object.
+
+# Component Container Logging
+
+In **Selenium Foundation**, component containers are _enhanced_ - additional facilities are added at runtime to improve performance and eliminate boilerplate code. The enhancement process produces a variant of the original class with an augmented name. If you use the standard technique to obtain an SLF4J **`Logger`**, it will be assigned this augmented name instead of the unadorned name you might expect:
+
+```java
+
+    System.out.println(pageObj.getName());
+    // => com.nordstrom.automation.selenium.model.ExamplePage$ByteBuddy$SPrBnLqt@2c7b1a01
+
+```
+
+The **`Enhanceable`** class, which is the base class for all of the component container classes, includes a **`getContainerClass(Object)`** method that returns the original class. However, you never need to create you own loggers, because each container object comes equipped with a logger out of the box:
+
+```java
+
+    pageObj.getLogger().info("Informative log message");
+    => 21:19:12.910 [main] INFO  c.n.a.selenium.model.ExamplePage - Informative log message
+
+```
+
+As demonstrated, each component container - in this case, a **`Page`** object - has a logger created for it automatically. You access this logger by way of the **`getLogger()`** method.

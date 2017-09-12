@@ -5,7 +5,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +32,7 @@ public class GridUtilityTest {
     private static final String NODE_SHUTDOWN = "/selenium-server/driver/?cmd=shutDownSeleniumServer";
     
     @BeforeClass
-    public void killLocalGrid() throws UnknownHostException, MalformedURLException, InterruptedException, TimeoutException {
+    public void killLocalGrid() throws UnknownHostException, TimeoutException {
         SeleniumConfig config = SeleniumConfig.getConfig();
         
         GridHubConfiguration hubConfig = config.getHubConfig();
@@ -76,7 +75,7 @@ public class GridUtilityTest {
     
     @Test
     @NoDriver
-    public void testIsActive() throws UnknownHostException, MalformedURLException {
+    public void testIsActive() {
         SeleniumConfig config = SeleniumConfig.getConfig();
         GridHubConfiguration hubConfig = config.getHubConfig();
         assertFalse(GridUtility.isHubActive(hubConfig), "Configured local hub should initially be inactive");

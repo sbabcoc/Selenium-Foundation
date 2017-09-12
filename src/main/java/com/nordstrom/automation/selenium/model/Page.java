@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.net.URI;
+import java.util.Arrays;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -9,8 +11,59 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 
+/**
+ * Extend this class when modeling a browser page.
+ * <p>
+ * This class defines two constructors:
+ * <ol>
+ *     <li>Instantiate {@link #Page(WebDriver) browser page}.</li>
+ *     <li>Instantiate {@link #Page(WebDriver, ComponentContainer) frame element}.</li>
+ * </ol>
+ * Your page class must implement #1, which is the sole public constructor. The second constructor is package-private,
+ * used by the {@link Frame} class to perform superclass initialization.
+ */
 public class Page extends ComponentContainer {
     
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = super.hashCode();
+        result = PRIME * result + Arrays.hashCode(argumentTypes);
+        result = PRIME * result + Arrays.hashCode(arguments);
+        result = PRIME * result + ((windowHandle == null) ? 0 : windowHandle.hashCode());
+        result = PRIME * result + ((windowState == null) ? 0 : windowState.hashCode());
+        result = PRIME * result + ((spawningPage == null) ? 0 : spawningPage.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Page other = (Page) obj;
+        if (!Arrays.equals(argumentTypes, other.argumentTypes))
+            return false;
+        if (!Arrays.equals(arguments, other.arguments))
+            return false;
+        if (windowHandle == null) {
+            if (other.windowHandle != null)
+                return false;
+        } else if (!windowHandle.equals(other.windowHandle))
+            return false;
+        if (windowState != other.windowState)
+            return false;
+        if (spawningPage == null) {
+            if (other.spawningPage != null)
+                return false;
+        } else if (!spawningPage.equals(other.spawningPage))
+            return false;
+        return true;
+    }
+
     private String windowHandle;
     private Page spawningPage;
     private WindowState windowState;
@@ -23,8 +76,14 @@ public class Page extends ComponentContainer {
     private static final String[] BYPASS_METHODS = {"setWindowHandle", "getWindowHandle", "setSpawningPage",
             "getSpawningPage", "setWindowState", "getWindowState", "openInitialPage", "getInitialUrl", "getPageUrl"};
     
+    /**
+     * This enumeration enables container methods to inform the {@link ContainerMethodInterceptor} that actions they've
+     * performed will cause a browser window to open or close.
+     */
     public enum WindowState {
-        WILL_OPEN, 
+        /** This state is set on a new page object to indicate that it will be associated with a new window. */
+        WILL_OPEN,
+        /** This state is set on an existing page object to indicate that its associated window will close. */
         WILL_CLOSE
     }
     
@@ -144,7 +203,7 @@ public class Page extends ComponentContainer {
     public static <T extends Page> T openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
         String url = getInitialUrl(initialPage, targetUri);
         if (url == null) {
-            throw new InitialPageNotSpecifiedException("No initial page has been specified");
+            throw new InitialPageNotSpecifiedException();
         }
         
         driver.get(url);
@@ -215,7 +274,10 @@ public class Page extends ComponentContainer {
      */
     @Override
     public <C extends ComponentContainer> C enhanceContainer(C container) {
-        if (container instanceof Enhanced) return container;
+        if (container instanceof Enhanced) {
+            return container;
+        }
+        
         C enhanced = super.enhanceContainer(container);
         ((Page) enhanced).setWindowHandle(((Page) container).getWindowHandle());
         ((Page) enhanced).setSpawningPage(((Page) container).getSpawningPage());

@@ -4,6 +4,9 @@ import java.lang.reflect.Method;
 
 import com.nordstrom.automation.selenium.utility.ReflectUtil;
 
+/**
+ * This exception is thrown when a client calls a method of a container object that's no longer valid.
+ */
 public class ContainerVacatedException extends RuntimeException {
 
     private static final long serialVersionUID = 2043877560841903084L;
@@ -12,7 +15,7 @@ public class ContainerVacatedException extends RuntimeException {
     private static final String PREAMBLE = "Container object was vacated by invocation of method: ";
     
     /**
-     * Constructs a new container vacated exception with the specified vacater.
+     * Constructs a new {@code container vacated} exception with the specified vacater.
      *
      * @param vacater method that caused the container to be vacated
      */

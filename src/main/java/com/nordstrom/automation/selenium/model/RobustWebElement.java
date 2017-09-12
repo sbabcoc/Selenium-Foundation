@@ -26,6 +26,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.exceptions.OptionalElementNotAcquiredException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -124,7 +125,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         if ((this.index == OPTIONAL) || (this.index > 0)) {
             if (findsByXPath && ( ! (this.locator instanceof By.ByCssSelector))) {
                 selector = ByType.xpathLocatorFor(this.locator);
-                if (this.index > 0) selector += "[" + (this.index + 1) + "]";
+                if (this.index > 0) {
+                    selector += "[" + (this.index + 1) + "]";
+                }
                 strategy = Strategy.JS_XPATH;
                 
                 this.locator = By.xpath(this.selector);
@@ -149,11 +152,11 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     
     @Override
     public int hashCode() {
-        final int prime = 31;
+        final int PRIME = 31;
         int result = 1;
-        result = prime * result + context.hashCode();
-        result = prime * result + locator.hashCode();
-        result = prime * result + index;
+        result = PRIME * result + context.hashCode();
+        result = PRIME * result + locator.hashCode();
+        result = PRIME * result + index;
         return result;
     }
 
@@ -475,7 +478,10 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
                     element.wrapped = context.findElement(element.locator);
                 }
             } catch (NoSuchElementException e) {
-                if (element.index != OPTIONAL) throw e;
+                if (element.index != OPTIONAL) {
+                    throw e;
+                }
+                
                 element.deferredException = e;
                 element.wrapped = null;
             } finally {
@@ -484,7 +490,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         } else {
             List<Object> args = new ArrayList<>();
             List<WebElement> contextArg = new ArrayList<>();
-            if (context instanceof WebElement) contextArg.add((WebElement) context);
+            if (context instanceof WebElement) {
+                contextArg.add((WebElement) context);
+            }
             
             String js;
             args.add(contextArg);
@@ -587,14 +595,16 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     
     /**
      * Throw the deferred exception that was stored upon failing to acquire the reference for an optional element.<br>
-     * <b>NOTE</b>: The deferred exception is not thrown directly - it's wrapped in a NullPointerException to indicate
-     * that the failure was caused by utilizing an optional element for which no actual reference could be acquired.
+     * <p>
+     * <b>NOTE</b>:
+     * The deferred exception is not thrown directly - it's wrapped in a OptionalElementNotAcquiredException to
+     * indicate that the failure was caused by utilizing an optional element for which no actual reference could be
+     * acquired.
      * 
-     * @return nothing (always throws deferred exception wrapped in NullPointerException)
+     * @return nothing (always throws deferred exception wrapped in OptionalElementNotAcquiredException)
      */
-    private NullPointerException deferredException() {
-        throw (NullPointerException) new NullPointerException("Unable to acquire reference for optional element")
-                .initCause(deferredException);
+    private OptionalElementNotAcquiredException deferredException() {
+        throw new OptionalElementNotAcquiredException(deferredException);
     }
 
     @Override

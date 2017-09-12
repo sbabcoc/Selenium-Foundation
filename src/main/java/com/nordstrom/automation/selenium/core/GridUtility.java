@@ -33,17 +33,20 @@ import org.testng.Reporter;
 import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
-import com.nordstrom.common.base.UncheckedThrow;
+import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.automation.selenium.exceptions.InvalidGridHostException;
+import com.nordstrom.automation.selenium.exceptions.UnknownGridHostException;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
  */
-public class GridUtility {
+public final class GridUtility {
     
     private static final String GRID_HUB = "GridHub";
     private static final String GRID_NODE = "GridNode";
-    private static final String HUB_REQUEST = "/grid/api/hub/";
-    private static final String NODE_REQUEST = "/wd/hub/status/";
+    private static final String GRID_ENDPOINT = "/wd/hub/";
+    private static final String HUB_STATUS = "/grid/api/hub/";
+    private static final String NODE_STATUS = "/wd/hub/status/";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
     
@@ -56,10 +59,8 @@ public class GridUtility {
      * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
      * 
      * @return 'true' if configured hub is active; otherwise 'false'
-     * @throws UnknownHostException No response was received from the configured hub host. 
-     * @throws MalformedURLException The configured hub settings produce a malformed URL.
      */
-    public static boolean isHubActive() throws UnknownHostException, MalformedURLException {
+    public static boolean isHubActive() {
         return isHubActive(Reporter.getCurrentTestResult());
     }
     
@@ -69,10 +70,8 @@ public class GridUtility {
      * 
      * @param testResult configuration context (TestNG test result object)
      * @return 'true' if configured hub is active; otherwise 'false'
-     * @throws UnknownHostException No response was received from the configured hub host. 
-     * @throws MalformedURLException The configured hub settings produce a malformed URL.
      */
-    public static boolean isHubActive(ITestResult testResult) throws UnknownHostException, MalformedURLException {
+    public static boolean isHubActive(ITestResult testResult) {
         
         Objects.requireNonNull(testResult, "Test result object must be non-null");
         
@@ -81,37 +80,34 @@ public class GridUtility {
         
         boolean isActive = isHubActive(hubConfig);
         
-        if (!isActive) {
-            // get IP address of the configured hub host
-            InetAddress addr = InetAddress.getByName(hubConfig.getHost());
-            // if configured for local hub
-            if (isThisMyIpAddress(addr)) {
-                try {
-                    UrlChecker urlChecker = new UrlChecker();
-                    long startupDelay = WaitType.HOST.getInterval();
-                    
-                    // launch local Selenium Grid hub
-                    Process gridHub = GridProcess.start(testResult, config.getHubArgs());
-                    HttpHost hubHost = getHubHost(config.getHubConfig());
-                    URI hubUri = URI.create(hubHost.toURI() + HUB_REQUEST);
-                    urlChecker.waitUntilAvailable(startupDelay, TimeUnit.SECONDS, hubUri.toURL());
-                    testResult.getTestContext().setAttribute(GRID_HUB, gridHub);
-                    // launch local Selenium Grid node
-                    Process gridNode = GridProcess.start(testResult, config.getNodeArgs());
-                    HttpHost nodeHost = getNodeHost(config.getNodeConfig());
-                    URI nodeUri = URI.create(nodeHost.toURI() + NODE_REQUEST);
-                    urlChecker.waitUntilAvailable(startupDelay, TimeUnit.SECONDS, nodeUri.toURL());
-                    testResult.getTestContext().setAttribute(GRID_NODE, gridNode);
-                    isActive = true;
-                } catch (IOException e) {
-                    LOGGER.warn("Unable to launch Grid component", e);
-                } catch (TimeoutException e) {
-                    LOGGER.warn("Timeout waiting for Grid component to be active", e);
-                }
+        try {
+            if (!isActive && isThisMyIpAddress(InetAddress.getByName(hubConfig.getHost()))) {
+                startGridServer(testResult, GridServerParms.getHubParms(config));
+                startGridServer(testResult, GridServerParms.getNodeParms(config));
+                isActive = true;
             }
+        } catch (UnknownHostException e) {
+            throw new UnknownGridHostException("hub", hubConfig.getHost(), e);
+        } catch (GridServerLaunchFailedException e) {
+            LOGGER.warn("Unable to launch Selenium Grid server", e);
+        } catch (TimeoutException e) {
+            LOGGER.warn("Timeout waiting for Selenium Grid server to be active", e);
         }
         
         return isActive;
+    }
+
+    /**
+     * Start the specified Selenium Grid server.
+     * 
+     * @param testResult configuration context (TestNG test result object)
+     * @param serverParms Selenium Grid server parameters
+     * @throws TimeoutException If Grid server took too long to activate.
+     */
+    private static void startGridServer(ITestResult testResult, GridServerParms serverParms) throws TimeoutException {
+        Process serverProcess = GridProcess.start(testResult, serverParms.processArgs);
+        new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
+        testResult.getTestContext().setAttribute(serverParms.propertyKey, serverProcess);
     }
 
     /**
@@ -119,10 +115,9 @@ public class GridUtility {
      * 
      * @param hubConfig hub configuration object
      * @return 'true' if configured hub is active; otherwise 'false'
-     * @throws MalformedURLException The configured hub settings produce a malformed URL.
      */
-    static boolean isHubActive(GridHubConfiguration hubConfig) throws MalformedURLException {
-        return isHostActive(getHubHost(hubConfig), HUB_REQUEST);
+    static boolean isHubActive(GridHubConfiguration hubConfig) {
+        return isHostActive(getHubHost(hubConfig), HUB_STATUS);
     }
     
     /**
@@ -140,10 +135,9 @@ public class GridUtility {
      * 
      * @param nodeConfig node configuration object
      * @return 'true' if configured node is active; otherwise 'false'
-     * @throws MalformedURLException The configured node settings produce a malformed URL.
      */
-    static boolean isNodeActive(RegistrationRequest nodeConfig) throws MalformedURLException {
-        return isHostActive(getNodeHost(nodeConfig), NODE_REQUEST);
+    static boolean isNodeActive(RegistrationRequest nodeConfig) {
+        return isHostActive(getNodeHost(nodeConfig), NODE_STATUS);
     }
     
     /**
@@ -163,14 +157,11 @@ public class GridUtility {
      * @param host HTTP host connection to be checked
      * @param request request path (may include parameters)
      * @return 'true' if specified host is active; otherwise 'false'
-     * @throws MalformedURLException The specified host settings produce a malformed URL.
      */
-    private static boolean isHostActive(HttpHost host, String request) throws MalformedURLException {
+    private static boolean isHostActive(HttpHost host, String request) {
         try {
             HttpResponse response = getHttpResponse(host, request);
             return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
-        } catch (MalformedURLException e) {
-            throw e;
         } catch (IOException e) {
             return false;
         }
@@ -203,11 +194,7 @@ public class GridUtility {
 
             @Override
             public Boolean apply(HttpHost host) {
-                try {
-                    return Boolean.valueOf(isHostActive(host, request));
-                } catch (MalformedURLException e) {
-                    throw UncheckedThrow.throwUnchecked(e);
-                }
+                return Boolean.valueOf(isHostActive(host, request));
             }
             
             @Override
@@ -236,18 +223,11 @@ public class GridUtility {
         Objects.requireNonNull(testResult, "Test result object must be non-null");
         
         SeleniumConfig config = SeleniumConfig.getConfig(testResult);
-        GridHubConfiguration hubConfig = config.getHubConfig();
-        try {
-            URL hubUrl = new URL("http://" + hubConfig.getHost() + ":" + hubConfig.getPort() + "/wd/hub");
-            if (isHubActive(testResult)) {
-                return new RemoteWebDriver(hubUrl, config.getBrowserCaps());
-            } else {
-                throw new IllegalStateException("No Selenium Grid instance was found at " + hubUrl);
-            }
-        } catch (UnknownHostException e) {
-            throw new RuntimeException("Specified Selenium Grid host '" + hubConfig.getHost() + "' was not found", e);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Selenium Grid host specification '" + hubConfig.getHost() + "' is malformed", e);
+        GridServerParms hubParms = GridServerParms.getHubParms(config);
+        if (isHubActive(testResult)) {
+            return new RemoteWebDriver(hubParms.endpointUrl, config.getBrowserCaps());
+        } else {
+            throw new IllegalStateException("No Selenium Grid instance was found at " + hubParms.endpointUrl);
         }
     }
     
@@ -297,13 +277,72 @@ public class GridUtility {
      */
     public static boolean isThisMyIpAddress(InetAddress addr) {
         // Check if the address is a valid special local or loop back
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) return true;
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
+            return true;
+        }
 
         // Check if the address is defined on any interface
         try {
             return NetworkInterface.getByInetAddress(addr) != null;
         } catch (SocketException e) {
+            LOGGER.warn("Attempt to associate IP address with adapter triggered I/O exception: {}", e.getMessage());
             return false;
+        }
+    }
+    
+    /**
+     * This private class encapsulated the parameters for a Selenium Grid server.
+     */
+    private static class GridServerParms {
+        
+        private String propertyKey;
+        private String[] processArgs;
+        private HttpHost serverHost;
+        private URL endpointUrl;
+        private URL statusUrl;
+
+        /**
+         * Assemble parameters object for the configured Selenium Grid hub.
+         * 
+         * @param config WebDriver/Grid configuration
+         * @return Grid hub parameters object
+         */
+        public static GridServerParms getHubParms(SeleniumConfig config) {
+                GridServerParms parms = new GridServerParms();
+                parms.propertyKey = GRID_HUB;
+                parms.processArgs = config.getHubArgs();
+                parms.serverHost = GridUtility.getHubHost(config.getHubConfig());
+                
+                try {
+                    parms.endpointUrl = URI.create(parms.serverHost.toURI() + GRID_ENDPOINT).toURL();
+                    parms.statusUrl = URI.create(parms.serverHost.toURI() + HUB_STATUS).toURL();
+                } catch (MalformedURLException e) {
+                    throw new InvalidGridHostException("hub", parms.serverHost, e);
+                }
+                
+                return parms;
+        }
+        
+        /**
+         * Assemble parameters object for the configured Selenium Grid node.
+         * 
+         * @param config WebDriver/Grid configuration
+         * @return Grid node parameters object
+         */
+        public static GridServerParms getNodeParms(SeleniumConfig config) {
+            GridServerParms parms = new GridServerParms();
+            parms.propertyKey = GRID_NODE;
+            parms.processArgs = config.getNodeArgs();
+            parms.serverHost = GridUtility.getNodeHost(config.getNodeConfig());
+            
+            try {
+                parms.endpointUrl = URI.create(parms.serverHost.toURI() + GRID_ENDPOINT).toURL();
+                parms.statusUrl = URI.create(parms.serverHost.toURI() + NODE_STATUS).toURL();
+            } catch (MalformedURLException e) {
+                throw new InvalidGridHostException("node", parms.serverHost, e);
+            }
+            
+            return parms;
         }
     }
 }

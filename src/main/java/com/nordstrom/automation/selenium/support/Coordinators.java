@@ -14,7 +14,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
-public class Coordinators {
+/**
+ * This utility class defines a collection of coordinator objects that enable you to synchronize your automation with
+ * the system under test.
+ */
+public final class Coordinators {
     
     private Coordinators() {
         throw new AssertionError("Coordinators is a static utility class that cannot be instantiated");

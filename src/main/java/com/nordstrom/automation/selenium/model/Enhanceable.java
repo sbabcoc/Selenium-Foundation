@@ -68,7 +68,9 @@ public abstract class Enhanceable<T> {
      */
     @SuppressWarnings("unchecked")
     public <C extends T> C enhanceContainer(C container) {
-        if (container instanceof Enhanced) return container;
+        if (container instanceof Enhanced) {
+            return container;
+        }
         
         Class<?> containerClass = container.getClass();
         

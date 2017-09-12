@@ -10,8 +10,46 @@ import org.openqa.selenium.internal.WrapsElement;
 
 import com.nordstrom.automation.selenium.support.Coordinator;
 
+/**
+ * Extend this class when modeling a browser page component.
+ * <p>
+ * This class defines three constructors:
+ * <ol>
+ *     <li>Create {@link #PageComponent(By, ComponentContainer) page component by locator}.</li>
+ *     <li>Create {@link #PageComponent(By, int, ComponentContainer) page component by locator and index}.</li>
+ *     <li>Create {@link #PageComponent(RobustWebElement, ComponentContainer) page component by context element}.</li>
+ * </ol>
+ * Your page component class can implement any of these constructors, but #3 ({@code page component by context element}
+ * ) is required if you wish to collect multiple instances in a {@link ComponentList} or {@link ComponentMap}. Also
+ * note that you must override {@link #hashCode()} and {@link #equals(Object)} if you add significant fields.
+ */
 public class PageComponent extends ComponentContainer implements WrapsElement {
     
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Arrays.hashCode(argumentTypes);
+        result = prime * result + Arrays.hashCode(arguments);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PageComponent other = (PageComponent) obj;
+        if (!Arrays.equals(argumentTypes, other.argumentTypes))
+            return false;
+        if (!Arrays.equals(arguments, other.arguments))
+            return false;
+        return true;
+    }
+
     private Class<?>[] argumentTypes;
     private Object[] arguments;
     
@@ -132,8 +170,8 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
         if (element.hasReference()) {
             try {
                 return ! element.getWrappedElement().isDisplayed();
-            } catch (StaleElementReferenceException eaten) {
-                // nothing to do here
+            } catch (StaleElementReferenceException e) {
+                getLogger().debug("Container element no longer exists", e);
             }
         }
         return true;
@@ -189,7 +227,10 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @throws UnsupportedOperationException The specified search context isn't a page component
      */
     private static PageComponent verifyContext(SearchContext context) {
-        if (context instanceof PageComponent) return (PageComponent) context;
+        if (context instanceof PageComponent) {
+            return (PageComponent) context;
+        }
+        
         throw new UnsupportedOperationException("Wait object search context is not a page component");
     }
 }
