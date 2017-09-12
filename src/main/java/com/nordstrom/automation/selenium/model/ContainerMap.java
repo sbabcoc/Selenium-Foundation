@@ -168,13 +168,13 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @param <V> the class of container object held by this entry
      */
     static class ContainerEntry<V extends ComponentContainer> implements Map.Entry<Object, V> {
+        
         @Override
         public int hashCode() {
             final int PRIME = 31;
             int result = 1;
             result = PRIME * result + map.hashCode();
             result = PRIME * result + element.hashCode();
-            result = PRIME * result + ((next == null) ? 0 : next.hashCode());
             result = PRIME * result + ((key == null) ? 0 : key.hashCode());
             return result;
         }
@@ -191,11 +191,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
             if (!map.equals(other.map))
                 return false;
             if (!element.equals(other.element))
-                return false;
-            if (next == null) {
-                if (other.next != null)
-                    return false;
-            } else if (!next.equals(other.next))
                 return false;
             if (key == null) {
                 if (other.key != null)
@@ -307,38 +302,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      */
     class ContainerEntryIterator implements Iterator<Map.Entry<Object, V>> {
         
-        @Override
-        public int hashCode() {
-            final int PRIME = 31;
-            int result = 1;
-            result = PRIME * result + ((next == null) ? 0 : next.hashCode());
-            result = PRIME * result + index;
-            result = PRIME * result + getOuterType().hashCode();
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            @SuppressWarnings("unchecked")
-            ContainerEntryIterator other = (ContainerEntryIterator) obj;
-            if (next == null) {
-                if (other.next != null)
-                    return false;
-            } else if (!next.equals(other.next))
-                return false;
-            if (index != other.index)
-                return false;
-            if (!getOuterType().equals(other.getOuterType()))
-                return false;
-            return true;
-        }
-
         private ContainerEntry<V> next;
         private int index;
         
@@ -383,15 +346,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
             while (next == null && index < table.length) {
                 next = table[index++];
             }
-        }
-
-        /**
-         * Get reference to the containing {@link ContainerMap} object.
-         * 
-         * @return ContainerMap object that contains this entry
-         */
-        private ContainerMap<V> getOuterType() {
-            return ContainerMap.this;
         }
     }
 }
