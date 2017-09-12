@@ -128,7 +128,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         return new Object[] {(RobustWebElement) element, parent};
     }
     
-    
     @Override
     public int hashCode() {
         final int PRIME = 31;
