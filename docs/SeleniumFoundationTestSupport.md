@@ -334,6 +334,7 @@ The **`Enhanceable`** class, which is the base class for all of the component co
 ```java
 
     pageObj.getLogger().info("Informative log message");
+    => 21:19:12.910 [main] INFO  c.n.a.selenium.model.ExamplePage - Informative log message
 
 ```
 
