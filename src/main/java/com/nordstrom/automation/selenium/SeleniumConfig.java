@@ -28,6 +28,7 @@ import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.commons.io.IOUtils;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
+import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
@@ -319,6 +320,9 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             nodeConfig = new RegistrationRequest();
             nodeConfig.loadFromJSON(getNodeConfigPath());
             nodeConfig = resolveNodeSettings(nodeConfig);
+            
+            // hack for RegistrationRequest bug
+            nodeConfig.setRole(GridRole.NODE);
         }
         return nodeConfig;
     }
