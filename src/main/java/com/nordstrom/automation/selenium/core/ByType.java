@@ -92,7 +92,7 @@ public final class ByType {
             return val;
         }
         
-        return val;
+        return null;
     }
     
     /**

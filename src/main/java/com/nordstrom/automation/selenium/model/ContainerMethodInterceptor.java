@@ -48,7 +48,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
 public enum ContainerMethodInterceptor {
     INSTANCE;
     
-    private int depth;
+    private static int depth;
     private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
     /**
