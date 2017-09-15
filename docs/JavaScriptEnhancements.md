@@ -48,7 +48,7 @@ public class JavaScriptExample {
         // Get script text from resource file <getMetaTagByName.js>.
         String script = JsUtility.getScriptResource("getMetaTagByName.js");
         // Execute script as anonymous function, passing specified argument
-        WebElement response = JsUtility.runAndReturn(driver, script, WebElement.class, "viewport");
+        WebElement response = JsUtility.runAndReturn(driver, script, "viewport");
         // If element reference was returned, extract 'content' attribute
         return (response == null) ? null : response.getAttribute("content");
     }
@@ -57,7 +57,7 @@ public class JavaScriptExample {
 
 The following code is sample JavaScript file &lt;getMetaTagByName.js&gt;. This file can be stored anywhere on the class path, typically a 'resources' folder within the project hierarchy.
 
-###### getMetaTabByName.js
+###### getMetaTagByName.js
 ```javascript
 var found = document.getElementsByTagName("meta");
 for (var i = 0; i < found.length; i++) {
@@ -101,13 +101,13 @@ public class AnotherJavaScriptExample {
      */
     public String runJavaScriptFunctionThrowsException(WebDriver driver, String name) {
         // Inject Java glue library
-        JsUtility.injectGlueLib(driver)
+        JsUtility.injectGlueLib(driver);
         // Get script text from resource file <requireMetaTagByName.js>.
         String script = JsUtility.getScriptResource("requireMetaTagByName.js");
          
         try {
             // Execute script as anonymous function, passing specified argument
-            WebElement response = JsUtility.runAndReturn(driver, script, WebElement.class, name);
+            WebElement response = JsUtility.runAndReturn(driver, script, name);
             // Extract 'content' attribute
             return response.getAttribute("content");
         } catch (WebDriverException e) {
@@ -120,7 +120,7 @@ public class AnotherJavaScriptExample {
 
 The following code is the sample JavaScript file &lt;requireMetaTagByName.js&gt;. This file can be stored anywhere on the class path, typically a 'resources' folder within the project hierarchy.
 
-###### requireMetaTabByName.js
+###### requireMetaTagByName.js
 ```javascript
 var found = document.getElementsByTagName("meta");
 for (var i = 0; i < found.length; i++) {

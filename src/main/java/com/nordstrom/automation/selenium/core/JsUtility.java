@@ -39,7 +39,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  *         // Get script text from resource file &lt;getMetaTagByName.js&gt;.
  *         String script = JsUtility.getScriptResource("getMetaTagByName.js");
  *         // Execute script as anonymous function, passing specified argument
- *         WebElement response = JsUtility.runAndReturn(driver, script, WebElement.class, name);
+ *         WebElement response = JsUtility.runAndReturn(driver, script, name);
  *         // If element reference was returned, extract 'content' attribute
  *         return (response == null) ? null : response.getAttribute("content");
  *     }
@@ -59,6 +59,7 @@ public final class JsUtility {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
     private static final String JAVA_GLUE_LIB = "javaGlueLib.js";
     private static final String ERROR_PREFIX = "unknown error";
+    private static final String ERROR_MESSAGE_KEY = "errorMessage";
     private static final String CLASS_NAME_KEY = "className";
     private static final String MESSAGE_KEY = "message";
     
@@ -172,26 +173,40 @@ public final class JsUtility {
         Throwable thrown = exception;
         if (exception.getClass().equals(WebDriverException.class)) { 
             String message = exception.getMessage();
+            // only retain the first line
+            message = message.split("\n")[0];
+            // remove prefix if present
             int index = message.indexOf(':');
             if ((index != -1) && ERROR_PREFIX.equals(message.substring(0, index))) {
-                String encodedException = message.substring(index + 1).trim();
-                if (encodedException.contains("\"" + CLASS_NAME_KEY + "\"")
-                        && encodedException.contains("\"" + MESSAGE_KEY + "\"")) {
-                    JsonObject obj = DataUtils.deserializeObject(encodedException);
-                    if (obj != null) {
-                        String className = obj.get(CLASS_NAME_KEY).toString();
-                        try {
-                            Class<?> clazz = Class.forName(className);
-                            Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
-                            thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).toString(), exception);
-                            thrown.setStackTrace(new Throwable().getStackTrace());
-                        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-                                | InstantiationException | IllegalAccessException | IllegalArgumentException
-                                | InvocationTargetException eaten)
-                        {
-                            LOGGER.warn("Unable to instantiate exception: " + className, eaten);
-                        }
+                message = message.substring(index + 1).trim();
+            }
+            // remove wrapper object if present
+            if (message.contains("\"" + ERROR_MESSAGE_KEY + "\"")) {
+                JsonObject obj = DataUtils.deserializeObject(message);
+                if (obj != null) {
+                    message = obj.get(ERROR_MESSAGE_KEY).getAsString();
+                }
+            }
+            // if message appears to be an encoded exception object
+            if (message.contains("\"" + CLASS_NAME_KEY + "\"") && message.contains("\"" + MESSAGE_KEY + "\"")) {
+                // deserialize encoded exception object
+                JsonObject obj = DataUtils.deserializeObject(message);
+                // if successful
+                if (obj != null) {
+                    String className = obj.get(CLASS_NAME_KEY).getAsString();
+                    try {
+                        Class<?> clazz = Class.forName(className);
+                        Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
+                        thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).getAsString(), exception);
+                        thrown.setStackTrace(new Throwable().getStackTrace());
+                    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
+                            | InstantiationException | IllegalAccessException | IllegalArgumentException
+                            | InvocationTargetException eaten)
+                    {
+                        LOGGER.warn("Unable to instantiate exception: {}", className, eaten);
                     }
+                } else {
+                    LOGGER.warn("Unable to deserialize encoded exception object: {}", message);
                 }
             }
         }
