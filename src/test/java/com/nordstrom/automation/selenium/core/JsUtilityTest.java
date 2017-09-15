@@ -77,7 +77,7 @@ public class JsUtilityTest {
     public void testPropagate() {
         ExamplePage page = getPage();
         try {
-            runJavaScriptFunctionThrowsException(page.getDriver(), "test");
+            getMetaTagNamed(page.getDriver(), "test");
             fail("No exception was thrown");
         } catch (NoSuchElementException e) {
             assertTrue(e.getMessage().startsWith("No meta element found with name: "));
@@ -88,19 +88,14 @@ public class JsUtilityTest {
         return (ExamplePage) DriverManager.getInitialPage();
     }
     
-    private String runJavaScriptFunctionThrowsException(WebDriver driver, String name) {
-        // Inject Java glue library
+    private String getMetaTagNamed(WebDriver driver, String name) {
         JsUtility.injectGlueLib(driver);
-        // Get script text from resource file <requireMetaTagByName.js>.
         String script = JsUtility.getScriptResource("requireMetaTagByName.js");
          
         try {
-            // Execute script as anonymous function, passing specified argument
             WebElement response = JsUtility.runAndReturn(driver, script, name);
-            // Extract 'content' attribute
             return response.getAttribute("content");
         } catch (WebDriverException e) {
-            // Extract encoded exception
             throw JsUtility.propagate(e);
         }
     }
