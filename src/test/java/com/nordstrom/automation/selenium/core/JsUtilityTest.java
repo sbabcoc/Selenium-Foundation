@@ -84,10 +84,6 @@ public class JsUtilityTest {
         }
     }
     
-    private ExamplePage getPage() {
-        return (ExamplePage) DriverManager.getInitialPage();
-    }
-    
     private String getMetaTagNamed(WebDriver driver, String name) {
         JsUtility.injectGlueLib(driver);
         String script = JsUtility.getScriptResource("requireMetaTagByName.js");
@@ -98,5 +94,9 @@ public class JsUtilityTest {
         } catch (WebDriverException e) {
             throw JsUtility.propagate(e);
         }
+    }
+    
+    private ExamplePage getPage() {
+        return (ExamplePage) DriverManager.getInitialPage();
     }
 }

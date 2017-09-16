@@ -20,7 +20,7 @@ import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
 public final class WebDriverUtils {
     
     private WebDriverUtils() {
-        throw new UnsupportedOperationException("WebDriverUtils is a static utility class that cannot be instantiated");
+        throw new AssertionError("WebDriverUtils is a static utility class that cannot be instantiated");
     }
     
     /**
