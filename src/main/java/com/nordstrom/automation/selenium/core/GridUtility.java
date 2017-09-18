@@ -30,7 +30,6 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
-import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -181,27 +180,6 @@ public final class GridUtility {
         BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
                 new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
         return client.execute(host, basicHttpEntityEnclosingRequest);
-    }
-    
-    /**
-     * Returns a 'wait' proxy that determines if the context host is active.
-     * 
-     * @param request request path (may include parameters)
-     * @return 'true' if specified host is active; otherwise 'false'
-     */
-    public static Function<HttpHost, Boolean> hostIsActive(final String request) {
-        return new Function<HttpHost, Boolean>() {
-
-            @Override
-            public Boolean apply(HttpHost host) {
-                return Boolean.valueOf(isHostActive(host, request));
-            }
-            
-            @Override
-            public String toString() {
-                return "Selenium Grid host to be active";
-            }
-        };
     }
     
     /**

@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -48,7 +47,13 @@ import net.bytebuddy.implementation.bind.annotation.This;
 public enum ContainerMethodInterceptor {
     INSTANCE;
     
-    private int depth;
+    private static final ThreadLocal<Integer> depth = new ThreadLocal<Integer>() {
+        @Override
+        protected Integer initialValue() {
+            return Integer.valueOf(0);
+        }
+    };
+    
     private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
 
     /**
@@ -69,7 +74,7 @@ public enum ContainerMethodInterceptor {
             return proxy.call();
         }
         
-        depth++;
+        increaseDepth();
         long initialTime = System.currentTimeMillis();
         ComponentContainer container = (ComponentContainer) obj;
         
@@ -153,15 +158,28 @@ public enum ContainerMethodInterceptor {
             
             return result;
         } finally {
-            depth--;
+            int level = decreaseDepth();
             long interval = System.currentTimeMillis() - initialTime;
             
-            if (depth == 0) {
-                container.getLogger().info("[{}] {} ({}ms)", depth, method.getName(), interval);
+            if (level == 0) {
+                container.getLogger().info("[{}] {} ({}ms)", level, method.getName(), interval);
             } else {
-                container.getLogger().debug("[{}] {} ({}ms)", depth, method.getName(), interval);
+                container.getLogger().debug("[{}] {} ({}ms)", level, method.getName(), interval);
             }
         }
     }
     
+    private static int increaseDepth() {
+        return adjustDepth(1);
+    }
+    
+    private static int decreaseDepth() {
+        return adjustDepth(-1);
+    }
+    
+    private static int adjustDepth(int delta) {
+        int i = depth.get().intValue() + delta;
+        depth.set(Integer.valueOf(i));
+        return i;
+    }
 }
