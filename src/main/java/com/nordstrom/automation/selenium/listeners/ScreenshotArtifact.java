@@ -28,7 +28,7 @@ public class ScreenshotArtifact implements ArtifactType {
                     "This driver is not capable of taking a screenshot.  If a screenshot is desired, use a WebDriver "
                     + "implementation that supports screenshots. https://seleniumhq.github.io/selenium/docs/api/java/"
                     + "org/openqa/selenium/TakesScreenshot.html";
-            LOGGER.info(message);
+            LOGGER.warn(message);
         }
         return canTakeScreenshot;
     }
@@ -39,7 +39,7 @@ public class ScreenshotArtifact implements ArtifactType {
             WebDriver driver = DriverManager.getDriver(result);
             return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
         } catch (WebDriverException e) {
-            LOGGER.info("The driver is capable of taking a screenshot, but it failed.", e);
+            LOGGER.warn("The driver is capable of taking a screenshot, but it failed.", e);
             return new byte[0];
         }
     }
