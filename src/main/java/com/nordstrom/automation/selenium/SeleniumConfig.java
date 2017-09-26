@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -48,7 +49,6 @@ import com.nordstrom.automation.settings.SettingsCore;
 public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings> {
     
     private static final String SETTINGS_FILE = "settings.properties";
-    private static final String CONFIG = "CONFIG";
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
@@ -200,8 +200,6 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         
     }
 
-    private static final ThreadLocal<SeleniumConfig> seleniumConfig = new ThreadLocal<>();
-    
     private URI targetUri;
     private String nodeConfigPath;
     private RegistrationRequest nodeConfig;
@@ -222,49 +220,24 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     }
 
     /**
-     * Get the Selenium configuration object for the current context.
+     * Get the Selenium configuration object for the specified context.
      * 
      * @return Selenium configuration object
      */
     public static SeleniumConfig getConfig() {
-        return getConfig(Reporter.getCurrentTestResult());
-    }
-    
-    /**
-     * Get the Selenium configuration object for the specified context.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return Selenium configuration object
-     */
-    public static SeleniumConfig getConfig(ITestResult testResult) {
-        if (testResult == null) {
-            return getSeleniumConfig();
-        }
+        Optional<SeleniumConfig> optConfig = TestAttributes.getAttributes().getConfig();
         
-        SeleniumConfig config = (SeleniumConfig) testResult.getAttribute(CONFIG);
-        
-        if (config == null) {
-            config = getSeleniumConfig();
-            testResult.setAttribute(CONFIG, config);
-        }
-        
-        return config;
-    }
-    
-    /**
-     * Get Selenium configuration object for this thread, creating one if needed
-     * 
-     * @return Selenium configuration object
-     */
-    private static SeleniumConfig getSeleniumConfig() {
-        if (seleniumConfig.get() == null) {
+        if (optConfig.isPresent()) {
+            return optConfig.get();
+        } else {
             try {
-                seleniumConfig.set(new SeleniumConfig());
+                SeleniumConfig config = new SeleniumConfig();
+                TestAttributes.getAttributes().setConfig(config);
+                return config;
             } catch (ConfigurationException | IOException e) {
                 throw new RuntimeException("Failed to instantiate settings", e);
             }
         }
-        return seleniumConfig.get();
     }
     
     /**

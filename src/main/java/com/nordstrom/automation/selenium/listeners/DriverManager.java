@@ -1,7 +1,7 @@
 package com.nordstrom.automation.selenium.listeners;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -14,10 +14,9 @@ import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.Reporter;
-
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.TestAttributes;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
@@ -47,10 +46,6 @@ import com.nordstrom.automation.testng.ExecutionFlowController;
  */
 public class DriverManager implements IInvokedMethodListener, ITestListener {
 
-    private static final String DRIVER = "Driver";
-    private static final String CLOSE_DRIVER = "CloseDriver";
-    private static final String INITIAL_PAGE = "InitialPage";
-    
     /**
      * Get the driver for the current test
      * 
@@ -58,96 +53,54 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @throws DriverNotAvailableException No driver was found in the current test context
      */
     public static WebDriver getDriver() {
-        WebDriver driver = getDriver(Reporter.getCurrentTestResult());
-        if (driver == null) {
-            throw new DriverNotAvailableException();
-        }
-        return driver;
-    }
-    
-    /**
-     * Set the driver for the current test
-     * 
-     * @param driver driver for the current test
-     */
-    public static void setDriver(WebDriver driver) {
-        setDriver(driver, Reporter.getCurrentTestResult());
+        return TestAttributes.getAttributes().getDriver();
     }
     
     /**
      * Get the driver for the specified test result
      * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return driver from the specified test result (may be 'null')
+     * @return (optional) driver from the specified test result
      */
-    public static WebDriver getDriver(ITestResult testResult) {
-        validateTestResult(testResult);
-        return (WebDriver) testResult.getAttribute(DRIVER);
+    public static Optional<WebDriver> findDriver() {
+        return TestAttributes.getAttributes().findDriver();
     }
     
     /**
      * Set the driver for the specified test result
      * 
      * @param driver driver for the specified test result
-     * @param testResult configuration context (TestNG test result object)
+     * @return 
      */
-    public static void setDriver(WebDriver driver, ITestResult testResult) {
-        validateTestResult(testResult);
-        if (driver != null) {
-            testResult.setAttribute(DRIVER, driver);
-        } else {
-            testResult.removeAttribute(DRIVER);
-        }
-    }
-    
-    /**
-     * Set the initial page object for the current test
-     * 
-     * @param pageObj page object for the current test
-     */
-    public static void setInitialPage(Page pageObj) {
-        setInitialPage(pageObj, Reporter.getCurrentTestResult());
-    }
-    
-    /**
-     * Get the initial page object for the current test
-     * 
-     * @return page object for the current test
-     * @throws InitialPageNotSpecifiedException No initial page has been specified
-     */
-    public static Page getInitialPage() {
-        Page initialPage = getInitialPage(Reporter.getCurrentTestResult());
-        if (initialPage == null) {
-            throw new InitialPageNotSpecifiedException();
-        }
-        return initialPage;
+    public static Optional<WebDriver> setDriver(WebDriver driver) {
+        return TestAttributes.getAttributes().setDriver(driver);
     }
     
     /**
      * Set the initial page object for the specified test result
      * 
      * @param pageObj page object for the specified test result
-     * @param testResult configuration context (TestNG test result object)
      */
-    public static void setInitialPage(Page pageObj, ITestResult testResult) {
-        validateTestResult(testResult);
+    public static void setInitialPage(Page pageObj) {
         if (pageObj.getWindowHandle() == null) {
             pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
         }
-        testResult.setAttribute(INITIAL_PAGE, pageObj.enhanceContainer(pageObj));
+        TestAttributes.getAttributes().setInitialPage(pageObj.enhanceContainer(pageObj));
         // required when initial page is local file
-        setDriver(pageObj.getDriver(), testResult);
+        setDriver(pageObj.getDriver());
     }
     
     /**
      * Get the initial page object for the specified test result
      * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return page object for the specified test result (may be 'null')
+     * @return page object for the specified test result
+     * @throws InitialPageNotSpecifiedException No initial page has been specified
      */
-    public static Page getInitialPage(ITestResult testResult) {
-        validateTestResult(testResult);
-        return (Page) testResult.getAttribute(INITIAL_PAGE);
+    public static Page getInitialPage() {
+        return TestAttributes.getAttributes().getInitialPage();
+    }
+    
+    private static boolean hasInitialPage() {
+        return TestAttributes.getAttributes().hasInitialPage();
     }
     
     /**
@@ -169,7 +122,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         Method method = testMethod.getConstructorOrMethod().getMethod();
         
         // get driver supplied by preceding phase
-        WebDriver driver = getDriver(testResult);
+        Optional<WebDriver> optDriver = findDriver();
         // get @InitialPage from invoked method
         InitialPage initialPage = method.getAnnotation(InitialPage.class);
         
@@ -181,16 +134,14 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             // if getting a driver
             if (getDriver) {
                 // if method lacks @InitialPage and none specified by @BeforeMethod
-                if ((initialPage == null) && (getInitialPage(testResult) == null)) {
+                if ((initialPage == null) && ! hasInitialPage()) {
                     // get @InitialPage from class that declares invoked method
                     initialPage = method.getDeclaringClass().getAnnotation(InitialPage.class);
                 }
             // otherwise, if driver supplied by @BeforeMethod
-            } else if (driver != null) {
+            } else if (optDriver.isPresent()) {
                 // close active driver
-                closeDriver(testResult);
-                // dump reference
-                driver = null;
+                optDriver = closeDriver();
             }
         // otherwise, if invoked method is @Before...
         } else if (testMethod.isBeforeMethodConfiguration() || testMethod.isBeforeClassConfiguration()
@@ -199,17 +150,18 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             // determine if driver is needed
             getDriver = (initialPage != null);
             // if getting a driver and invoked method isn't @BeforeMethod, close it after invocation
-            if (getDriver && (!testMethod.isBeforeMethodConfiguration())) {
-                testResult.setAttribute(CLOSE_DRIVER, "");
+            if (getDriver && ( ! testMethod.isBeforeMethodConfiguration())) {
+                TestAttributes.getAttributes().setCloseDriver();
             }
         }
         
         // if getting a driver
         if (getDriver) {
-            SeleniumConfig config = SeleniumConfig.getConfig(testResult);
+            WebDriver driver;
+            SeleniumConfig config = SeleniumConfig.getConfig();
             
             // if driver not yet acquired
-            if (driver == null) {
+            if ( ! optDriver.isPresent()) {
                 long prior = System.currentTimeMillis();
                 Object instance = testMethod.getInstance();
                 // if test class provides its own drivers
@@ -221,7 +173,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
                 
                 if (driver != null) {
                     setDriverTimeouts(driver, config);
-                    setDriver(driver, testResult);
+                    optDriver = setDriver(driver);
                     if (testMethod.isTest()) {
                         long after = System.currentTimeMillis();
                         ExecutionFlowController.adjustTimeout(after - prior, testResult);
@@ -230,9 +182,9 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             }
             
             // if driver acquired and initial page specified
-            if ((driver != null) && (initialPage != null)) {
-                Page page = Page.openInitialPage(initialPage, driver, config.getTargetUri());
-                setInitialPage(page, testResult);
+            if ((optDriver.isPresent()) && (initialPage != null)) {
+                Page page = Page.openInitialPage(initialPage, optDriver.get(), config.getTargetUri());
+                setInitialPage(page);
             }
         }
     }
@@ -248,8 +200,8 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void afterInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
-        if (testResult.getAttribute(CLOSE_DRIVER) != null) {
-            closeDriver(testResult);
+        if (TestAttributes.getAttributes().doCloseDriver()) {
+            closeDriver();
         }
     }
 
@@ -264,12 +216,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void onFinish(ITestContext testContext) {
-        Process gridProc = GridUtility.getGridNode(testContext);
+        Process gridProc = GridUtility.getGridNode();
         if (gridProc != null) {
             gridProc.destroy();
         }
         
-        gridProc = GridUtility.getGridHub(testContext);
+        gridProc = GridUtility.getGridHub();
         if (gridProc != null) {
             gridProc.destroy();
         }
@@ -283,17 +235,17 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
-        closeDriver(testResult);
+        closeDriver();
     }
 
     @Override
     public void onTestFailure(ITestResult testResult) {
-        closeDriver(testResult);
+        closeDriver();
     }
 
     @Override
     public void onTestSkipped(ITestResult testResult) {
-        closeDriver(testResult);
+        closeDriver();
     }
 
     @Override
@@ -303,7 +255,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 
     @Override
     public void onTestSuccess(ITestResult testResult) {
-        closeDriver(testResult);
+        closeDriver();
     }
     
     /**
@@ -321,12 +273,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
 
     /**
      * Close the Selenium driver attached to the specified configuration context.
-     * 
-     * @param testResult configuration context (TestNG test result object)
+     * @return 
      */
-    private static void closeDriver(ITestResult testResult) {
-        WebDriver driver = getDriver(testResult);
-        if (driver != null) {
+    private static Optional<WebDriver> closeDriver() {
+        Optional<WebDriver> optDriver = findDriver();
+        if (optDriver.isPresent()) {
+            WebDriver driver = optDriver.get();
             try {
                 ((JavascriptExecutor) driver).executeScript("return window.stop");
             } catch (WebDriverException | UnsupportedOperationException e) {
@@ -340,16 +292,9 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             }
             
             driver.quit();
-            setDriver(null, testResult);
+            optDriver = setDriver(null);
         }
-    }
-    
-    /**
-     * Verify that the specified configuration context is non-null.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     */
-    private static void validateTestResult(ITestResult testResult) {
-        Objects.requireNonNull(testResult, "Test result object must be non-null");
+        
+        return optDriver;
     }
 }

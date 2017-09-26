@@ -1,9 +1,8 @@
 package com.nordstrom.automation.selenium.listener;
 
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
-import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -18,18 +17,18 @@ public class NoDriverManagerTest {
 
     @BeforeMethod(groups = {"NoDriverBefore"})
     public void beforeMethodNoDriver() {
-        assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should not have been created");
+        assertFalse(DriverManager.findDriver().isPresent(), "Driver should not have been created");
     }
     
     @NoDriver
     @Test(groups = {"NoBeforeNoDriver"})
     public void testNoBeforeNoDriver() {
-        assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should not have been created");
+        assertFalse(DriverManager.findDriver().isPresent(), "Driver should not have been created");
     }
     
     @Test(groups = {"NoDriverBefore"})
     public void testNoDriverBefore() {
-        assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
+        assertTrue(DriverManager.findDriver().isPresent(), "Driver should have been created");
     }
     
     @NoDriver

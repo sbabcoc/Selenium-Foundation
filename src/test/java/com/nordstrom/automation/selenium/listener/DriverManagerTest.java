@@ -1,9 +1,8 @@
 package com.nordstrom.automation.selenium.listener;
 
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
-import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -20,18 +19,18 @@ public class DriverManagerTest {
     @InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
     @BeforeMethod(groups = {"WithDriverBefore"})
     public void beforeMethodWithDriver() {
-        assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
+        assertTrue(DriverManager.findDriver().isPresent(), "Driver should have been created");
     }
     
     @Test(groups = {"WithDriverBefore"})
     public void testWithDriverBefore() {
-        assertNotNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been created");
+        assertTrue(DriverManager.findDriver().isPresent(), "Driver should have been created");
     }
     
     @NoDriver
     @Test(groups = {"WithDriverBefore"})
     public void testCloseDriverBefore() {
-        assertNull(DriverManager.getDriver(Reporter.getCurrentTestResult()), "Driver should have been closed");
+        assertFalse(DriverManager.findDriver().isPresent(), "Driver should have been closed");
     }
     
 }

@@ -21,7 +21,7 @@ public class ScreenshotArtifact implements ArtifactType {
 
     @Override
     public boolean canGetArtifact(ITestResult result) {
-        WebDriver driver = DriverManager.getDriver(result);
+        WebDriver driver = DriverManager.getDriver();
         Boolean canTakeScreenshot = driver instanceof TakesScreenshot;
         if (!canTakeScreenshot) {
             String message =
@@ -36,7 +36,7 @@ public class ScreenshotArtifact implements ArtifactType {
     @Override
     public byte[] getArtifact(ITestResult result) {
         try {
-            WebDriver driver = DriverManager.getDriver(result);
+            WebDriver driver = DriverManager.getDriver();
             return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
         } catch (WebDriverException e) {
             LOGGER.warn("The driver is capable of taking a screenshot, but it failed.", e);
