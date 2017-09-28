@@ -109,6 +109,12 @@ public final class GridUtility {
         setProcess(serverParms.processRole, serverProcess);
     }
     
+    /**
+     * Store the specified Selenium Grid server process using the specified role.
+     * 
+     * @param processRole Selenium Grid server role (either HUB or NODE)
+     * @param serverProcess Selenium Grib server process
+     */
     private static void setProcess(GridRole processRole, Process serverProcess) {
         switch (processRole) {
             case HUB:

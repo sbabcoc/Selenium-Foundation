@@ -1,9 +1,9 @@
 package com.nordstrom.automation.selenium.exceptions;
 
-import com.nordstrom.automation.selenium.listeners.DriverManager;
+import com.nordstrom.automation.selenium.support.TestBase;
 
 /**
- * This exception is thrown by {@link DriverManager#getDriver} when no driver is available.
+ * This exception is thrown by {@link TestBase#getDriver} when no driver is available.
  */
 public class DriverNotAvailableException extends RuntimeException {
 

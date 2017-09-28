@@ -14,18 +14,18 @@ public class NoDriverManagerTest extends TestNGBase {
 
     @BeforeMethod(groups = {"NoDriverBefore"})
     public void beforeMethodNoDriver() {
-        assertFalse(findDriver().isPresent(), "Driver should not have been created");
+        assertFalse(nabDriver().isPresent(), "Driver should not have been created");
     }
     
     @NoDriver
     @Test(groups = {"NoBeforeNoDriver"})
     public void testNoBeforeNoDriver() {
-        assertFalse(findDriver().isPresent(), "Driver should not have been created");
+        assertFalse(nabDriver().isPresent(), "Driver should not have been created");
     }
     
     @Test(groups = {"NoDriverBefore"})
     public void testNoDriverBefore() {
-        assertTrue(findDriver().isPresent(), "Driver should have been created");
+        assertTrue(nabDriver().isPresent(), "Driver should have been created");
     }
     
     @NoDriver

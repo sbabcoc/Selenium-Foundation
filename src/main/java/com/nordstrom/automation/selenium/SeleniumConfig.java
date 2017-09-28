@@ -228,7 +228,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     }
 
     /**
-     * Get the Selenium configuration object for the specified context.
+     * Get the Selenium configuration object.
      * 
      * @return Selenium configuration object
      */

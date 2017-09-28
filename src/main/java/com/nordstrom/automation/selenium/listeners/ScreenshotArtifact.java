@@ -15,6 +15,9 @@ import org.testng.ITestResult;
 import com.nordstrom.automation.selenium.support.TestBase;
 import com.nordstrom.automation.testng.ArtifactType;
 
+/**
+ * This class implements the artifact type for screenshot capture.
+ */
 public class ScreenshotArtifact implements ArtifactType {
     
     private static final Path ARTIFACT_PATH = Paths.get("screenshots");

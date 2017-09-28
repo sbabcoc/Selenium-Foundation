@@ -30,7 +30,7 @@ public class SeleniumConfigTest {
     }
     
     @Test
-    public void testSaveToThreadLocal() {
+    public void testSaveToTestAttribute() {
         SeleniumConfig config1 = SeleniumConfig.getConfig();
         SeleniumConfig config2 = SeleniumConfig.getConfig();
         assertTrue(config2 == config1);

@@ -73,7 +73,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         Reporter.setCurrentTestResult(testResult);
                         
         // get driver supplied by preceding phase
-        Optional<WebDriver> optDriver = instance.findDriver();
+        Optional<WebDriver> optDriver = instance.nabDriver();
         // get @InitialPage from invoked method
         InitialPage initialPage = method.getAnnotation(InitialPage.class);
         
@@ -104,11 +104,11 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         
         // if getting a driver
         if (getDriver) {
-            WebDriver driver;
             SeleniumConfig config = SeleniumConfig.getConfig();
             
             // if driver not yet acquired
             if ( ! optDriver.isPresent()) {
+                WebDriver driver;
                 long prior = System.currentTimeMillis();
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
@@ -179,7 +179,6 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
     @Override
     public void onStart(ITestContext testContext) {
         // no pre-run processing
-        
     }
 
     @Override
@@ -220,25 +219,37 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
     }
     
+    /**
+     * Get the driver for the specified configuration context.
+     * 
+     * @param testResult configuration context (TestNG test result object)
+     * @return (optional) driver from the specified test result
+     */
     public static Optional<WebDriver> findDriver(ITestResult testResult) {
         if (testResult.getInstance() instanceof TestBase) {
             // ensure current test result is set
             Reporter.setCurrentTestResult(testResult);
-            return ((TestBase) testResult.getInstance()).findDriver();
+            return ((TestBase) testResult.getInstance()).nabDriver();
         } else {
             return Optional.empty();
         }
     }
     
+    /**
+     * Determine if a driver is present in the specified configuration context.
+     * 
+     * @param testResult configuration context (TestNG test result object)
+     * @return 'true' if a driver is present; otherwise 'false'
+     */
     public static boolean hasDriver(ITestResult testResult) {
         return findDriver(testResult).isPresent();
     }
 
     /**
      * Close the Selenium driver attached to the specified configuration context.
-     * @param testResult TODO
-     * @param object 
-     * @return 
+     * 
+     * @param testResult configuration context (TestNG test result object)
+     * @return an empty {@link Optional} object
      */
     private static Optional<WebDriver> closeDriver(ITestResult testResult) {
         Optional<WebDriver> optDriver = findDriver(testResult);
