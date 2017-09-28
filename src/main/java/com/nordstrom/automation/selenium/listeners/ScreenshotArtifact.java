@@ -26,7 +26,7 @@ public class ScreenshotArtifact implements ArtifactType {
 
     @Override
     public boolean canGetArtifact(ITestResult result) {
-        Optional<WebDriver> optDriver = DriverManager.findDriver(result);
+        Optional<WebDriver> optDriver = DriverManager.nabDriver(result);
         if (optDriver.isPresent()) {
             if (optDriver.get() instanceof TakesScreenshot) {
                 return true;

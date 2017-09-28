@@ -220,12 +220,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
     }
     
     /**
-     * Get the driver for the specified configuration context.
+     * If present, get the driver for the specified configuration context.
      * 
      * @param testResult configuration context (TestNG test result object)
      * @return (optional) driver from the specified test result
      */
-    public static Optional<WebDriver> findDriver(ITestResult testResult) {
+    public static Optional<WebDriver> nabDriver(ITestResult testResult) {
         if (testResult.getInstance() instanceof TestBase) {
             // ensure current test result is set
             Reporter.setCurrentTestResult(testResult);
@@ -242,7 +242,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @return 'true' if a driver is present; otherwise 'false'
      */
     public static boolean hasDriver(ITestResult testResult) {
-        return findDriver(testResult).isPresent();
+        return nabDriver(testResult).isPresent();
     }
 
     /**
@@ -252,7 +252,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @return an empty {@link Optional} object
      */
     private static Optional<WebDriver> closeDriver(ITestResult testResult) {
-        Optional<WebDriver> optDriver = findDriver(testResult);
+        Optional<WebDriver> optDriver = nabDriver(testResult);
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             try {
