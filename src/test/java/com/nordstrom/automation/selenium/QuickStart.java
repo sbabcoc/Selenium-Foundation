@@ -11,6 +11,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;
+import com.nordstrom.automation.selenium.support.TestNGBase;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
@@ -151,9 +152,8 @@ import com.nordstrom.automation.testng.ListenerChain;
  * and follow the <a href="https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration">
  * Required Configuration</a> procedure.
  */
-@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
 @InitialPage(ExamplePage.class)
-public class QuickStart {
+public class QuickStart extends TestNGBase {
     
     private static final String PAGE_TITLE = "Example Page";
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);
@@ -162,7 +162,7 @@ public class QuickStart {
     public void dummyTest() {
         SeleniumConfig config = SeleniumConfig.getConfig();
         LOGGER.info("The configured browser is: " + config.getString(SeleniumSettings.BROWSER_NAME.key()));
-        ExamplePage examplePage = (ExamplePage) DriverManager.getInitialPage();
+        ExamplePage examplePage = (ExamplePage) getInitialPage();
         assertEquals(examplePage.getTitle(), PAGE_TITLE, "Unexpeced page title");
     }
 }

@@ -11,16 +11,13 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.testng.ExecutionFlowController;
-import com.nordstrom.automation.testng.LinkedListeners;
+import com.nordstrom.automation.selenium.support.TestNGBase;
 import com.nordstrom.automation.testng.ListenerChain;
 
 @InitialPage(ExamplePage.class)
-@LinkedListeners({ScreenshotCapture.class, DriverManager.class, ExecutionFlowController.class})
-public class ScreenshotCaptureTest {
+public class ScreenshotCaptureTest extends TestNGBase {
     
     @Test
     public void testScreenshotCapture() {

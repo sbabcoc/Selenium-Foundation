@@ -9,28 +9,25 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
-import com.nordstrom.automation.testng.ExecutionFlowController;
-import com.nordstrom.automation.testng.LinkedListeners;
+import com.nordstrom.automation.selenium.support.TestNGBase;
 
-@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
-public class DriverManagerTest {
+public class DriverManagerTest extends TestNGBase {
     
     @InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
     @BeforeMethod(groups = {"WithDriverBefore"})
     public void beforeMethodWithDriver() {
-        assertTrue(DriverManager.findDriver().isPresent(), "Driver should have been created");
+        assertTrue(findDriver().isPresent(), "Driver should have been created");
     }
     
     @Test(groups = {"WithDriverBefore"})
     public void testWithDriverBefore() {
-        assertTrue(DriverManager.findDriver().isPresent(), "Driver should have been created");
+        assertTrue(findDriver().isPresent(), "Driver should have been created");
     }
     
     @NoDriver
     @Test(groups = {"WithDriverBefore"})
     public void testCloseDriverBefore() {
-        assertFalse(DriverManager.findDriver().isPresent(), "Driver should have been closed");
+        assertFalse(findDriver().isPresent(), "Driver should have been closed");
     }
     
 }

@@ -32,7 +32,6 @@ import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
-import com.nordstrom.automation.selenium.TestAttributes;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.exceptions.InvalidGridHostException;
 import com.nordstrom.automation.selenium.exceptions.UnknownGridHostException;
@@ -46,6 +45,8 @@ public final class GridUtility {
     private static final String HUB_STATUS = "/grid/api/hub/";
     private static final String NODE_STATUS = "/wd/hub/status/";
     
+    private static Process hubProcess;
+    private static Process nodeProcess;
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
     
     private GridUtility() {
@@ -105,7 +106,20 @@ public final class GridUtility {
     private static void startGridServer(ITestResult testResult, GridServerParms serverParms) throws TimeoutException {
         Process serverProcess = GridProcess.start(testResult, serverParms.processArgs);
         new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
-        TestAttributes.getAttributes().setProcess(serverParms.processRole, serverProcess);
+        setProcess(serverParms.processRole, serverProcess);
+    }
+    
+    private static void setProcess(GridRole processRole, Process serverProcess) {
+        switch (processRole) {
+            case HUB:
+                hubProcess = serverProcess;
+                break;
+            case NODE:
+                nodeProcess = serverProcess;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -214,7 +228,7 @@ public final class GridUtility {
      * @return process object for the hub (may be 'null')
      */
     public static Process getGridHub() {
-        return TestAttributes.getAttributes().getHubProcess();
+        return hubProcess;
     }
 
     /**
@@ -223,7 +237,7 @@ public final class GridUtility {
      * @return process object for the node (may be 'null')
      */
     public static Process getGridNode() {
-        return TestAttributes.getAttributes().getNodeProcess();
+        return nodeProcess;
     }
 
     /**

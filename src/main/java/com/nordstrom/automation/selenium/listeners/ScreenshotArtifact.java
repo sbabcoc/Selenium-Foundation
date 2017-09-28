@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.listeners;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 
+import com.nordstrom.automation.selenium.support.TestBase;
 import com.nordstrom.automation.testng.ArtifactType;
 
 public class ScreenshotArtifact implements ArtifactType {
@@ -21,27 +23,33 @@ public class ScreenshotArtifact implements ArtifactType {
 
     @Override
     public boolean canGetArtifact(ITestResult result) {
-        WebDriver driver = DriverManager.getDriver();
-        Boolean canTakeScreenshot = driver instanceof TakesScreenshot;
-        if (!canTakeScreenshot) {
-            String message =
-                    "This driver is not capable of taking a screenshot.  If a screenshot is desired, use a WebDriver "
-                    + "implementation that supports screenshots. https://seleniumhq.github.io/selenium/docs/api/java/"
-                    + "org/openqa/selenium/TakesScreenshot.html";
-            LOGGER.warn(message);
+        Optional<WebDriver> optDriver = DriverManager.findDriver(result);
+        if (optDriver.isPresent()) {
+            if (optDriver.get() instanceof TakesScreenshot) {
+                return true;
+            } else {
+                String message =
+                        "This driver is not capable of taking a screenshot.  If a screenshot is desired, use a WebDriver "
+                        + "implementation that supports screenshots. https://seleniumhq.github.io/selenium/docs/api/java/"
+                        + "org/openqa/selenium/TakesScreenshot.html";
+                LOGGER.warn(message);
+            }
         }
-        return canTakeScreenshot;
+        return false;
     }
 
     @Override
     public byte[] getArtifact(ITestResult result) {
-        try {
-            WebDriver driver = DriverManager.getDriver();
-            return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-        } catch (WebDriverException e) {
-            LOGGER.warn("The driver is capable of taking a screenshot, but it failed.", e);
-            return new byte[0];
+        if (canGetArtifact(result)) {
+            try {
+                TestBase instance = (TestBase) result.getInstance();
+                WebDriver driver = instance.getDriver();
+                return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+            } catch (WebDriverException e) {
+                LOGGER.warn("The driver is capable of taking a screenshot, but it failed.", e);
+            }
         }
+        return new byte[0];
     }
 
     @Override

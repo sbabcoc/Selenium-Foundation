@@ -8,13 +8,10 @@ import java.util.Map;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
-import com.nordstrom.automation.testng.ExecutionFlowController;
-import com.nordstrom.automation.testng.LinkedListeners;
+import com.nordstrom.automation.selenium.support.TestNGBase;
 
 @InitialPage(ExamplePage.class)
-@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
-public class ModelTest {
+public class ModelTest extends TestNGBase {
     
     private static final String TITLE = "Example Page";
     private static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
@@ -178,7 +175,7 @@ public class ModelTest {
     }
 
     private ExamplePage getPage() {
-        return (ExamplePage) DriverManager.getInitialPage();
+        return (ExamplePage) getInitialPage();
     }
     
 }

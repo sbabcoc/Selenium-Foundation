@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-
 import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
@@ -200,6 +198,16 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         
     }
 
+    private static final SeleniumConfig seleniumConfig;
+    
+    static {
+        try {
+            seleniumConfig = new SeleniumConfig();
+        } catch (ConfigurationException | IOException e) {
+            throw new RuntimeException("Failed to instantiate settings", e);
+        }
+    }
+    
     private URI targetUri;
     private String nodeConfigPath;
     private RegistrationRequest nodeConfig;
@@ -225,19 +233,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @return Selenium configuration object
      */
     public static SeleniumConfig getConfig() {
-        Optional<SeleniumConfig> optConfig = TestAttributes.getAttributes().getConfig();
-        
-        if (optConfig.isPresent()) {
-            return optConfig.get();
-        } else {
-            try {
-                SeleniumConfig config = new SeleniumConfig();
-                TestAttributes.getAttributes().setConfig(config);
-                return config;
-            } catch (ConfigurationException | IOException e) {
-                throw new RuntimeException("Failed to instantiate settings", e);
-            }
-        }
+        return seleniumConfig;
     }
     
     /**
