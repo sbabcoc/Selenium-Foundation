@@ -99,5 +99,19 @@ public interface TestBase {
      * @return (optional) initial page for the current test
      */
     Optional<Page> setInitialPage(Page pageObj);
+    
+    /**
+     * Wrap the specified object in an {@link Optional} object.
+     * 
+     * @param obj object to be wrapped (may be 'null')
+     * @return (optional) wrapped object; empty if {@code obj} is 'null'
+     */
+    static <T> Optional<T> optionalOf(T obj) {
+        if (obj != null) {
+            return Optional.of(obj);
+        } else {
+            return Optional.empty();
+        }
+    }
 
 }

@@ -39,13 +39,8 @@ public abstract class TestNGBase implements TestBase {
          * @return (optional) specified object
          */
         private Optional<?> set(Object obj) {
-            Optional<?> val;
-            if (obj != null) {
-                val = Optional.of(obj);
-            } else {
-                val = Optional.empty();
-            }
             ITestResult result = Reporter.getCurrentTestResult();
+            Optional<?> val = TestBase.optionalOf(obj);
             result.setAttribute(key, val);
             return val;
         }
