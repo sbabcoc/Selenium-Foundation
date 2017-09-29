@@ -22,13 +22,13 @@ public abstract class TestNGBase implements TestBase {
      * This enumeration is responsible for storing and retrieving values in the attributes collection of the current
      * test result, as reported by {@link Reporter#getCurrentTestResult()}. 
      */
-    private enum TestAttributes {
+    private enum TestAttribute {
         DRIVER("Driver"),
         INITIAL_PAGE("InitialPage");
         
         private String key;
         
-        TestAttributes(String key) {
+        TestAttribute(String key) {
             this.key = key;
         }
         
@@ -38,9 +38,9 @@ public abstract class TestNGBase implements TestBase {
          * @param obj object to be stored; 'null' to discard value
          * @return (optional) specified object
          */
-        private Optional<?> set(Object obj) {
+        private <T> Optional<T> set(T obj) {
             ITestResult result = Reporter.getCurrentTestResult();
-            Optional<?> val = TestBase.optionalOf(obj);
+            Optional<T> val = TestBase.optionalOf(obj);
             result.setAttribute(key, val);
             return val;
         }
@@ -64,24 +64,22 @@ public abstract class TestNGBase implements TestBase {
     @Override
     @SuppressWarnings("unchecked")
     public Optional<WebDriver> nabDriver() {
-        return (Optional<WebDriver>) TestAttributes.DRIVER.nab();
+        return (Optional<WebDriver>) TestAttribute.DRIVER.nab();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Optional<WebDriver> setDriver(WebDriver driver) {
-        return (Optional<WebDriver>) TestAttributes.DRIVER.set(driver);
+        return TestAttribute.DRIVER.set(driver);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Optional<Page> nabInitialPage() {
-        return (Optional<Page>) TestAttributes.INITIAL_PAGE.nab();
+        return (Optional<Page>) TestAttribute.INITIAL_PAGE.nab();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Optional<Page> setInitialPage(Page initialPage) {
-        return (Optional<Page>) TestAttributes.INITIAL_PAGE.set(initialPage);
+        return TestAttribute.INITIAL_PAGE.set(initialPage);
     }
 }
