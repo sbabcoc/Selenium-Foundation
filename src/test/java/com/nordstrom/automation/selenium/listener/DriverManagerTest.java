@@ -9,9 +9,9 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.support.TestNGBase;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 
-public class DriverManagerTest extends TestNGBase {
+public class DriverManagerTest extends TestNgBase {
     
     @InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
     @BeforeMethod(groups = {"WithDriverBefore"})

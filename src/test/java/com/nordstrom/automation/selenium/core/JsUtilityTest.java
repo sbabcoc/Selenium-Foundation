@@ -18,10 +18,10 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.support.TestNGBase;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 
 @InitialPage(ExamplePage.class)
-public class JsUtilityTest extends TestNGBase {
+public class JsUtilityTest extends TestNgBase {
 
     @NoDriver
     @Test(expectedExceptions = {AssertionError.class},

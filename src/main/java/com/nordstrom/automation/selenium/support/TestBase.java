@@ -28,7 +28,18 @@ public interface TestBase {
     }
     
     /**
-     * If present, get the driver for the current test.
+     * Determine if the current test has a driver.
+     * 
+     * @return 'true' if a driver is present; otherwise 'false'
+     */
+    default boolean hasDriver() {
+        return nabDriver().isPresent();
+    }
+    
+    /**
+     * If present, get the driver for the current test. <br>
+     * <b>NOTE</b>: It's uncommon that you'll need to access this {@link Optional} value directly. You'll typically
+     * use the {@link #getDriver} and {@link #hasDriver} methods instead.
      * 
      * @return (optional) driver for the current test
      */
@@ -86,7 +97,9 @@ public interface TestBase {
     }
     
     /**
-     * If present, get the initial page for the current test.
+     * If present, get the initial page for the current test. <br>
+     * <b>NOTE</b>: It's uncommon that you'll need to access this {@link Optional} value directly. You'll typically
+     * use the {@link #getInitialPage} and {@link #hasInitialPage} methods instead.
      * 
      * @return (optional) initial page for the current test
      */

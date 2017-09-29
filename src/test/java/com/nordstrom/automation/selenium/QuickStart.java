@@ -11,7 +11,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.support.TestNGBase;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
@@ -153,7 +153,7 @@ import com.nordstrom.automation.testng.ListenerChain;
  * Required Configuration</a> procedure.
  */
 @InitialPage(ExamplePage.class)
-public class QuickStart extends TestNGBase {
+public class QuickStart extends TestNgBase {
     
     private static final String PAGE_TITLE = "Example Page";
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);

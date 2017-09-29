@@ -8,9 +8,9 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
-import com.nordstrom.automation.selenium.support.TestNGBase;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 
-public class NoDriverManagerTest extends TestNGBase {
+public class NoDriverManagerTest extends TestNgBase {
 
     @BeforeMethod(groups = {"NoDriverBefore"})
     public void beforeMethodNoDriver() {

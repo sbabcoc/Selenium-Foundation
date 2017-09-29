@@ -16,7 +16,7 @@ import com.nordstrom.automation.testng.LinkedListeners;
  * This abstract class implements the contract for Selenium Foundation test classes for TestNG.
  */
 @LinkedListeners({ScreenshotCapture.class, DriverManager.class, ExecutionFlowController.class})
-public abstract class TestNGBase implements TestBase {
+public abstract class TestNgBase implements TestBase {
     
     /**
      * This enumeration is responsible for storing and retrieving values in the attributes collection of the current

@@ -8,10 +8,10 @@ import java.util.Map;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.support.TestNGBase;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 
 @InitialPage(ExamplePage.class)
-public class ModelTest extends TestNGBase {
+public class ModelTest extends TestNgBase {
     
     private static final String TITLE = "Example Page";
     private static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
