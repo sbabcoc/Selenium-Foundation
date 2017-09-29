@@ -47,14 +47,14 @@ import net.bytebuddy.implementation.bind.annotation.This;
 public enum ContainerMethodInterceptor {
     INSTANCE;
     
-    private static final ThreadLocal<Integer> depth = new ThreadLocal<Integer>() {
+    private static final ThreadLocal<Integer> depth = new InheritableThreadLocal<Integer>() {
         @Override
         protected Integer initialValue() {
             return Integer.valueOf(0);
         }
     };
     
-    private static final ThreadLocal<ComponentContainer> target = new ThreadLocal<>();
+    private static final ThreadLocal<ComponentContainer> target = new InheritableThreadLocal<>();
 
     /**
      * This is the method that intercepts component container methods in "enhanced" model objects.

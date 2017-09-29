@@ -22,15 +22,12 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
-import com.nordstrom.automation.testng.ExecutionFlowController;
-import com.nordstrom.automation.testng.LinkedListeners;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 
 @InitialPage(ExamplePage.class)
-@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
-public class WebDriverUtilsTest {
+public class WebDriverUtilsTest extends TestNgBase {
 
     @NoDriver
     @Test(expectedExceptions = {AssertionError.class},
@@ -54,7 +51,7 @@ public class WebDriverUtilsTest {
     
     @Test
     public void testGetDriver() {
-        WebDriver driver = DriverManager.getDriver();
+        WebDriver driver = getDriver();
         ExamplePage page = getPage();
         WebElement element = page.findElement(By.tagName("html"));
         
@@ -72,13 +69,13 @@ public class WebDriverUtilsTest {
     
     @Test
     public void testGetExecutor() {
-        WebDriver driver = DriverManager.getDriver();
+        WebDriver driver = getDriver();
         ExamplePage page = getPage();
         WebElement element = page.findElement(By.tagName("html"));
         
-        verifyExecutor(driver);
-        verifyExecutor(page);
-        verifyExecutor(element);
+        verifyExecutor(driver, driver);
+        verifyExecutor(page, driver);
+        verifyExecutor(element, driver);
         
         try {
             WebDriverUtils.getExecutor(mock(WebDriver.class));
@@ -90,7 +87,7 @@ public class WebDriverUtilsTest {
     
     @Test
     public void testBrowserName() {
-        WebDriver driver = DriverManager.getDriver();
+        WebDriver driver = getDriver();
         ExamplePage page = getPage();
         WebElement element = page.findElement(By.tagName("html"));
         SeleniumConfig config = SeleniumConfig.getConfig();
@@ -125,13 +122,13 @@ public class WebDriverUtilsTest {
         assertTrue(elements.isEmpty());
     }
     
-    private static void verifyExecutor(SearchContext context) {
+    private static void verifyExecutor(SearchContext context, WebDriver driver) {
         JavascriptExecutor executor = WebDriverUtils.getExecutor(context);
         assertTrue(executor instanceof RobustJavascriptExecutor);
-        assertTrue(((RobustJavascriptExecutor) executor).getWrappedDriver() == DriverManager.getDriver());
+        assertTrue(((RobustJavascriptExecutor) executor).getWrappedDriver() == driver);
     }
     
     private ExamplePage getPage() {
-        return (ExamplePage) DriverManager.getInitialPage();
+        return (ExamplePage) getInitialPage();
     }
 }

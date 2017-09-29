@@ -18,6 +18,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.selenium.WebDriver;
@@ -26,7 +27,6 @@ import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -41,12 +41,12 @@ import com.nordstrom.automation.selenium.exceptions.UnknownGridHostException;
  */
 public final class GridUtility {
     
-    private static final String GRID_HUB = "GridHub";
-    private static final String GRID_NODE = "GridNode";
     private static final String GRID_ENDPOINT = "/wd/hub/";
     private static final String HUB_STATUS = "/grid/api/hub/";
     private static final String NODE_STATUS = "/wd/hub/status/";
     
+    private static Process hubProcess;
+    private static Process nodeProcess;
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
     
     private GridUtility() {
@@ -74,7 +74,7 @@ public final class GridUtility {
         
         Objects.requireNonNull(testResult, "Test result object must be non-null");
         
-        SeleniumConfig config = SeleniumConfig.getConfig(testResult);
+        SeleniumConfig config = SeleniumConfig.getConfig();
         GridHubConfiguration hubConfig = config.getHubConfig();
         
         boolean isActive = isHubActive(hubConfig);
@@ -106,7 +106,26 @@ public final class GridUtility {
     private static void startGridServer(ITestResult testResult, GridServerParms serverParms) throws TimeoutException {
         Process serverProcess = GridProcess.start(testResult, serverParms.processArgs);
         new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
-        testResult.getTestContext().setAttribute(serverParms.propertyKey, serverProcess);
+        setProcess(serverParms.processRole, serverProcess);
+    }
+    
+    /**
+     * Store the specified Selenium Grid server process using the specified role.
+     * 
+     * @param processRole Selenium Grid server role (either HUB or NODE)
+     * @param serverProcess Selenium Grib server process
+     */
+    private static void setProcess(GridRole processRole, Process serverProcess) {
+        switch (processRole) {
+            case HUB:
+                hubProcess = serverProcess;
+                break;
+            case NODE:
+                nodeProcess = serverProcess;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -200,7 +219,7 @@ public final class GridUtility {
     public static WebDriver getDriver(ITestResult testResult) {
         Objects.requireNonNull(testResult, "Test result object must be non-null");
         
-        SeleniumConfig config = SeleniumConfig.getConfig(testResult);
+        SeleniumConfig config = SeleniumConfig.getConfig();
         GridServerParms hubParms = GridServerParms.getHubParms(config);
         if (isHubActive(testResult)) {
             return new RemoteWebDriver(hubParms.endpointUrl, config.getBrowserCaps());
@@ -210,41 +229,21 @@ public final class GridUtility {
     }
     
     /**
-     * Get the Selenium Grid hub server process for the current configuration context.
+     * Get the Selenium Grid hub server process for the specified configuration context.
      * 
      * @return process object for the hub (may be 'null')
      */
     public static Process getGridHub() {
-        return getGridHub(Reporter.getCurrentTestResult().getTestContext());
-    }
-    
-    /**
-     * Get the Selenium Grid hub server process for the specified configuration context.
-     * 
-     * @param testContext configuration context (TestNG test context object)
-     * @return process object for the hub (may be 'null')
-     */
-    public static Process getGridHub(ITestContext testContext) {
-        return (Process) testContext.getAttribute(GRID_HUB);
+        return hubProcess;
     }
 
     /**
-     * Get the Selenium Grid node server process for the current configuration context.
+     * Get the Selenium Grid node server process for the specified configuration context.
      * 
      * @return process object for the node (may be 'null')
      */
     public static Process getGridNode() {
-        return getGridNode(Reporter.getCurrentTestResult().getTestContext());
-    }
-    
-    /**
-     * Get the Selenium Grid node server process for the specified configuration context.
-     * 
-     * @param testContext configuration context (TestNG test context object)
-     * @return process object for the node (may be 'null')
-     */
-    public static Process getGridNode(ITestContext testContext) {
-        return (Process) testContext.getAttribute(GRID_NODE);
+        return nodeProcess;
     }
 
     /**
@@ -273,7 +272,7 @@ public final class GridUtility {
      */
     private static class GridServerParms {
         
-        private String propertyKey;
+        private GridRole processRole;
         private String[] processArgs;
         private HttpHost serverHost;
         private URL endpointUrl;
@@ -287,7 +286,7 @@ public final class GridUtility {
          */
         public static GridServerParms getHubParms(SeleniumConfig config) {
             GridServerParms parms = new GridServerParms();
-            parms.propertyKey = GRID_HUB;
+            parms.processRole = GridRole.HUB;
             parms.processArgs = config.getHubArgs();
             parms.serverHost = GridUtility.getHubHost(config.getHubConfig());
             
@@ -309,7 +308,7 @@ public final class GridUtility {
          */
         public static GridServerParms getNodeParms(SeleniumConfig config) {
             GridServerParms parms = new GridServerParms();
-            parms.propertyKey = GRID_NODE;
+            parms.processRole = GridRole.NODE;
             parms.processArgs = config.getNodeArgs();
             parms.serverHost = GridUtility.getNodeHost(config.getNodeConfig());
             

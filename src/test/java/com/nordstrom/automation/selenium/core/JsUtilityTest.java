@@ -17,14 +17,11 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.testng.ExecutionFlowController;
-import com.nordstrom.automation.testng.LinkedListeners;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 
 @InitialPage(ExamplePage.class)
-@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
-public class JsUtilityTest {
+public class JsUtilityTest extends TestNgBase {
 
     @NoDriver
     @Test(expectedExceptions = {AssertionError.class},
@@ -97,6 +94,6 @@ public class JsUtilityTest {
     }
     
     private ExamplePage getPage() {
-        return (ExamplePage) DriverManager.getInitialPage();
+        return (ExamplePage) getInitialPage();
     }
 }

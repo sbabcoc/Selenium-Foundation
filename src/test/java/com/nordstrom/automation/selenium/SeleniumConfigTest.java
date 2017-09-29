@@ -15,8 +15,6 @@ import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.ITestResult;
-import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
@@ -32,18 +30,9 @@ public class SeleniumConfigTest {
     }
     
     @Test
-    public void testSaveToThreadLocal() {
-        SeleniumConfig config1 = SeleniumConfig.getConfig(null);
-        SeleniumConfig config2 = SeleniumConfig.getConfig(null);
-        assertTrue(config2 == config1);
-    }
-    
-    @Test
     public void testSaveToTestAttribute() {
         SeleniumConfig config1 = SeleniumConfig.getConfig();
-        ITestResult testResult = Reporter.getCurrentTestResult();
-        SeleniumConfig config2 = (SeleniumConfig) testResult.getAttribute("CONFIG");
-        assertNotNull(config2);
+        SeleniumConfig config2 = SeleniumConfig.getConfig();
         assertTrue(config2 == config1);
     }
     
