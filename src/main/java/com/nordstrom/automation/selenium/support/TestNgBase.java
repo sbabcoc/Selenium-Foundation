@@ -1,10 +1,16 @@
 package com.nordstrom.automation.selenium.support;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
@@ -81,5 +87,30 @@ public abstract class TestNgBase implements TestBase {
     @Override
     public Optional<Page> setInitialPage(Page initialPage) {
         return TestAttribute.INITIAL_PAGE.set(initialPage);
+    }
+    
+    @Override
+    public boolean isTest(Method method) {
+        return null != method.getAnnotation(Test.class);
+    }
+    
+    @Override
+    public boolean isBeforeMethod(Method method) {
+        return null != method.getAnnotation(BeforeMethod.class);
+    }
+    
+    @Override
+    public boolean isAfterMethod(Method method) {
+        return null != method.getAnnotation(AfterMethod.class);
+    }
+    
+    @Override
+    public boolean isBeforeClass(Method method) {
+        return null != method.getAnnotation(BeforeClass.class);
+    }
+    
+    @Override
+    public boolean isAfterClass(Method method) {
+        return null != method.getAnnotation(AfterClass.class);
     }
 }

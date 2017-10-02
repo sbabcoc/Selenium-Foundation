@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
@@ -71,9 +70,6 @@ public final class GridUtility {
      * @return 'true' if configured hub is active; otherwise 'false'
      */
     public static boolean isHubActive(ITestResult testResult) {
-        
-        Objects.requireNonNull(testResult, "Test result object must be non-null");
-        
         SeleniumConfig config = SeleniumConfig.getConfig();
         GridHubConfiguration hubConfig = config.getHubConfig();
         
@@ -217,8 +213,6 @@ public final class GridUtility {
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver(ITestResult testResult) {
-        Objects.requireNonNull(testResult, "Test result object must be non-null");
-        
         SeleniumConfig config = SeleniumConfig.getConfig();
         GridServerParms hubParms = GridServerParms.getHubParms(config);
         if (isHubActive(testResult)) {

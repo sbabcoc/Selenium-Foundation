@@ -12,7 +12,6 @@ import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -25,7 +24,6 @@ import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.support.TestBase;
-import com.nordstrom.automation.testng.ExecutionFlowController;
 
 /**
  * This TestNG listener performs several basic functions related to driver session management:
@@ -60,25 +58,30 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
-        if ( ! (testResult.getInstance() instanceof TestBase)) {
+        // ensure current test result is set
+        Reporter.setCurrentTestResult(testResult);
+        
+        Object obj = testResult.getInstance();
+        Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
+        
+        beforeInvocation(obj, method);
+    }
+    
+    public static void beforeInvocation(Object obj, Method method) {
+        if ( ! (obj instanceof TestBase)) {
             return;
         }
         
         boolean getDriver = false;
-        ITestNGMethod testMethod = invokedMethod.getTestMethod();
-        Method method = testMethod.getConstructorOrMethod().getMethod();
-        TestBase instance = (TestBase) testMethod.getInstance();
+        TestBase instance = (TestBase) obj;
         
-        // ensure current test result is set
-        Reporter.setCurrentTestResult(testResult);
-                        
         // get driver supplied by preceding phase
         Optional<WebDriver> optDriver = instance.nabDriver();
         // get @InitialPage from invoked method
         InitialPage initialPage = method.getAnnotation(InitialPage.class);
         
         // if invoked method is @Test
-        if (testMethod.isTest()) {
+        if (instance.isTest(method)) {
             // get driver if @NoDriver is absent
             getDriver = (null == method.getAnnotation(NoDriver.class));
             
@@ -92,12 +95,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             // otherwise, if driver supplied by @BeforeMethod
             } else if (optDriver.isPresent()) {
                 // close active driver
-                optDriver = closeDriver(testResult);
+                optDriver = closeDriver(obj);
             }
         // otherwise, if invoked method is @Before...
-        } else if (testMethod.isBeforeMethodConfiguration() || testMethod.isBeforeClassConfiguration()
-                || testMethod.isBeforeGroupsConfiguration() || testMethod.isBeforeTestConfiguration()
-                || testMethod.isBeforeSuiteConfiguration()) {
+        } else if (instance.isBeforeMethod(method) || instance.isBeforeClass(method)) {
             // determine if driver is needed
             getDriver = (initialPage != null);
         }
@@ -109,20 +110,20 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             // if driver not yet acquired
             if ( ! optDriver.isPresent()) {
                 WebDriver driver;
-                long prior = System.currentTimeMillis();
+                //long prior = System.currentTimeMillis();
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
-                    driver = ((DriverProvider) instance).provideDriver(invokedMethod, testResult);
+                    driver = ((DriverProvider) instance).provideDriver(instance, method);
                 } else {
-                    driver = GridUtility.getDriver(testResult);
+                    driver = GridUtility.getDriver();
                 }
                 
                 if (driver != null) {
                     setDriverTimeouts(driver, config);
                     optDriver = instance.setDriver(driver);
-                    if (testMethod.isTest()) {
-                        long after = System.currentTimeMillis();
-                        ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                    if (instance.isTest(method)) {
+                        //long after = System.currentTimeMillis();
+                        //ExecutionFlowController.adjustTimeout(after - prior, testResult);
                     }
                 }
             }
@@ -146,11 +147,21 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void afterInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
-        ITestNGMethod method = testResult.getMethod();
-        if ( ! (method.isTest() || method.isBeforeMethodConfiguration())) {
-            // ensure current test result is set
-            Reporter.setCurrentTestResult(testResult);
-            closeDriver(testResult);
+        // ensure current test result is set
+        Reporter.setCurrentTestResult(testResult);
+        
+        Object obj = testResult.getInstance();
+        Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
+        
+        afterInvocation(obj, method);
+    }
+    
+    public static void afterInvocation(Object obj, Method method) {
+        if (obj instanceof TestBase) {
+            TestBase instance = (TestBase) obj;
+            if ( ! (instance.isTest(method) || instance.isBeforeMethod(method))) {
+                closeDriver(obj);
+            }
         }
     }
 
@@ -226,10 +237,14 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @return (optional) driver from the specified test result
      */
     public static Optional<WebDriver> nabDriver(ITestResult testResult) {
-        if (testResult.getInstance() instanceof TestBase) {
-            // ensure current test result is set
-            Reporter.setCurrentTestResult(testResult);
-            return ((TestBase) testResult.getInstance()).nabDriver();
+        // ensure current test result is set
+        Reporter.setCurrentTestResult(testResult);
+        return nabDriver(testResult.getInstance());
+    }
+    
+    public static Optional<WebDriver> nabDriver(Object obj) {
+        if (obj instanceof TestBase) {
+            return ((TestBase) obj).nabDriver();
         } else {
             return Optional.empty();
         }
@@ -244,6 +259,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
     public static boolean hasDriver(ITestResult testResult) {
         return nabDriver(testResult).isPresent();
     }
+    
+    public static boolean hasDriver(Object obj) {
+        return nabDriver(obj).isPresent();
+    }
 
     /**
      * Close the Selenium driver attached to the specified configuration context.
@@ -251,8 +270,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      * @param testResult configuration context (TestNG test result object)
      * @return an empty {@link Optional} object
      */
-    private static Optional<WebDriver> closeDriver(ITestResult testResult) {
-        Optional<WebDriver> optDriver = nabDriver(testResult);
+    public static Optional<WebDriver> closeDriver(ITestResult testResult) {
+        return closeDriver(testResult.getInstance());
+    }
+    
+    public static Optional<WebDriver> closeDriver(Object obj) {
+        Optional<WebDriver> optDriver = nabDriver(obj);
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             try {
@@ -268,7 +291,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             }
             
             driver.quit();
-            optDriver = ((TestBase) testResult.getInstance()).setDriver(null);
+            optDriver = ((TestBase) obj).setDriver(null);
         }
         
         return optDriver;

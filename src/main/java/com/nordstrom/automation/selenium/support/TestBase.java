@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.support;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
@@ -126,5 +127,14 @@ public interface TestBase {
             return Optional.empty();
         }
     }
-
+    
+    boolean isTest(Method method);
+    
+    boolean isBeforeMethod(Method method);
+    
+    boolean isAfterMethod(Method method);
+    
+    boolean isBeforeClass(Method method);
+    
+    boolean isAfterClass(Method method);
 }
