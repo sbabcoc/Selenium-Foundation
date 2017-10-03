@@ -7,9 +7,9 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import com.nordstrom.automation.selenium.annotations.PageUrl;
+import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.core.GridUtility;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
-import com.nordstrom.automation.selenium.support.TestBase;
+import com.nordstrom.automation.selenium.core.TestBase;
 
 /**
  * This JUnit watcher performs several basic functions related to driver session management:

@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.listeners;
+package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -8,10 +8,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
-import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
-import org.testng.ITestContext;
-import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -20,10 +16,8 @@ import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
-import com.nordstrom.automation.selenium.support.TestBase;
 
 /**
  * This TestNG listener performs several basic functions related to driver session management:
@@ -42,31 +36,8 @@ import com.nordstrom.automation.selenium.support.TestBase;
  * 
  * @see GridUtility
  */
-public class DriverManager implements IInvokedMethodListener, ITestListener {
+public class DriverManager {
 
-    /**
-     * Perform pre-invocation processing:
-     * <ul>
-     *     <li>Ensure that a driver instance has been created for the test.</li>
-     *     <li>Store the driver instance for subsequent dispensing.</li>
-     *     <li>Manage configured driver timeout intervals.</li>
-     *     <li>If specified, open the initial page, storing the page object for subsequent dispensing.</li>
-     * </ul>
-     * 
-     * @param invokedMethod an object representing the method that's about to be invoked
-     * @param testResult test result object for the method that's about to be invoked
-     */
-    @Override
-    public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
-        // ensure current test result is set
-        Reporter.setCurrentTestResult(testResult);
-        
-        Object obj = testResult.getInstance();
-        Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
-        
-        beforeInvocation(obj, method);
-    }
-    
     /**
      * Perform pre-invocation processing:
      * <ul>
@@ -127,7 +98,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
                 if (instance instanceof DriverProvider) {
                     driver = ((DriverProvider) instance).provideDriver(instance, method);
                 } else {
-                    driver = GridUtility.getDriver();
+                    driver = GridUtility.getDriver(instance);
                 }
                 
                 if (driver != null) {
@@ -154,26 +125,6 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      *     <li>If indicated, close the driver that was acquired for this method.</li>
      * </ul>
      * 
-     * @param invokedMethod an object representing the method that's just been invoked
-     * @param testResult test result object for the method that's just been invoked
-     */
-    @Override
-    public void afterInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
-        // ensure current test result is set
-        Reporter.setCurrentTestResult(testResult);
-        
-        Object obj = testResult.getInstance();
-        Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
-        
-        afterInvocation(obj, method);
-    }
-    
-    /**
-     * Perform post-invocation processing:
-     * <ul>
-     *     <li>If indicated, close the driver that was acquired for this method.</li>
-     * </ul>
-     * 
      * @param obj test class instance
      * @param method test method
      */
@@ -192,72 +143,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      *     <li>If a Selenium Grid node process was spawned, shut it down.</li>
      *     <li>If a Selenium Grid hub process was spawned, shut it down.</li>
      * </ul>
-     * 
-     * @param testContext execution context for the test suite that just finished
-     */
-    @Override
-    public void onFinish(ITestContext testContext) {
-        onFinish();
-    }
-    
-    /**
-     * Perform post-suite processing:
-     * <ul>
-     *     <li>If a Selenium Grid node process was spawned, shut it down.</li>
-     *     <li>If a Selenium Grid hub process was spawned, shut it down.</li>
-     * </ul>
      */
     public static void onFinish() {
         GridUtility.stopGridNode();
         GridUtility.stopGridHub();
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onStart(ITestContext testContext) {
-        // no pre-run processing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
-        closeDriver(testResult);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onTestFailure(ITestResult testResult) {
-        closeDriver(testResult);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onTestSkipped(ITestResult testResult) {
-        closeDriver(testResult);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onTestStart(ITestResult testResult) {
-        // no pre-test processing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onTestSuccess(ITestResult testResult) {
-        closeDriver(testResult);
     }
     
     /**

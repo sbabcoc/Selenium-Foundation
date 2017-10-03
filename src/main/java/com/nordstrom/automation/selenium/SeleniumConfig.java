@@ -33,9 +33,8 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.ITestResult;
-import org.testng.Reporter;
 
+import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
 
@@ -472,7 +471,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                         LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
                     } 
                     
-                    String outputDir = getOutputDir();
+                    String outputDir = TestBase.getOutputDir();
                     File outputFile = new File(outputDir, path);
                     Path outputPath = outputFile.toPath();
                     if (!outputPath.toFile().exists()) {
@@ -489,32 +488,6 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             }
         }
         return null;
-    }
-    
-    /**
-     * Get test run output directory.
-     * 
-     * @return test run output directory
-     */
-    public static String getOutputDir() {
-        return getOutputDir(Reporter.getCurrentTestResult());
-    }
-    
-    /**
-     * Get test run output directory.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return test run output directory
-     */
-    public static String getOutputDir(ITestResult testResult) {
-        String outputDir;
-        if (testResult != null) {
-            outputDir = testResult.getTestContext().getOutputDirectory();
-        } else {
-            Path currentRelativePath = Paths.get("");
-            outputDir = currentRelativePath.toAbsolutePath().toString();
-        }
-        return outputDir;
     }
     
     @Override

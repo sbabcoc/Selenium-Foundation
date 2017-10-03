@@ -20,8 +20,9 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 
-public class SeleniumConfigTest {
+public class SeleniumConfigTest extends TestNgBase {
     
     @Test
     public void testBasicBehavior() {
@@ -116,6 +117,6 @@ public class SeleniumConfigTest {
     
     @Test
     public void testOutputDir() {
-        assertNotNull(SeleniumConfig.getOutputDir());
+        assertNotNull(getOutputDirectory());
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
+import com.nordstrom.automation.selenium.interfaces.Hooked;
 import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;

@@ -14,8 +14,8 @@ import org.junit.rules.ExternalResource;
 import org.junit.rules.TestWatcher;
 import org.openqa.selenium.WebDriver;
 
+import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.model.Page;
-import com.nordstrom.automation.selenium.support.TestBase;
 
 /**
  * This abstract class implements the contract for Selenium Foundation test classes for JUnit.
@@ -53,6 +53,11 @@ public abstract class JUnitBase implements TestBase {
         return optInitialPage;
     }
 
+    @Override
+    public String getOutputDirectory() {
+        return TestBase.getOutputDir();
+    }
+    
     @Override
     public boolean isTest(Method method) {
         return null != method.getAnnotation(Test.class);

@@ -12,7 +12,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.nordstrom.automation.selenium.listeners.DriverManager;
+import com.nordstrom.automation.selenium.core.TestBase;
+import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.testng.ExecutionFlowController;
@@ -21,7 +22,7 @@ import com.nordstrom.automation.testng.LinkedListeners;
 /**
  * This abstract class implements the contract for Selenium Foundation test classes for TestNG.
  */
-@LinkedListeners({ScreenshotCapture.class, DriverManager.class, ExecutionFlowController.class})
+@LinkedListeners({ScreenshotCapture.class, DriverListener.class, ExecutionFlowController.class})
 public abstract class TestNgBase implements TestBase {
     
     /**
@@ -87,6 +88,16 @@ public abstract class TestNgBase implements TestBase {
     @Override
     public Optional<Page> setInitialPage(Page initialPage) {
         return TestAttribute.INITIAL_PAGE.set(initialPage);
+    }
+    
+    @Override
+    public String getOutputDirectory() {
+        ITestResult testResult = Reporter.getCurrentTestResult();
+        if (testResult != null) {
+            return testResult.getTestContext().getOutputDirectory();
+        } else {
+            return TestBase.getOutputDir();
+        }
     }
     
     @Override

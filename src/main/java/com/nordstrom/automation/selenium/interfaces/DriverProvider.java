@@ -3,7 +3,8 @@ package com.nordstrom.automation.selenium.interfaces;
 import java.lang.reflect.Method;
 
 import org.openqa.selenium.WebDriver;
-import com.nordstrom.automation.selenium.support.TestBase;
+
+import com.nordstrom.automation.selenium.core.TestBase;
 
 /**
  * Test classes with non-standard driver configurations implement this interface, which enables the driver manager 

@@ -22,13 +22,14 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
+import com.nordstrom.automation.selenium.listeners.DriverListener;
+import com.nordstrom.automation.selenium.support.TestNgBase;
 import com.nordstrom.common.base.UncheckedThrow;
 
-@LinkedListeners({DriverManager.class, ExecutionFlowController.class})
-public class GridUtilityTest {
+@LinkedListeners({DriverListener.class, ExecutionFlowController.class})
+public class GridUtilityTest extends TestNgBase {
     
     private static final long SHUTDOWN_DELAY = 15;
     private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
@@ -82,7 +83,7 @@ public class GridUtilityTest {
         SeleniumConfig config = SeleniumConfig.getConfig();
         GridHubConfiguration hubConfig = config.getHubConfig();
         assertFalse(GridUtility.isHubActive(hubConfig), "Configured local hub should initially be inactive");
-        assertTrue(GridUtility.isHubActive(), "Configured local hub should have been activated");
+        assertTrue(GridUtility.isHubActive(this), "Configured local hub should have been activated");
     }
     
     @NoDriver

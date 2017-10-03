@@ -1,10 +1,11 @@
-package com.nordstrom.automation.selenium.support;
+package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
-
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.model.Page;
@@ -115,8 +116,27 @@ public interface TestBase {
     Optional<Page> setInitialPage(Page pageObj);
     
     /**
+     * Get test run output directory.
+     * 
+     * @return test run output directory
+     */
+    String getOutputDirectory();
+    
+    /**
+     * Get test run output directory.
+     * 
+     * @return test run output directory
+     */
+    public static String getOutputDir() {
+        Path currentRelativePath = Paths.get("");
+        return currentRelativePath.toAbsolutePath().toString();
+    }
+    
+    
+    /**
      * Wrap the specified object in an {@link Optional} object.
      * 
+     * @param <T> type of object to be wrapped
      * @param obj object to be wrapped (may be 'null')
      * @return (optional) wrapped object; empty if {@code obj} is 'null'
      */

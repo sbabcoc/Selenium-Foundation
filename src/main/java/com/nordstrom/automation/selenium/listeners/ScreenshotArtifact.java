@@ -12,7 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 
-import com.nordstrom.automation.selenium.support.TestBase;
+import com.nordstrom.automation.selenium.core.DriverManager;
+import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.testng.ArtifactType;
 
 /**

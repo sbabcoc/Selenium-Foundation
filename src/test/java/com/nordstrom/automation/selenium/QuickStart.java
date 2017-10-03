@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import com.github.sbabcoc.logback.testng.ReporterAppender;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.listeners.DriverManager;
+import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.automation.selenium.support.TestNgBase;
 import com.nordstrom.automation.testng.ExecutionFlowController;
