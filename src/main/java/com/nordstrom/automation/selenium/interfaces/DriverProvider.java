@@ -3,14 +3,11 @@ package com.nordstrom.automation.selenium.interfaces;
 import java.lang.reflect.Method;
 
 import org.openqa.selenium.WebDriver;
-import org.testng.IInvokedMethod;
-import org.testng.ITestResult;
-
 import com.nordstrom.automation.selenium.support.TestBase;
 
 /**
  * Test classes with non-standard driver configurations implement this interface, which enables the driver manager 
- * to obtain a driver from the {@link #provideDriver(IInvokedMethod, ITestResult)} method of test class instance.
+ * to obtain a driver from the {@link #provideDriver(TestBase, Method)} method of test class instance.
  */
 public interface DriverProvider {
     

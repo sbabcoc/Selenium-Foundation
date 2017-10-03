@@ -2,6 +2,9 @@ package com.nordstrom.automation.selenium.junit;
 
 import java.lang.reflect.Method;
 
+/**
+ * This interface defines the methods implemented by JUnit method watchers.
+ */
 public interface JUnitMethodWatcher {
 
     /**

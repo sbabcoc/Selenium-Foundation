@@ -128,13 +128,43 @@ public interface TestBase {
         }
     }
     
+    /**
+     * Determine if the specified method is a 'test' method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code Test} annotation; otherwise 'false'
+     */
     boolean isTest(Method method);
     
+    /**
+     * Determine if the specified method is a 'before method' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code Before} annotation; otherwise 'false'
+     */
     boolean isBeforeMethod(Method method);
     
+    /**
+     * Determine if the specified method is an 'after method' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code After} annotation; otherwise 'false'
+     */
     boolean isAfterMethod(Method method);
     
+    /**
+     * Determine if the specified method is a 'before class' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code BeforeClass} annotation; otherwise 'false'
+     */
     boolean isBeforeClass(Method method);
     
+    /**
+     * Determine if the specified method is a 'after class' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code AfterClass} annotation; otherwise 'false'
+     */
     boolean isAfterClass(Method method);
 }

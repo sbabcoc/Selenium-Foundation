@@ -17,13 +17,16 @@ import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.support.TestBase;
 
+/**
+ * This abstract class implements the contract for Selenium Foundation test classes for JUnit.
+ */
 public abstract class JUnitBase implements TestBase {
     
     @ClassRule
-    public static final ExternalResource resource = UnitTestWatcher.getClassWatcher();
+    public static final ExternalResource resource = DriverWatcher.getClassWatcher();
     
     @Rule
-    public final TestWatcher watcher = UnitTestWatcher.getTestWatcher(this);
+    public final TestWatcher watcher = DriverWatcher.getTestWatcher(this);
     
     private Optional<WebDriver> optDriver = Optional.empty();
     private Optional<Page> optInitialPage = Optional.empty();

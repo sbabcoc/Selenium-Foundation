@@ -223,9 +223,7 @@ public final class GridUtility {
     }
     
     /**
-     * Get the Selenium Grid hub server process for the specified configuration context.
-     * 
-     * @return process object for the hub (may be 'null')
+     * If a Selenium Grid hub server process exists, destroy it.
      */
     public static void stopGridHub() {
         if (hubProcess != null) {
@@ -235,9 +233,7 @@ public final class GridUtility {
     }
 
     /**
-     * Get the Selenium Grid node server process for the specified configuration context.
-     * 
-     * @return process object for the node (may be 'null')
+     * If a Selenium Grid node server process exists, destroy it.
      */
     public static void stopGridNode() {
         if (nodeProcess != null) {

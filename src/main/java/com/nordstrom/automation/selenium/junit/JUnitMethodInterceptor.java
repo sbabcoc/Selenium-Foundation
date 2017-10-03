@@ -18,9 +18,9 @@ import net.bytebuddy.implementation.bind.annotation.This;
 
 /**
  * This enumeration implements the method interceptor for <b>JUnitBase</b> test class objects.
- * This interceptor is implemented as a standard Java enumeration singleton and performs the following tasks:
- * <ul>
- * </ul>
+ * This interceptor is implemented as a standard Java enumeration singleton and enables classes that implement the
+ * {@link JUnitMethodWatcher} interface to perform processing before and after methods with the following JUnit
+ * annotations: &#64;Test, &#64;Before, &#64;After, &#64;BeforeClass, and &#64;AfterClass.
  */
 public enum JUnitMethodInterceptor {
     INSTANCE;
@@ -66,6 +66,12 @@ public enum JUnitMethodInterceptor {
         return result;
     }
     
+    /**
+     * Get reference to an instance of the specified watcher type.
+     * 
+     * @param watcherType watcher type
+     * @return optional watcher instance
+     */
     public Optional<JUnitMethodWatcher> getAttachedWatcher(Class<? extends JUnitMethodWatcher> watcherType) {
         Objects.requireNonNull(watcherType, "[watcherType] must be non-null");
         for (JUnitMethodWatcher watcher : watchers) {

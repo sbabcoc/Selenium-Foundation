@@ -67,6 +67,18 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         beforeInvocation(obj, method);
     }
     
+    /**
+     * Perform pre-invocation processing:
+     * <ul>
+     *     <li>Ensure that a driver instance has been created for the test.</li>
+     *     <li>Store the driver instance for subsequent dispensing.</li>
+     *     <li>Manage configured driver timeout intervals.</li>
+     *     <li>If specified, open the initial page, storing the page object for subsequent dispensing.</li>
+     * </ul>
+     * 
+     * @param obj test class instance
+     * @param method test method
+     */
     public static void beforeInvocation(Object obj, Method method) {
         if ( ! (obj instanceof TestBase)) {
             return;
@@ -156,6 +168,15 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         afterInvocation(obj, method);
     }
     
+    /**
+     * Perform post-invocation processing:
+     * <ul>
+     *     <li>If indicated, close the driver that was acquired for this method.</li>
+     * </ul>
+     * 
+     * @param obj test class instance
+     * @param method test method
+     */
     public static void afterInvocation(Object obj, Method method) {
         if (obj instanceof TestBase) {
             TestBase instance = (TestBase) obj;
@@ -178,37 +199,62 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
     public void onFinish(ITestContext testContext) {
         onFinish();
     }
-
+    
+    /**
+     * Perform post-suite processing:
+     * <ul>
+     *     <li>If a Selenium Grid node process was spawned, shut it down.</li>
+     *     <li>If a Selenium Grid hub process was spawned, shut it down.</li>
+     * </ul>
+     */
     public static void onFinish() {
         GridUtility.stopGridNode();
         GridUtility.stopGridHub();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onStart(ITestContext testContext) {
         // no pre-run processing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
         closeDriver(testResult);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onTestFailure(ITestResult testResult) {
         closeDriver(testResult);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onTestSkipped(ITestResult testResult) {
         closeDriver(testResult);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onTestStart(ITestResult testResult) {
         // no pre-test processing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onTestSuccess(ITestResult testResult) {
         closeDriver(testResult);
@@ -239,6 +285,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         return nabDriver(testResult.getInstance());
     }
     
+    /**
+     * If present, get the driver for the specified test class instance.
+     * 
+     * @param obj test class instance
+     * @return (optional) driver from the specified test result
+     */
     public static Optional<WebDriver> nabDriver(Object obj) {
         if (obj instanceof TestBase) {
             return ((TestBase) obj).nabDriver();
@@ -257,6 +309,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         return nabDriver(testResult).isPresent();
     }
     
+    /**
+     * Determine if a driver is present in the specified test class instance.
+     * 
+     * @param obj test class instance
+     * @return 'true' if a driver is present; otherwise 'false'
+     */
     public static boolean hasDriver(Object obj) {
         return nabDriver(obj).isPresent();
     }
@@ -271,6 +329,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
         return closeDriver(testResult.getInstance());
     }
     
+    /**
+     * Close the Selenium driver attached to the specified test class instance.
+     * 
+     * @param obj test class instance
+     * @return an empty {@link Optional} object
+     */
     public static Optional<WebDriver> closeDriver(Object obj) {
         Optional<WebDriver> optDriver = nabDriver(obj);
         if (optDriver.isPresent()) {

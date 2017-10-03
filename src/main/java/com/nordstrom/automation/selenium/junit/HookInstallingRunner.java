@@ -21,6 +21,9 @@ public class HookInstallingRunner extends BlockJUnit4ClassRunner {
         super(klass);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object createTest() throws Exception {
         Object obj = super.createTest();
