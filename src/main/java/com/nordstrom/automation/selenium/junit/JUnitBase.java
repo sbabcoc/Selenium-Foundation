@@ -7,13 +7,23 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExternalResource;
+import org.junit.rules.TestWatcher;
 import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.support.TestBase;
 
 public abstract class JUnitBase implements TestBase {
+    
+    @ClassRule
+    public static final ExternalResource resource = UnitTestWatcher.getClassWatcher();
+    
+    @Rule
+    public final TestWatcher watcher = UnitTestWatcher.getTestWatcher(this);
     
     private Optional<WebDriver> optDriver = Optional.empty();
     private Optional<Page> optInitialPage = Optional.empty();

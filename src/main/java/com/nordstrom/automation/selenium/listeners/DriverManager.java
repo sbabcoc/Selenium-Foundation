@@ -176,15 +176,12 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void onFinish(ITestContext testContext) {
-        Process gridProc = GridUtility.getGridNode();
-        if (gridProc != null) {
-            gridProc.destroy();
-        }
-        
-        gridProc = GridUtility.getGridHub();
-        if (gridProc != null) {
-            gridProc.destroy();
-        }
+        onFinish();
+    }
+
+    public static void onFinish() {
+        GridUtility.stopGridNode();
+        GridUtility.stopGridHub();
     }
 
     @Override

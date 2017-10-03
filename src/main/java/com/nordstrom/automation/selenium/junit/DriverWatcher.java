@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.junit;
 
 import java.lang.reflect.Method;
 
+import org.junit.rules.ExternalResource;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import com.nordstrom.automation.selenium.listeners.DriverManager;
@@ -25,6 +26,16 @@ public class DriverWatcher implements JUnitMethodWatcher {
             protected void finished(Description description) {
                 DriverManager.closeDriver(obj);
             }
+        };
+    }
+    
+    public static ExternalResource getClassWatcher() {
+        return new ExternalResource() {
+            @Override
+            protected void after() {
+                DriverManager.onFinish();
+            }
+            
         };
     }
 }

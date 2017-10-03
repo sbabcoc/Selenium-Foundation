@@ -227,8 +227,11 @@ public final class GridUtility {
      * 
      * @return process object for the hub (may be 'null')
      */
-    public static Process getGridHub() {
-        return hubProcess;
+    public static void stopGridHub() {
+        if (hubProcess != null) {
+            hubProcess.destroy();
+            hubProcess = null;
+        }
     }
 
     /**
@@ -236,8 +239,11 @@ public final class GridUtility {
      * 
      * @return process object for the node (may be 'null')
      */
-    public static Process getGridNode() {
-        return nodeProcess;
+    public static void stopGridNode() {
+        if (nodeProcess != null) {
+            nodeProcess.destroy();
+            nodeProcess = null;
+        }
     }
 
     /**
