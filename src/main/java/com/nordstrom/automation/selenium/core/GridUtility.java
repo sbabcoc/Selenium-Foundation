@@ -186,9 +186,9 @@ public final class GridUtility {
     }
     
     /**
-     * Get the Selenium driver for the specified configuration context.
+     * Get the Selenium driver for the specified test class instance.
      * 
-     * @param instance configuration context (TestNG test result object)
+     * @param instance test class instance
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver(TestBase instance) {
