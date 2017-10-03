@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.listeners;
+package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -8,24 +8,13 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
-import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
-import com.nordstrom.automation.selenium.support.TestBase;
-import com.nordstrom.automation.testng.ExecutionFlowController;
 
 /**
  * This TestNG listener performs several basic functions related to driver session management:
@@ -44,8 +33,12 @@ import com.nordstrom.automation.testng.ExecutionFlowController;
  * 
  * @see GridUtility
  */
-public class DriverManager implements IInvokedMethodListener, ITestListener {
+public class DriverManager {
 
+    private DriverManager() {
+        throw new AssertionError("DriverManager is a static utility class that cannot be instantiated");
+    }
+    
     /**
      * Perform pre-invocation processing:
      * <ul>
@@ -55,30 +48,24 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      *     <li>If specified, open the initial page, storing the page object for subsequent dispensing.</li>
      * </ul>
      * 
-     * @param invokedMethod an object representing the method that's about to be invoked
-     * @param testResult test result object for the method that's about to be invoked
+     * @param obj test class instance
+     * @param method test method
      */
-    @Override
-    public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
-        if ( ! (testResult.getInstance() instanceof TestBase)) {
+    public static void beforeInvocation(Object obj, Method method) {
+        if ( ! (obj instanceof TestBase)) {
             return;
         }
         
         boolean getDriver = false;
-        ITestNGMethod testMethod = invokedMethod.getTestMethod();
-        Method method = testMethod.getConstructorOrMethod().getMethod();
-        TestBase instance = (TestBase) testMethod.getInstance();
+        TestBase instance = (TestBase) obj;
         
-        // ensure current test result is set
-        Reporter.setCurrentTestResult(testResult);
-                        
         // get driver supplied by preceding phase
         Optional<WebDriver> optDriver = instance.nabDriver();
         // get @InitialPage from invoked method
         InitialPage initialPage = method.getAnnotation(InitialPage.class);
         
         // if invoked method is @Test
-        if (testMethod.isTest()) {
+        if (instance.isTest(method)) {
             // get driver if @NoDriver is absent
             getDriver = (null == method.getAnnotation(NoDriver.class));
             
@@ -92,12 +79,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             // otherwise, if driver supplied by @BeforeMethod
             } else if (optDriver.isPresent()) {
                 // close active driver
-                optDriver = closeDriver(testResult);
+                optDriver = closeDriver(instance);
             }
         // otherwise, if invoked method is @Before...
-        } else if (testMethod.isBeforeMethodConfiguration() || testMethod.isBeforeClassConfiguration()
-                || testMethod.isBeforeGroupsConfiguration() || testMethod.isBeforeTestConfiguration()
-                || testMethod.isBeforeSuiteConfiguration()) {
+        } else if (instance.isBeforeMethod(method) || instance.isBeforeClass(method)) {
             // determine if driver is needed
             getDriver = (initialPage != null);
         }
@@ -112,17 +97,17 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
                 long prior = System.currentTimeMillis();
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
-                    driver = ((DriverProvider) instance).provideDriver(invokedMethod, testResult);
+                    driver = ((DriverProvider) instance).provideDriver(instance, method);
                 } else {
-                    driver = GridUtility.getDriver(testResult);
+                    driver = GridUtility.getDriver(instance);
                 }
                 
                 if (driver != null) {
                     setDriverTimeouts(driver, config);
                     optDriver = instance.setDriver(driver);
-                    if (testMethod.isTest()) {
+                    if (instance.isTest(method)) {
                         long after = System.currentTimeMillis();
-                        ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                        instance.adjustTimeout(after - prior);
                     }
                 }
             }
@@ -141,16 +126,15 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      *     <li>If indicated, close the driver that was acquired for this method.</li>
      * </ul>
      * 
-     * @param invokedMethod an object representing the method that's just been invoked
-     * @param testResult test result object for the method that's just been invoked
+     * @param obj test class instance
+     * @param method test method
      */
-    @Override
-    public void afterInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
-        ITestNGMethod method = testResult.getMethod();
-        if ( ! (method.isTest() || method.isBeforeMethodConfiguration())) {
-            // ensure current test result is set
-            Reporter.setCurrentTestResult(testResult);
-            closeDriver(testResult);
+    public static void afterInvocation(Object obj, Method method) {
+        if (obj instanceof TestBase) {
+            TestBase instance = (TestBase) obj;
+            if ( ! (instance.isTest(method) || instance.isBeforeMethod(method))) {
+                closeDriver(instance);
+            }
         }
     }
 
@@ -160,50 +144,10 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
      *     <li>If a Selenium Grid node process was spawned, shut it down.</li>
      *     <li>If a Selenium Grid hub process was spawned, shut it down.</li>
      * </ul>
-     * 
-     * @param testContext execution context for the test suite that just finished
      */
-    @Override
-    public void onFinish(ITestContext testContext) {
-        Process gridProc = GridUtility.getGridNode();
-        if (gridProc != null) {
-            gridProc.destroy();
-        }
-        
-        gridProc = GridUtility.getGridHub();
-        if (gridProc != null) {
-            gridProc.destroy();
-        }
-    }
-
-    @Override
-    public void onStart(ITestContext testContext) {
-        // no pre-run processing
-    }
-
-    @Override
-    public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
-        closeDriver(testResult);
-    }
-
-    @Override
-    public void onTestFailure(ITestResult testResult) {
-        closeDriver(testResult);
-    }
-
-    @Override
-    public void onTestSkipped(ITestResult testResult) {
-        closeDriver(testResult);
-    }
-
-    @Override
-    public void onTestStart(ITestResult testResult) {
-        // no pre-test processing
-    }
-
-    @Override
-    public void onTestSuccess(ITestResult testResult) {
-        closeDriver(testResult);
+    public static void onFinish() {
+        GridUtility.stopGridNode();
+        GridUtility.stopGridHub();
     }
     
     /**
@@ -220,39 +164,37 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
     }
     
     /**
-     * If present, get the driver for the specified configuration context.
+     * If present, get the driver for the specified test class instance.
      * 
-     * @param testResult configuration context (TestNG test result object)
+     * @param obj test class instance
      * @return (optional) driver from the specified test result
      */
-    public static Optional<WebDriver> nabDriver(ITestResult testResult) {
-        if (testResult.getInstance() instanceof TestBase) {
-            // ensure current test result is set
-            Reporter.setCurrentTestResult(testResult);
-            return ((TestBase) testResult.getInstance()).nabDriver();
+    public static Optional<WebDriver> nabDriver(Object obj) {
+        if (obj instanceof TestBase) {
+            return ((TestBase) obj).nabDriver();
         } else {
             return Optional.empty();
         }
     }
     
     /**
-     * Determine if a driver is present in the specified configuration context.
+     * Determine if a driver is present in the specified test class instance.
      * 
-     * @param testResult configuration context (TestNG test result object)
+     * @param obj test class instance
      * @return 'true' if a driver is present; otherwise 'false'
      */
-    public static boolean hasDriver(ITestResult testResult) {
-        return nabDriver(testResult).isPresent();
+    public static boolean hasDriver(Object obj) {
+        return nabDriver(obj).isPresent();
     }
 
     /**
-     * Close the Selenium driver attached to the specified configuration context.
+     * Close the Selenium driver attached to the specified test class instance.
      * 
-     * @param testResult configuration context (TestNG test result object)
+     * @param obj test class instance
      * @return an empty {@link Optional} object
      */
-    private static Optional<WebDriver> closeDriver(ITestResult testResult) {
-        Optional<WebDriver> optDriver = nabDriver(testResult);
+    public static Optional<WebDriver> closeDriver(Object obj) {
+        Optional<WebDriver> optDriver = nabDriver(obj);
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             try {
@@ -268,7 +210,7 @@ public class DriverManager implements IInvokedMethodListener, ITestListener {
             }
             
             driver.quit();
-            optDriver = ((TestBase) testResult.getInstance()).setDriver(null);
+            optDriver = ((TestBase) obj).setDriver(null);
         }
         
         return optDriver;

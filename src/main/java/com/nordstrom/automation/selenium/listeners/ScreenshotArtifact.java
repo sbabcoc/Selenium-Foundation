@@ -12,7 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 
-import com.nordstrom.automation.selenium.support.TestBase;
+import com.nordstrom.automation.selenium.core.DriverManager;
+import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.testng.ArtifactType;
 
 /**
@@ -26,7 +27,7 @@ public class ScreenshotArtifact implements ArtifactType {
 
     @Override
     public boolean canGetArtifact(ITestResult result) {
-        Optional<WebDriver> optDriver = DriverManager.nabDriver(result);
+        Optional<WebDriver> optDriver = DriverManager.nabDriver(result.getInstance());
         if (optDriver.isPresent()) {
             if (optDriver.get() instanceof TakesScreenshot) {
                 return true;

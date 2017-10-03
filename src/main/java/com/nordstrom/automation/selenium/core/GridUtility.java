@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
@@ -27,8 +26,6 @@ import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.ITestResult;
-import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
@@ -57,23 +54,10 @@ public final class GridUtility {
      * Determine if the configured Selenium Grid hub is active.<br>
      * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
      * 
+     * @param instance test class instance
      * @return 'true' if configured hub is active; otherwise 'false'
      */
-    public static boolean isHubActive() {
-        return isHubActive(Reporter.getCurrentTestResult());
-    }
-    
-    /**
-     * Determine if the configured Selenium Grid hub is active.<br>
-     * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return 'true' if configured hub is active; otherwise 'false'
-     */
-    public static boolean isHubActive(ITestResult testResult) {
-        
-        Objects.requireNonNull(testResult, "Test result object must be non-null");
-        
+    public static boolean isHubActive(TestBase instance) {
         SeleniumConfig config = SeleniumConfig.getConfig();
         GridHubConfiguration hubConfig = config.getHubConfig();
         
@@ -81,8 +65,8 @@ public final class GridUtility {
         
         try {
             if (!isActive && isThisMyIpAddress(InetAddress.getByName(hubConfig.getHost()))) {
-                startGridServer(testResult, GridServerParms.getHubParms(config));
-                startGridServer(testResult, GridServerParms.getNodeParms(config));
+                startGridServer(instance, GridServerParms.getHubParms(config));
+                startGridServer(instance, GridServerParms.getNodeParms(config));
                 isActive = true;
             }
         } catch (UnknownHostException e) {
@@ -99,12 +83,12 @@ public final class GridUtility {
     /**
      * Start the specified Selenium Grid server.
      * 
-     * @param testResult configuration context (TestNG test result object)
+     * @param instance test class instance
      * @param serverParms Selenium Grid server parameters
      * @throws TimeoutException If Grid server took too long to activate.
      */
-    private static void startGridServer(ITestResult testResult, GridServerParms serverParms) throws TimeoutException {
-        Process serverProcess = GridProcess.start(testResult, serverParms.processArgs);
+    private static void startGridServer(TestBase instance, GridServerParms serverParms) throws TimeoutException {
+        Process serverProcess = GridProcess.start(instance, serverParms.processArgs);
         new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
         setProcess(serverParms.processRole, serverProcess);
     }
@@ -202,26 +186,15 @@ public final class GridUtility {
     }
     
     /**
-     * Get the Selenium driver for the current configuration context.
+     * Get the Selenium driver for the specified test class instance.
      * 
+     * @param instance test class instance
      * @return driver object (may be 'null')
      */
-    public static WebDriver getDriver() {
-        return getDriver(Reporter.getCurrentTestResult());
-    }
-    
-    /**
-     * Get the Selenium driver for the specified configuration context.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return driver object (may be 'null')
-     */
-    public static WebDriver getDriver(ITestResult testResult) {
-        Objects.requireNonNull(testResult, "Test result object must be non-null");
-        
+    public static WebDriver getDriver(TestBase instance) {
         SeleniumConfig config = SeleniumConfig.getConfig();
         GridServerParms hubParms = GridServerParms.getHubParms(config);
-        if (isHubActive(testResult)) {
+        if (isHubActive(instance)) {
             return new RemoteWebDriver(hubParms.endpointUrl, config.getBrowserCaps());
         } else {
             throw new IllegalStateException("No Selenium Grid instance was found at " + hubParms.endpointUrl);
@@ -229,21 +202,23 @@ public final class GridUtility {
     }
     
     /**
-     * Get the Selenium Grid hub server process for the specified configuration context.
-     * 
-     * @return process object for the hub (may be 'null')
+     * If a Selenium Grid hub server process exists, destroy it.
      */
-    public static Process getGridHub() {
-        return hubProcess;
+    public static void stopGridHub() {
+        if (hubProcess != null) {
+            hubProcess.destroy();
+            hubProcess = null;
+        }
     }
 
     /**
-     * Get the Selenium Grid node server process for the specified configuration context.
-     * 
-     * @return process object for the node (may be 'null')
+     * If a Selenium Grid node server process exists, destroy it.
      */
-    public static Process getGridNode() {
-        return nodeProcess;
+    public static void stopGridNode() {
+        if (nodeProcess != null) {
+            nodeProcess.destroy();
+            nodeProcess = null;
+        }
     }
 
     /**

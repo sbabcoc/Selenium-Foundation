@@ -1,9 +1,11 @@
-package com.nordstrom.automation.selenium.support;
+package com.nordstrom.automation.selenium.core;
 
+import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
-
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.model.Page;
@@ -114,8 +116,25 @@ public interface TestBase {
     Optional<Page> setInitialPage(Page pageObj);
     
     /**
+     * Get test run output directory.
+     * 
+     * @return test run output directory
+     */
+    String getOutputDirectory();
+    
+    /**
+     * Adjust test method timeout by adding the specified interval.
+     * 
+     * @param adjust timeout adjustment
+     */
+    default void adjustTimeout(long adjust) {
+        // by default, do nothing
+    }
+    
+    /**
      * Wrap the specified object in an {@link Optional} object.
      * 
+     * @param <T> type of object to be wrapped
      * @param obj object to be wrapped (may be 'null')
      * @return (optional) wrapped object; empty if {@code obj} is 'null'
      */
@@ -126,5 +145,54 @@ public interface TestBase {
             return Optional.empty();
         }
     }
-
+    
+    /**
+     * Determine if the specified method is a 'test' method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code Test} annotation; otherwise 'false'
+     */
+    boolean isTest(Method method);
+    
+    /**
+     * Determine if the specified method is a 'before method' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code Before} annotation; otherwise 'false'
+     */
+    boolean isBeforeMethod(Method method);
+    
+    /**
+     * Determine if the specified method is an 'after method' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code After} annotation; otherwise 'false'
+     */
+    boolean isAfterMethod(Method method);
+    
+    /**
+     * Determine if the specified method is a 'before class' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code BeforeClass} annotation; otherwise 'false'
+     */
+    boolean isBeforeClass(Method method);
+    
+    /**
+     * Determine if the specified method is a 'after class' configuration method.
+     * 
+     * @param method method to be checked
+     * @return 'true' if specified method has {@code AfterClass} annotation; otherwise 'false'
+     */
+    boolean isAfterClass(Method method);
+    
+    /**
+     * Get test run output directory.
+     * 
+     * @return test run output directory
+     */
+    public static String getOutputDir() {
+        Path currentRelativePath = Paths.get("");
+        return currentRelativePath.toAbsolutePath().toString();
+    }
 }

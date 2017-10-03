@@ -1,6 +1,6 @@
 package com.nordstrom.automation.selenium.exceptions;
 
-import com.nordstrom.automation.selenium.support.TestBase;
+import com.nordstrom.automation.selenium.core.TestBase;
 
 /**
  * This exception is thrown by {@link TestBase#getDriver} when no driver is available.

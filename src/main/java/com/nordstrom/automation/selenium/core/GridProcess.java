@@ -11,9 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.grid.selenium.GridLauncher;
-import org.testng.ITestResult;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 
 /**
@@ -39,13 +37,13 @@ final class GridProcess {
     /**
      * Start a Selenium Grid server with the specified arguments in a separate process.
      * 
-     * @param testResult TestNG test results object (may be 'null')
+     * @param instance test class instance
      * @param args Selenium server command line arguments (check {@code See Also} below)
      * @return Java {@link Process} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
      */
-    static Process start(ITestResult testResult, String[] args) {
+    static Process start(TestBase instance, String[] args) {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
@@ -57,7 +55,7 @@ final class GridProcess {
         
         ProcessBuilder builder = new ProcessBuilder(argsList);
         
-        String outputDir = SeleniumConfig.getOutputDir(testResult);
+        String outputDir = instance.getOutputDirectory();
         File outputFile = new File(outputDir, "grid-" + gridRole + ".log");
         
         builder.redirectErrorStream(true);
