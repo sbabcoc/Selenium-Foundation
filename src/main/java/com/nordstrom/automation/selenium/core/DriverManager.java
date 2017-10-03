@@ -106,7 +106,7 @@ public class DriverManager {
                     optDriver = instance.setDriver(driver);
                     if (instance.isTest(method)) {
                         long after = System.currentTimeMillis();
-                        instance.adjustTimeout(instance, after - prior);
+                        instance.adjustTimeout(after - prior);
                     }
                 }
             }

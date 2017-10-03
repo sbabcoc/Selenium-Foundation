@@ -124,11 +124,9 @@ public interface TestBase {
     
     /**
      * Adjust test method timeout by adding the specified interval.
-     * 
-     * @param instance test class instance
      * @param adjust timeout adjustment
      */
-    default void adjustTimeout(TestBase instance, long adjust) {
+    default void adjustTimeout(long adjust) {
         // by default, do nothing
     }
     
