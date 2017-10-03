@@ -93,7 +93,7 @@ public class DriverManager {
             // if driver not yet acquired
             if ( ! optDriver.isPresent()) {
                 WebDriver driver;
-                //long prior = System.currentTimeMillis();
+                long prior = System.currentTimeMillis();
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
                     driver = ((DriverProvider) instance).provideDriver(instance, method);
@@ -105,8 +105,8 @@ public class DriverManager {
                     setDriverTimeouts(driver, config);
                     optDriver = instance.setDriver(driver);
                     if (instance.isTest(method)) {
-                        //long after = System.currentTimeMillis();
-                        //ExecutionFlowController.adjustTimeout(after - prior, testResult);
+                        long after = System.currentTimeMillis();
+                        instance.adjustTimeout(instance, after - prior);
                     }
                 }
             }

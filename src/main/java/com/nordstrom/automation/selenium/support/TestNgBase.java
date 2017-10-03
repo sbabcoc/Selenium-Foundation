@@ -101,6 +101,17 @@ public abstract class TestNgBase implements TestBase {
     }
     
     @Override
+    public void adjustTimeout(TestBase instance, long adjust) {
+        ITestResult testResult = Reporter.getCurrentTestResult();
+        if (testResult != null) {
+            long timeout = testResult.getMethod().getTimeOut();
+            if (timeout > 0) {
+                testResult.getMethod().setTimeOut(timeout + adjust);
+            }
+        }
+    }
+
+    @Override
     public boolean isTest(Method method) {
         return null != method.getAnnotation(Test.class);
     }

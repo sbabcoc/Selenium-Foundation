@@ -123,6 +123,16 @@ public interface TestBase {
     String getOutputDirectory();
     
     /**
+     * Adjust test method timeout by adding the specified interval.
+     * 
+     * @param instance test class instance
+     * @param adjust timeout adjustment
+     */
+    default void adjustTimeout(TestBase instance, long adjust) {
+        // by default, do nothing
+    }
+    
+    /**
      * Get test run output directory.
      * 
      * @return test run output directory
