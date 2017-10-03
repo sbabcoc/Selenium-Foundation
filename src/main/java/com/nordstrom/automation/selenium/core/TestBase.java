@@ -132,17 +132,6 @@ public interface TestBase {
     }
     
     /**
-     * Get test run output directory.
-     * 
-     * @return test run output directory
-     */
-    public static String getOutputDir() {
-        Path currentRelativePath = Paths.get("");
-        return currentRelativePath.toAbsolutePath().toString();
-    }
-    
-    
-    /**
      * Wrap the specified object in an {@link Optional} object.
      * 
      * @param <T> type of object to be wrapped
@@ -196,4 +185,14 @@ public interface TestBase {
      * @return 'true' if specified method has {@code AfterClass} annotation; otherwise 'false'
      */
     boolean isAfterClass(Method method);
+    
+    /**
+     * Get test run output directory.
+     * 
+     * @return test run output directory
+     */
+    public static String getOutputDir() {
+        Path currentRelativePath = Paths.get("");
+        return currentRelativePath.toAbsolutePath().toString();
+    }
 }
