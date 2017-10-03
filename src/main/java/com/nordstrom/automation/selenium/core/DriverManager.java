@@ -8,9 +8,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -82,7 +79,7 @@ public class DriverManager {
             // otherwise, if driver supplied by @BeforeMethod
             } else if (optDriver.isPresent()) {
                 // close active driver
-                optDriver = closeDriver(obj);
+                optDriver = closeDriver(instance);
             }
         // otherwise, if invoked method is @Before...
         } else if (instance.isBeforeMethod(method) || instance.isBeforeClass(method)) {
@@ -136,7 +133,7 @@ public class DriverManager {
         if (obj instanceof TestBase) {
             TestBase instance = (TestBase) obj;
             if ( ! (instance.isTest(method) || instance.isBeforeMethod(method))) {
-                closeDriver(obj);
+                closeDriver(instance);
             }
         }
     }
@@ -167,18 +164,6 @@ public class DriverManager {
     }
     
     /**
-     * If present, get the driver for the specified configuration context.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return (optional) driver from the specified test result
-     */
-    public static Optional<WebDriver> nabDriver(ITestResult testResult) {
-        // ensure current test result is set
-        Reporter.setCurrentTestResult(testResult);
-        return nabDriver(testResult.getInstance());
-    }
-    
-    /**
      * If present, get the driver for the specified test class instance.
      * 
      * @param obj test class instance
@@ -193,16 +178,6 @@ public class DriverManager {
     }
     
     /**
-     * Determine if a driver is present in the specified configuration context.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return 'true' if a driver is present; otherwise 'false'
-     */
-    public static boolean hasDriver(ITestResult testResult) {
-        return nabDriver(testResult).isPresent();
-    }
-    
-    /**
      * Determine if a driver is present in the specified test class instance.
      * 
      * @param obj test class instance
@@ -212,16 +187,6 @@ public class DriverManager {
         return nabDriver(obj).isPresent();
     }
 
-    /**
-     * Close the Selenium driver attached to the specified configuration context.
-     * 
-     * @param testResult configuration context (TestNG test result object)
-     * @return an empty {@link Optional} object
-     */
-    public static Optional<WebDriver> closeDriver(ITestResult testResult) {
-        return closeDriver(testResult.getInstance());
-    }
-    
     /**
      * Close the Selenium driver attached to the specified test class instance.
      * 
