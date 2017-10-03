@@ -102,7 +102,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
-        DriverManager.closeDriver(testResult);
+        DriverManager.closeDriver(testResult.getInstance());
     }
 
     /**
@@ -110,7 +110,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void onTestFailure(ITestResult testResult) {
-        DriverManager.closeDriver(testResult);
+        DriverManager.closeDriver(testResult.getInstance());
     }
 
     /**
@@ -118,7 +118,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void onTestSkipped(ITestResult testResult) {
-        DriverManager.closeDriver(testResult);
+        DriverManager.closeDriver(testResult.getInstance());
     }
 
     /**
@@ -134,7 +134,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void onTestSuccess(ITestResult testResult) {
-        DriverManager.closeDriver(testResult);
+        DriverManager.closeDriver(testResult.getInstance());
     }
     
 }
