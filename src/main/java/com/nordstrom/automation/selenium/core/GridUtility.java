@@ -97,15 +97,15 @@ public final class GridUtility {
      * Store the specified Selenium Grid server process using the specified role.
      * 
      * @param processRole Selenium Grid server role (either HUB or NODE)
-     * @param serverProcess Selenium Grib server process
+     * @param serverProcess Selenium Grid server process
      */
     private static void setProcess(GridRole processRole, Process serverProcess) {
         switch (processRole) {
             case HUB:
-                hubProcess = serverProcess;
+                setHubProcess(serverProcess);
                 break;
             case NODE:
-                nodeProcess = serverProcess;
+                setNodeProcess(serverProcess);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -205,20 +205,14 @@ public final class GridUtility {
      * If a Selenium Grid hub server process exists, destroy it.
      */
     public static void stopGridHub() {
-        if (hubProcess != null) {
-            hubProcess.destroy();
-            hubProcess = null;
-        }
+        setHubProcess(null);
     }
 
     /**
      * If a Selenium Grid node server process exists, destroy it.
      */
     public static void stopGridNode() {
-        if (nodeProcess != null) {
-            nodeProcess.destroy();
-            nodeProcess = null;
-        }
+        setNodeProcess(null);
     }
 
     /**
@@ -295,6 +289,46 @@ public final class GridUtility {
             }
             
             return parms;
+        }
+    }
+    
+    /**
+     * Set a new Selenium Grid hub process, or stop an existing one.
+     * 
+     * @param process Selenium Grid server process; 'null' to stop process
+     */
+    private static synchronized void setHubProcess(Process process) {
+        if (hubProcess == null) {
+            if (process != null) {
+                hubProcess = process;
+            }
+        } else {
+            if (process == null) {
+                hubProcess.destroy();
+                hubProcess = null;
+            } else {
+                process.destroy();
+            }
+        }
+    }
+    
+    /**
+     * Set a new Selenium Grid node process, or stop an existing one.
+     * 
+     * @param process Selenium Grid server process; 'null' to stop process
+     */
+    private static synchronized void setNodeProcess(Process process) {
+        if (nodeProcess == null) {
+            if (process != null) {
+                nodeProcess = process;
+            }
+        } else {
+            if (process == null) {
+                nodeProcess.destroy();
+                nodeProcess = null;
+            } else {
+                process.destroy();
+            }
         }
     }
 }
