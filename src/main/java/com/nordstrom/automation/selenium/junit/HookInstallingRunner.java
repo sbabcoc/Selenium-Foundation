@@ -10,13 +10,18 @@ import org.junit.Test;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
-import com.nordstrom.automation.selenium.interfaces.Hooked;
 import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 
-public class HookInstallingRunner extends BlockJUnit4ClassRunner {
+/**
+ * This JUnit test runner uses bytecode enhancement to install hooks on test and configuration methods to enable
+ * method pre-processing and post-processing. This closely resembles the {@code IInvokedMethodListener} feature
+ * of TestNG. Classes that implement the {@link JUnitMethodWatcher} interface are attached to these hooks via the
+ * {@link JUnitMethodWatchers} annotation, which is applied to applicable test classes.
+ */
+public final class HookInstallingRunner extends BlockJUnit4ClassRunner {
     
     public HookInstallingRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -53,7 +58,8 @@ public class HookInstallingRunner extends BlockJUnit4ClassRunner {
             
             Class<C> proxyType = (Class<C>) new ByteBuddy()
                     .subclass(testClass)
-                    .method(isAnnotatedWith(anyOf(Test.class, Before.class, After.class, BeforeClass.class, AfterClass.class)))
+                    .method(isAnnotatedWith(anyOf(Test.class, Before.class,
+                                    After.class, BeforeClass.class, AfterClass.class)))
                     .intercept(MethodDelegation.to(JUnitMethodInterceptor.INSTANCE))
                     .implement(Hooked.class)
                     .make()

@@ -22,9 +22,11 @@ import com.nordstrom.automation.selenium.model.Page;
  */
 public abstract class JUnitBase implements TestBase {
     
+    /** This class rule performs end-of-class clean-up of drivers and local Grid. */
     @ClassRule
     public static final ExternalResource resource = DriverWatcher.getClassWatcher();
     
+    /** This method rule manages driver lifetimes and opens initial pages. */
     @Rule
     public final TestWatcher watcher = DriverWatcher.getTestWatcher(this);
     
