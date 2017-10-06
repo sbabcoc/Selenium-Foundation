@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 import org.openqa.grid.selenium.GridLauncher;
 
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.common.file.PathUtils;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -36,14 +39,13 @@ final class GridProcess {
     
     /**
      * Start a Selenium Grid server with the specified arguments in a separate process.
-     * 
-     * @param instance test class instance
      * @param args Selenium server command line arguments (check {@code See Also} below)
+     * 
      * @return Java {@link Process} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
      */
-    static Process start(TestBase instance, String[] args) {
+    static Process start(String[] args) {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
@@ -55,14 +57,20 @@ final class GridProcess {
         
         ProcessBuilder builder = new ProcessBuilder(argsList);
         
-        String outputDir = instance.getOutputDirectory();
-        File outputFile = new File(outputDir, "grid-" + gridRole + ".log");
-        
-        builder.redirectErrorStream(true);
-        builder.redirectOutput(outputFile);
+        Path outputPath;
+        String outputDir = TestBase.getOutputDir();
         
         try {
-            Files.createDirectories(outputFile.toPath().getParent());
+            outputPath = PathUtils.getNextPath(Paths.get(outputDir), "grid-" + gridRole, "log");
+        } catch (IOException e) {
+            throw new GridServerLaunchFailedException(gridRole, e);
+        }
+        
+        builder.redirectErrorStream(true);
+        builder.redirectOutput(outputPath.toFile());
+        
+        try {
+            Files.createDirectories(outputPath.getParent());
             return builder.start();
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);

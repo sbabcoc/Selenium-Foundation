@@ -99,7 +99,7 @@ public class DriverManager {
                 if (instance instanceof DriverProvider) {
                     driver = ((DriverProvider) instance).provideDriver(instance, method);
                 } else {
-                    driver = GridUtility.getDriver(instance);
+                    driver = GridUtility.getDriver();
                 }
                 
                 if (driver != null) {

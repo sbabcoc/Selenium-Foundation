@@ -609,7 +609,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
             
             @Override
             public String toString() {
-                return "expected panding page to appear";
+                return "expected landing page to appear";
             }
         };
     }

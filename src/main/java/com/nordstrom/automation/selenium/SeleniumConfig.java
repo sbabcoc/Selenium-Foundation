@@ -274,6 +274,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     private String getNodeConfigPath() {
         if (nodeConfigPath == null) {
             nodeConfigPath = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
+            LOGGER.debug("nodeConfigPath = {}", nodeConfigPath);
         }
         return nodeConfigPath;
     }
@@ -341,6 +342,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     private String getHubConfigPath() {
         if (hubConfigPath == null) {
             hubConfigPath = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
+            LOGGER.debug("hubConfigPath = {}", hubConfigPath);
         }
         return hubConfigPath;
     }
