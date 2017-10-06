@@ -3,9 +3,7 @@ package com.nordstrom.automation.selenium.junit;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
@@ -32,34 +30,23 @@ public final class HookInstallingRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     public Object createTest() throws Exception {
-        Object obj = super.createTest();
-        if (obj instanceof JUnitBase) {
-            obj = installHooks((JUnitBase) obj);
-        }
-        return obj;
+        return installHooks(super.createTest());
     }
     
     /**
-     * Create an enhanced instance of the specified container.
+     * Create an enhanced instance of the specified test class object.
      * 
-     * @param <C> container type
-     * @param testObj container object to be enhanced
-     * @return enhanced container object
+     * @param testObj test class object to be enhanced
+     * @return enhanced test class object
      */
-    @SuppressWarnings("unchecked")
-    public <C extends JUnitBase> C installHooks(C testObj) {
-        if (testObj instanceof Hooked) {
-            return testObj;
-        }
-        
+    private Object installHooks(Object testObj) {
         Class<?> testClass = testObj.getClass();
         
         try {
             
-            Class<C> proxyType = (Class<C>) new ByteBuddy()
+          Class<?> proxyType = new ByteBuddy()
                     .subclass(testClass)
-                    .method(isAnnotatedWith(anyOf(Test.class, Before.class,
-                                    After.class, BeforeClass.class, AfterClass.class)))
+                    .method(isAnnotatedWith(anyOf(Test.class, Before.class, After.class)))
                     .intercept(MethodDelegation.to(JUnitMethodInterceptor.INSTANCE))
                     .implement(Hooked.class)
                     .make()
@@ -74,4 +61,14 @@ public final class HookInstallingRunner extends BlockJUnit4ClassRunner {
         }
     }
     
+    /**
+     * Get class of specified test class instance.
+     * 
+     * @param instance test class instance
+     * @return class of test class instance
+     */
+    public static Class<?> getInstanceClass(Object instance) {
+        Class<?> clazz = instance.getClass();      
+        return (instance instanceof Hooked) ? clazz.getSuperclass() : clazz;
+    }
 }
