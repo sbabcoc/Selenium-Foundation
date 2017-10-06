@@ -205,14 +205,14 @@ public final class GridUtility {
      * If a Selenium Grid hub server process exists, destroy it.
      */
     public static void stopGridHub() {
-        setHubProcess(null);
+        //setHubProcess(null);
     }
 
     /**
      * If a Selenium Grid node server process exists, destroy it.
      */
     public static void stopGridNode() {
-        setNodeProcess(null);
+        //setNodeProcess(null);
     }
 
     /**
