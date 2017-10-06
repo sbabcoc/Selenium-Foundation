@@ -56,9 +56,9 @@ public class SeleniumConfigTest {
         SeleniumConfig config = SeleniumConfig.getConfig();
         URI targetUri = config.getTargetUri();
         assertNotNull(targetUri);
-        assertEquals(targetUri.getScheme(), "http");
-        assertEquals(targetUri.getHost(), "localhost");
-        assertEquals(targetUri.getPath(), "/");
+        assertEquals(targetUri.getScheme(), config.getString(SeleniumSettings.TARGET_SCHEME.key()));
+        assertEquals(targetUri.getHost(), config.getString(SeleniumSettings.TARGET_HOST.key()));
+        assertEquals(targetUri.getPath(), config.getString(SeleniumSettings.TARGET_PATH.key()));
     }
     
     @Test

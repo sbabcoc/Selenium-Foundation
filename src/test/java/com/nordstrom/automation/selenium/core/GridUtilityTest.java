@@ -83,7 +83,7 @@ public class GridUtilityTest extends TestNgBase {
         SeleniumConfig config = SeleniumConfig.getConfig();
         GridHubConfiguration hubConfig = config.getHubConfig();
         assertFalse(GridUtility.isHubActive(hubConfig), "Configured local hub should initially be inactive");
-        assertTrue(GridUtility.isHubActive(this), "Configured local hub should have been activated");
+        assertTrue(GridUtility.isHubActive(), "Configured local hub should have been activated");
     }
     
     @NoDriver
