@@ -44,7 +44,7 @@ public final class GridUtility {
     
     private static Process hubProcess;
     private static Process nodeProcess;
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
     
     private GridUtility() {
         throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
@@ -205,14 +205,14 @@ public final class GridUtility {
      * If a Selenium Grid hub server process exists, destroy it.
      */
     public static void stopGridHub() {
-        setHubProcess(null);
+        //setHubProcess(null);
     }
 
     /**
      * If a Selenium Grid node server process exists, destroy it.
      */
     public static void stopGridNode() {
-        setNodeProcess(null);
+        //setNodeProcess(null);
     }
 
     /**
@@ -300,13 +300,16 @@ public final class GridUtility {
     private static synchronized void setHubProcess(Process process) {
         if (hubProcess == null) {
             if (process != null) {
+                LOGGER.debug("Setting new Grid hub process {}", process);
                 hubProcess = process;
             }
         } else {
             if (process == null) {
+                LOGGER.debug("Destroying current Grid hub process {}", hubProcess);
                 hubProcess.destroy();
                 hubProcess = null;
             } else {
+                LOGGER.debug("Destroying redundant Grid hub process {}", process);
                 process.destroy();
             }
         }
@@ -320,13 +323,16 @@ public final class GridUtility {
     private static synchronized void setNodeProcess(Process process) {
         if (nodeProcess == null) {
             if (process != null) {
+                LOGGER.debug("Setting new Grid node process {}", process);
                 nodeProcess = process;
             }
         } else {
             if (process == null) {
+                LOGGER.debug("Destroying current Grid node process {}", nodeProcess);
                 nodeProcess.destroy();
                 nodeProcess = null;
             } else {
+                LOGGER.debug("Destroying redundant Grid node process {}", process);
                 process.destroy();
             }
         }
