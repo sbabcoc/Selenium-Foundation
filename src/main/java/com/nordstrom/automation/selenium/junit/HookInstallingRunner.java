@@ -44,7 +44,7 @@ public final class HookInstallingRunner extends BlockJUnit4ClassRunner {
         
         try {
             
-          Class<?> proxyType = new ByteBuddy()
+            Class<?> proxyType = new ByteBuddy()
                     .subclass(testClass)
                     .method(isAnnotatedWith(anyOf(Test.class, Before.class, After.class)))
                     .intercept(MethodDelegation.to(JUnitMethodInterceptor.INSTANCE))
