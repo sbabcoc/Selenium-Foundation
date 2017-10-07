@@ -3,19 +3,11 @@ package com.nordstrom.automation.selenium.core;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.net.InetAddress;
-import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.http.HttpHost;
-import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.utils.GridHubConfiguration;
-import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -26,55 +18,18 @@ import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.support.TestNgBase;
-import com.nordstrom.common.base.UncheckedThrow;
 
 @LinkedListeners({DriverListener.class, ExecutionFlowController.class})
 public class GridUtilityTest extends TestNgBase {
     
-    private static final long SHUTDOWN_DELAY = 15;
-    private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
-    private static final String NODE_SHUTDOWN = "/selenium-server/driver/?cmd=shutDownSeleniumServer";
-    
     @BeforeClass
-    public void killLocalGrid() throws UnknownHostException, TimeoutException {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-        
-        GridHubConfiguration hubConfig = config.getHubConfig();
-        RegistrationRequest nodeConfig = config.getNodeConfig();
-        
-        HttpHost hubHost = GridUtility.getHubHost(hubConfig);
-        HttpHost nodeHost = GridUtility.getNodeHost(nodeConfig);
-        
-        boolean isLocalHub = GridUtility.isThisMyIpAddress(InetAddress.getByName(hubHost.getHostName()));
-        boolean isLocalNode = GridUtility.isThisMyIpAddress(InetAddress.getByName(nodeHost.getHostName()));
-        
-        if (!isLocalHub) {
-            throw new IllegalStateException("Configured for non-local hub host");
-        }
-        if (!isLocalNode) {
+    public void stopLocalGrid() throws UnknownHostException, TimeoutException {
+        if (!GridUtility.stopGridNode(true)) {
             throw new IllegalStateException("Configured for non-local node host");
         }
-        
-        UrlChecker urlChecker = new UrlChecker();
-        
-        if (GridUtility.isNodeActive(nodeConfig)) {
-            try {
-                GridUtility.getHttpResponse(nodeHost, NODE_SHUTDOWN);
-                urlChecker.waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, URI.create(nodeHost.toURI()).toURL());
-            } catch (IOException e) {
-                throw UncheckedThrow.throwUnchecked(e);
-            }
+        if (!GridUtility.stopGridHub(true)) {
+            throw new IllegalStateException("Configured for non-local hub host");
         }
-        
-        if (GridUtility.isHubActive(hubConfig)) {
-            try {
-                GridUtility.getHttpResponse(hubHost, HUB_SHUTDOWN);
-                urlChecker.waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, URI.create(hubHost.toURI()).toURL());
-            } catch (IOException e) {
-                throw UncheckedThrow.throwUnchecked(e);
-            }
-        }
-        
     }
     
     @Test
