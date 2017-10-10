@@ -8,6 +8,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
+import com.nordstrom.automation.selenium.model.RobustElementFactory.ElementMethodInterceptor;
 import com.nordstrom.automation.selenium.support.Coordinator;
 
 /**
@@ -52,7 +53,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @param parent component parent container
      */
     public PageComponent(By locator, int index, ComponentContainer parent) {
-        this(RobustWebElement.getElement(parent, locator, index), parent);
+        this((RobustWebElement) ElementMethodInterceptor.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
         arguments = new Object[] {locator, index, parent};
@@ -121,8 +122,8 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * 
      * @return 'true' if component is visible; otherwise 'false'
      */
-    public RobustWebElement getViewport() {
-        return (RobustWebElement) context;
+    public WebElement getViewport() {
+        return (WebElement) context;
     }
     
     /**
@@ -131,8 +132,11 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @return 'true' if component is visible; otherwise 'false'
      */
     public boolean isDisplayed() {
-        RobustWebElement element = getViewport();
-        return (element.hasReference()) ? element.isDisplayed() : false;
+        RobustWebElement element = (RobustWebElement) getViewport();
+        if (element.hasReference()) {
+            return ((WebElement) element).isDisplayed();
+        }
+        return false;
     }
     
     /**
@@ -141,7 +145,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @return 'true' if component is absent or hidden; otherwise 'false'
      */
     public boolean isInvisible() {
-        RobustWebElement element = getViewport();
+        RobustWebElement element = (RobustWebElement) getViewport();
         if (element.hasReference()) {
             try {
                 return ! element.getWrappedElement().isDisplayed();

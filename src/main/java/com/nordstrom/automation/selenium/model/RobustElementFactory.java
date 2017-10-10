@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -19,8 +21,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
-import org.openqa.selenium.internal.WrapsElement;
-
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
@@ -36,10 +36,11 @@ import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.FieldValue;
 import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.Pipe;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
-
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class RobustElementFactory {
@@ -49,7 +50,7 @@ public class RobustElementFactory {
     /** wraps an optional reference */
     public static final int OPTIONAL = -2;
     
-    private static Map<String, Class<? extends WebElement>> wrapperClassMap = new HashMap<>();
+    private static Map<String, InstanceCreator> creatorMap = new HashMap<>();
     
     private RobustElementFactory() {
         throw new AssertionError("RobustElementFactory is a static utility class that cannot be instantiated");
@@ -85,23 +86,18 @@ public class RobustElementFactory {
      * @param index element index
      */
     public static WebElement makeRobustElement(WebElement element, WrapsContext context, By locator, int index) {
-        Class<? extends WebElement> wrapperClass = getWrapperClass(context);
-        ReferenceFetcher referenceFetcher = new ReferenceFetcher(element, context, locator, index);
-        ElementMethodInterceptor interceptor = new ElementMethodInterceptor(referenceFetcher); 
-        try {
-            WebElement robust = wrapperClass.newInstance();
-            ((InterceptionAccessor) robust).setInterceptor(interceptor);
-            return robust;
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw UncheckedThrow.throwUnchecked(e);
-        }
+        InstanceCreator creator = getCreator(context);
+        ElementMethodInterceptor interceptor = new ElementMethodInterceptor(element, context, locator, index);
+        WebElement robust = (WebElement) creator.makeInstance();
+        ((InterceptionAccessor) robust).setInterceptor(interceptor);
+        return robust;
     }
     
-    private static synchronized Class<? extends WebElement> getWrapperClass(WrapsContext context) {
+    private static synchronized InstanceCreator getCreator(WrapsContext context) {
         WebDriver driver = context.getWrappedDriver();
         String driverName = driver.getClass().getName();
-        if (wrapperClassMap.containsKey(driverName)) {
-            return wrapperClassMap.get(driverName);
+        if (creatorMap.containsKey(driverName)) {
+            return creatorMap.get(driverName);
         }
         
         WebElement reference = driver.findElement(By.tagName("*"));
@@ -110,23 +106,31 @@ public class RobustElementFactory {
         Class<? extends WebElement> wrapperClass = new ByteBuddy()
                         .subclass(refClass)
                         .name(refClass.getPackage().getName() + ".Robust" + refClass.getSimpleName())
-                        .defineField("interceptor", ElementMethodInterceptor.class, Visibility.PUBLIC)
-                        .implement(InterceptionAccessor.class)
-                        .method(isDeclaredBy(InterceptionAccessor.class))
-                        .intercept(FieldAccessor.ofBeanProperty())
-                        .implement(WrapsElement.class, WrapsContext.class, Enhanced.class)
-                        .method(isDeclaredBy(refClass))
+                        .method(not(isDeclaredBy(Object.class)))
                         .intercept(MethodDelegation.toField("interceptor"))
-                        .method(isDeclaredBy(WrapsElement.class))
-                        .intercept(MethodDelegation.toField("interceptor"))
-                        .method(isDeclaredBy(WrapsContext.class))
-                        .intercept(MethodDelegation.toField("interceptor"))
+                        .implement(RobustWebElement.class)
+                        .defineField("interceptor", ElementMethodInterceptor.class, Visibility.PRIVATE)
+                        .implement(InterceptionAccessor.class).intercept(FieldAccessor.ofBeanProperty())
                         .make()
                         .load(refClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
                         .getLoaded();
         
-        wrapperClassMap.put(driverName, wrapperClass);
-        return wrapperClass;
+        InstanceCreator creator;
+        
+        try {
+            creator = new ByteBuddy()
+                            .subclass(InstanceCreator.class)
+                            .method(not(isDeclaredBy(Object.class)))
+                            .intercept(MethodDelegation.toConstructor(wrapperClass))
+                            .make()
+                            .load(wrapperClass.getClassLoader())
+                            .getLoaded().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw UncheckedThrow.throwUnchecked(e);
+        }
+        
+        creatorMap.put(driverName, creator);
+        return creator;
     }
     
     public interface InterceptionAccessor {
@@ -134,13 +138,11 @@ public class RobustElementFactory {
         void setInterceptor(ElementMethodInterceptor interceptor);
     }
     
-    public static class ElementMethodInterceptor {
-        
-        private ReferenceFetcher referenceFetcher;
-        
-        public ElementMethodInterceptor(ReferenceFetcher referenceFetcher) {
-            this.referenceFetcher = referenceFetcher;
-        }
+    public interface InstanceCreator {
+        Object makeInstance();
+    }
+    
+    public static class ElementMethodInterceptor implements ReferenceFetcher {
         
         /**
          * This is the method that intercepts component container methods in "enhanced" model objects.
@@ -155,19 +157,26 @@ public class RobustElementFactory {
         public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args) throws Exception
         {
             try {
-                return method.invoke(referenceFetcher.getWrappedElement(), args);
-            } catch (StaleElementReferenceException e) {
-                return method.invoke(referenceFetcher.refreshReference(e).getWrappedElement(), args);
-            } catch (NullPointerException e) {
-                throw referenceFetcher.deferredException();
+                return method.invoke(getWrappedElement(), args);
+            } catch (InvocationTargetException ite) {
+                Throwable t = ite.getCause();
+                if (t instanceof StaleElementReferenceException) {
+                    try {
+                        StaleElementReferenceException sere = (StaleElementReferenceException) t;
+                        return method.invoke(refreshReference(sere).getWrappedElement(), args);
+                    } catch (NullPointerException npe) {
+                        throw deferredException();
+                    }
+                }
+                throw UncheckedThrow.throwUnchecked(t);
             }
         }
-    }
-    
-    /**
-     * 
-     */
-    public static class ReferenceFetcher implements SearchContext, WrapsElement, WrapsContext {
+        
+        @RuntimeType
+        public static Object intercept(@Pipe Function<Object, Object> pipe,
+                        @FieldValue("referenceFetcher") Object delegate) throws Exception {
+            return pipe.apply(delegate);
+        }
         
         private static final String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
         private static final String LOCATE_BY_XPATH = JsUtility.getScriptResource("locateByXpath.js");
@@ -198,11 +207,11 @@ public class RobustElementFactory {
          * @param locator element locator
          * @param index element index
          */
-        public ReferenceFetcher(WebElement element, WrapsContext context, By locator, int index) {
+        public ElementMethodInterceptor(WebElement element, WrapsContext context, By locator, int index) {
             
             // if specified element is already robust
-            if (element instanceof ReferenceFetcher) {
-                ReferenceFetcher robust = (ReferenceFetcher) element;
+            if (element instanceof ElementMethodInterceptor) {
+                ElementMethodInterceptor robust = (ElementMethodInterceptor) element;
                 this.acquiredAt = robust.acquiredAt;
                 
                 this.wrapped = robust.wrapped;
@@ -271,6 +280,7 @@ public class RobustElementFactory {
          * 
          * @return 'true' if reference was acquired; otherwise 'false'
          */
+        @Override
         public boolean hasReference() {
             if ((index == OPTIONAL) && (wrapped == null)) {
                 acquireReference(this);
@@ -285,6 +295,7 @@ public class RobustElementFactory {
          * 
          * @return element search context
          */
+        @Override
         public WrapsContext getContext() {
             return context;
         }
@@ -294,6 +305,7 @@ public class RobustElementFactory {
          * 
          * @return element locator
          */
+        @Override
         public By getLocator() {
             return locator;
         }
@@ -305,6 +317,7 @@ public class RobustElementFactory {
          * 
          * @return element index (see NOTE)
          */
+        @Override
         public int getIndex() {
             return index;
         }
@@ -315,7 +328,8 @@ public class RobustElementFactory {
          * @param refreshTrigger {@link StaleElementReferenceException} that necessitates reference refresh
          * @return this robust web element with refreshed reference
          */
-        ReferenceFetcher refreshReference(final StaleElementReferenceException refreshTrigger) {
+        @Override
+        public ElementMethodInterceptor refreshReference(final StaleElementReferenceException refreshTrigger) {
             try {
                 WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
                 return this;
@@ -337,11 +351,11 @@ public class RobustElementFactory {
          * @param element robust web element object
          * @return wrapped element reference (refreshed)
          */
-        private static Coordinator<ReferenceFetcher> referenceIsRefreshed(final ReferenceFetcher element) {
-            return new Coordinator<ReferenceFetcher>() {
+        private static Coordinator<ElementMethodInterceptor> referenceIsRefreshed(final ElementMethodInterceptor element) {
+            return new Coordinator<ElementMethodInterceptor>() {
 
                 @Override
-                public ReferenceFetcher apply(SearchContext context) {
+                public ElementMethodInterceptor apply(SearchContext context) {
                     try {
                         return acquireReference(element);
                     } catch (StaleElementReferenceException e) {
@@ -364,7 +378,7 @@ public class RobustElementFactory {
          * @param element robust web element object
          * @return wrapped element reference
          */
-        private static ReferenceFetcher acquireReference(ReferenceFetcher element) {
+        private static ElementMethodInterceptor acquireReference(ElementMethodInterceptor element) {
             SearchContext context = element.context.getWrappedContext();
             
             if (element.strategy == Strategy.LOCATOR) {
@@ -394,9 +408,9 @@ public class RobustElementFactory {
                 }
             } else {
                 List<Object> args = new ArrayList<>();
-                List<ReferenceFetcher> contextArg = new ArrayList<>();
-                if (context instanceof ReferenceFetcher) {
-                    contextArg.add((ReferenceFetcher) context);
+                List<ElementMethodInterceptor> contextArg = new ArrayList<>();
+                if (context instanceof ElementMethodInterceptor) {
+                    contextArg.add((ElementMethodInterceptor) context);
                 }
                 
                 String js;
@@ -457,7 +471,7 @@ public class RobustElementFactory {
         /**
          * Get a wrapped reference to the first element matching the specified locator.
          * <p>
-         * <b>NOTE</b>: Use {@link ReferenceFetcher#hasReference()} to determine if a valid reference was acquired.
+         * <b>NOTE</b>: Use {@link ElementMethodInterceptor#hasReference()} to determine if a valid reference was acquired.
          * 
          * @param by the locating mechanism
          * @return robust web element
@@ -556,7 +570,7 @@ public class RobustElementFactory {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            ReferenceFetcher other = (ReferenceFetcher) obj;
+            ElementMethodInterceptor other = (ElementMethodInterceptor) obj;
             if (!context.equals(other.context))
                 return false;
             if (!locator.equals(other.locator))
@@ -568,12 +582,12 @@ public class RobustElementFactory {
 
         @Override
         public WebElement findElement(By locator) {
-            return ReferenceFetcher.getElement(this, locator);
+            return ElementMethodInterceptor.getElement(this, locator);
         }
 
         @Override
         public List<WebElement> findElements(By locator) {
-            return ReferenceFetcher.getElements(this, locator);
+            return ElementMethodInterceptor.getElements(this, locator);
         }
     }
 }
