@@ -13,13 +13,22 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsByCssSelector;
+import org.openqa.selenium.internal.FindsById;
+import org.openqa.selenium.internal.FindsByLinkText;
+import org.openqa.selenium.internal.FindsByName;
+import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.internal.HasIdentity;
+import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
 
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
@@ -40,8 +49,10 @@ import com.nordstrom.common.base.UncheckedThrow;
  * This class also implements support for 'optional' elements, which provide an efficient 
  * mechanism for handling elements that may be absent in certain scenarios.
  */
-public class RobustWebElement implements WebElement, WrapsElement, WrapsContext {
-    
+public class RobustWebElement implements WebElement, FindsByLinkText, FindsById, FindsByName,
+                FindsByTagName, FindsByClassName, FindsByCssSelector, FindsByXPath, Locatable,
+                HasIdentity, TakesScreenshot, WrapsElement, WrapsContext
+{
     /** wraps 1st matched reference */
     public static final int CARDINAL = -1;
     /** wraps an optional reference */
@@ -52,9 +63,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     
     private enum Strategy { LOCATOR, JS_XPATH, JS_CSS }
     
-    private WebDriver driver;
+    private final WebDriver driver;
+    private final WrapsContext context;
     private WebElement wrapped;
-    private WrapsContext context;
     private By locator;
     private int index;
     
@@ -64,6 +75,17 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
     private Long acquiredAt;
     
     private NoSuchElementException deferredException;
+    
+    private final boolean findsByLinkText;
+    private final boolean findsById;
+    private final boolean findsByName;
+    private final boolean findsByTagName;
+    private final boolean findsByClassName;
+    private final boolean findsByCssSelector;
+    private final boolean findsByXPath;
+    private final boolean locatable;
+    private final boolean hasIdentity;
+    private final boolean takesScreenshot;
     
     /**
      * Basic robust web element constructor
@@ -119,8 +141,17 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
         
         driver = WebDriverUtils.getDriver(this.context.getWrappedContext());
-        boolean findsByCss = (driver instanceof FindsByCssSelector);
-        boolean findsByXPath = (driver instanceof FindsByXPath);
+        
+        findsByLinkText = (driver instanceof FindsByLinkText);
+        findsById = (driver instanceof FindsById);
+        findsByName = (driver instanceof FindsByName);
+        findsByTagName = (driver instanceof FindsByTagName);
+        findsByClassName = (driver instanceof FindsByClassName);
+        findsByCssSelector = (driver instanceof FindsByCssSelector);
+        findsByXPath = (driver instanceof FindsByXPath);
+        locatable = (driver instanceof Locatable);
+        hasIdentity = (driver instanceof HasIdentity);
+        takesScreenshot = (driver instanceof TakesScreenshot);
         
         if ((this.index == OPTIONAL) || (this.index > 0)) {
             if (findsByXPath && ( ! (this.locator instanceof By.ByCssSelector))) {
@@ -131,7 +162,7 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
                 strategy = Strategy.JS_XPATH;
                 
                 this.locator = By.xpath(this.selector);
-            } else if (findsByCss) {
+            } else if (findsByCssSelector) {
                 selector = ByType.cssLocatorFor(this.locator);
                 if (selector != null) {
                     strategy = Strategy.JS_CSS;
@@ -150,8 +181,14 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <X> X getScreenshotAs(final OutputType<X> arg0) {
+        if (!takesScreenshot) {
+            throw new UnsupportedOperationException();
+        }
         try {
             return getWrappedElement().getScreenshotAs(arg0);
         } catch (StaleElementReferenceException e) {
@@ -161,6 +198,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         try {
@@ -172,6 +212,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void click() {
         try {
@@ -183,16 +226,25 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WebElement findElement(final By by) {
         return getElement(this, by);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<WebElement> findElements(final By by) {
         return getElements(this, by);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getAttribute(String name) {
         try {
@@ -204,6 +256,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCssValue(String propertyName) {
         try {
@@ -215,6 +270,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Point getLocation() {
         try {
@@ -226,6 +284,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Rectangle getRect() {
         try {
@@ -237,6 +298,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Dimension getSize() {
         try {
@@ -248,6 +312,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getTagName() {
         try {
@@ -259,6 +326,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getText() {
         try {
@@ -270,6 +340,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isDisplayed() {
         try {
@@ -281,6 +354,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEnabled() {
         try {
@@ -292,6 +368,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isSelected() {
         try {
@@ -303,6 +382,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendKeys(CharSequence... keysToSend) {
         try {
@@ -314,6 +396,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void submit() {
         try {
@@ -325,6 +410,9 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WebElement getWrappedElement() {
         if (wrapped == null) {
@@ -488,25 +576,37 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         return element;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchContext getWrappedContext() {
         return getWrappedElement();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchContext refreshContext(Long expiration) {
         // refresh wrapped element reference if it's past the expiration
         return (expiration.compareTo(acquiredAt()) >= 0) ? refreshReference(null) : this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long acquiredAt() {
         return acquiredAt;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WebDriver getWrappedDriver() {
-        return WebDriverUtils.getDriver(getWrappedElement());
+        return driver;
     }
     
     /**
@@ -579,21 +679,30 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         throw new OptionalElementNotAcquiredException(deferredException);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchContext switchTo() {
         return context.switchTo();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + context.hashCode();
-        result = PRIME * result + locator.hashCode();
-        result = PRIME * result + index;
+        result = prime * result + context.hashCode();
+        result = prime * result + locator.hashCode();
+        result = prime * result + index;
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -610,5 +719,252 @@ public class RobustWebElement implements WebElement, WrapsElement, WrapsContext 
         if (index != other.index)
             return false;
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getId() {
+        if (!hasIdentity) {
+            throw new UnsupportedOperationException();
+        }
+        try {
+            return ((HasIdentity) getWrappedElement()).getId();
+        } catch (StaleElementReferenceException e) {
+            return ((HasIdentity) refreshReference(e)).getId();
+        } catch (NullPointerException e) {
+            throw deferredException();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementByXPath(String xpath) {
+        if (!findsByXPath) {
+            throw new UnsupportedOperationException();
+        }
+        return findElement(By.xpath(xpath));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsByXPath(String xpath) {
+        if (!findsByXPath) {
+            throw new UnsupportedOperationException();
+        }
+        return findElements(By.xpath(xpath));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementByTagName(String name) {
+        By loc = By.tagName(name);
+        if (!findsByTagName) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElement(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsByTagName(String name) {
+        By loc = By.tagName(name);
+        if (!findsByTagName) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElements(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementByName(String name) {
+        By loc = By.name(name);
+        if (!findsByName) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElement(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsByName(String name) {
+        By loc = By.name(name);
+        if (!findsByName) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElements(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementByLinkText(String linkText) {
+        By loc = By.linkText(linkText);
+        if (!findsByLinkText) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElement(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementByPartialLinkText(String linkText) {
+        By loc = By.partialLinkText(linkText);
+        if (!findsByLinkText) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElement(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsByLinkText(String linkText) {
+        By loc = By.linkText(linkText);
+        if (!findsByLinkText) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElements(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsByPartialLinkText(String linkText) {
+        By loc = By.partialLinkText(linkText);
+        if (!findsByLinkText) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElements(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementById(String id) {
+        By loc = By.id(id);
+        if (!findsById) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElement(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsById(String id) {
+        By loc = By.id(id);
+        if (!findsById) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElements(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementByCssSelector(String sel) {
+        By loc = By.cssSelector(sel);
+        if (!findsByCssSelector) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElement(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsByCssSelector(String sel) {
+        By loc = By.cssSelector(sel);
+        if (!findsByCssSelector) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElements(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElementByClassName(String className) {
+        By loc = By.className(className);
+        if (!findsByClassName) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElement(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElementsByClassName(String className) {
+        By loc = By.className(className);
+        if (!findsByClassName) {
+            loc = getSupportedLocator(loc);
+        }
+        return findElements(loc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Coordinates getCoordinates() {
+        if (!locatable) {
+            throw new UnsupportedOperationException();
+        }
+        try {
+            return ((Locatable) getWrappedElement()).getCoordinates();
+        } catch (StaleElementReferenceException e) {
+            return ((Locatable) refreshReference(e)).getCoordinates();
+        } catch (NullPointerException e) {
+            throw deferredException();
+        }
+    }
+    
+    /**
+     * Transform the specified locator to a type that's supported by the current driver.
+     * 
+     * @param loc unsupported locator
+     * @return transformed locator of supported type
+     * @throws UnsupportedOperationException if specified locator cannot be transformed
+     */
+    private By getSupportedLocator(By loc) {
+        if (findsByCssSelector) {
+            String sel = ByType.cssLocatorFor(loc);
+            if (sel != null) {
+                return By.cssSelector(sel);
+            }
+        }
+        if (findsByXPath) {
+            String xpath = ByType.xpathLocatorFor(loc);
+            if (xpath != null) {
+                return By.xpath(xpath);
+            }
+        }
+        throw new UnsupportedOperationException();
     }
 }
