@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -36,9 +34,7 @@ import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.FieldValue;
 import net.bytebuddy.implementation.bind.annotation.Origin;
-import net.bytebuddy.implementation.bind.annotation.Pipe;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
 import static net.bytebuddy.matcher.ElementMatchers.*;
@@ -142,6 +138,10 @@ public class RobustElementFactory {
         Object makeInstance();
     }
     
+    public static class EqualsAndHashCode {
+        
+    }
+    
     public static class ElementMethodInterceptor implements ReferenceFetcher {
         
         /**
@@ -170,12 +170,6 @@ public class RobustElementFactory {
                 }
                 throw UncheckedThrow.throwUnchecked(t);
             }
-        }
-        
-        @RuntimeType
-        public static Object intercept(@Pipe Function<Object, Object> pipe,
-                        @FieldValue("referenceFetcher") Object delegate) throws Exception {
-            return pipe.apply(delegate);
         }
         
         private static final String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
@@ -546,40 +540,40 @@ public class RobustElementFactory {
             return context.switchTo();
         }
         
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + context.hashCode();
-            result = prime * result + locator.hashCode();
-            result = prime * result + index;
-            return result;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            ElementMethodInterceptor other = (ElementMethodInterceptor) obj;
-            if (!context.equals(other.context))
-                return false;
-            if (!locator.equals(other.locator))
-                return false;
-            if (index != other.index)
-                return false;
-            return true;
-        }
-
+//        /**
+//         * {@inheritDoc}
+//         */
+//        @Override
+//        public int hashCode() {
+//            final int prime = 31;
+//            int result = 1;
+//            result = prime * result + context.hashCode();
+//            result = prime * result + locator.hashCode();
+//            result = prime * result + index;
+//            return result;
+//        }
+//
+//        /**
+//         * {@inheritDoc}
+//         */
+//        @Override
+//        public boolean equals(Object obj) {
+//            if (this == obj)
+//                return true;
+//            if (obj == null)
+//                return false;
+//            if (getClass() != obj.getClass())
+//                return false;
+//            ElementMethodInterceptor other = (ElementMethodInterceptor) obj;
+//            if (!context.equals(other.context))
+//                return false;
+//            if (!locator.equals(other.locator))
+//                return false;
+//            if (index != other.index)
+//                return false;
+//            return true;
+//        }
+//
         @Override
         public WebElement findElement(By locator) {
             return ElementMethodInterceptor.getElement(this, locator);
