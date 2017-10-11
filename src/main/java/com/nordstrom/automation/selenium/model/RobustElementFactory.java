@@ -402,9 +402,9 @@ public class RobustElementFactory {
                 }
             } else {
                 List<Object> args = new ArrayList<>();
-                List<ElementMethodInterceptor> contextArg = new ArrayList<>();
-                if (context instanceof ElementMethodInterceptor) {
-                    contextArg.add((ElementMethodInterceptor) context);
+                List<WebElement> contextArg = new ArrayList<>();
+                if (context instanceof WebElement) {
+                    contextArg.add((WebElement) context);
                 }
                 
                 String js;
