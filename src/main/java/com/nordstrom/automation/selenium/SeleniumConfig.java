@@ -408,6 +408,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      */
     private static String getLocalHost() {
         try (final DatagramSocket socket = new DatagramSocket()) {
+            // use Google Public DNS to discover preferred local IP
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             return socket.getLocalAddress().getHostAddress();
         } catch (SocketException | UnknownHostException eaten) {

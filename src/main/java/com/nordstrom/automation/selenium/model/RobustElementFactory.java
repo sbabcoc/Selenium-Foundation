@@ -210,7 +210,7 @@ public class RobustElementFactory {
         private String selector;
         private Strategy strategy = Strategy.LOCATOR;
         
-        private Long acquiredAt;
+        private Long acquiredAt = Long.valueOf(0);
         
         private NoSuchElementException deferredException;
         
@@ -277,7 +277,7 @@ public class RobustElementFactory {
                 } else {
                     refreshReference(null);
                 }
-            } else if (acquiredAt == null) {
+            } else if (acquiredAt.compareTo(Long.valueOf(0)) == 0) {
                 acquiredAt = Long.valueOf(System.currentTimeMillis());
             }
         }
@@ -440,7 +440,7 @@ public class RobustElementFactory {
             }
             
             if (wrapper.wrapped != null) {
-                wrapper.acquiredAt = System.currentTimeMillis();
+                wrapper.acquiredAt = Long.valueOf(System.currentTimeMillis());
                 wrapper.deferredException = null;
             }
             
