@@ -207,7 +207,7 @@ public class Page extends ComponentContainer {
 
     @Override
     public long acquiredAt() {
-        return Long.valueOf(System.currentTimeMillis());
+        return System.currentTimeMillis();
     }
 
     @Override
