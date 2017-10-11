@@ -580,11 +580,17 @@ public class RobustElementFactory {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public WebElement findElement(By locator) {
             return RobustElementWrapper.getElement(this, locator);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public List<WebElement> findElements(By locator) {
             return RobustElementWrapper.getElements(this, locator);
