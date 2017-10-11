@@ -8,7 +8,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
-import com.nordstrom.automation.selenium.model.RobustElementFactory.ElementMethodInterceptor;
+import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 import com.nordstrom.automation.selenium.support.Coordinator;
 
 /**
@@ -53,7 +53,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @param parent component parent container
      */
     public PageComponent(By locator, int index, ComponentContainer parent) {
-        this((RobustWebElement) ElementMethodInterceptor.getElement(parent, locator, index), parent);
+        this((RobustWebElement) RobustElementWrapper.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
         arguments = new Object[] {locator, index, parent};

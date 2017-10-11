@@ -33,9 +33,12 @@ import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.bind.MethodNameEqualityResolver;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.BindingPriority;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.implementation.bind.annotation.TargetMethodAnnotationDrivenBinder;
 import net.bytebuddy.implementation.bind.annotation.This;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
@@ -53,42 +56,51 @@ public class RobustElementFactory {
     }
     
     /**
-     * Basic robust web element constructor
+     * Basic robust web element builder.
      * 
      * @param context element search context
      * @param locator element locator
+     * @return robust web element
      */
     public static WebElement makeRobustElement(WrapsContext context, By locator) {
         return makeRobustElement(null, context, locator, CARDINAL);
     }
     
     /**
-     * Constructor for wrapping an existing element reference 
+     * Builder for wrapping an existing element reference.
      * 
      * @param element element reference to be wrapped
      * @param context element search context
      * @param locator element locator
+     * @return robust web element
      */
     public static WebElement makeRobustElement(WebElement element, WrapsContext context, By locator) {
         return makeRobustElement(element, context, locator, CARDINAL);
     }
     
     /**
-     * Main robust web element constructor
+     * Main robust web element builder.
      * 
      * @param element element reference to be wrapped (may be 'null')
      * @param context element search context
      * @param locator element locator
      * @param index element index
+     * @return robust web element
      */
     public static WebElement makeRobustElement(WebElement element, WrapsContext context, By locator, int index) {
         InstanceCreator creator = getCreator(context);
-        ElementMethodInterceptor interceptor = new ElementMethodInterceptor(element, context, locator, index);
+        RobustElementWrapper interceptor = new RobustElementWrapper(element, context, locator, index);
         WebElement robust = (WebElement) creator.makeInstance();
         ((InterceptionAccessor) robust).setInterceptor(interceptor);
         return robust;
     }
     
+    /**
+     * Get robust web element factory for this context.
+     * 
+     * @param context target context
+     * @return robust web element factory
+     */
     private static synchronized InstanceCreator getCreator(WrapsContext context) {
         WebDriver driver = context.getWrappedDriver();
         String driverName = driver.getClass().getName();
@@ -103,9 +115,13 @@ public class RobustElementFactory {
                         .subclass(refClass)
                         .name(refClass.getPackage().getName() + ".Robust" + refClass.getSimpleName())
                         .method(not(isDeclaredBy(Object.class)))
-                        .intercept(MethodDelegation.toField("interceptor"))
+                        .intercept(MethodDelegation.withEmptyConfiguration()
+                                        .withBinders(TargetMethodAnnotationDrivenBinder.ParameterBinder.DEFAULTS)
+                                        .withResolvers(MethodNameEqualityResolver.INSTANCE, BindingPriority.Resolver.INSTANCE)
+                                        .filter(not(isDeclaredBy(Object.class)))
+                                        .toField("interceptor"))
                         .implement(RobustWebElement.class)
-                        .defineField("interceptor", ElementMethodInterceptor.class, Visibility.PRIVATE)
+                        .defineField("interceptor", RobustElementWrapper.class, Visibility.PRIVATE)
                         .implement(InterceptionAccessor.class).intercept(FieldAccessor.ofBeanProperty())
                         .make()
                         .load(refClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
@@ -129,20 +145,27 @@ public class RobustElementFactory {
         return creator;
     }
     
+    /**
+     * This interface defines accessor and mutator methods for element method interceptor.
+     */
     public interface InterceptionAccessor {
-        ElementMethodInterceptor getInterceptor();
-        void setInterceptor(ElementMethodInterceptor interceptor);
+        RobustElementWrapper getInterceptor();
+        void setInterceptor(RobustElementWrapper interceptor);
     }
     
+    /**
+     * This interface defines the robust web element factory builder method.
+     */
     public interface InstanceCreator {
         Object makeInstance();
     }
     
-    public static class EqualsAndHashCode {
-        
-    }
-    
-    public static class ElementMethodInterceptor implements ReferenceFetcher {
+    /**
+     * This class defines the generic interceptor for the methods of wrapped web element references. It also provides
+     * implementations for methods that acquire web element references and recover from StaleElementReferenceException
+     * failures.  
+     */
+    public static class RobustElementWrapper implements ReferenceFetcher {
         
         /**
          * This is the method that intercepts component container methods in "enhanced" model objects.
@@ -154,6 +177,7 @@ public class RobustElementFactory {
          * @throws Exception {@code anything} (exception thrown by the intercepted method)
          */
         @RuntimeType
+        @BindingPriority(Integer.MAX_VALUE)
         public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args) throws Exception
         {
             try {
@@ -201,11 +225,11 @@ public class RobustElementFactory {
          * @param locator element locator
          * @param index element index
          */
-        public ElementMethodInterceptor(WebElement element, WrapsContext context, By locator, int index) {
+        public RobustElementWrapper(WebElement element, WrapsContext context, By locator, int index) {
             
             // if specified element is already robust
-            if (element instanceof ElementMethodInterceptor) {
-                ElementMethodInterceptor robust = (ElementMethodInterceptor) element;
+            if (element instanceof RobustElementWrapper) {
+                RobustElementWrapper robust = (RobustElementWrapper) element;
                 this.acquiredAt = robust.acquiredAt;
                 
                 this.wrapped = robust.wrapped;
@@ -270,9 +294,14 @@ public class RobustElementFactory {
         }
         
         /**
-         * Determine if this robust element wraps a valid reference.
-         * 
-         * @return 'true' if reference was acquired; otherwise 'false'
+         * {@inheritDoc}
+         */
+        public WebElement findOptional(By by) {
+            return getElement(this, by, OPTIONAL);
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public boolean hasReference() {
@@ -285,9 +314,7 @@ public class RobustElementFactory {
         }
         
         /**
-         * Get the search context for this element.
-         * 
-         * @return element search context
+         * {@inheritDoc}
          */
         @Override
         public WrapsContext getContext() {
@@ -295,9 +322,7 @@ public class RobustElementFactory {
         }
         
         /**
-         * Get the locator for this element.
-         * 
-         * @return element locator
+         * {@inheritDoc}
          */
         @Override
         public By getLocator() {
@@ -305,11 +330,7 @@ public class RobustElementFactory {
         }
         
         /**
-         * Get the element index.
-         * <p>
-         * <b>NOTE</b>: {@link #CARDINAL} = 1st matched reference; {@link #OPTIONAL} = an optional reference
-         * 
-         * @return element index (see NOTE)
+         * {@inheritDoc}
          */
         @Override
         public int getIndex() {
@@ -317,13 +338,10 @@ public class RobustElementFactory {
         }
         
         /**
-         * Refresh the wrapped element reference.
-         * 
-         * @param refreshTrigger {@link StaleElementReferenceException} that necessitates reference refresh
-         * @return this robust web element with refreshed reference
+         * {@inheritDoc}
          */
         @Override
-        public ElementMethodInterceptor refreshReference(final StaleElementReferenceException refreshTrigger) {
+        public RobustElementWrapper refreshReference(final StaleElementReferenceException refreshTrigger) {
             try {
                 WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
                 return this;
@@ -342,19 +360,19 @@ public class RobustElementFactory {
         /**
          * Returns a 'wait' proxy that refreshes the wrapped reference of the specified robust element.
          * 
-         * @param element robust web element object
+         * @param wrapper robust element wrapper
          * @return wrapped element reference (refreshed)
          */
-        private static Coordinator<ElementMethodInterceptor> referenceIsRefreshed(final ElementMethodInterceptor element) {
-            return new Coordinator<ElementMethodInterceptor>() {
+        private static Coordinator<RobustElementWrapper> referenceIsRefreshed(final RobustElementWrapper wrapper) {
+            return new Coordinator<RobustElementWrapper>() {
 
                 @Override
-                public ElementMethodInterceptor apply(SearchContext context) {
+                public RobustElementWrapper apply(SearchContext context) {
                     try {
-                        return acquireReference(element);
+                        return acquireReference(wrapper);
                     } catch (StaleElementReferenceException e) {
                         ((WrapsContext) context).refreshContext(((WrapsContext) context).acquiredAt());
-                        return acquireReference(element);
+                        return acquireReference(wrapper);
                     }
                 }
 
@@ -367,36 +385,36 @@ public class RobustElementFactory {
         }
         
         /**
-         * Acquire the element reference that's wrapped by the specified robust element.
+         * Acquire the element reference that's wrapped by the specified robust element wrapper.
          * 
-         * @param element robust web element object
+         * @param wrapper robust element wrapper
          * @return wrapped element reference
          */
-        private static ElementMethodInterceptor acquireReference(ElementMethodInterceptor element) {
-            SearchContext context = element.context.getWrappedContext();
+        private static RobustElementWrapper acquireReference(RobustElementWrapper wrapper) {
+            SearchContext context = wrapper.context.getWrappedContext();
             
-            if (element.strategy == Strategy.LOCATOR) {
-                Timeouts timeouts = element.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+            if (wrapper.strategy == Strategy.LOCATOR) {
+                Timeouts timeouts = wrapper.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
                 try {
-                    if (element.index > 0) {
-                        List<WebElement> elements = context.findElements(element.locator);
-                        if (element.index < elements.size()) {
-                            element.wrapped = elements.get(element.index);
+                    if (wrapper.index > 0) {
+                        List<WebElement> elements = context.findElements(wrapper.locator);
+                        if (wrapper.index < elements.size()) {
+                            wrapper.wrapped = elements.get(wrapper.index);
                         } else {
                             throw new NoSuchElementException(
                                     String.format("Too few elements located %s: need: %d; have: %d", 
-                                            element.locator, element.index + 1, elements.size()));
+                                            wrapper.locator, wrapper.index + 1, elements.size()));
                         }
                     } else {
-                        element.wrapped = context.findElement(element.locator);
+                        wrapper.wrapped = context.findElement(wrapper.locator);
                     }
                 } catch (NoSuchElementException e) {
-                    if (element.index != OPTIONAL) {
+                    if (wrapper.index != OPTIONAL) {
                         throw e;
                     }
                     
-                    element.deferredException = e;
-                    element.wrapped = null;
+                    wrapper.deferredException = e;
+                    wrapper.wrapped = null;
                 } finally {
                     timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
                 }
@@ -409,24 +427,24 @@ public class RobustElementFactory {
                 
                 String js;
                 args.add(contextArg);
-                args.add(element.selector);
+                args.add(wrapper.selector);
                 
-                if (element.strategy == Strategy.JS_XPATH) {
+                if (wrapper.strategy == Strategy.JS_XPATH) {
                     js = LOCATE_BY_XPATH;
                 } else {
                     js = LOCATE_BY_CSS;
-                    args.add(element.index);
+                    args.add(wrapper.index);
                 }
                 
-                element.wrapped = JsUtility.runAndReturn(element.driver, js, args.toArray());
+                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, js, args.toArray());
             }
             
-            if (element.wrapped != null) {
-                element.acquiredAt = System.currentTimeMillis();
-                element.deferredException = null;
+            if (wrapper.wrapped != null) {
+                wrapper.acquiredAt = System.currentTimeMillis();
+                wrapper.deferredException = null;
             }
             
-            return element;
+            return wrapper;
         }
         
         /**
@@ -462,18 +480,6 @@ public class RobustElementFactory {
             return driver;
         }
         
-        /**
-         * Get a wrapped reference to the first element matching the specified locator.
-         * <p>
-         * <b>NOTE</b>: Use {@link ElementMethodInterceptor#hasReference()} to determine if a valid reference was acquired.
-         * 
-         * @param by the locating mechanism
-         * @return robust web element
-         */
-        public WebElement findOptional(By by) {
-            return getElement(this, by, OPTIONAL);
-        }
-
         /**
          * Get the list of elements that match the specified locator in the indicated context.
          * 
@@ -540,48 +546,48 @@ public class RobustElementFactory {
             return context.switchTo();
         }
         
-//        /**
-//         * {@inheritDoc}
-//         */
-//        @Override
-//        public int hashCode() {
-//            final int prime = 31;
-//            int result = 1;
-//            result = prime * result + context.hashCode();
-//            result = prime * result + locator.hashCode();
-//            result = prime * result + index;
-//            return result;
-//        }
-//
-//        /**
-//         * {@inheritDoc}
-//         */
-//        @Override
-//        public boolean equals(Object obj) {
-//            if (this == obj)
-//                return true;
-//            if (obj == null)
-//                return false;
-//            if (getClass() != obj.getClass())
-//                return false;
-//            ElementMethodInterceptor other = (ElementMethodInterceptor) obj;
-//            if (!context.equals(other.context))
-//                return false;
-//            if (!locator.equals(other.locator))
-//                return false;
-//            if (index != other.index)
-//                return false;
-//            return true;
-//        }
-//
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + context.hashCode();
+            result = prime * result + locator.hashCode();
+            result = prime * result + index;
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if ( ! (obj instanceof RobustWebElement))
+                return false;
+            RobustWebElement other = (RobustWebElement) obj;
+            if (!context.equals(other.getContext()))
+                return false;
+            if (!locator.equals(other.getLocator()))
+                return false;
+            if (index != other.getIndex())
+                return false;
+            return true;
+        }
+
         @Override
         public WebElement findElement(By locator) {
-            return ElementMethodInterceptor.getElement(this, locator);
+            return RobustElementWrapper.getElement(this, locator);
         }
 
         @Override
         public List<WebElement> findElements(By locator) {
-            return ElementMethodInterceptor.getElements(this, locator);
+            return RobustElementWrapper.getElements(this, locator);
         }
     }
 }

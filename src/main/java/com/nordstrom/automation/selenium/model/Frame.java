@@ -6,7 +6,7 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriverException;
 
 import com.google.common.base.Throwables;
-import com.nordstrom.automation.selenium.model.RobustElementFactory.ElementMethodInterceptor;
+import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 
 /**
  * Extend this class when modeling a browser frame element.
@@ -64,7 +64,7 @@ public class Frame extends Page {
      * @param parent frame parent
      */
     public Frame(By locator, int index, ComponentContainer parent) {
-        this((RobustWebElement) ElementMethodInterceptor.getElement(parent, locator, index), parent);
+        this((RobustWebElement) RobustElementWrapper.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
         arguments = new Object[] {locator, index, parent};

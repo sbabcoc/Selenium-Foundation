@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
-import com.nordstrom.automation.selenium.model.RobustElementFactory.ElementMethodInterceptor;
+import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 
 public interface ReferenceFetcher extends SearchContext, WrapsElement, WrapsContext, Enhanced {
     
@@ -45,7 +45,8 @@ public interface ReferenceFetcher extends SearchContext, WrapsElement, WrapsCont
     /**
      * Get the element index.
      * <p>
-     * <b>NOTE</b>: {@link #CARDINAL} = 1st matched reference; {@link #OPTIONAL} = an optional reference
+     * <b>NOTE</b>: {@link RobustElementFactory#CARDINAL CARDINAL} = 1st matched reference;
+     *              {@link RobustElementFactory#OPTIONAL OPTIONAL} = an optional reference
      * 
      * @return element index (see NOTE)
      */
@@ -55,7 +56,7 @@ public interface ReferenceFetcher extends SearchContext, WrapsElement, WrapsCont
      * Refresh the wrapped element reference.
      * 
      * @param refreshTrigger {@link StaleElementReferenceException} that necessitates reference refresh
-     * @return this robust web element with refreshed reference
+     * @return this robust element wrapper with refreshed reference
      */
-    ElementMethodInterceptor refreshReference(final StaleElementReferenceException refreshTrigger);
+    RobustElementWrapper refreshReference(final StaleElementReferenceException refreshTrigger);
 }
