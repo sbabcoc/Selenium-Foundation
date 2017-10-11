@@ -146,8 +146,8 @@ public class DriverManager {
      * </ul>
      */
     public static void onFinish() {
-        GridUtility.stopGridNode();
-        GridUtility.stopGridHub();
+        GridUtility.stopGridNode(true);
+        GridUtility.stopGridHub(true);
     }
     
     /**

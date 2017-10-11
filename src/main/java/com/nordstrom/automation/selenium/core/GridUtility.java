@@ -26,12 +26,12 @@ import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.exceptions.InvalidGridHostException;
 import com.nordstrom.automation.selenium.exceptions.UnknownGridHostException;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
@@ -41,6 +41,10 @@ public final class GridUtility {
     private static final String GRID_ENDPOINT = "/wd/hub/";
     private static final String HUB_STATUS = "/grid/api/hub/";
     private static final String NODE_STATUS = "/wd/hub/status/";
+    
+    private static final long SHUTDOWN_DELAY = 15;
+    private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
+    private static final String NODE_SHUTDOWN = "/selenium-server/driver/?cmd=shutDownSeleniumServer";
     
     private static Process hubProcess;
     private static Process nodeProcess;
@@ -199,19 +203,101 @@ public final class GridUtility {
     }
     
     /**
-     * If a Selenium Grid hub server process exists, destroy it.
+     * Stop the configured Selenium Grid node server.
+     * 
+     * @param localOnly 'true' to target only local Grid node server
+     * @return 'false' if [localOnly] and node is remote; otherwise 'true'
      */
-    public static void stopGridHub() {
-        //setHubProcess(null);
+    public static boolean stopGridNode(boolean localOnly) {
+        if (localOnly) {
+            if (setNodeProcess(null)) {
+                return true;
+            }
+            
+            if (!isLocalNode()) {
+                return false;
+            }
+        }
+        
+        RegistrationRequest nodeConfig = SeleniumConfig.getConfig().getNodeConfig();
+        if (isNodeActive(nodeConfig)) {
+            HttpHost nodeHost = GridUtility.getNodeHost(nodeConfig);
+            try {
+                GridUtility.getHttpResponse(nodeHost, NODE_SHUTDOWN);
+                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, URI.create(nodeHost.toURI()).toURL());
+            } catch (IOException | TimeoutException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
+        }
+        
+        return true;
     }
-
+    
     /**
-     * If a Selenium Grid node server process exists, destroy it.
+     * Stop the configured Selenium Grid hub server.
+     * 
+     * @param localOnly 'true' to target only local Grid hub server
+     * @return 'false' if [localOnly] and hub is remote; otherwise 'true'
      */
-    public static void stopGridNode() {
-        //setNodeProcess(null);
+    public static boolean stopGridHub(boolean localOnly) {
+        if (localOnly) {
+            if (setHubProcess(null)) {
+                return true;
+            }
+            
+            if (!isLocalHub()) {
+                return false;
+            }
+        }
+        
+        GridHubConfiguration hubConfig = SeleniumConfig.getConfig().getHubConfig();
+        if (isHubActive(hubConfig)) {
+            HttpHost hubHost = GridUtility.getHubHost(hubConfig);
+            try {
+                GridUtility.getHttpResponse(hubHost, HUB_SHUTDOWN);
+                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, URI.create(hubHost.toURI()).toURL());
+            } catch (IOException | TimeoutException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
+        }
+        
+        return true;
     }
-
+    
+    /**
+     * Determine if the configured Selenium Grid node server is the local host.
+     * 
+     * @return 'true' if Grid node is local host; otherwise 'false'
+     */
+    public static boolean isLocalNode() {
+        RegistrationRequest nodeConfig = SeleniumConfig.getConfig().getNodeConfig();
+        HttpHost nodeHost = GridUtility.getNodeHost(nodeConfig);
+        try {
+            InetAddress nodeAddr = InetAddress.getByName(nodeHost.getHostName());
+            return (GridUtility.isThisMyIpAddress(nodeAddr));
+        } catch (UnknownHostException e) {
+            LOGGER.warn("Unable to get IP address for '{}'", nodeHost.getHostName(), e);
+            return false;
+        }
+    }
+    
+    /**
+     * Determine if the configured Selenium Grid hub server is the local host.
+     * 
+     * @return 'true' if Grid hub is local host; otherwise 'false'
+     */
+    public static boolean isLocalHub() {
+        GridHubConfiguration hubConfig = SeleniumConfig.getConfig().getHubConfig();
+        HttpHost hubHost = GridUtility.getHubHost(hubConfig);
+        try {
+            InetAddress hubAddr = InetAddress.getByName(hubHost.getHostName());
+            return (GridUtility.isThisMyIpAddress(hubAddr));
+        } catch (UnknownHostException e) {
+            LOGGER.warn("Unable to get IP address for '{}'", hubHost.getHostName(), e);
+            return false;
+        }
+    }
+    
     /**
      * Determine if the specified address is local to the machine we're running on.
      * 
@@ -293,45 +379,37 @@ public final class GridUtility {
      * Set a new Selenium Grid hub process, or stop an existing one.
      * 
      * @param process Selenium Grid server process; 'null' to stop process
+     * @return 'true' if existing hub process was stopped; otherwise 'false'
      */
-    private static synchronized void setHubProcess(Process process) {
-        if (hubProcess == null) {
-            if (process != null) {
-                LOGGER.debug("Setting new Grid hub process {}", process);
-                hubProcess = process;
-            }
-        } else {
-            if (process == null) {
-                LOGGER.debug("Destroying current Grid hub process {}", hubProcess);
-                hubProcess.destroy();
-                hubProcess = null;
-            } else {
-                LOGGER.debug("Destroying redundant Grid hub process {}", process);
-                process.destroy();
-            }
+    private static synchronized boolean setHubProcess(Process process) {
+        boolean hasHubProcess = (hubProcess != null);
+        if (hasHubProcess) {
+            LOGGER.debug("Destroying current Grid hub process {}", hubProcess);
+            hubProcess.destroy();
         }
+        if (process != null) {
+            LOGGER.debug("Setting new Grid hub process {}", process);
+        }
+        hubProcess = process;
+        return hasHubProcess;
     }
     
     /**
      * Set a new Selenium Grid node process, or stop an existing one.
      * 
      * @param process Selenium Grid server process; 'null' to stop process
+     * @return 'true' if existing node process was stopped; otherwise 'false'
      */
-    private static synchronized void setNodeProcess(Process process) {
-        if (nodeProcess == null) {
-            if (process != null) {
-                LOGGER.debug("Setting new Grid node process {}", process);
-                nodeProcess = process;
-            }
-        } else {
-            if (process == null) {
-                LOGGER.debug("Destroying current Grid node process {}", nodeProcess);
-                nodeProcess.destroy();
-                nodeProcess = null;
-            } else {
-                LOGGER.debug("Destroying redundant Grid node process {}", process);
-                process.destroy();
-            }
+    private static synchronized boolean setNodeProcess(Process process) {
+        boolean hasNodeProcess = (nodeProcess != null);
+        if (hasNodeProcess) {
+            LOGGER.debug("Destroying current Grid node process {}", nodeProcess);
+            nodeProcess.destroy();
         }
+        if (process != null) {
+            LOGGER.debug("Setting new Grid node process {}", process);
+        }
+        nodeProcess = process;
+        return hasNodeProcess;
     }
 }
