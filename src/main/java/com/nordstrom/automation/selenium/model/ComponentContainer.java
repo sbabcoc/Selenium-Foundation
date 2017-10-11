@@ -318,7 +318,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return robust web element
      */
     public RobustWebElement findOptional(By by) {
-        return (RobustWebElement) RobustElementWrapper.getElement(this, by, RobustElementFactory.OPTIONAL);
+        return (RobustWebElement) RobustElementWrapper.getElement(this, by, RobustElementWrapper.OPTIONAL);
     }
     
     /**

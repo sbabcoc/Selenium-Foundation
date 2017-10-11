@@ -45,8 +45,8 @@ public interface ReferenceFetcher extends SearchContext, WrapsElement, WrapsCont
     /**
      * Get the element index.
      * <p>
-     * <b>NOTE</b>: {@link RobustElementFactory#CARDINAL CARDINAL} = 1st matched reference;
-     *              {@link RobustElementFactory#OPTIONAL OPTIONAL} = an optional reference
+     * <b>NOTE</b>: {@link RobustElementWrapper#CARDINAL CARDINAL} = 1st matched reference;
+     *              {@link RobustElementWrapper#OPTIONAL OPTIONAL} = an optional reference
      * 
      * @return element index (see NOTE)
      */

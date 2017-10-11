@@ -44,11 +44,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class RobustElementFactory {
     
-    /** wraps 1st matched reference */
-    public static final int CARDINAL = -1;
-    /** wraps an optional reference */
-    public static final int OPTIONAL = -2;
-    
     private static Map<String, InstanceCreator> creatorMap = new HashMap<>();
     
     private RobustElementFactory() {
@@ -63,7 +58,7 @@ public class RobustElementFactory {
      * @return robust web element
      */
     public static WebElement makeRobustElement(WrapsContext context, By locator) {
-        return makeRobustElement(null, context, locator, CARDINAL);
+        return makeRobustElement(null, context, locator, RobustElementWrapper.CARDINAL);
     }
     
     /**
@@ -75,7 +70,7 @@ public class RobustElementFactory {
      * @return robust web element
      */
     public static WebElement makeRobustElement(WebElement element, WrapsContext context, By locator) {
-        return makeRobustElement(element, context, locator, CARDINAL);
+        return makeRobustElement(element, context, locator, RobustElementWrapper.CARDINAL);
     }
     
     /**
@@ -195,6 +190,11 @@ public class RobustElementFactory {
                 throw UncheckedThrow.throwUnchecked(t);
             }
         }
+        
+        /** wraps 1st matched reference */
+        public static final int CARDINAL = -1;
+        /** wraps an optional reference */
+        public static final int OPTIONAL = -2;
         
         private static final String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
         private static final String LOCATE_BY_XPATH = JsUtility.getScriptResource("locateByXpath.js");
