@@ -58,5 +58,5 @@ public interface ReferenceFetcher extends SearchContext, WrapsElement, WrapsCont
      * @param refreshTrigger {@link StaleElementReferenceException} that necessitates reference refresh
      * @return this robust element wrapper with refreshed reference
      */
-    RobustElementWrapper refreshReference(final StaleElementReferenceException refreshTrigger);
+    RobustElementWrapper refreshReference(StaleElementReferenceException refreshTrigger);
 }
