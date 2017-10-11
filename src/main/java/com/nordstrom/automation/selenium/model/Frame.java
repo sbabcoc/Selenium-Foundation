@@ -190,12 +190,12 @@ public class Frame extends Page {
     
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = super.hashCode();
-        result = PRIME * result + frameSelect.hashCode();
-        result = PRIME * result + ((element == null) ? 0 : element.hashCode());
-        result = PRIME * result + index;
-        result = PRIME * result + ((nameOrId == null) ? 0 : nameOrId.hashCode());
+        result = prime * result + frameSelect.hashCode();
+        result = prime * result + ((element == null) ? 0 : element.hashCode());
+        result = prime * result + index;
+        result = prime * result + ((nameOrId == null) ? 0 : nameOrId.hashCode());
         return result;
     }
 

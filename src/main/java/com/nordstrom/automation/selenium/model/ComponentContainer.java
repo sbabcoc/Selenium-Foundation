@@ -892,12 +892,12 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + context.hashCode();
-        result = PRIME * result + ((parent == null) ? 0 : parent.hashCode());
-        result = PRIME * result + ((bypassClasses == null) ? 0 : bypassClasses.hashCode());
-        result = PRIME * result + ((bypassMethods == null) ? 0 : bypassMethods.hashCode());
+        result = prime * result + context.hashCode();
+        result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+        result = prime * result + ((bypassClasses == null) ? 0 : bypassClasses.hashCode());
+        result = prime * result + ((bypassMethods == null) ? 0 : bypassMethods.hashCode());
         return result;
     }
 
