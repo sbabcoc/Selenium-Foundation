@@ -122,8 +122,8 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * 
      * @return 'true' if component is visible; otherwise 'false'
      */
-    public WebElement getViewport() {
-        return (WebElement) context;
+    public RobustWebElement getViewport() {
+        return (RobustWebElement) context;
     }
     
     /**
@@ -132,9 +132,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @return 'true' if component is visible; otherwise 'false'
      */
     public boolean isDisplayed() {
-        RobustWebElement element = (RobustWebElement) getViewport();
+        RobustWebElement element = getViewport();
         if (element.hasReference()) {
-            return ((WebElement) element).isDisplayed();
+            return element.isDisplayed();
         }
         return false;
     }
@@ -145,7 +145,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @return 'true' if component is absent or hidden; otherwise 'false'
      */
     public boolean isInvisible() {
-        RobustWebElement element = (RobustWebElement) getViewport();
+        RobustWebElement element = getViewport();
         if (element.hasReference()) {
             try {
                 return ! element.getWrappedElement().isDisplayed();
