@@ -130,12 +130,12 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = super.hashCode();
-        result = PRIME * result + parent.hashCode();
-        result = PRIME * result + containerType.hashCode();
-        result = PRIME * result + locator.hashCode();
-        result = PRIME * result + elements.hashCode();
+        result = prime * result + parent.hashCode();
+        result = prime * result + containerType.hashCode();
+        result = prime * result + locator.hashCode();
+        result = prime * result + elements.hashCode();
         return result;
     }
 

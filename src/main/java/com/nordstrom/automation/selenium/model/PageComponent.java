@@ -8,6 +8,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
+import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 import com.nordstrom.automation.selenium.support.Coordinator;
 
 /**
@@ -52,7 +53,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @param parent component parent container
      */
     public PageComponent(By locator, int index, ComponentContainer parent) {
-        this(RobustWebElement.getElement(parent, locator, index), parent);
+        this((RobustWebElement) RobustElementWrapper.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
         arguments = new Object[] {locator, index, parent};
@@ -82,9 +83,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
     }
 
     @Override
-    public SearchContext refreshContext(Long expiration) {
+    public SearchContext refreshContext(long expiration) {
         // if this context is past the expiration
-        if (expiration.compareTo(acquiredAt()) >= 0) {
+        if (expiration >= acquiredAt()) {
             // refresh context ancestry
             parent.refreshContext(expiration);
             // refresh context element
@@ -94,7 +95,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
     }
 
     @Override
-    public Long acquiredAt() {
+    public long acquiredAt() {
         return ((RobustWebElement) context).acquiredAt();
     }
 

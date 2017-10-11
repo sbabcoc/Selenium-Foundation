@@ -3,7 +3,9 @@ package com.nordstrom.automation.selenium;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -405,9 +407,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @return IP address for the machine we're running on (a.k.a. - 'localhost')
      */
     private static String getLocalHost() {
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException eaten) {
+        try (final DatagramSocket socket = new DatagramSocket()) {
+            // use Google Public DNS to discover preferred local IP
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            return socket.getLocalAddress().getHostAddress();
+        } catch (SocketException | UnknownHostException eaten) {
             LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
             return "localhost";
         }

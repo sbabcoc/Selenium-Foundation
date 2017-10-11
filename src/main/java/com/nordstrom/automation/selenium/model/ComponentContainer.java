@@ -36,6 +36,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
+import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -272,7 +273,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      */
     @Override
     public List<WebElement> findElements(By by) {
-        return RobustWebElement.getElements(this, by);
+        return RobustElementWrapper.getElements(this, by);
     }
     
     /**
@@ -293,7 +294,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      */
     @Override
     public WebElement findElement(By by) {
-        return RobustWebElement.getElement(this, by);
+        return RobustElementWrapper.getElement(this, by);
     }
     
     /**
@@ -317,7 +318,7 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @return robust web element
      */
     public RobustWebElement findOptional(By by) {
-        return RobustWebElement.getElement(this, by, RobustWebElement.OPTIONAL);
+        return (RobustWebElement) RobustElementWrapper.getElement(this, by, RobustElementWrapper.OPTIONAL);
     }
     
     /**
@@ -891,12 +892,12 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + context.hashCode();
-        result = PRIME * result + ((parent == null) ? 0 : parent.hashCode());
-        result = PRIME * result + ((bypassClasses == null) ? 0 : bypassClasses.hashCode());
-        result = PRIME * result + ((bypassMethods == null) ? 0 : bypassMethods.hashCode());
+        result = prime * result + context.hashCode();
+        result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+        result = prime * result + ((bypassClasses == null) ? 0 : bypassClasses.hashCode());
+        result = prime * result + ((bypassMethods == null) ? 0 : bypassMethods.hashCode());
         return result;
     }
 

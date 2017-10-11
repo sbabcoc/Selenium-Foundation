@@ -68,7 +68,7 @@ public class TableComponent extends PageComponent {
     }
 
     @Override
-    public SearchContext refreshContext(Long expiration) {
+    public SearchContext refreshContext(long expiration) {
         refreshCount++;
         return super.refreshContext(expiration);
     }

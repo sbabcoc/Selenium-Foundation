@@ -6,6 +6,7 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriverException;
 
 import com.google.common.base.Throwables;
+import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 
 /**
  * Extend this class when modeling a browser frame element.
@@ -63,7 +64,7 @@ public class Frame extends Page {
      * @param parent frame parent
      */
     public Frame(By locator, int index, ComponentContainer parent) {
-        this(RobustWebElement.getElement(parent, locator, index), parent);
+        this((RobustWebElement) RobustElementWrapper.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
         arguments = new Object[] {locator, index, parent};
@@ -159,7 +160,7 @@ public class Frame extends Page {
     }
     
     @Override
-    public SearchContext refreshContext(Long expiration) {
+    public SearchContext refreshContext(long expiration) {
         if (frameSelect == FrameSelect.ELEMENT) {
             element.refreshContext(expiration);
         } else {
@@ -169,7 +170,7 @@ public class Frame extends Page {
     }
 
     @Override
-    public Long acquiredAt() {
+    public long acquiredAt() {
         if (frameSelect == FrameSelect.ELEMENT) {
             return element.acquiredAt();
         } else {
@@ -189,12 +190,12 @@ public class Frame extends Page {
     
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = super.hashCode();
-        result = PRIME * result + frameSelect.hashCode();
-        result = PRIME * result + ((element == null) ? 0 : element.hashCode());
-        result = PRIME * result + index;
-        result = PRIME * result + ((nameOrId == null) ? 0 : nameOrId.hashCode());
+        result = prime * result + frameSelect.hashCode();
+        result = prime * result + ((element == null) ? 0 : element.hashCode());
+        result = prime * result + index;
+        result = prime * result + ((nameOrId == null) ? 0 : nameOrId.hashCode());
         return result;
     }
 

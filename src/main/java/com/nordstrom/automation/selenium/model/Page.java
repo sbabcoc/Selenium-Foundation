@@ -201,12 +201,12 @@ public class Page extends ComponentContainer {
     }
 
     @Override
-    public SearchContext refreshContext(Long expiration) {
+    public SearchContext refreshContext(long expiration) {
         return this;
     }
 
     @Override
-    public Long acquiredAt() {
+    public long acquiredAt() {
         return System.currentTimeMillis();
     }
 
@@ -246,13 +246,13 @@ public class Page extends ComponentContainer {
     
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = super.hashCode();
-        result = PRIME * result + Arrays.hashCode(argumentTypes);
-        result = PRIME * result + Arrays.hashCode(arguments);
-        result = PRIME * result + ((windowHandle == null) ? 0 : windowHandle.hashCode());
-        result = PRIME * result + ((windowState == null) ? 0 : windowState.hashCode());
-        result = PRIME * result + ((spawningPage == null) ? 0 : spawningPage.hashCode());
+        result = prime * result + Arrays.hashCode(argumentTypes);
+        result = prime * result + Arrays.hashCode(arguments);
+        result = prime * result + ((windowHandle == null) ? 0 : windowHandle.hashCode());
+        result = prime * result + ((windowState == null) ? 0 : windowState.hashCode());
+        result = prime * result + ((spawningPage == null) ? 0 : spawningPage.hashCode());
         return result;
     }
 
