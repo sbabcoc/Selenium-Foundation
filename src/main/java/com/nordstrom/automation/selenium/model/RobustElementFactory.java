@@ -228,14 +228,14 @@ public class RobustElementFactory {
         public RobustElementWrapper(WebElement element, WrapsContext context, By locator, int index) {
             
             // if specified element is already robust
-            if (element instanceof RobustElementWrapper) {
-                RobustElementWrapper robust = (RobustElementWrapper) element;
-                this.acquiredAt = robust.acquiredAt;
+            if (element instanceof RobustWebElement) {
+                RobustElementWrapper wrapper = ((InterceptionAccessor) element).getInterceptor();
+                this.acquiredAt = wrapper.acquiredAt;
                 
-                this.wrapped = robust.wrapped;
-                this.context = robust.context;
-                this.locator = robust.locator;
-                this.index = robust.index;
+                this.wrapped = wrapper.wrapped;
+                this.context = wrapper.context;
+                this.locator = wrapper.locator;
+                this.index = wrapper.index;
             } else {
                 Objects.requireNonNull(context, "[context] must be non-null");
                 Objects.requireNonNull(locator, "[locator] must be non-null");
