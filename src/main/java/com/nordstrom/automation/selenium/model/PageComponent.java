@@ -133,10 +133,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      */
     public boolean isDisplayed() {
         RobustWebElement element = getViewport();
-        if (element.hasReference()) {
-            return element.isDisplayed();
-        }
-        return false;
+        return (element.hasReference()) ? element.isDisplayed() : false;
     }
     
     /**
