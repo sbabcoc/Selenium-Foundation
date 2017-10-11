@@ -31,13 +31,13 @@ public interface WrapsContext extends WrapsDriver {
      * @param expiration expiration time of context chain
      * @return object search context
      */
-    SearchContext refreshContext(Long expiration);
+    SearchContext refreshContext(long expiration);
     
     /**
      * Determine when the underlying search context for this object was acquired.
      * 
      * @return search context acquisition time (from {@link System#currentTimeMillis()})
      */
-    Long acquiredAt();
+    long acquiredAt();
     
 }

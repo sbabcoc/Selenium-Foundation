@@ -210,7 +210,7 @@ public class RobustElementFactory {
         private String selector;
         private Strategy strategy = Strategy.LOCATOR;
         
-        private Long acquiredAt = Long.valueOf(0);
+        private long acquiredAt;
         
         private NoSuchElementException deferredException;
         
@@ -277,8 +277,8 @@ public class RobustElementFactory {
                 } else {
                     refreshReference(null);
                 }
-            } else if (acquiredAt.compareTo(Long.valueOf(0)) == 0) {
-                acquiredAt = Long.valueOf(System.currentTimeMillis());
+            } else if (acquiredAt == 0) {
+                acquiredAt = System.currentTimeMillis();
             }
         }
         
@@ -440,7 +440,7 @@ public class RobustElementFactory {
             }
             
             if (wrapper.wrapped != null) {
-                wrapper.acquiredAt = Long.valueOf(System.currentTimeMillis());
+                wrapper.acquiredAt = System.currentTimeMillis();
                 wrapper.deferredException = null;
             }
             
@@ -459,16 +459,16 @@ public class RobustElementFactory {
          * {@inheritDoc}
          */
         @Override
-        public SearchContext refreshContext(Long expiration) {
+        public SearchContext refreshContext(long expiration) {
             // refresh wrapped element reference if it's past the expiration
-            return (expiration.compareTo(acquiredAt()) >= 0) ? refreshReference(null) : this;
+            return (expiration >= acquiredAt()) ? refreshReference(null) : this;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Long acquiredAt() {
+        public long acquiredAt() {
             return acquiredAt;
         }
         
@@ -570,12 +570,12 @@ public class RobustElementFactory {
                 return false;
             if ( ! (obj instanceof RobustWebElement))
                 return false;
-            RobustWebElement other = (RobustWebElement) obj;
-            if (!context.equals(other.getContext()))
+            RobustElementWrapper other = ((InterceptionAccessor) obj).getInterceptor();
+            if (!context.equals(other.context))
                 return false;
-            if (!locator.equals(other.getLocator()))
+            if (!locator.equals(other.locator))
                 return false;
-            if (index != other.getIndex())
+            if (index != other.index)
                 return false;
             return true;
         }

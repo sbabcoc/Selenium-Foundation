@@ -160,7 +160,7 @@ public class Frame extends Page {
     }
     
     @Override
-    public SearchContext refreshContext(Long expiration) {
+    public SearchContext refreshContext(long expiration) {
         if (frameSelect == FrameSelect.ELEMENT) {
             element.refreshContext(expiration);
         } else {
@@ -170,7 +170,7 @@ public class Frame extends Page {
     }
 
     @Override
-    public Long acquiredAt() {
+    public long acquiredAt() {
         if (frameSelect == FrameSelect.ELEMENT) {
             return element.acquiredAt();
         } else {

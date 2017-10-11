@@ -201,12 +201,12 @@ public class Page extends ComponentContainer {
     }
 
     @Override
-    public SearchContext refreshContext(Long expiration) {
+    public SearchContext refreshContext(long expiration) {
         return this;
     }
 
     @Override
-    public Long acquiredAt() {
+    public long acquiredAt() {
         return Long.valueOf(System.currentTimeMillis());
     }
 
