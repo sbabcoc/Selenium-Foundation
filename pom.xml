@@ -22,7 +22,6 @@
     <selenium.version>2.53.0</selenium.version>
     <testng-foundation.version>1.4.0.0</testng-foundation.version>
     <junit-foundation.version>1.0.0</junit-foundation.version>
-<!--     <junit.version>4.12</junit.version> -->
     <resteasy.version>3.1.2.Final</resteasy.version>
     <bytebuddy.version>1.7.5</bytebuddy.version>
     <logback.version>1.2.2</logback.version>
@@ -61,11 +60,6 @@
         <artifactId>junit-foundation</artifactId>
         <version>${junit-foundation.version}</version>
       </dependency>
-<!--       <dependency> -->
-<!--         <groupId>junit</groupId> -->
-<!--         <artifactId>junit</artifactId> -->
-<!--         <version>${junit.version}</version> -->
-<!--       </dependency> -->
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-server-standalone</artifactId>
@@ -120,10 +114,6 @@
       <groupId>com.nordstrom.test-automation.tools</groupId>
       <artifactId>junit-foundation</artifactId>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>junit</groupId> -->
-<!--       <artifactId>junit</artifactId> -->
-<!--     </dependency> -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-server-standalone</artifactId>
