@@ -209,14 +209,8 @@ public final class GridUtility {
      * @return 'false' if [localOnly] and node is remote; otherwise 'true'
      */
     public static boolean stopGridNode(boolean localOnly) {
-        if (localOnly) {
-            if (setNodeProcess(null)) {
-                return true;
-            }
-            
-            if (!isLocalNode()) {
-                return false;
-            }
+        if (localOnly && !isLocalNode()) {
+            return false;
         }
         
         RegistrationRequest nodeConfig = SeleniumConfig.getConfig().getNodeConfig();
@@ -230,6 +224,7 @@ public final class GridUtility {
             }
         }
         
+        setNodeProcess(null);
         return true;
     }
     
@@ -240,14 +235,8 @@ public final class GridUtility {
      * @return 'false' if [localOnly] and hub is remote; otherwise 'true'
      */
     public static boolean stopGridHub(boolean localOnly) {
-        if (localOnly) {
-            if (setHubProcess(null)) {
-                return true;
-            }
-            
-            if (!isLocalHub()) {
-                return false;
-            }
+        if (localOnly && !isLocalHub()) {
+            return false;
         }
         
         GridHubConfiguration hubConfig = SeleniumConfig.getConfig().getHubConfig();
@@ -261,6 +250,7 @@ public final class GridUtility {
             }
         }
         
+        setHubProcess(null);
         return true;
     }
     
