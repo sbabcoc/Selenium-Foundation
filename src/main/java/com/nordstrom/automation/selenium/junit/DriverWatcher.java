@@ -6,6 +6,7 @@ import org.junit.rules.ExternalResource;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import com.nordstrom.automation.junit.JUnitMethodWatcher;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.core.GridUtility;
