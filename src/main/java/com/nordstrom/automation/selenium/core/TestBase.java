@@ -192,7 +192,7 @@ public interface TestBase {
      * @return test run output directory
      */
     static String getOutputDir() {
-        Path currentRelativePath = Paths.get("");
+        Path currentRelativePath = Paths.get(System.getProperty("user.dir"));
         return currentRelativePath.toAbsolutePath().toString();
     }
 }
