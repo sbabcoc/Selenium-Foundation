@@ -6,7 +6,7 @@ import org.junit.rules.ExternalResource;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
-import com.nordstrom.automation.junit.JUnitMethodWatcher;
+import com.nordstrom.automation.junit.MethodWatcher;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.core.GridUtility;
@@ -29,7 +29,7 @@ import com.nordstrom.automation.selenium.core.TestBase;
  * 
  * @see GridUtility
  */
-public class DriverWatcher implements JUnitMethodWatcher {
+public class DriverWatcher implements MethodWatcher {
 
     @Override
     public void beforeInvocation(Object obj, Method method, Object[] args) {

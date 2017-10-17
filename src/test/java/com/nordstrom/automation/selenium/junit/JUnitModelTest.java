@@ -1,17 +1,11 @@
 package com.nordstrom.automation.selenium.junit;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import com.nordstrom.automation.junit.HookInstallingRunner;
-import com.nordstrom.automation.junit.JUnitMethodWatchers;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 
 @InitialPage(ExamplePage.class)
-@RunWith(HookInstallingRunner.class)
-@JUnitMethodWatchers({DriverWatcher.class})
 public class JUnitModelTest extends JUnitBase {
 
     @Test
