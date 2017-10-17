@@ -11,7 +11,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.RuleChain;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -19,6 +19,7 @@ import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.junit.ArtifactParams;
 import com.nordstrom.automation.junit.HookInstallingRunner;
 import com.nordstrom.automation.junit.MethodWatchers;
+import com.nordstrom.automation.junit.RuleChainWalker;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.model.Page;
 
@@ -34,11 +35,11 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     public static final ExternalResource resource = DriverWatcher.getClassWatcher();
     
     /** This method rule manages driver lifetimes and opens initial pages. */
-    @Rule
-    public final TestWatcher driverWatcher = DriverWatcher.getTestWatcher(this);
     
     @Rule
-    public final ScreenshotCapture screenshotCapture = new ScreenshotCapture(this);
+    public final RuleChain ruleChain = RuleChain
+            .outerRule(new ScreenshotCapture(this))
+            .around(DriverWatcher.getTestWatcher(this));
     
     private Optional<WebDriver> optDriver = Optional.empty();
     private Optional<Page> optInitialPage = Optional.empty();
@@ -97,6 +98,19 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     
     @Override
     public Description getDescription() {
-        return screenshotCapture.getDescription();
+        return getScreenshotCapture().getDescription();
+    }
+    
+    /**
+     * Get the screenshot capture test rule that's attached to the rule chain.
+     * 
+     * @return {@link ScreenshotCapture} test rule
+     */
+    public ScreenshotCapture getScreenshotCapture() {
+        Optional<ScreenshotCapture> optional = RuleChainWalker.getAttachedRule(ruleChain, ScreenshotCapture.class);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        throw new IllegalStateException("ScreenshotCapture test rule wasn't found on the rule chain");
     }
 }

@@ -15,7 +15,7 @@ public class ScreenshotCaptureTest extends JUnitBase {
     
     @Test
     public void testScreenshotCapture() {
-        Optional<Path> optArtifactPath = screenshotCapture.captureArtifact();
+        Optional<Path> optArtifactPath = getScreenshotCapture().captureArtifact();
         assertTrue(optArtifactPath.isPresent());
     }
 
