@@ -18,6 +18,7 @@ import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
+import com.nordstrom.automation.testng.ListenerChain;
 
 /**
  * This abstract class implements the contract for Selenium Foundation test classes for TestNG.
@@ -134,5 +135,19 @@ public abstract class TestNgBase implements TestBase {
     @Override
     public boolean isAfterClass(Method method) {
         return null != method.getAnnotation(AfterClass.class);
+    }
+    
+    /**
+     * Get the screenshot capture listener that's attached to the listener chain.
+     * 
+     * @return {@link ScreenshotCapture} test rule
+     */
+    public static ScreenshotCapture getScreenshotCapture() {
+        ITestResult testResult = Reporter.getCurrentTestResult();
+        Optional<ScreenshotCapture> optListener = ListenerChain.getAttachedListener(testResult, ScreenshotCapture.class);
+        if (optListener.isPresent()) {
+            return optListener.get();
+        }
+        throw new IllegalStateException("ScreenshotCapture listener wasn't found on the listener chain");
     }
 }
