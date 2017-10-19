@@ -25,8 +25,7 @@ The following is an outline of the elements that must be included in every TestN
   * [ExecutionFlowController](https://git.nordstrom.net/projects/MFATT/repos/testng-foundation/browse/src/main/java/com/nordstrom/automation/testng/ExecutionFlowController.java):  
 **ExecutionFlowController** is a TestNG listener that propagates test context attributes:  
  [_before_ method] → [test method] → [_after_ method]
-  * Note that the **`@LinkedListeners`** annotation declared by **TestNgBase** also includes the **ScreenshotCapture** listener, which automatically captures a screenshot in the event of test failure.
- 
+
 The **`@LinkedListeners`** annotation is processed by the **ListenerChain**, which must be activated so that the other core listeners will be connected and functioning correctly. Although you can use the standard TestNG **`@Listeners`** annotation to activate **ListenerChain**, we recommend that you use the **ServiceLoader** mechanism for this purpose in your actual project. This is the technique employed by the test suite of the **Selenium Foundation** project. For details, see [Selenium Foundation Test Support](docs/SeleniumFoundationTestSupport.md).
 
 ## DEMONSTRATED FEATURES
@@ -41,7 +40,7 @@ The **QuickStart** class demonstrates several important **Selenium Foundation** 
 **SeleniumSettings** declares the constants, property names, and default values for the settings managed by SeleniumConfig. Defaults can be overridden via System properties or the _settings.propeties_ file in your user "home" directory. See **ESSENTIAL SETTINGS** below for more details.
 * [ReporterAppender](https://github.com/sbabcoc/logback-testng/blob/master/src/main/java/com/github/sbabcoc/logback/testng/ReporterAppender.java):  
 **ReporterAppender** is a **Logback** appender for TestNG Reporter. The **Selenium Foundation** project ships with a _logback.xml_ file that attaches this appender. See the complete **logback-testng** information page [here](https://github.com/sbabcoc/logback-testng).
-* **`TestBase.optionalOf(Object)`**:  
+* `TestBase.optionalOf(Object)`:  
 This static utility method wraps the specified object in an [Optional](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
 
 ## DRIVER ACQUISITION AND HAND-OFF
@@ -139,11 +138,11 @@ Here are the official homes for several of the major drivers:
 
 **NOTE**: GhostDriver and ChromeDriver are simple binary installations, but several system configuration changes must be applied for IEDriver to work properly. For details, visit the InternetExplorerDriver project Wiki on GitHub and follow the [Required Configuration](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration) procedure.
 
-## JUNIT SUPPORT
+# JUNIT SUPPORT
 
-In addition to the TestNG support documented above, **Selenium Foundation** also includes support for JUnit. This support is built upon **JUnit Foundation**, which provides the framework for method interception and artifact capture used for driver management and screenshots.
+In addition to the TestNG support documented above, **Selenium Foundation** also includes support for JUnit. This support is built upon **JUnit Foundation**, which provides the framework for method interception (used for driver management) and artifact capture (used to acquire screenshots).
 
-### JUnit Required Elements
+## JUnit Required Elements
 
 There are several required elements that must be included in every JUnit test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [JUnitBase](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class as a starter. This class includes all of the required elements outlined below.
 
@@ -158,9 +157,9 @@ The following is an outline of the elements that must be included in every JUnit
 * [RuleChain](http://junit.org/junit4/javadoc/latest/org/junit/rules/RuleChain.html):  
  Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies two watchers that manage core features of **Selenium Foundation**:
   * [DriverWatcher](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
-**DriverWatcher** is a JUnit test watcher that manages driver sessions and local Selenium Grid servers.
+**DriverWatcher** manages driver sessions and local Selenium Grid servers. This class supplies a standard JUnit test watcher and an external resources class rule. It also implements the **JUnit Foundation**  [MethodWatcher](https://git.nordstrom.net/projects/MFATT/repos/junit-foundation/browse/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to provide automatic driver lifetime management and initial page support.
   * [ScreenshotCapture](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/ScreenshotCapture.java):  
-  The **RuleChain** declared by **JUnitBase** also includes the **ScreenshotCapture** watcher, which automatically captures a screenshot in the event of test failure.
+  **ScreenshotCapture** is a JUnit test watcher that automatically captures a screenshot in the event of test failure.
 
 ### DEMONSTRATED FEATURES
 
@@ -173,6 +172,6 @@ This static utility method gets reference to an instance of the specified test r
 * **`ScreenshotCapture.getDescription()`**:  
 This instance method of **ScreenshotCapture** enables test code to acquire the [Description](http://junit.org/junit4/javadoc/latest/org/junit/runner/Description.html) object for the current JUnit test method. This object can be interrogated for many useful propeties of the test method, including method name, attached annotations, and containing class.
 
-## FEATURE PARITY
+# FEATURE PARITY
 
 All of the feature of **Selenium Foundation** are available regardless of which testing framework you choose - either TestNG or JUnit. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from both TestNG (via [ModelTest](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)) and JUnit (via [JUnitModelTest](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)).
