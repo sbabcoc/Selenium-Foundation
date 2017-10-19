@@ -153,13 +153,21 @@ There are several required elements that must be included in every JUnit test cl
 The following is an outline of the elements that must be included in every JUnit test that uses **Selenium Foundation**:
 
 * [HookInstallingRunner](https://git.nordstrom.net/projects/MFATT/repos/junit-foundation/browse/src/main/java/com/nordstrom/automation/junit/HookInstallingRunner.java):  
-**HookInstallingRunner** is a JUnit test runneruses bytecode enhancement to install hooks on test and configuration methods to enable method pre-processing and post-processing. This closely resembles the **IInvokedMethodListener** feature of TestNG.
+**HookInstallingRunner** is a JUnit test runner that uses bytecode enhancement to install hooks on test and configuration methods to enable method pre-processing and post-processing. This closely resembles the **IInvokedMethodListener** feature of TestNG.
+* [@MethodWatchers](https://git.nordstrom.net/projects/MFATT/repos/junit-foundation/browse/src/main/java/com/nordstrom/automation/junit/MethodWatchers.java):  
+The **MethodWatchers** annotation is assigned to test classes and enables you to attach one or more method watcher class, which implement the **MethodWatcher** interface. To activate this feature, run with the **HookInstallingRunner**.
+* [DriverWatcher](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
+**DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://git.nordstrom.net/projects/MFATT/repos/junit-foundation/browse/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions and local Selenium Grid servers. It provides initial page support, and it also supplies two JUnit rules:
+  * **`DriverWatcher.getClassWatcher()`**:  
+  The class rule returned by this static method is responsible for shutting down the local Selenium Grid servers.
+  * **`DriverWatcher.getTestWatcher()`**:  
+  The test rule returned by this static method is responsible for closing the driver attached to the current test method.
 * [RuleChain](http://junit.org/junit4/javadoc/latest/org/junit/rules/RuleChain.html):  
  Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies two watchers that manage core features of **Selenium Foundation**:
-  * [DriverWatcher](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
-**DriverWatcher** manages driver sessions and local Selenium Grid servers. This class supplies a standard JUnit test watcher and an external resources class rule. It also implements the **JUnit Foundation**  [MethodWatcher](https://git.nordstrom.net/projects/MFATT/repos/junit-foundation/browse/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to provide automatic driver lifetime management and initial page support.
   * [ScreenshotCapture](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/ScreenshotCapture.java):  
   **ScreenshotCapture** is a JUnit test watcher that automatically captures a screenshot in the event of test failure.
+  * [DriverWatcher](https://git.nordstrom.net/projects/MFATT/repos/selenium-foundation/browse/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
+  As described previously, the test watcher returned by `DriverWatcher.getTestWatcher()` closes the driver attached to the current test method.
 
 ### DEMONSTRATED FEATURES
 
