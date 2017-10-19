@@ -14,3 +14,4 @@ runner
 test-output
 *.md.html
 *.log
+*.png
