@@ -40,7 +40,7 @@ The **QuickStart** class demonstrates several important **Selenium Foundation** 
 **SeleniumSettings** declares the constants, property names, and default values for the settings managed by SeleniumConfig. Defaults can be overridden via System properties or the _settings.propeties_ file in your user "home" directory. See **ESSENTIAL SETTINGS** below for more details.
 * [ReporterAppender](https://github.com/sbabcoc/logback-testng/blob/master/src/main/java/com/github/sbabcoc/logback/testng/ReporterAppender.java):  
 **ReporterAppender** is a **Logback** appender for TestNG Reporter. The **Selenium Foundation** project ships with a _logback.xml_ file that attaches this appender. See the complete **logback-testng** information page [here](https://github.com/sbabcoc/logback-testng).
-* `TestBase.optionalOf(Object)`:  
+* **`TestBase.optionalOf(Object)`**:  
 This static utility method wraps the specified object in an [Optional](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
 
 ## DRIVER ACQUISITION AND HAND-OFF
