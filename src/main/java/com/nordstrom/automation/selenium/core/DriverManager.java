@@ -33,7 +33,7 @@ import com.nordstrom.automation.selenium.model.Page;
  * 
  * @see GridUtility
  */
-public class DriverManager {
+public final class DriverManager {
 
     private DriverManager() {
         throw new AssertionError("DriverManager is a static utility class that cannot be instantiated");

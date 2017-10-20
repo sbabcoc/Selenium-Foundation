@@ -44,7 +44,9 @@ import com.nordstrom.common.base.UncheckedThrow;
 /**
  * This is a abstract base class for all of the container classes defined by <b>Selenium Foundation</b>.
  */
-public abstract class ComponentContainer extends Enhanceable<ComponentContainer> implements SearchContext, WrapsContext {
+public abstract class ComponentContainer
+                        extends Enhanceable<ComponentContainer> 
+                        implements SearchContext, WrapsContext {
     
     /**
      * This interface provides common methods for collections of Selenium locators ({@link By} objects)
@@ -475,7 +477,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     public <T extends Page> T openAnnotatedPage(Class<T> pageClass, boolean newWindow) {
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
         String url = getPageUrl(pageUrl, SeleniumConfig.getConfig().getTargetUri());
-        Objects.requireNonNull(url, pageClass.toString() + " has no @PageUrl annotation, or specified @PageUrl has no value");
+        Objects.requireNonNull(url, pageClass.toString() 
+                        + " has no @PageUrl annotation, or the specified @PageUrl has no value");
         return openPageAtUrl(pageClass, url, newWindow);
     }
     
@@ -759,7 +762,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
     }
     
     /**
-     * Get {@link Method} object for the static {@code getKey(SearchContext)} method declared by the specified container type.
+     * Get {@link Method} object for the static {@code getKey(SearchContext)} method declared by the specified
+     * container type.
      * 
      * @param <T> component container type
      * @param containerType target container type
@@ -775,7 +779,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         } catch (NoSuchMethodException e) {
             // fall through to 'throw' statement below
         }
-        throw new UnsupportedOperationException("Container class must declare method: public static Object getKey(SearchContext)");
+        throw new UnsupportedOperationException(
+                "Container class must declare method: public static Object getKey(SearchContext)");
     }
     
     /**
@@ -789,7 +794,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
         try {
             containerType.getConstructor(COLLECTIBLE_ARGS);
         } catch (NoSuchMethodException | SecurityException e) {
-            String format = "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
+            String format = 
+                    "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
             throw new UnsupportedOperationException(String.format(format, containerType.getSimpleName()));
         }
     }
@@ -812,7 +818,8 @@ public abstract class ComponentContainer extends Enhanceable<ComponentContainer>
      * @param arguments array of constructor argument values
      * @return new container of the specified type
      */
-    static <T extends ComponentContainer> T newContainer(Class<T> containerType, Class<?>[] argumentTypes, Object[] arguments) {
+    static <T extends ComponentContainer> T newContainer(
+                    Class<T> containerType, Class<?>[] argumentTypes, Object[] arguments) {
         try {
             Constructor<T> ctor = containerType.getConstructor(argumentTypes);
             return ctor.newInstance(arguments);

@@ -42,7 +42,11 @@ import net.bytebuddy.implementation.bind.annotation.TargetMethodAnnotationDriven
 import net.bytebuddy.implementation.bind.annotation.This;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
-public class RobustElementFactory {
+/**
+ * This class contains the classes, methods, and interfaces used to wrap {@link WebElement} objects in a
+ * reference-refreshing shell.
+ */
+public final class RobustElementFactory {
     
     private static Map<String, InstanceCreator> creatorMap = new HashMap<>();
     
@@ -111,10 +115,10 @@ public class RobustElementFactory {
                         .name(refClass.getPackage().getName() + ".Robust" + refClass.getSimpleName())
                         .method(not(isDeclaredBy(Object.class)))
                         .intercept(MethodDelegation.withEmptyConfiguration()
-                                        .withBinders(TargetMethodAnnotationDrivenBinder.ParameterBinder.DEFAULTS)
-                                        .withResolvers(MethodNameEqualityResolver.INSTANCE, BindingPriority.Resolver.INSTANCE)
-                                        .filter(not(isDeclaredBy(Object.class)))
-                                        .toField("interceptor"))
+                                .withBinders(TargetMethodAnnotationDrivenBinder.ParameterBinder.DEFAULTS)
+                                .withResolvers(MethodNameEqualityResolver.INSTANCE, BindingPriority.Resolver.INSTANCE)
+                                .filter(not(isDeclaredBy(Object.class)))
+                                .toField("interceptor"))
                         .implement(RobustWebElement.class)
                         .defineField("interceptor", RobustElementWrapper.class, Visibility.PRIVATE)
                         .implement(InterceptionAccessor.class).intercept(FieldAccessor.ofBeanProperty())
@@ -144,7 +148,18 @@ public class RobustElementFactory {
      * This interface defines accessor and mutator methods for element method interceptor.
      */
     public interface InterceptionAccessor {
+        /**
+         * Get the {@link RobustElementWrapper} interceptor.
+         * 
+         * @return RobustElementWrapper object
+         */
         RobustElementWrapper getInterceptor();
+        
+        /**
+         * Set the {@link RobustElementWrapper} interceptor.
+         * 
+         * @param interceptor RobustElementWrapper object
+         */
         void setInterceptor(RobustElementWrapper interceptor);
     }
     
@@ -152,6 +167,12 @@ public class RobustElementFactory {
      * This interface defines the robust web element factory builder method.
      */
     public interface InstanceCreator {
+        
+        /**
+         * Make a new robust web element instance.
+         *  
+         * @return robust web element
+         */
         Object makeInstance();
     }
     
@@ -161,35 +182,6 @@ public class RobustElementFactory {
      * failures.  
      */
     public static class RobustElementWrapper implements ReferenceFetcher {
-        
-        /**
-         * This is the method that intercepts component container methods in "enhanced" model objects.
-         * 
-         * @param obj "enhanced" object upon which the method was invoked
-         * @param method {@link Method} object for the invoked method
-         * @param args method invocation arguments
-         * @return {@code anything} (the result of invoking the intercepted method)
-         * @throws Exception {@code anything} (exception thrown by the intercepted method)
-         */
-        @RuntimeType
-        @BindingPriority(Integer.MAX_VALUE)
-        public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args) throws Exception
-        {
-            try {
-                return method.invoke(getWrappedElement(), args);
-            } catch (InvocationTargetException ite) {
-                Throwable t = ite.getCause();
-                if (t instanceof StaleElementReferenceException) {
-                    try {
-                        StaleElementReferenceException sere = (StaleElementReferenceException) t;
-                        return method.invoke(refreshReference(sere).getWrappedElement(), args);
-                    } catch (NullPointerException npe) {
-                        throw deferredException();
-                    }
-                }
-                throw UncheckedThrow.throwUnchecked(t);
-            }
-        }
         
         /** wraps 1st matched reference */
         public static final int CARDINAL = -1;
@@ -279,6 +271,35 @@ public class RobustElementFactory {
                 }
             } else if (acquiredAt == 0) {
                 acquiredAt = System.currentTimeMillis();
+            }
+        }
+        
+        /**
+         * This is the method that intercepts component container methods in "enhanced" model objects.
+         * 
+         * @param obj "enhanced" object upon which the method was invoked
+         * @param method {@link Method} object for the invoked method
+         * @param args method invocation arguments
+         * @return {@code anything} (the result of invoking the intercepted method)
+         * @throws Exception {@code anything} (exception thrown by the intercepted method)
+         */
+        @RuntimeType
+        @BindingPriority(Integer.MAX_VALUE)
+        public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args) throws Exception
+        {
+            try {
+                return method.invoke(getWrappedElement(), args);
+            } catch (InvocationTargetException ite) {
+                Throwable t = ite.getCause();
+                if (t instanceof StaleElementReferenceException) {
+                    try {
+                        StaleElementReferenceException sere = (StaleElementReferenceException) t;
+                        return method.invoke(refreshReference(sere).getWrappedElement(), args);
+                    } catch (NullPointerException npe) {
+                        throw deferredException();
+                    }
+                }
+                throw UncheckedThrow.throwUnchecked(t);
             }
         }
         
@@ -492,7 +513,8 @@ public class RobustElementFactory {
             try {
                 elements = context.getWrappedContext().findElements(locator);
                 for (int index = 0; index < elements.size(); index++) {
-                    elements.set(index, RobustElementFactory.makeRobustElement(elements.get(index), context, locator, index));
+                    elements.set(index, 
+                            RobustElementFactory.makeRobustElement(elements.get(index), context, locator, index));
                 }
             } catch (StaleElementReferenceException e) {
                 elements = context.refreshContext(context.acquiredAt()).findElements(locator);
@@ -525,12 +547,12 @@ public class RobustElementFactory {
         }
         
         /**
-         * Throw the deferred exception that was stored upon failing to acquire the reference for an optional element.<br>
-         * <p>
+         * Throw the deferred exception that was stored upon failing to acquire the reference for an optional element.
+         * <br><p>
          * <b>NOTE</b>:
          * The deferred exception is not thrown directly - it's wrapped in a OptionalElementNotAcquiredException to
-         * indicate that the failure was caused by utilizing an optional element for which no actual reference could be
-         * acquired.
+         * indicate that the failure was caused by utilizing an optional element for which no actual reference could
+         * be acquired.
          * 
          * @return nothing (always throws deferred exception wrapped in OptionalElementNotAcquiredException)
          */

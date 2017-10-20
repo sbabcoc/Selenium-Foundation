@@ -144,7 +144,8 @@ public abstract class TestNgBase implements TestBase {
      */
     public static ScreenshotCapture getScreenshotCapture() {
         ITestResult testResult = Reporter.getCurrentTestResult();
-        Optional<ScreenshotCapture> optListener = ListenerChain.getAttachedListener(testResult, ScreenshotCapture.class);
+        Optional<ScreenshotCapture> optListener = 
+                        ListenerChain.getAttachedListener(testResult, ScreenshotCapture.class);
         if (optListener.isPresent()) {
             return optListener.get();
         }

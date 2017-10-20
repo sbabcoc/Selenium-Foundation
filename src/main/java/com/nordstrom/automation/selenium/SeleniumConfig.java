@@ -102,7 +102,11 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         /** name: <b>selenium.timeout.wait</b> <br> default: <b>15</b> */
         WAIT_TIMEOUT("selenium.timeout.wait", "15"),
         /** name: <b>selenium.timeout.host</b> <br> default: <b>30</b> */
-        HOST_TIMEOUT("selenium.timeout.host", "30");
+        HOST_TIMEOUT("selenium.timeout.host", "30"),
+        /** name: <b>google.dns.socket.host</b> <br> default: <b>8.8.8.8</b> */
+        GOOGLE_DNS_SOCKET_HOST("google.dns.socket.host", "8.8.8.8"),
+        /** name: <b>google.dns.socket.port</b> <br> default: <b>10002</b> */
+        GOOGLE_DNS_SOCKET_PORT("google.dns.socket.port", "10002");
         
         private String propertyName;
         private String defaultValue;
@@ -406,10 +410,13 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * 
      * @return IP address for the machine we're running on (a.k.a. - 'localhost')
      */
-    private static String getLocalHost() {
+    private String getLocalHost() {
+        String host = getString(SeleniumSettings.GOOGLE_DNS_SOCKET_HOST.key());
+        int port = getInt(SeleniumSettings.GOOGLE_DNS_SOCKET_PORT.key());
+        
         try (final DatagramSocket socket = new DatagramSocket()) {
             // use Google Public DNS to discover preferred local IP
-            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            socket.connect(InetAddress.getByName(host), port);
             return socket.getLocalAddress().getHostAddress();
         } catch (SocketException | UnknownHostException eaten) {
             LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
