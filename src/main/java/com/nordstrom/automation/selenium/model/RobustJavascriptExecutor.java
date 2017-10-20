@@ -40,6 +40,9 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object executeAsyncScript(String script, Object... args) {
         Object result = null;
@@ -55,6 +58,9 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object executeScript(String script, Object... args) {
         Object result = null;
@@ -70,6 +76,9 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WebDriver getWrappedDriver() {
         return (WebDriver) executor;

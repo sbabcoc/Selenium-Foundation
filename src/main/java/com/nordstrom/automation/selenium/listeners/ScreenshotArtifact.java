@@ -32,10 +32,9 @@ public class ScreenshotArtifact implements ArtifactType {
             if (optDriver.get() instanceof TakesScreenshot) {
                 return true;
             } else {
-                String message =
-                        "This driver is not capable of taking a screenshot.  If a screenshot is desired, use a WebDriver "
-                        + "implementation that supports screenshots. https://seleniumhq.github.io/selenium/docs/api/java/"
-                        + "org/openqa/selenium/TakesScreenshot.html";
+                String message = "This driver is not capable of taking a screenshot.  If a screenshot is desired, use"
+                        + " a WebDriver implementation that supports screenshots. For more information, see https://"
+                        + "seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/TakesScreenshot.html";
                 LOGGER.warn(message);
             }
         }

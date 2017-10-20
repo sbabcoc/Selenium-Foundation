@@ -172,14 +172,14 @@ public final class Coordinators {
      */
     public static Coordinator<Boolean> stalenessOf(final WebElement element) {
         return new Coordinator<Boolean>() {
-            private final ExpectedCondition<Boolean> condition;
+            private final ExpectedCondition<Boolean> condition = conditionInitializer();
 
-            // initializer block for [condition] field
-            {
+            // initializer for [condition] field
+            private final ExpectedCondition<Boolean> conditionInitializer() {
                 if (element instanceof WrapsElement) {
-                    condition = ExpectedConditions.stalenessOf(((WrapsElement) element).getWrappedElement());
+                    return ExpectedConditions.stalenessOf(((WrapsElement) element).getWrappedElement());
                 } else {
-                    condition = ExpectedConditions.stalenessOf(element);
+                    return ExpectedConditions.stalenessOf(element);
                 }
             }
 

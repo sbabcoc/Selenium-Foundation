@@ -84,7 +84,10 @@ public class SearchContextWait extends FluentWait<SearchContext> {
         ignoring(NotFoundException.class);
         this.context = context;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected RuntimeException timeoutException(String message, Throwable lastException) {
         TimeoutException ex = new TimeoutException(message, lastException);
