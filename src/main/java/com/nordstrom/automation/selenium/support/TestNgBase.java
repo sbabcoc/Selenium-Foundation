@@ -143,7 +143,7 @@ public abstract class TestNgBase implements TestBase {
      * Get the listener of the specified type that's attached to the listener chain.
      * 
      * @param <T> listener type
-     * @param listenerType
+     * @param listenerType listener type
      * @return listener of the specified type
      */
     public static <T extends ITestNGListener> T getListener(Class<T> listenerType) {

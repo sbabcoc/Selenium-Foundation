@@ -119,9 +119,10 @@ public final class WebDriverUtils {
     }
     
     /**
+     * Unwrap the specified exception to reveal its report-able cause.
      * 
-     * @param exception
-     * @return
+     * @param exception exception to be unwrapped
+     * @return report-able cause for the specified exception
      */
     public static Throwable getReportableCause(Throwable exception) {
         for (Throwable throwable = exception; throwable != null; throwable = throwable.getCause()) {
@@ -139,17 +140,22 @@ public final class WebDriverUtils {
     }
     
     /**
+     * Get the client code breakpoint from the stack trace of the specified exception.
      * 
-     * @param exception
-     * @return
+     * @param exception exception whose stack trace is to be analyzed
+     * @return first stack trace element that exists in client code; 'null' if unable to identify breakpoint
      */
     public static StackTraceElement getClientBreakpoint(Throwable exception) {
         if (exception != null) {
             for (StackTraceElement element : exception.getStackTrace()) {
+                // if line number is unavailable
                 if (element.getLineNumber() < 0) {
                     continue;
                 }
+                
                 Matcher matcher = frameworkPackage.matcher(element.getClassName());
+                
+                // if not in framework code
                 if (!matcher.lookingAt()) {
                     return element;
                 }

@@ -1,11 +1,12 @@
 package com.nordstrom.automation.selenium.junit;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.utility.ScreenshotUtils;
 import com.nordstrom.automation.junit.ArtifactType;
@@ -15,6 +16,7 @@ import com.nordstrom.automation.junit.ArtifactType;
  */
 public class ScreenshotArtifact implements ArtifactType {
     
+    private static final Path ARTIFACT_PATH = Paths.get("screenshots");
     private static final String EXTENSION = "png";
     private static final Logger LOGGER = LoggerFactory.getLogger(ScreenshotArtifact.class);
     
@@ -34,6 +36,14 @@ public class ScreenshotArtifact implements ArtifactType {
     public byte[] getArtifact(Object instance, Throwable reason) {
         Optional<WebDriver> optDriver = DriverManager.nabDriver(instance);
         return ScreenshotUtils.getArtifact(optDriver, reason, LOGGER);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Path getArtifactPath() {
+        return ARTIFACT_PATH;
     }
     
     /**
