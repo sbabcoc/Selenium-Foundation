@@ -1,6 +1,6 @@
 package com.nordstrom.automation.selenium.junit;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Path;
 import java.util.Optional;
