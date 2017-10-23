@@ -15,7 +15,7 @@ public class PageSourceCaptureTest extends JUnitBase {
     
     @Test
     public void testPageSourceCapture() {
-        Optional<Path> optArtifactPath = getTestRule(PageSourceCapture.class).captureArtifact(null);
+        Optional<Path> optArtifactPath = getLinkedRule(PageSourceCapture.class).captureArtifact(null);
         assertTrue(optArtifactPath.isPresent());
     }
 

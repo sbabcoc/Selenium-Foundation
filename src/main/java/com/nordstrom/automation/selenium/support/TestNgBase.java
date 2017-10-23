@@ -146,7 +146,7 @@ public abstract class TestNgBase implements TestBase {
      * @param listenerType listener type
      * @return listener of the specified type
      */
-    public static <T extends ITestNGListener> T getListener(Class<T> listenerType) {
+    public static <T extends ITestNGListener> T getLinkedListener(Class<T> listenerType) {
         ITestResult testResult = Reporter.getCurrentTestResult();
         Optional<T> optListener = 
                         ListenerChain.getAttachedListener(testResult, listenerType);

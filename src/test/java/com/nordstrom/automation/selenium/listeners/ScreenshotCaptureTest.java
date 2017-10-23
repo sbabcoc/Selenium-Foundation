@@ -18,7 +18,7 @@ public class ScreenshotCaptureTest extends TestNgBase {
     @Test
     public void testScreenshotCapture() {
         Optional<Path> optArtifactPath = 
-                        getListener(ScreenshotCapture.class).captureArtifact(Reporter.getCurrentTestResult());
+                        getLinkedListener(ScreenshotCapture.class).captureArtifact(Reporter.getCurrentTestResult());
         assertTrue(optArtifactPath.isPresent());
     }
 

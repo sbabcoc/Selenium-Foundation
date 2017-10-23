@@ -100,7 +100,7 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     
     @Override
     public Description getDescription() {
-        return getTestRule(ScreenshotCapture.class).getDescription();
+        return getLinkedRule(ScreenshotCapture.class).getDescription();
     }
     
     /**
@@ -110,7 +110,7 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
      * @param testRuleType test rule type
      * @return {@link ScreenshotCapture} test rule
      */
-    public <T extends TestRule> T getTestRule(Class<T> testRuleType) {
+    public <T extends TestRule> T getLinkedRule(Class<T> testRuleType) {
         Optional<T> optional = RuleChainWalker.getAttachedRule(ruleChain, testRuleType);
         if (optional.isPresent()) {
             return optional.get();

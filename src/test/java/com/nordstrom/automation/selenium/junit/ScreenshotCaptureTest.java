@@ -15,7 +15,7 @@ public class ScreenshotCaptureTest extends JUnitBase {
     
     @Test
     public void testScreenshotCapture() {
-        Optional<Path> optArtifactPath = getTestRule(ScreenshotCapture.class).captureArtifact(null);
+        Optional<Path> optArtifactPath = getLinkedRule(ScreenshotCapture.class).captureArtifact(null);
         assertTrue(optArtifactPath.isPresent());
     }
 
