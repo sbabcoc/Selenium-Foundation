@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestNGListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.AfterClass;
@@ -14,6 +15,7 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
+import com.nordstrom.automation.selenium.listeners.PageSourceCapture;
 import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.testng.ExecutionFlowController;
@@ -23,7 +25,7 @@ import com.nordstrom.automation.testng.ListenerChain;
 /**
  * This abstract class implements the contract for Selenium Foundation test classes for TestNG.
  */
-@LinkedListeners({ScreenshotCapture.class, DriverListener.class, ExecutionFlowController.class})
+@LinkedListeners({ScreenshotCapture.class, PageSourceCapture.class, DriverListener.class, ExecutionFlowController.class})
 public abstract class TestNgBase implements TestBase {
     
     /**
@@ -138,17 +140,19 @@ public abstract class TestNgBase implements TestBase {
     }
     
     /**
-     * Get the screenshot capture listener that's attached to the listener chain.
+     * Get the listener of the specified type that's attached to the listener chain.
      * 
-     * @return {@link ScreenshotCapture} test rule
+     * @param <T> listener type
+     * @param listenerType
+     * @return listener of the specified type
      */
-    public static ScreenshotCapture getScreenshotCapture() {
+    public static <T extends ITestNGListener> T getListener(Class<T> listenerType) {
         ITestResult testResult = Reporter.getCurrentTestResult();
-        Optional<ScreenshotCapture> optListener = 
-                        ListenerChain.getAttachedListener(testResult, ScreenshotCapture.class);
+        Optional<T> optListener = 
+                        ListenerChain.getAttachedListener(testResult, listenerType);
         if (optListener.isPresent()) {
             return optListener.get();
         }
-        throw new IllegalStateException("ScreenshotCapture listener wasn't found on the listener chain");
+        throw new IllegalStateException(listenerType.getSimpleName() + " listener wasn't found on the listener chain");
     }
 }

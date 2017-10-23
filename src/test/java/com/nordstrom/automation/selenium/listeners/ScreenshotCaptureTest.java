@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.listener;
+package com.nordstrom.automation.selenium.listeners;
 
 import static org.testng.Assert.assertTrue;
 
@@ -17,7 +17,8 @@ public class ScreenshotCaptureTest extends TestNgBase {
     
     @Test
     public void testScreenshotCapture() {
-        Optional<Path> optArtifactPath = getScreenshotCapture().captureArtifact(Reporter.getCurrentTestResult());
+        Optional<Path> optArtifactPath = 
+                        getListener(ScreenshotCapture.class).captureArtifact(Reporter.getCurrentTestResult());
         assertTrue(optArtifactPath.isPresent());
     }
 

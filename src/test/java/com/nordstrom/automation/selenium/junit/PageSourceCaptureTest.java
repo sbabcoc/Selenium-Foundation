@@ -1,6 +1,6 @@
 package com.nordstrom.automation.selenium.junit;
 
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -11,11 +11,11 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 
 @InitialPage(ExamplePage.class)
-public class ScreenshotCaptureTest extends JUnitBase {
+public class PageSourceCaptureTest extends JUnitBase {
     
     @Test
-    public void testScreenshotCapture() {
-        Optional<Path> optArtifactPath = getTestRule(ScreenshotCapture.class).captureArtifact(null);
+    public void testPageSourceCapture() {
+        Optional<Path> optArtifactPath = getTestRule(PageSourceCapture.class).captureArtifact(null);
         assertTrue(optArtifactPath.isPresent());
     }
 

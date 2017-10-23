@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -39,6 +40,7 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     @Rule
     public final RuleChain ruleChain = RuleChain
             .outerRule(new ScreenshotCapture(this))
+            .around(new PageSourceCapture(this))
             .around(DriverWatcher.getTestWatcher(this));
     
     private Optional<WebDriver> optDriver = Optional.empty();
@@ -98,19 +100,21 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     
     @Override
     public Description getDescription() {
-        return getScreenshotCapture().getDescription();
+        return getTestRule(ScreenshotCapture.class).getDescription();
     }
     
     /**
-     * Get the screenshot capture test rule that's attached to the rule chain.
+     * Get the test rule of the specified type that's attached to the rule chain.
      * 
+     * @param <T> test rule type
+     * @param testRuleType test rule type
      * @return {@link ScreenshotCapture} test rule
      */
-    public ScreenshotCapture getScreenshotCapture() {
-        Optional<ScreenshotCapture> optional = RuleChainWalker.getAttachedRule(ruleChain, ScreenshotCapture.class);
+    public <T extends TestRule> T getTestRule(Class<T> testRuleType) {
+        Optional<T> optional = RuleChainWalker.getAttachedRule(ruleChain, testRuleType);
         if (optional.isPresent()) {
             return optional.get();
         }
-        throw new IllegalStateException("ScreenshotCapture test rule wasn't found on the rule chain");
+        throw new IllegalStateException(testRuleType.getSimpleName() + " test rule wasn't found on the rule chain");
     }
 }
