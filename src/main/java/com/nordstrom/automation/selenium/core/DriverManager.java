@@ -8,6 +8,9 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
+
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -186,6 +189,22 @@ public final class DriverManager {
     public static boolean hasDriver(Object obj) {
         return nabDriver(obj).isPresent();
     }
+    
+    /**
+     * Get the remote session ID of the specified driver.<br>
+     * <b>NOTE</b>: The session ID will be 'null' if no remote session is associated with the specified driver.<br>
+     * <b>NOTE</b>: If the specified driver isn't a {@link RemoteWebDriver}, an empty {@link Optional} is returned.
+     * 
+     * @param driver driver object
+     * @return optional session ID (see NOTES) 
+     */
+    public static Optional<SessionId> getSessionId(WebDriver driver) {
+        if (driver instanceof RemoteWebDriver) {
+            SessionId sessionId = ((RemoteWebDriver) driver).getSessionId();
+            return Optional.of(sessionId);
+        }
+        return Optional.empty();
+    }
 
     /**
      * Close the Selenium driver attached to the specified test class instance.
@@ -197,6 +216,7 @@ public final class DriverManager {
         Optional<WebDriver> optDriver = nabDriver(obj);
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
+            
             try {
                 ((JavascriptExecutor) driver).executeScript("return window.stop");
             } catch (WebDriverException | UnsupportedOperationException e) {

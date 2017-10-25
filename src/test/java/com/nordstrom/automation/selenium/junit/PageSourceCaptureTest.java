@@ -12,11 +12,11 @@ import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.common.file.PathUtils;
 
 @InitialPage(ExamplePage.class)
-public class ScreenshotCaptureTest extends JUnitBase {
+public class PageSourceCaptureTest extends JUnitBase {
     
     @Test
-    public void testScreenshotCapture() {
-        Optional<Path> optArtifactPath = getLinkedRule(ScreenshotCapture.class).captureArtifact(null);
+    public void testPageSourceCapture() {
+        Optional<Path> optArtifactPath = getLinkedRule(PageSourceCapture.class).captureArtifact(null);
         assertTrue(optArtifactPath.isPresent());
     }
 

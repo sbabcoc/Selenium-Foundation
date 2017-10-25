@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.listener;
+package com.nordstrom.automation.selenium.listeners;
 
 import static org.testng.Assert.assertTrue;
 
@@ -13,11 +13,12 @@ import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.automation.selenium.support.TestNgBase;
 
 @InitialPage(ExamplePage.class)
-public class ScreenshotCaptureTest extends TestNgBase {
+public class PageSourceCaptureTest extends TestNgBase {
     
     @Test
-    public void testScreenshotCapture() {
-        Optional<Path> optArtifactPath = getScreenshotCapture().captureArtifact(Reporter.getCurrentTestResult());
+    public void testPageSourceCapture() {
+        Optional<Path> optArtifactPath = 
+                        getLinkedListener(PageSourceCapture.class).captureArtifact(Reporter.getCurrentTestResult());
         assertTrue(optArtifactPath.isPresent());
     }
 

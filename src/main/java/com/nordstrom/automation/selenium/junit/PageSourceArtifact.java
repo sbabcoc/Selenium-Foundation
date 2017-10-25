@@ -8,17 +8,17 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.core.DriverManager;
-import com.nordstrom.automation.selenium.utility.ScreenshotUtils;
+import com.nordstrom.automation.selenium.utility.PageSourceUtils;
 import com.nordstrom.automation.junit.ArtifactType;
 
 /**
  * This class implements the artifact type for screenshot capture.
  */
-public class ScreenshotArtifact implements ArtifactType {
+public class PageSourceArtifact implements ArtifactType {
     
-    private static final Path ARTIFACT_PATH = Paths.get("screenshots");
-    private static final String EXTENSION = "png";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScreenshotArtifact.class);
+    private static final Path ARTIFACT_PATH = Paths.get("page-source");
+    private static final String EXTENSION = "html";
+    private static final Logger LOGGER = LoggerFactory.getLogger(PageSourceArtifact.class);
     
     /**
      * {@inheritDoc}
@@ -26,7 +26,7 @@ public class ScreenshotArtifact implements ArtifactType {
     @Override
     public boolean canGetArtifact(Object instance) {
         Optional<WebDriver> optDriver = DriverManager.nabDriver(instance);
-        return ScreenshotUtils.canGetArtifact(optDriver, LOGGER);
+        return PageSourceUtils.canGetArtifact(optDriver, LOGGER);
     }
     
     /**
@@ -35,7 +35,7 @@ public class ScreenshotArtifact implements ArtifactType {
     @Override
     public byte[] getArtifact(Object instance, Throwable reason) {
         Optional<WebDriver> optDriver = DriverManager.nabDriver(instance);
-        return ScreenshotUtils.getArtifact(optDriver, reason, LOGGER);
+        return PageSourceUtils.getArtifact(optDriver, reason, LOGGER).getBytes();
     }
     
     /**

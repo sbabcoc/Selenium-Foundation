@@ -32,6 +32,7 @@ final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
     private static final Class<?>[] dependencies = { GridLauncher.class };
+    private static final String LOGS_PATH = "logs";
     
     private GridProcess() {
         throw new AssertionError("GridProcess is a static utility class that cannot be instantiated");
@@ -58,10 +59,14 @@ final class GridProcess {
         ProcessBuilder builder = new ProcessBuilder(argsList);
         
         Path outputPath;
-        String outputDir = TestBase.getOutputDir();
+        String outputDir = PathUtils.getBaseDir();
         
         try {
-            outputPath = PathUtils.getNextPath(Paths.get(outputDir), "grid-" + gridRole, "log");
+            outputPath = Paths.get(outputDir, LOGS_PATH);
+            if (!outputPath.toFile().exists()) {
+                Files.createDirectories(outputPath);
+            }
+            outputPath = PathUtils.getNextPath(outputPath, "grid-" + gridRole, "log");
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }

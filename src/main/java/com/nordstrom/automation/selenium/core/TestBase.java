@@ -1,8 +1,6 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
@@ -185,14 +183,4 @@ public interface TestBase {
      * @return 'true' if specified method has {@code AfterClass} annotation; otherwise 'false'
      */
     boolean isAfterClass(Method method);
-    
-    /**
-     * Get test run output directory.
-     * 
-     * @return test run output directory
-     */
-    static String getOutputDir() {
-        Path currentRelativePath = Paths.get(System.getProperty("user.dir"));
-        return currentRelativePath.toAbsolutePath().toString();
-    }
 }

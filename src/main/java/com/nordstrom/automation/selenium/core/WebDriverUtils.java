@@ -1,13 +1,23 @@
 package com.nordstrom.automation.selenium.core;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 
@@ -19,6 +29,18 @@ import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
  */
 public final class WebDriverUtils {
     
+    private static final List<Class<? extends WebDriverException>> reportableException =
+                    Collections.unmodifiableList(
+                            Arrays.asList(
+                                    NotFoundException.class, ElementNotVisibleException.class,
+                                    UnhandledAlertException.class, StaleElementReferenceException.class,
+                                    TimeoutException.class));
+    
+    private static final Pattern frameworkPackage = Pattern.compile(
+                    "^(?:sun\\.reflect|java\\.lang|"
+                    + "org\\.(?:openqa|testng|junit|hamcrest)|"
+                    + "com\\.nordstrom\\.automation\\.selenium)\\.");
+            
     private WebDriverUtils() {
         throw new AssertionError("WebDriverUtils is a static utility class that cannot be instantiated");
     }
@@ -94,6 +116,52 @@ public final class WebDriverUtils {
             }
         }
         return elements.isEmpty();
+    }
+    
+    /**
+     * Unwrap the specified exception to reveal its report-able cause.
+     * 
+     * @param exception exception to be unwrapped
+     * @return report-able cause for the specified exception
+     */
+    public static Throwable getReportableCause(Throwable exception) {
+        for (Throwable throwable = exception; throwable != null; throwable = throwable.getCause()) {
+            Class<?> clazz = throwable.getClass();
+            if (clazz == WebDriverException.class) {
+                return throwable;
+            }
+            for (Class<? extends WebDriverException> reportable : reportableException) {
+                if (reportable.isAssignableFrom(clazz)) {
+                    return throwable;
+                }
+            }
+        }
+        return exception;
+    }
+    
+    /**
+     * Get the client code breakpoint from the stack trace of the specified exception.
+     * 
+     * @param exception exception whose stack trace is to be analyzed
+     * @return first stack trace element that exists in client code; 'null' if unable to identify breakpoint
+     */
+    public static StackTraceElement getClientBreakpoint(Throwable exception) {
+        if (exception != null) {
+            for (StackTraceElement element : exception.getStackTrace()) {
+                // if line number is unavailable
+                if (element.getLineNumber() < 0) {
+                    continue;
+                }
+                
+                Matcher matcher = frameworkPackage.matcher(element.getClassName());
+                
+                // if not in framework code
+                if (!matcher.lookingAt()) {
+                    return element;
+                }
+            }
+        }
+        return null;
     }
 
 }

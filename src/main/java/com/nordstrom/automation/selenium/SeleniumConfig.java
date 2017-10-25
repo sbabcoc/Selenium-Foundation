@@ -36,9 +36,9 @@ import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
+import com.nordstrom.common.file.PathUtils;
 
 /**
  * This class declares settings and methods related to Selenium WebDriver and Grid configuration.
@@ -484,7 +484,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                         LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
                     } 
                     
-                    String outputDir = TestBase.getOutputDir();
+                    String outputDir = PathUtils.getBaseDir();
                     File outputFile = new File(outputDir, path);
                     Path outputPath = outputFile.toPath();
                     if (!outputPath.toFile().exists()) {
