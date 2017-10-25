@@ -21,6 +21,7 @@ import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.common.file.PathUtils;
 
 /**
  * This abstract class implements the contract for Selenium Foundation test classes for TestNG.
@@ -99,7 +100,7 @@ public abstract class TestNgBase implements TestBase {
         if (testResult != null) {
             return testResult.getTestContext().getOutputDirectory();
         } else {
-            return TestBase.getOutputDir();
+            return PathUtils.ReportsDirectory.ARTIFACT.getPath().toString();
         }
     }
     

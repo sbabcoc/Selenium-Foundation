@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium.junit;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,7 +44,7 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     
     private Optional<WebDriver> optDriver = Optional.empty();
     private Optional<Page> optInitialPage = Optional.empty();
-
+    
     @Override
     public Optional<WebDriver> nabDriver() {
         return optDriver;
@@ -68,11 +67,6 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
         return optInitialPage;
     }
 
-    @Override
-    public String getOutputDirectory() {
-        return TestBase.getOutputDir();
-    }
-    
     @Override
     public boolean isTest(Method method) {
         return null != method.getAnnotation(Test.class);

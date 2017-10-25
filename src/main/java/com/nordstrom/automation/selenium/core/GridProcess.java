@@ -59,7 +59,7 @@ final class GridProcess {
         ProcessBuilder builder = new ProcessBuilder(argsList);
         
         Path outputPath;
-        String outputDir = TestBase.getOutputDir();
+        String outputDir = PathUtils.getBaseDir();
         
         try {
             outputPath = Paths.get(outputDir, LOGS_PATH);

@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.listeners;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
@@ -18,7 +17,7 @@ import com.nordstrom.automation.testng.ArtifactType;
  */
 public class PageSourceArtifact implements ArtifactType {
     
-    private static final Path ARTIFACT_PATH = Paths.get("page-source");
+    private static final String ARTIFACT_PATH = "page-source";
     private static final String EXTENSION = "html";
     private static final Logger LOGGER = LoggerFactory.getLogger(PageSourceArtifact.class);
     
@@ -45,7 +44,7 @@ public class PageSourceArtifact implements ArtifactType {
      */
     @Override
     public Path getArtifactPath(ITestResult result) {
-        return ARTIFACT_PATH;
+        return ArtifactType.super.getArtifactPath(result).resolve(ARTIFACT_PATH);
     }
     
     /**

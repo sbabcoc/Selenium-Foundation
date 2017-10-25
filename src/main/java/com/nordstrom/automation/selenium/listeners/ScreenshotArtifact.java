@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.listeners;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
@@ -18,7 +17,7 @@ import com.nordstrom.automation.testng.ArtifactType;
  */
 public class ScreenshotArtifact implements ArtifactType {
     
-    private static final Path ARTIFACT_PATH = Paths.get("screenshots");
+    private static final String ARTIFACT_PATH = "screenshots";
     private static final String EXTENSION = "png";
     private static final Logger LOGGER = LoggerFactory.getLogger(ScreenshotArtifact.class);
     
@@ -45,7 +44,7 @@ public class ScreenshotArtifact implements ArtifactType {
      */
     @Override
     public Path getArtifactPath(ITestResult result) {
-        return ARTIFACT_PATH;
+        return ArtifactType.super.getArtifactPath(result).resolve(ARTIFACT_PATH);
     }
     
     /**

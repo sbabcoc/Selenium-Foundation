@@ -42,8 +42,8 @@ public class PageSourceArtifact implements ArtifactType {
      * {@inheritDoc}
      */
     @Override
-    public Path getArtifactPath() {
-        return ARTIFACT_PATH;
+    public Path getArtifactPath(Object instance) {
+        return ArtifactType.super.getArtifactPath(instance).resolve(ARTIFACT_PATH);
     }
     
     /**
