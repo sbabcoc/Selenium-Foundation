@@ -159,11 +159,6 @@ public class QuickStart extends TestNgBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);
     
     @Test
-    public void foo() {
-        LOGGER.info(System.getProperty("project.build.directory"));
-    }
-    
-    @Test
     public void dummyTest() {
         SeleniumConfig config = SeleniumConfig.getConfig();
         LOGGER.info("The configured browser is: " + config.getString(SeleniumSettings.BROWSER_NAME.key()));
