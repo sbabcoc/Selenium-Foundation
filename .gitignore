@@ -13,3 +13,4 @@ runner
 .DS_Store
 test-output
 *.md.html
+logs
