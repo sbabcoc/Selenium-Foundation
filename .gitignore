@@ -13,6 +13,3 @@ runner
 .DS_Store
 test-output
 *.md.html
-logs
-screenshots
-page-source
