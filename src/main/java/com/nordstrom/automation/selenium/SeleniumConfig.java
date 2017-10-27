@@ -104,7 +104,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         /** name: <b>selenium.timeout.host</b> <br> default: <b>30</b> */
         HOST_TIMEOUT("selenium.timeout.host", "30"),
         /** name: <b>google.dns.socket.host</b> <br> default: <b>8.8.8.8</b> */
-        GOOGLE_DNS_SOCKET_HOST("google.dns.socket.host", "8.8.8.8"),
+        GOOGLE_DNS_SOCKET_HOST("google.dns.socket.host", "8.8.8.8"),    //NOSONAR
         /** name: <b>google.dns.socket.port</b> <br> default: <b>10002</b> */
         GOOGLE_DNS_SOCKET_PORT("google.dns.socket.port", "10002");
         
