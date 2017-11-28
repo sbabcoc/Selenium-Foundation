@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation)
+
 # INTRODUCTION
 
 **Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium 2.0** (_WebDriver_). The last stable release of Selenium 2.0 is **2.53.1**.
