@@ -4,6 +4,8 @@
 
 **Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium 2.0** (_WebDriver_). The last stable release of Selenium 2.0 is **2.53.1**.
 
+**NOTE**: If you've upgraded to Selenium 3, the [Selenium3 Foundation](https://github.com/Nordstrom/Selenium3-Foundation) project is for you.
+
 The [QuickStart](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**, **TestNG Foundation**, and the **Settings API**. It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
 
 ## HIGHLIGHTS
