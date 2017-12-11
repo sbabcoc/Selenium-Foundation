@@ -33,7 +33,7 @@
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
     <settings.version>2.0.7</settings.version>
-    <selenium.version>2.53.0</selenium.version>
+    <selenium.version>2.53.1</selenium.version>
     <testng-foundation.version>1.5.1</testng-foundation.version>
     <junit-foundation.version>3.1.1</junit-foundation.version>
     <resteasy.version>3.1.2.Final</resteasy.version>
