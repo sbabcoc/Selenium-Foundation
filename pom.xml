@@ -35,9 +35,9 @@
     <settings.version>2.0.7</settings.version>
     <selenium.version>2.53.1</selenium.version>
     <testng-foundation.version>1.5.1</testng-foundation.version>
-    <junit-foundation.version>3.1.4</junit-foundation.version>
+    <junit-foundation.version>3.1.5</junit-foundation.version>
     <resteasy.version>3.1.2.Final</resteasy.version>
-    <bytebuddy.version>1.7.8</bytebuddy.version>
+    <bytebuddy.version>1.7.9</bytebuddy.version>
     <logback.version>1.2.2</logback.version>
     <logback-testng.version>1.0.0</logback-testng.version>
     <sonar.language>java</sonar.language>
