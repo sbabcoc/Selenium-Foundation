@@ -14,3 +14,8 @@ runner
 test-output
 *.md.html
 logs
+.gradle/
+build/
+gradle/
+gradlew
+gradlew.bat
