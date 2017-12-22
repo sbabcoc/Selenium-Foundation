@@ -1,6 +1,6 @@
 plugins {
-	id 'io.codearte.nexus-staging' version '0.11.0'
-	id 'net.researchgate.release' version '2.6.0'
+  id 'io.codearte.nexus-staging' version '0.11.0'
+  id 'net.researchgate.release' version '2.6.0'
 }
 
 apply plugin: 'java'
@@ -16,34 +16,34 @@ description = """Selenium Foundation"""
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
+  options.encoding = 'UTF-8'
 }
 
 jacoco {
-    toolVersion = "0.7.9"
-    reportsDir = file("$buildDir/customJacocoReportDir")
+  toolVersion = "0.7.9"
+  reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
 jacocoTestReport {
-    reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination file("${buildDir}/jacocoHtml")
-    }
+  reports {
+    xml.enabled false
+    csv.enabled false
+    html.destination file("${buildDir}/jacocoHtml")
+  }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+  classifier = 'sources'
+  from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+  classifier = 'javadoc'
+  from javadoc.destinationDir
 }
 
 signing {
-    sign configurations.archives
+  sign configurations.archives
 }
 
 uploadArchives {
@@ -69,7 +69,7 @@ uploadArchives {
           connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
           developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
           url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
-		  tag 'HEAD'
+          tag 'HEAD'
         }
 
         licenses {
@@ -84,8 +84,8 @@ uploadArchives {
             id 'scoba'
             name 'Scott Babcock'
             email 'scoba@hotmail.com'
-			organization 'Nordstrom'
-			organizationUrl 'https://shop.nordstrom.com'
+            organization 'Nordstrom'
+            organizationUrl 'https://shop.nordstrom.com'
           }
         }
       }
@@ -94,32 +94,32 @@ uploadArchives {
 }
 
 nexusStaging {
-	packageGroup = "com.nordstrom"
-	stagingProfileId = "76d943f622957"
+  packageGroup = "com.nordstrom"
+  stagingProfileId = "76d943f622957"
 }
 
 artifacts {
-    archives sourcesJar
-    archives javadocJar
+  archives sourcesJar
+  archives javadocJar
 }
 
 repositories {
-     maven { url "http://central" }
-     maven { url "https://mvnrepo.nordstrom.net/nexus/content/repositories/thirdparty" }
-     maven { url "http://public-snapshots" }
-     maven { url "http://repo.maven.apache.org/maven2" }
+   maven { url "http://central" }
+   maven { url "https://mvnrepo.nordstrom.net/nexus/content/repositories/thirdparty" }
+   maven { url "http://public-snapshots" }
+   maven { url "http://repo.maven.apache.org/maven2" }
 }
 
 dependencies {
-    compile group: 'com.nordstrom.tools', name: 'java-utils', version:'1.3.3'
-    compile group: 'com.nordstrom.tools', name: 'settings', version:'2.0.7'
-    compile group: 'com.nordstrom.tools', name: 'testng-foundation', version:'1.5.1'
-    compile group: 'com.nordstrom.tools', name: 'junit-foundation', version:'3.1.5'
-    compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'2.53.1'
-    compile group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version:'3.1.2.Final'
-    compile group: 'org.jboss.resteasy', name: 'resteasy-client', version:'3.1.2.Final'
-    compile group: 'net.bytebuddy', name: 'byte-buddy', version:'1.7.9'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.2'
-    compile group: 'com.github.sbabcoc', name: 'logback-testng', version:'1.0.0'
-    testCompile group: 'org.mockito', name: 'mockito-all', version:'1.10.19'
+  compile group: 'com.nordstrom.tools', name: 'java-utils', version:'1.3.3'
+  compile group: 'com.nordstrom.tools', name: 'settings', version:'2.0.7'
+  compile group: 'com.nordstrom.tools', name: 'testng-foundation', version:'1.5.1'
+  compile group: 'com.nordstrom.tools', name: 'junit-foundation', version:'3.1.5'
+  compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'2.53.1'
+  compile group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version:'3.1.2.Final'
+  compile group: 'org.jboss.resteasy', name: 'resteasy-client', version:'3.1.2.Final'
+  compile group: 'net.bytebuddy', name: 'byte-buddy', version:'1.7.9'
+  compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.2'
+  compile group: 'com.github.sbabcoc', name: 'logback-testng', version:'1.0.0'
+  testCompile group: 'org.mockito', name: 'mockito-all', version:'1.10.19'
 }
