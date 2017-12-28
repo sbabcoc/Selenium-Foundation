@@ -11,7 +11,6 @@ apply plugin: 'signing'
 afterReleaseBuild.dependsOn uploadArchives
 
 group = 'com.nordstrom.ui-tools'
-version = '14.1.7-SNAPSHOT'
 
 description = """Selenium Foundation"""
 
