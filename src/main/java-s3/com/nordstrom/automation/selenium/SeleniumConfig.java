@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -28,14 +27,15 @@ import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.commons.io.IOUtils;
-import org.openqa.grid.internal.utils.GridHubConfiguration;
-import org.openqa.grid.common.GridRole;
-import org.openqa.grid.common.RegistrationRequest;
+import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
+import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.file.PathUtils;
@@ -49,7 +49,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     
     private static final String SETTINGS_FILE = "settings.properties";
     private static final String JSON_HEAD = "{ \"capabilities\": [";
-    private static final String JSON_TAIL = "], \"configuration\": {} }";
+    private static final String JSON_TAIL = "] }";
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
@@ -81,14 +81,14 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
         /** name: <b>selenium.hub.host</b> <br> default: {@code null} */
         HUB_HOST("selenium.hub.host", null),
-        /** name: <b>selenium.hub.port</b> <br> default: {@code null} */
-        HUB_PORT("selenuim.hub.port", null),
+        /** name: <b>selenium.hub.port</b> <br> default: <b>4445</b> */
+        HUB_PORT("selenuim.hub.port", "4445"),
         /** name: <b>selenium.node.config</b> <br> default: <b>nodeConfig.json</b> */
         NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
         /** name: <b>selenium.node.host</b> <br> default: {@code null} */
         NODE_HOST("selenium.node.host", null),
-        /** name: <b>selenium.node.port</b> <br> default: <b>5555</b> */
-        NODE_PORT("selenium.node.port", "5555"),
+        /** name: <b>selenium.node.port</b> <br> default: <b>5556</b> */
+        NODE_PORT("selenium.node.port", "5556"),
         /** name: <b>selenium.browser.name</b> <br> default: {@code null} */
         BROWSER_NAME("selenium.browser.name", null),
         /** name: <b>selenium.browser.caps</b> <br> default: {@link SeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
@@ -215,7 +215,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     
     private URI targetUri;
     private String nodeConfigPath;
-    private RegistrationRequest nodeConfig;
+    private GridNodeConfiguration nodeConfig;
     private String[] nodeArgs;
     private String hubConfigPath;
     private GridHubConfiguration hubConfig;
@@ -290,14 +290,10 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * 
      * @return Selenium Grid node configuration
      */
-    public RegistrationRequest getNodeConfig() {
+    public GridNodeConfiguration getNodeConfig() {
         if (nodeConfig == null) {
-            nodeConfig = new RegistrationRequest();
-            nodeConfig.loadFromJSON(getNodeConfigPath());
+            nodeConfig = GridNodeConfiguration.loadFromJSON(getNodeConfigPath());
             nodeConfig = resolveNodeSettings(nodeConfig);
-            
-            // hack for RegistrationRequest bug
-            nodeConfig.setRole(GridRole.NODE);
         }
         return nodeConfig;
     }
@@ -310,9 +306,10 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     public String[] getNodeArgs() {
         if (nodeArgs == null) {
             String configPath = getNodeConfigPath();
-            Map<String, Object> config = getNodeConfig().getConfiguration();
-            nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get("host"),
-                    "-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
+            GridNodeConfiguration config = getNodeConfig();
+            nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host",
+                    config.host, "-port", config.port.toString(), "-hub", config.hub,
+                    "-servlet", "org.openqa.grid.web.servlet.LifecycleServlet"};
         }
         return Arrays.copyOf(nodeArgs, nodeArgs.length);
     }
@@ -323,19 +320,17 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @param nodeConfig node configuration with unresolved settings
      * @return node configuration with resolved settings
      */
-    private RegistrationRequest resolveNodeSettings(RegistrationRequest nodeConfig) {
-        Map<String, Object> config = nodeConfig.getConfiguration();
-        
+    private GridNodeConfiguration resolveNodeSettings(GridNodeConfiguration nodeConfig) {
         String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
         if (nodeHost != null) {
-            config.put("host", nodeHost);
+            nodeConfig.host = nodeHost;
         }
-        if (config.get("host") == null) {
-            config.put("host", getLocalHost());
+        if (nodeConfig.host == null) {
+            nodeConfig.host = getLocalHost();
         }
         
-        config.put("port", getInteger(SeleniumSettings.NODE_PORT.key(), DEFAULT_NODE_PORT));
-        config.put("hub", "http://" + getHubConfig().getHost() + ":" + getHubConfig().getPort() + "/grid/register/");
+        nodeConfig.port = getInteger(SeleniumSettings.NODE_PORT.key(), DEFAULT_NODE_PORT);
+        nodeConfig.hub = "http://" + getHubConfig().host + ":" + getHubConfig().port + "/grid/register/";
         
         return nodeConfig;
     }
@@ -360,8 +355,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      */
     public GridHubConfiguration getHubConfig() {
         if (hubConfig == null) {
-            hubConfig = new GridHubConfiguration();
-            hubConfig.loadFromJSON(getHubConfigPath());
+            hubConfig = GridHubConfiguration.loadFromJSON(getHubConfigPath());
             hubConfig = resolveHubSettings(hubConfig);
         }
         return hubConfig;
@@ -377,7 +371,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             String configPath = getHubConfigPath();
             GridHubConfiguration config = getHubConfig();
             hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
-                    "-host", config.getHost(), "-port", Integer.toString(config.getPort())};
+                    "-host", config.host, "-port", config.port.toString()};
         }
         return Arrays.copyOf(hubArgs, hubArgs.length);
     }
@@ -391,15 +385,15 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     private GridHubConfiguration resolveHubSettings(GridHubConfiguration hubConfig) {
         String hubHost = getString(SeleniumSettings.HUB_HOST.key());
         if (hubHost != null) {
-            hubConfig.setHost(hubHost);
+            hubConfig.host = hubHost;
         }
-        if (hubConfig.getHost() == null) {
-            hubConfig.setHost(getLocalHost());
+        if (hubConfig.host == null) {
+            hubConfig.host = getLocalHost();
         }
         
         Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), null);
         if (hubPort != null) {
-            hubConfig.setPort(hubPort.intValue());
+            hubConfig.port = hubPort;
         }
         
         return hubConfig;
@@ -453,8 +447,9 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                 jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
             }
             
-            RegistrationRequest config = RegistrationRequest.getNewInstance(JSON_HEAD + jsonStr + JSON_TAIL);
-            browserCaps = config.getCapabilities().get(0);
+            JsonObject json = new JsonParser().parse(JSON_HEAD + jsonStr + JSON_TAIL).getAsJsonObject();
+            GridNodeConfiguration config = GridNodeConfiguration.loadFromJSON(json);
+            browserCaps = config.capabilities.get(0);
         }
         return browserCaps;
     }
