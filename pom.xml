@@ -46,6 +46,7 @@
     <staging-plugin.version>1.6.7</staging-plugin.version>
     <release-plugin.version>2.5.3</release-plugin.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
+    <jar-plugin.version>3.0.2</jar-plugin.version>
   </properties>
   
   <scm>
@@ -187,6 +188,7 @@
       <properties>
         <selenium.version>2.53.1</selenium.version>
         <guava.version>21.0</guava.version>
+        <artifact.classifier>s2</artifact.classifier>
       </properties>
       <build>
         <directory>target-s2</directory>
@@ -246,6 +248,7 @@
         <selenium.version>3.8.1</selenium.version>
         <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
         <guava.version>23.5-jre</guava.version>
+        <artifact.classifier>s3</artifact.classifier>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -363,6 +366,11 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>${build-helper-plugin.version}</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${jar-plugin.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -447,6 +455,13 @@
           <useReleaseProfile>false</useReleaseProfile>
           <releaseProfiles>release</releaseProfiles>
           <goals>deploy</goals>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <classifier>${artifact.classifier}</classifier>
         </configuration>
       </plugin>
     </plugins>
