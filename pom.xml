@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.nordstrom.ui-tools</groupId>
   <artifactId>selenium-foundation</artifactId>
-  <version>14.1.13-SNAPSHOT</version>
+  <version>14.1.12-SNAPSHOT</version>
   <packaging>jar</packaging>
   
   <name>Selenium Foundation</name>
@@ -399,6 +399,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <classifier>${artifact.classifier}-sources</classifier>
+        </configuration>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -411,6 +414,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <classifier>${artifact.classifier}-javadoc</classifier>
+        </configuration>
         <executions>
           <execution>
             <id>attach-javadocs</id>
