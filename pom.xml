@@ -399,6 +399,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <classifier>${artifact.classifier}-sources</classifier>
+        </configuration>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -411,6 +414,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <classifier>${artifact.classifier}-javadoc</classifier>
+        </configuration>
         <executions>
           <execution>
             <id>attach-javadocs</id>
