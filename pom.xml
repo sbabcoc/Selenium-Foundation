@@ -466,9 +466,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <classifier>${artifact.classifier}</classifier>
-        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <classifier>${artifact.classifier}</classifier>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
