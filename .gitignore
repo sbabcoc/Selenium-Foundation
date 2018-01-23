@@ -9,7 +9,8 @@ target*
 *.md.html
 logs
 .gradle/
-build*
+build/
+build-*/
 gradle/
 gradlew
 gradlew.bat

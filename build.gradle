@@ -1,0 +1,189 @@
+plugins {
+  id 'io.codearte.nexus-staging' version '0.11.0'
+  id 'net.researchgate.release' version '2.6.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'jacoco'
+apply plugin: 'signing'
+
+compileJava.enabled = false
+processResources.enabled = false
+classes.enabled = false
+jar.enabled = false
+
+afterReleaseBuild.dependsOn uploadArchives
+
+group = 'com.nordstrom.ui-tools'
+description = "Selenium Foundation"
+
+if (!project.hasProperty("profile")) {
+  ext.profile = "selenium2"
+}
+
+sourceSets {
+  selenium2 {
+    java {
+      srcDirs = [ 'src/main/java', 'src/main/java-s2' ]
+      outputDir = file('build-s2/classes')
+    }
+    resources {
+      srcDirs = [ 'src/main/resources', 'src/main/resources-s2' ]
+    }
+    compileClasspath = sourceSets.main.output + configurations.selenium2Compile
+    runtimeClasspath = output + compileClasspath + configurations.selenium2Runtime
+  }
+  selenium3 {
+    java {
+      srcDirs = [ 'src/main/java', 'src/main/java-s3' ]
+      outputDir = file('build-s3/classes')
+    }
+    resources {
+      srcDirs = [ 'src/main/resources', 'src/main/resources-s3' ]
+    }
+    compileClasspath = sourceSets.main.output + configurations.selenium3Compile
+    runtimeClasspath = output + compileClasspath + configurations.selenium3Runtime
+  }
+  test {
+    java {
+      outputDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'test-classes')
+    }
+    compileClasspath += sourceSets["${profile}"].output
+    runtimeClasspath += sourceSets["${profile}"].output
+  }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+jacoco {
+  toolVersion = "0.7.9"
+  reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled false
+    csv.enabled false
+    html.destination file("${buildDir}/jacocoHtml")
+  }
+}
+
+task("${profile}Javadoc", type: Javadoc) {
+  source sourceSets["${profile}"].allJava
+//  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
+}
+
+task("${profile}Jar", type: Jar) {
+  from sourceSets["${profile}"].output
+  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
+}
+
+task("${profile}SourcesJar", type: Jar) {
+  classifier = 'sources'
+  from sourceSets["${profile}"].allSource
+  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
+}
+
+task("${profile}JavadocJar", type: Jar) {
+  classifier = 'javadoc'
+  from tasks["${profile}Javadoc"].destinationDir
+  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
+}
+
+signing {
+  sign tasks["${profile}Jar"]
+  sign tasks["${profile}SourcesJar"]
+  sign tasks["${profile}JavadocJar"]
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'Selenium Foundation'
+        packaging 'jar'
+        description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
+        url 'https://github.com/Nordstrom/Selenium-Foundation'
+
+        scm {
+          connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+          developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+          url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
+          tag 'HEAD'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'scoba'
+            name 'Scott Babcock'
+            email 'scoba@hotmail.com'
+            organization 'Nordstrom'
+            organizationUrl 'https://shop.nordstrom.com'
+          }
+        }
+      }
+    }
+  }
+}
+
+nexusStaging {
+  packageGroup = "com.nordstrom"
+  stagingProfileId = "76d943f622957"
+}
+
+artifacts {
+  archives tasks["${profile}Jar"]
+  archives tasks["${profile}SourcesJar"]
+  archives tasks["${profile}JavadocJar"]
+}
+
+repositories {
+   mavenLocal()
+   mavenCentral()
+   maven { url "https://mvnrepo.nordstrom.net/nexus/content/repositories/thirdparty" }
+   maven { url "http://public-snapshots" }
+   maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+dependencies {
+  compile group: 'com.nordstrom.tools', name: 'java-utils', version:'1.3.3'
+  compile group: 'com.nordstrom.tools', name: 'settings', version:'2.0.7'
+  compile group: 'com.nordstrom.tools', name: 'testng-foundation', version:'1.5.1'
+  compile group: 'com.nordstrom.tools', name: 'junit-foundation', version:'3.1.5'
+  compile group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version:'3.1.2.Final'
+  compile group: 'org.jboss.resteasy', name: 'resteasy-client', version:'3.1.2.Final'
+  compile group: 'net.bytebuddy', name: 'byte-buddy', version:'1.7.9'
+  compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.2'
+  compile group: 'com.github.sbabcoc', name: 'logback-testng', version:'1.0.0'
+  
+  selenium2Compile configurations.compile
+  selenium2Compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'2.53.0'
+  selenium2Compile group: 'com.google.guava', name: 'guava', version: '21.0'
+  
+  selenium3Compile configurations.compile
+  selenium3Compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'3.8.1'
+  selenium3Compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
+  selenium3Compile group: 'com.codeborne', name: 'phantomjsdriver', version: '1.4.2'
+  
+  testCompile configurations["${profile}Compile"]
+  testCompile group: 'org.mockito', name: 'mockito-all', version:'1.10.19'
+}
