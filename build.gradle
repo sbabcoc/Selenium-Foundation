@@ -72,7 +72,6 @@ jacocoTestReport {
 
 task("${profile}Javadoc", type: Javadoc) {
   source sourceSets["${profile}"].allJava
-//  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
 }
 
 task("${profile}Jar", type: Jar) {
