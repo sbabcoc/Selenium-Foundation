@@ -15,3 +15,4 @@ gradle/
 gradlew
 gradlew.bat
 /bin/
+test-output/
