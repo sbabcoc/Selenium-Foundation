@@ -1,10 +1,36 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation)
+Foundation for Selenium 2: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation)  
+Foundation for Selenium 3: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium3-foundation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation)
 
 # INTRODUCTION
+**Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium** (_WebDriver_).
 
-**Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium 2** (_WebDriver_). The last stable release of Selenium 2 is **2.53.1**.
+## SELENIUM API SUPPORT
 
-> **NOTE**: If you've upgraded to Selenium 3, the [Selenium3 Foundation](https://github.com/Nordstrom/Selenium3-Foundation) project is for you.
+**Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](https://github.com/Nordstrom/Selenium-Foundation/blob/master/build.gradle).
+
+### Building Selenium Foundation
+
+#### Building in Eclipse
+
+For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plugin. By default, this project will build it's **Selenium 2** configuration. To build the **Selenium 3** configuration, add this program argument to the run configuration for the `build` task:
+
+> `-Pprofile=selenium3`
+
+#### Building from Command Line
+
+Both configurations of **Selenium Foundation** can by built from the command line. 
+
+> **`gradle build`** `# build Selenium 2 configuration`  
+> **`gradle build -Pprofile=selenium3`** `# build Selenium 3 configuration`
+
+#### Maven Support
+
+Configuration-specific `POM` files have also been provided with **Selenium Foundation**. These `POM` files are primarily intended as artifacts to be bundled into official releases. However, they can also be used to build the project:
+
+> **`mvn -f pom-s2.xml clean install`** `# build Selenium 2 configuration`  
+> **`mvn -f pom-s3.xml clean install`** `# build Selenium 3 configuration`
+
+## GETTING STARTED
 
 The [QuickStart](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation), and the [Settings API](https://github.com/Nordstrom/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
 
