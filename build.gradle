@@ -27,8 +27,8 @@ if (!project.hasProperty("profile")) {
 ext {
   seleniumApi = "-s" + profile.charAt(8)
   def verBits = project.version.split("-")
-  classifier = (verBits.length > 1) ? verBits[1] : ""
-  archiveVer = verBits[0] + seleniumApi + "-" + classifier
+  classifier = (verBits.length > 1) ? "-" + verBits[1] : ""
+  archiveVer = verBits[0] + seleniumApi + classifier
   archiveBase = rootProject.name + "-" + archiveVer
 }
 
