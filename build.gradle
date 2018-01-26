@@ -97,7 +97,7 @@ task pomCopy(type: Copy) {
   description "Copies and filters the POM file for the active profile."
   
   destinationDir = sourceSets["${profile}"].ext.libsDir
-  def pomName = project.ext.archiveBase + "-pom.xml"
+  def pomName = project.ext.archiveBase + ".pom"
   def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
   
   from '.'
