@@ -27,8 +27,8 @@ Both configurations of **Selenium Foundation** can by built from the command lin
 
 Configuration-specific `POM` files have also been provided with **Selenium Foundation**. These `POM` files are primarily intended as artifacts to be bundled into official releases. However, they can also be used to build the project:
 
-> **`mvn -f pom-s2.xml clean install`** `# build Selenium 2 configuration`  
-> **`mvn -f pom-s3.xml clean install`** `# build Selenium 3 configuration`
+> **`mvn -f selenium2-pom.xml clean install`** `# build Selenium 2 configuration`  
+> **`mvn -f selenium3-pom.xml clean install`** `# build Selenium 3 configuration`
 
 ## GETTING STARTED
 

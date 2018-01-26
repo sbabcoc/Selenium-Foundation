@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
   id 'io.codearte.nexus-staging' version '0.11.0'
   id 'net.researchgate.release' version '2.6.0'
@@ -75,7 +77,21 @@ task("${profile}Javadoc", type: Javadoc) {
 }
 
 task("${profile}Jar", type: Jar) {
-  from sourceSets["${profile}"].output
+  def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
+  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.version]
+  
+  from(sourceSets["${profile}"].output) { }
+  from(".") {
+    include("${profile}-pom.xml")
+    rename(/.*/, 'pom.xml')
+    into(destPath)
+    filter(ReplaceTokens, tokens: tokens)
+  }
+  from(".") {
+    include("pom.properties")
+    into(destPath)
+    filter(ReplaceTokens, tokens: tokens)
+  }
   destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
 }
 
@@ -91,10 +107,25 @@ task("${profile}JavadocJar", type: Jar) {
   destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
 }
 
+task pomCopy(type: Copy) {
+  destinationDir = tasks["${profile}Jar"].destinationDir
+  def pomName = "${rootProject.name}-${project.version}-pom.xml"
+  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.version]
+  
+  from '.'
+  include "${profile}-pom.xml"
+  rename(/.*/, pomName)
+  into destinationDir
+  filter(ReplaceTokens, tokens: tokens)
+  inputs.properties(tokens)
+  outputs.file(new File(destinationDir, pomName))
+}
+
 signing {
   sign tasks["${profile}Jar"]
   sign tasks["${profile}SourcesJar"]
   sign tasks["${profile}JavadocJar"]
+//  sign file(pomCopy.outputs.files[0])
 }
 
 uploadArchives {
@@ -153,6 +184,7 @@ artifacts {
   archives tasks["${profile}Jar"]
   archives tasks["${profile}SourcesJar"]
   archives tasks["${profile}JavadocJar"]
+  archives file(pomCopy.outputs.files[0])
 }
 
 repositories {

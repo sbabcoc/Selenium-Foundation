@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.nordstrom.ui-tools</groupId>
-  <artifactId>selenium-foundation</artifactId>
-  <version>14.1.13-SNAPSHOT</version>
+  <groupId>@projectGroupId@</groupId>
+  <artifactId>@projectArtifactId@</artifactId>
+  <version>@projectVersion@</version>
   <packaging>jar</packaging>
   
-  <name>Selenium Foundation</name>
-  <description>Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium 2.0 (WebDriver).</description>
-  <url>https://github.com/Nordstrom/Selenium-Foundation</url>
+  <name>Selenium3 Foundation</name>
+  <description>Selenium3 Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium 3.0 (WebDriver).</description>
+  <url>https://github.com/Nordstrom/Selenium3-Foundation</url>
   
   <licenses>
     <license>
@@ -33,10 +33,10 @@
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
     <settings.version>2.0.7</settings.version>
-    <selenium.version>2.53.1</selenium.version>
+    <selenium.version>3.8.1</selenium.version>
     <testng-foundation.version>1.6.0</testng-foundation.version>
     <junit-foundation.version>3.1.5</junit-foundation.version>
-    <guava.version>21.0</guava.version>
+    <guava.version>23.5-jre</guava.version>
     <resteasy.version>3.1.2.Final</resteasy.version>
     <bytebuddy.version>1.7.9</bytebuddy.version>
     <logback.version>1.2.2</logback.version>
@@ -47,13 +47,14 @@
     <gpg-plugin.version>1.6</gpg-plugin.version>
     <staging-plugin.version>1.6.7</staging-plugin.version>
     <release-plugin.version>2.5.3</release-plugin.version>
+    <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
   </properties>
   
   <scm>
-    <connection>scm:git:https://github.com/Nordstrom/Selenium-Foundation.git</connection>
-    <developerConnection>scm:git:https://github.com/Nordstrom/Selenium-Foundation.git</developerConnection>
-    <url>https://github.com/Nordstrom/Selenium-Foundation/tree/master</url>
+    <connection>scm:git:https://github.com/Nordstrom/Selenium3-Foundation.git</connection>
+    <developerConnection>scm:git:https://github.com/Nordstrom/Selenium3-Foundation.git</developerConnection>
+    <url>https://github.com/Nordstrom/Selenium3-Foundation/tree/master</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -130,6 +131,11 @@
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.codeborne</groupId>
+        <artifactId>phantomjsdriver</artifactId>
+        <version>${phantomjsdriver.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -178,10 +184,14 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.codeborne</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+    </dependency>
   </dependencies>
   
   <build>
-    <directory>target-s2</directory>
+    <directory>target-s3</directory>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -318,7 +328,7 @@
             <goals><goal>add-source</goal></goals>
             <configuration>
               <sources>
-                <source>src/main/java-s2</source>
+                <source>src/main/java-s3</source>
               </sources>
             </configuration>
           </execution>
@@ -328,7 +338,7 @@
             <configuration>
               <resources>
                 <resource>
-                  <directory>src/main/resources-s2</directory>
+                  <directory>src/main/resources-s3</directory>
                 </resource>
               </resources>
             </configuration>
@@ -338,7 +348,7 @@
             <goals><goal>add-test-source</goal></goals>
             <configuration>
               <sources>
-                <source>src/test/java-s2</source>
+                <source>src/test/java-s3</source>
               </sources>
             </configuration>
           </execution>
