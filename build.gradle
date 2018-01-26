@@ -24,7 +24,18 @@ if (!project.hasProperty("profile")) {
   ext.profile = "selenium2"
 }
 
+ext {
+  seleniumApi = "-s" + profile.charAt(8)
+  def verBits = project.version.split("-")
+  classifier = (verBits.length > 1) ? verBits[1] : ""
+  archiveVer = verBits[0] + seleniumApi + "-" + classifier
+  archiveBase = rootProject.name + "-" + archiveVer
+}
+
 sourceSets {
+  all {
+    ext.libsDir = null
+  }
   selenium2 {
     java {
       srcDirs = [ 'src/main/java', 'src/main/java-s2' ]
@@ -33,6 +44,7 @@ sourceSets {
     resources {
       srcDirs = [ 'src/main/resources', 'src/main/resources-s2' ]
     }
+    ext.libsDir = file('build-s2/libs')
     compileClasspath = sourceSets.main.output + configurations.selenium2Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium2Runtime
   }
@@ -44,6 +56,7 @@ sourceSets {
     resources {
       srcDirs = [ 'src/main/resources', 'src/main/resources-s3' ]
     }
+    ext.libsDir = file('build-s3/libs')
     compileClasspath = sourceSets.main.output + configurations.selenium3Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium3Runtime
   }
@@ -73,12 +86,36 @@ jacocoTestReport {
 }
 
 task("${profile}Javadoc", type: Javadoc) {
+  group 'Documentation'
+  description "Generates Javadoc API documentation for the '${profile}' source code."
+  
   source sourceSets["${profile}"].allJava
 }
 
+task pomCopy(type: Copy) {
+  group 'Build'
+  description "Copies and filters the POM file for the active profile."
+  
+  destinationDir = sourceSets["${profile}"].ext.libsDir
+  def pomName = project.ext.archiveBase + "-pom.xml"
+  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
+  
+  from '.'
+  include "${profile}-pom.xml"
+  rename(/.*/, pomName)
+  into destinationDir
+  filter(ReplaceTokens, tokens: tokens)
+  inputs.properties(tokens)
+  ext.pomFile = new File(destinationDir, pomName)
+  ext.operation = new SignOperation().sign(ext.pomFile)
+}
+
 task("${profile}Jar", type: Jar) {
+  group 'Build'
+  description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
+  
   def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
-  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.version]
+  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
   
   from(sourceSets["${profile}"].output) { }
   from(".") {
@@ -92,46 +129,42 @@ task("${profile}Jar", type: Jar) {
     into(destPath)
     filter(ReplaceTokens, tokens: tokens)
   }
-  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
+  archiveName = project.ext.archiveBase + ".jar"
+  destinationDir = sourceSets["${profile}"].ext.libsDir
 }
 
 task("${profile}SourcesJar", type: Jar) {
+  group 'Build'
+  description "Assembles a jar archive containing the '${profile}' source files."
+  
   classifier = 'sources'
   from sourceSets["${profile}"].allSource
-  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
+  archiveName = project.ext.archiveBase + "-sources.jar"
+  destinationDir = sourceSets["${profile}"].ext.libsDir
 }
 
 task("${profile}JavadocJar", type: Jar) {
+  group 'Build'
+  description "Assembles a jar archive containing the '${profile}' JavaDoc files."
+  
   classifier = 'javadoc'
   from tasks["${profile}Javadoc"].destinationDir
-  destinationDir = new File(sourceSets["${profile}"].java.outputDir.getParentFile(), 'libs')
-}
-
-task pomCopy(type: Copy) {
-  destinationDir = tasks["${profile}Jar"].destinationDir
-  def pomName = "${rootProject.name}-${project.version}-pom.xml"
-  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.version]
-  
-  from '.'
-  include "${profile}-pom.xml"
-  rename(/.*/, pomName)
-  into destinationDir
-  filter(ReplaceTokens, tokens: tokens)
-  inputs.properties(tokens)
-  outputs.file(new File(destinationDir, pomName))
+  archiveName = project.ext.archiveBase + "-javadoc.jar"
+  destinationDir = sourceSets["${profile}"].ext.libsDir
 }
 
 signing {
   sign tasks["${profile}Jar"]
   sign tasks["${profile}SourcesJar"]
   sign tasks["${profile}JavadocJar"]
-//  sign file(pomCopy.outputs.files[0])
 }
 
 uploadArchives {
   repositories {
     mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+      beforeDeployment {
+        MavenDeployment deployment -> signing.signPom(deployment, pomCopy.ext.operation)
+      }
 
       repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
         authentication(userName: ossrhUsername, password: ossrhPassword)
@@ -143,6 +176,9 @@ uploadArchives {
 
       pom.project {
         name 'Selenium Foundation'
+        groupId project.group
+        artifactId rootProject.name
+        version project.ext.archiveVer
         packaging 'jar'
         description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
         url 'https://github.com/Nordstrom/Selenium-Foundation'
@@ -184,7 +220,9 @@ artifacts {
   archives tasks["${profile}Jar"]
   archives tasks["${profile}SourcesJar"]
   archives tasks["${profile}JavadocJar"]
-  archives file(pomCopy.outputs.files[0])
+  archives(pomCopy.ext.pomFile) {
+    builtBy pomCopy
+  }
 }
 
 repositories {
