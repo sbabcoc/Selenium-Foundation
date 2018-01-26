@@ -107,7 +107,6 @@ task pomCopy(type: Copy) {
   filter(ReplaceTokens, tokens: tokens)
   inputs.properties(tokens)
   ext.pomFile = new File(destinationDir, pomName)
-  ext.operation = new SignOperation().sign(ext.pomFile)
 }
 
 task("${profile}Jar", type: Jar) {
@@ -163,7 +162,7 @@ uploadArchives {
   repositories {
     mavenDeployer {
       beforeDeployment {
-        MavenDeployment deployment -> signing.signPom(deployment, tasks["pomCopy"].ext.operation)
+        MavenDeployment deployment -> signing.signPom(deployment)
       }
 
       repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
