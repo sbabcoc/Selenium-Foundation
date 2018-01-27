@@ -39,7 +39,6 @@ ext {
   } else {
     archiveVer = verBits[0] + "-" + seleniumApi
   }
-  println "##### archiveVer = " + archiveVer + " #####"
   archiveBase = rootProject.name + "-" + archiveVer
 }
 
@@ -103,22 +102,22 @@ task("${profile}Javadoc", type: Javadoc) {
   source sourceSets["${profile}"].allJava
 }
 
-task pomCopy(type: Copy) {
-  group 'Build'
-  description "Copies and filters the POM file for the active profile."
-  
-  destinationDir = sourceSets["${profile}"].ext.libsDir
-  def pomName = project.ext.archiveBase + ".pom"
-  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
-  
-  from '.'
-  include "${profile}-pom.xml"
-  rename(/.*/, pomName)
-  into destinationDir
-  filter(ReplaceTokens, tokens: tokens)
-  inputs.properties(tokens)
-  ext.pomFile = new File(destinationDir, pomName)
-}
+//task pomCopy(type: Copy) {
+//  group 'Build'
+//  description "Copies and filters the POM file for the active profile."
+//  
+//  destinationDir = sourceSets["${profile}"].ext.libsDir
+//  def pomName = project.ext.archiveBase + ".pom"
+//  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
+//  
+//  from '.'
+//  include "${profile}-pom.xml"
+//  rename(/.*/, pomName)
+//  into destinationDir
+//  filter(ReplaceTokens, tokens: tokens)
+//  inputs.properties(tokens)
+//  ext.pomFile = new File(destinationDir, pomName)
+//}
 
 task("${profile}Jar", type: Jar) {
   group 'Build'
@@ -230,9 +229,9 @@ artifacts {
   archives tasks["${profile}Jar"]
   archives tasks["${profile}SourcesJar"]
   archives tasks["${profile}JavadocJar"]
-  archives(pomCopy.ext.pomFile) {
-    builtBy pomCopy
-  }
+//  archives(pomCopy.ext.pomFile) {
+//    builtBy pomCopy
+//  }
 }
 
 repositories {
