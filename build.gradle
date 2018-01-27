@@ -27,11 +27,13 @@ if (!project.hasProperty("profile")) {
 ext {
   archiveVer = project.version
   def verBits = archiveVer.split("-")
+  def seleniumApi = "s" + profile.charAt(8)
   if (verBits.length > 1) {
-    def seleniumApi = "s" + profile.charAt(8)
     if ( ! verBits[1].equals(seleniumApi)) {
       archiveVer = verBits[0] + "-" + seleniumApi + "-" + verBits[1]
     }
+  } else {
+    archiveVer += "-" + seleniumApi
   }
   archiveBase = rootProject.name + "-" + archiveVer
 }
