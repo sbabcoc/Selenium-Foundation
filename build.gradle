@@ -39,6 +39,7 @@ ext {
   } else {
     archiveVer = verBits[0] + "-" + seleniumApi
   }
+  println "##### archiveVer = " + archiveVer + " #####"
   archiveBase = rootProject.name + "-" + archiveVer
 }
 
