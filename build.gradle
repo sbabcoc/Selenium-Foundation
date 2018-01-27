@@ -183,6 +183,11 @@ uploadArchives {
         authentication(userName: ossrhUsername, password: ossrhPassword)
       }
 
+      pom.scopeMappings.with {
+        mappings.clear()
+        addMapping(300, configurations["${profile}Compile"], 'runtime')
+      }
+            
       pom.project {
         name 'Selenium Foundation'
         groupId project.group
