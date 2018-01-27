@@ -21,19 +21,23 @@ group = 'com.nordstrom.ui-tools'
 description = "Selenium Foundation"
 
 if (!project.hasProperty("profile")) {
-  ext.profile = "selenium2"
+  ext.profile = 'selenium2'
+} else {
+  assert ['selenium2', 'selenium3'].contains(profile)
 }
 
 ext {
-  archiveVer = project.version
-  def verBits = archiveVer.split("-")
+  archiveVer = null
+  def verBits = project.version.split("-")
   def seleniumApi = "s" + profile.charAt(8)
   if (verBits.length > 1) {
-    if ( ! verBits[1].equals(seleniumApi)) {
+    if (verBits[1].equals(seleniumApi)) {
+      archiveVer = project.version
+    } else {
       archiveVer = verBits[0] + "-" + seleniumApi + "-" + verBits[1]
     }
   } else {
-    archiveVer += "-" + seleniumApi
+    archiveVer = verBits[0] + "-" + seleniumApi
   }
   archiveBase = rootProject.name + "-" + archiveVer
 }
@@ -179,39 +183,39 @@ uploadArchives {
         authentication(userName: ossrhUsername, password: ossrhPassword)
       }
 
-//      pom.project {
-//        name 'Selenium Foundation'
-//        groupId project.group
-//        artifactId rootProject.name
-//        version project.ext.archiveVer
-//        packaging 'jar'
-//        description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
-//        url 'https://github.com/Nordstrom/Selenium-Foundation'
-//
-//        scm {
-//          connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
-//          developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
-//          url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
-//          tag 'HEAD'
-//        }
-//
-//        licenses {
-//          license {
-//            name 'The Apache License, Version 2.0'
-//            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//          }
-//        }
-//
-//        developers {
-//          developer {
-//            id 'scoba'
-//            name 'Scott Babcock'
-//            email 'scoba@hotmail.com'
-//            organization 'Nordstrom'
-//            organizationUrl 'https://shop.nordstrom.com'
-//          }
-//        }
-//      }
+      pom.project {
+        name 'Selenium Foundation'
+        groupId project.group
+        artifactId rootProject.name
+        version project.ext.archiveVer
+        packaging 'jar'
+        description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
+        url 'https://github.com/Nordstrom/Selenium-Foundation'
+
+        scm {
+          connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+          developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+          url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
+          tag 'HEAD'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'scoba'
+            name 'Scott Babcock'
+            email 'scoba@hotmail.com'
+            organization 'Nordstrom'
+            organizationUrl 'https://shop.nordstrom.com'
+          }
+        }
+      }
     }
   }
 }
