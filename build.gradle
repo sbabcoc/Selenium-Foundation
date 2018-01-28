@@ -185,8 +185,8 @@ uploadArchives {
 
       pom.scopeMappings.with {
         mappings.clear()
-        addMapping(300, configurations.compile, 'runtime')
-        addMapping(300, configurations["${profile}Compile"], 'runtime')
+        addMapping(300, configurations.compile, 'compile')
+        addMapping(300, configurations["${profile}Compile"], 'compile')
       }
             
       pom.project {
