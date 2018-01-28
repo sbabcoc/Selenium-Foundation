@@ -7,6 +7,35 @@
 
 **Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](https://github.com/Nordstrom/Selenium-Foundation/blob/master/build.gradle).
 
+### Dependency Artifact Coordinates
+
+The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Use
+version `*-s2` for **Selenium 2** support, or `*-s3` for **Selenium 3** support.
+
+To add a dependency on **Selenium Foundation** using Maven, use the following:
+
+```xml
+<dependency>
+  <groupId>com.nordstrom.ui-tools</groupId>
+  <artifactId>selenium-foundation</artifactId>
+  <!-- either Selenium 2 support: -->
+  <version>14.1.13-s2</version>
+  <!-- or Selenium 3 support: -->
+  <version>14.1.13-s3</version>
+</dependency>
+```
+
+To add a dependency using Gradle:
+
+```java
+dependencies {
+  // either Selenium 2 support:
+  compile 'com.nordstrom.ui-tools:selenium-foundation:14.1.13-s2'
+  // or Selenium 3 support:
+  compile 'com.nordstrom.ui-tools:selenium-foundation:14.1.13-s3'
+}
+```
+
 ### Building Selenium Foundation
 
 #### Building in Eclipse
@@ -19,8 +48,8 @@ For Eclipse, we recommend enabling Gradle integration through the official [Buil
 
 Both configurations of **Selenium Foundation** can by built from the command line. 
 
-> **`gradle build`** `# build Selenium 2 configuration`  
-> **`gradle build -Pprofile=selenium3`** `# build Selenium 3 configuration`
+> **`gradle build --info`** `# build Selenium 2 configuration`  
+> **`gradle build -Pprofile=selenium3 --info`** `# build Selenium 3 configuration`
 
 #### Maven Support
 
@@ -28,6 +57,8 @@ Configuration-specific `POM` files have also been provided with **Selenium Found
 
 > **`mvn -f selenium2-pom.xml clean install`** `# build Selenium 2 configuration`  
 > **`mvn -f selenium3-pom.xml clean install`** `# build Selenium 3 configuration`
+
+Note that the artifact coordinates in these POM files are merely placeholders - tokens that get replaced during the build process. Also, the `POM` files found on public repositories like [Maven Central](https://search.maven.org/) are merely provided to supply artifact metadata and dependencies. Finalized, functional `POMs` can be found within the **Selenium Foundation** JAR itself at `META-INF\maven\com.nordstrom.ui-tools\selenium-foundation\pom.xml`
 
 ## GETTING STARTED
 
