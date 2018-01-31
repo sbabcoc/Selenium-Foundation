@@ -105,7 +105,8 @@ task("${profile}Javadoc", type: Javadoc) {
   group 'Documentation'
   description "Generates Javadoc API documentation for the '${profile}' source code."
   
-  source sourceSets["${profile}"].allJava
+  source = sourceSets["${profile}"].allJava
+  classpath = configurations.compile + configurations["${profile}Compile"]
 }
 
 task pomCopy(type: Copy) {
@@ -162,7 +163,7 @@ task("${profile}SourcesJar", type: Jar) {
   destinationDir = sourceSets["${profile}"].ext.libsDir
 }
 
-task("${profile}JavadocJar", type: Jar) {
+task("${profile}JavadocJar", type: Jar, dependsOn: "${profile}Javadoc") {
   group 'Build'
   description "Assembles a jar archive containing the '${profile}' JavaDoc files."
   
