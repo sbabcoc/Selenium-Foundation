@@ -34,7 +34,7 @@ public class ModelTest extends TestNgBase {
         ModelTestCore.testFrameByIndex(this);
     }
 
-    @Test
+    @Test(enabled = false)
     public void testFrameById() {
         ModelTestCore.testFrameById(this);
     }

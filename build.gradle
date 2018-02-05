@@ -1,4 +1,11 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.api.InvalidUserDataException
+import org.gradle.api.internal.file.FileResolver
+import org.gradle.api.internal.file.copy.CopyAction
+import org.gradle.api.internal.file.copy.CopySpecInternal
+import org.gradle.api.internal.file.copy.DestinationRootCopySpec
+import org.gradle.api.internal.file.copy.FileCopyAction
+import org.gradle.internal.reflect.Instantiator
 
 plugins {
   id 'io.codearte.nexus-staging' version '0.11.0'
@@ -109,13 +116,15 @@ task("${profile}Javadoc", type: Javadoc) {
   classpath = configurations.compile + configurations["${profile}Compile"]
 }
 
-task pomCopy(type: Copy) {
+task pomCopy(type: PomCopy) {
   group 'Build'
   description "Copies and filters the POM file for the active profile."
   
-  destinationDir = sourceSets["${profile}"].ext.libsDir
   def pomName = project.ext.archiveBase + ".pom"
   def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
+  
+  destinationDir = sourceSets["${profile}"].ext.libsDir
+  archiveName = pomName
   
   from '.'
   include "${profile}-pom.xml"
@@ -123,7 +132,6 @@ task pomCopy(type: Copy) {
   into destinationDir
   filter(ReplaceTokens, tokens: tokens)
   inputs.properties(tokens)
-  ext.pomFile = new File(destinationDir, pomName)
 }
 
 task("${profile}Jar", type: Jar) {
@@ -177,7 +185,7 @@ signing {
   sign tasks["${profile}Jar"]
   sign tasks["${profile}SourcesJar"]
   sign tasks["${profile}JavadocJar"]
-  sign file(tasks['pomCopy'].ext.pomFile)
+  sign pomCopy
 }
 
 uploadArchives {
@@ -247,9 +255,7 @@ artifacts {
   archives tasks["${profile}Jar"]
   archives tasks["${profile}SourcesJar"]
   archives tasks["${profile}JavadocJar"]
-  archives(pomCopy.ext.pomFile) {
-    builtBy pomCopy
-  }
+  archives pomCopy
 }
 
 repositories {
@@ -282,4 +288,49 @@ dependencies {
   
   testCompile configurations["${profile}Compile"]
   testCompile group: 'org.mockito', name: 'mockito-all', version:'1.10.19'
+}
+
+class PomCopy extends Tar {
+
+    @Override
+    protected CopyAction createCopyAction() {
+        File destinationDir = getDestinationDir();
+        if (destinationDir == null) {
+            throw new InvalidUserDataException("No copy destination directory has been specified, use 'into' to specify a target directory.");
+        }
+        return new FileCopyAction(getFileLookup().getFileResolver(destinationDir));
+    }
+
+    @Override
+    protected CopySpecInternal createRootSpec() {
+        Instantiator instantiator = getInstantiator();
+        FileResolver fileResolver = getFileResolver();
+
+        return instantiator.newInstance(DestinationRootCopySpec.class, fileResolver, super.createRootSpec());
+    }
+
+    @Override
+    public DestinationRootCopySpec getRootSpec() {
+        return (DestinationRootCopySpec) super.getRootSpec();
+    }
+
+    /**
+     * Returns the directory to copy files into.
+     *
+     * @return The destination dir.
+     */
+    @OutputDirectory
+    public File getDestinationDir() {
+        return getRootSpec().getDestinationDir();
+    }
+
+    /**
+     * Sets the directory to copy files into. This is the same as calling {@link #into(Object)} on this task.
+     *
+     * @param destinationDir The destination directory. Must not be null.
+     */
+    public void setDestinationDir(File destinationDir) {
+        into(destinationDir);
+    }
+  
 }

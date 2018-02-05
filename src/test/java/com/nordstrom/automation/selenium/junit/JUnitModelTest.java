@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.junit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
@@ -15,46 +16,55 @@ public class JUnitModelTest extends JUnitBase {
     }
     
     @Test
+    @Ignore
     public void testParagraphs() {
         ModelTestCore.testParagraphs(this);
     }
     
     @Test
+    @Ignore
     public void testTable() {
         ModelTestCore.testTable(this);
     }
 
     @Test
+    @Ignore
     public void testFrameByElement() {
         ModelTestCore.testFrameByElement(this);
     }
 
     @Test
+    @Ignore
     public void testFrameByIndex() {
         ModelTestCore.testFrameByIndex(this);
     }
 
     @Test
+    @Ignore
     public void testFrameById() {
         ModelTestCore.testFrameById(this);
     }
     
     @Test
+    @Ignore
     public void testComponentList() {
         ModelTestCore.testComponentList(this);
     }
     
     @Test
+    @Ignore
     public void testComponentMap() {
         ModelTestCore.testComponentMap(this);
     }
     
     @Test
+    @Ignore
     public void testFrameList() {
         ModelTestCore.testFrameList(this);
     }
 
     @Test
+    @Ignore
     public void testFrameMap() {
         ModelTestCore.testFrameMap(this);
     }
@@ -64,6 +74,7 @@ public class JUnitModelTest extends JUnitBase {
      * and that the search context chain gets refreshed efficiently.
      */
     @Test
+    @Ignore
     public void testRefresh() {
         ModelTestCore.testRefresh(this);
     }
