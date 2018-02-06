@@ -25,39 +25,63 @@ jar.enabled = false
 afterReleaseBuild.dependsOn uploadArchives
 
 group = 'com.nordstrom.ui-tools'
-description = "Selenium Foundation"
+description = 'Selenium Foundation'
 
-if (!project.hasProperty("profile")) {
+if (!project.hasProperty('profile')) {
   ext.profile = 'selenium2'
 } else {
   assert ['selenium2', 'selenium3'].contains(profile)
 }
 
-ext {
-  if (!project.hasProperty("archiveVer")) {
-    archiveVer = null
-    def verBits = project.version.split("-")
-    def seleniumApi = "s" + profile.charAt(8)
-    if (verBits.length > 1) {
-      if (verBits[1].equals(seleniumApi)) {
-        archiveVer = project.version
-      } else {
-        archiveVer = verBits[0] + "-" + seleniumApi + "-" + verBits[1]
+def archiveVer = null
+def verBits = project.version.split('-')
+def seleniumApi = 's' + profile.charAt(8)
+if (verBits.length > 1) {
+  if (verBits[1].equals(seleniumApi)) {
+    archiveVer = project.version
+  } else {
+    archiveVer = verBits[0] + '-' + seleniumApi + '-' + verBits[1]
+  }
+} else {
+  archiveVer = verBits[0] + '-' + seleniumApi
+}
+
+project.version = archiveVer
+  
+def archiveBase = rootProject.name + '-' + archiveVer
+def pomSourceName = "${profile}-pom.xml"
+def pomTargetName = archiveBase + ".pom"
+def doPomCopy = true
+def buildRoot = null
+def libsDir = null
+
+switch ("${profile}") {
+case "selenium2":
+  buildRoot = file('build-s2')
+  libsDir = new File(buildRoot, 'libs')
+  break
+case "selenium3":
+  buildRoot = file('build-s3')
+  libsDir = new File(buildRoot, 'libs')
+  break
+}
+  
+gradle.taskGraph.whenReady { taskGraph ->
+  if (!taskGraph.hasTask(clean)) {
+    def targetFile = new File(libsDir, pomTargetName)
+    if (targetFile.exists()) {
+      def sourceFile = file(pomSourceName)
+      def sourceTime = sourceFile.lastModified()
+      def targetTime = targetFile.lastModified()
+      if (sourceTime < targetTime) {
+        doPomCopy = false
       }
-    } else {
-      archiveVer = verBits[0] + "-" + seleniumApi
     }
-    archiveBase = rootProject.name + "-" + archiveVer
-    project.version = archiveVer
   }
 }
 
 sourceSets {
   selenium2 {
-    ext {
-      buildRoot = file('build-s2')
-      libsDir = new File(buildRoot, 'libs')
-    }
     java {
       srcDirs = [ 'src/main/java', 'src/main/java-s2' ]
       outputDir = new File(buildRoot, 'classes')
@@ -69,10 +93,6 @@ sourceSets {
     runtimeClasspath = output + compileClasspath + configurations.selenium2Runtime
   }
   selenium3 {
-    ext {
-      buildRoot = file('build-s3')
-      libsDir = new File(buildRoot, 'libs')
-    }
     java {
       srcDirs = [ 'src/main/java', 'src/main/java-s3' ]
       outputDir = new File(buildRoot, 'classes')
@@ -85,7 +105,7 @@ sourceSets {
   }
   test {
     java {
-      outputDir = new File(sourceSets["${profile}"].ext.buildRoot, 'test-classes')
+      outputDir = new File(buildRoot, 'test-classes')
     }
     compileClasspath += sourceSets["${profile}"].output
     runtimeClasspath += sourceSets["${profile}"].output
@@ -96,8 +116,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 jacoco {
-  toolVersion = "0.7.9"
-  reportsDir = file("$buildDir/customJacocoReportDir")
+  toolVersion = '0.7.9'
+  reportsDir = file("${buildDir}/customJacocoReportDir")
 }
 
 jacocoTestReport {
@@ -118,47 +138,55 @@ task("${profile}Javadoc", type: Javadoc) {
 
 task pomCopy(type: PomCopy) {
   group 'Build'
-  description "Copies and filters the POM file for the active profile."
+  description 'Copies and filters the POM file for the active profile.'
   
-  def pomName = project.ext.archiveBase + ".pom"
-  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
+  onlyIf { doPomCopy }
+
+  def tokens = [projectGroupId: project.group,
+                projectArtifactId: rootProject.name,
+                projectVersion: archiveVer,
+                projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
   
-  destinationDir = sourceSets["${profile}"].ext.libsDir
-  archiveName = pomName
+  destinationDir = libsDir
+  archiveName = pomTargetName
   
   from '.'
-  include "${profile}-pom.xml"
-  rename(/.*/, pomName)
+  include pomSourceName
+  rename(/.*/, pomTargetName)
   into destinationDir
   filter(ReplaceTokens, tokens: tokens)
   inputs.properties(tokens)
 }
 
-task("${profile}Jar", type: Jar) {
+task("${profile}Jar", type: Jar) { //, dependsOn: pomCopy) {
   group 'Build'
   description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
   
   def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
-  def tokens = [projectGroupId: project.group, projectArtifactId: rootProject.name, projectVersion: project.ext.archiveVer]
+  
+  def tokens = [projectGroupId: project.group,
+                projectArtifactId: rootProject.name,
+                projectVersion: archiveVer,
+                projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
   
   from(sourceSets["${profile}"].output) { }
-  from(".") {
+  from('.') {
     include("${profile}-pom.xml")
     rename(/.*/, 'pom.xml')
     into(destPath)
     filter(ReplaceTokens, tokens: tokens)
   }
-  from(".") {
-    include("pom.properties")
+  from('.') {
+    include('pom.properties')
     into(destPath)
     filter(ReplaceTokens, tokens: tokens)
   }
-  archiveName = project.ext.archiveBase + ".jar"
-  destinationDir = sourceSets["${profile}"].ext.libsDir
+  archiveName = archiveBase + '.jar'
+  destinationDir = libsDir
 }
 
 clean {
-  delete sourceSets["${profile}"].ext.buildRoot
+  delete buildRoot
 }
 
 task("${profile}SourcesJar", type: Jar) {
@@ -167,8 +195,8 @@ task("${profile}SourcesJar", type: Jar) {
   
   classifier = 'sources'
   from sourceSets["${profile}"].allSource
-  archiveName = project.ext.archiveBase + "-sources.jar"
-  destinationDir = sourceSets["${profile}"].ext.libsDir
+  archiveName = archiveBase + '-sources.jar'
+  destinationDir = libsDir
 }
 
 task("${profile}JavadocJar", type: Jar, dependsOn: "${profile}Javadoc") {
@@ -177,8 +205,8 @@ task("${profile}JavadocJar", type: Jar, dependsOn: "${profile}Javadoc") {
   
   classifier = 'javadoc'
   from tasks["${profile}Javadoc"].destinationDir
-  archiveName = project.ext.archiveBase + "-javadoc.jar"
-  destinationDir = sourceSets["${profile}"].ext.libsDir
+  archiveName = archiveBase + '-javadoc.jar'
+  destinationDir = libsDir
 }
 
 signing {
@@ -195,11 +223,11 @@ uploadArchives {
         MavenDeployment deployment -> signing.signPom(deployment)
       }
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+      repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
         authentication(userName: ossrhUsername, password: ossrhPassword)
       }
 
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+      snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
         authentication(userName: ossrhUsername, password: ossrhPassword)
       }
 
@@ -213,7 +241,7 @@ uploadArchives {
         name 'Selenium Foundation'
         groupId project.group
         artifactId rootProject.name
-        version project.ext.archiveVer
+        version archiveVer
         packaging 'jar'
         description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
         url 'https://github.com/Nordstrom/Selenium-Foundation'
@@ -247,8 +275,8 @@ uploadArchives {
 }
 
 nexusStaging {
-  packageGroup = "com.nordstrom"
-  stagingProfileId = "76d943f622957"
+  packageGroup = 'com.nordstrom'
+  stagingProfileId = '76d943f622957'
 }
 
 artifacts {
@@ -261,9 +289,9 @@ artifacts {
 repositories {
    mavenLocal()
    mavenCentral()
-   maven { url "https://mvnrepo.nordstrom.net/nexus/content/repositories/thirdparty" }
-   maven { url "http://public-snapshots" }
-   maven { url "http://repo.maven.apache.org/maven2" }
+   maven { url 'https://mvnrepo.nordstrom.net/nexus/content/repositories/thirdparty' }
+   maven { url 'http://public-snapshots' }
+   maven { url 'http://repo.maven.apache.org/maven2' }
 }
 
 dependencies {
