@@ -209,6 +209,16 @@ task("${profile}JavadocJar", type: Jar, dependsOn: "${profile}Javadoc") {
   destinationDir = libsDir
 }
 
+task testNG(type: Test) {
+  useTestNG()
+  reports.html.destination = file("${buildDir}/reports/testng")
+}
+
+test {
+  dependsOn testNG
+  reports.html.destination = file("${buildDir}/reports/junit")
+}
+
 signing {
   sign tasks["${profile}Jar"]
   sign tasks["${profile}SourcesJar"]
