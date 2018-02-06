@@ -158,7 +158,7 @@ task pomCopy(type: PomCopy) {
   inputs.properties(tokens)
 }
 
-task("${profile}Jar", type: Jar) { //, dependsOn: pomCopy) {
+task("${profile}Jar", type: Jar) {
   group 'Build'
   description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
   
