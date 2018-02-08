@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.interfaces;
 
 import org.openqa.selenium.SearchContext;
+
+import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.support.Coordinator;
 
@@ -43,8 +45,10 @@ public interface DetectsLoadCompletion {
      * Check the specified page-load condition to determine if this condition has been met.<br>
      * NOTE - This method indicates failure to meet the condition by throwing {@link PageNotLoadedException}.
      * 
+     * @param <T> coordinator type parameter
      * @param condition expected page-load condition
      * @param message the detail message for the {@link PageNotLoadedException} thrown if the condition isn't met
+     * @return result from the {@link Function#apply(Object) apply} method of the specified coordinator
      */
     default <T> T checkPageLoadCondition(final Coordinator<T> condition, final String message) {
         T result = null;
