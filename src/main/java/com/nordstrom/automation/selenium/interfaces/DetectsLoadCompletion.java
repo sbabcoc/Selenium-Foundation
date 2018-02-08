@@ -1,7 +1,7 @@
 package com.nordstrom.automation.selenium.interfaces;
 
 import org.openqa.selenium.SearchContext;
-
+import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.support.Coordinator;
 
 /**
@@ -23,6 +23,7 @@ public interface DetectsLoadCompletion {
      * 
      * @return 'true' if the page has finished loading; otherwise 'false'
      */
+    // FIXME - This method performs an unchecked cast to DetectsLoadCompletion
     static Coordinator<Boolean> pageLoadIsComplete() {
         return new Coordinator<Boolean>() {
 
@@ -38,4 +39,34 @@ public interface DetectsLoadCompletion {
         };
     }
 
+    /**
+     * Check the specified page-load condition to determine if this condition has been met.<br>
+     * NOTE - This method indicates failure to meet the condition by throwing {@link PageNotLoadedException}.
+     * 
+     * @param condition expected page-load condition
+     * @param message the detail message for the {@link PageNotLoadedException} thrown if the condition isn't met
+     */
+    default <T> T checkPageLoadCondition(final Coordinator<T> condition, final String message) {
+        T result = null;
+        Throwable cause = null;
+        try {
+            result = condition.apply(getContext());
+        } catch (RuntimeException t) {
+            cause = t;
+        }
+        if (cause != null) {
+            throw new PageNotLoadedException(message, cause);
+        } else if (result == null || result == Boolean.FALSE) {
+            throw new PageNotLoadedException(message);
+        }
+        return result;
+    }
+    
+    /**
+     * Get the container search context
+     * 
+     * @return container search context
+     */
+    SearchContext getContext();
+    
 }

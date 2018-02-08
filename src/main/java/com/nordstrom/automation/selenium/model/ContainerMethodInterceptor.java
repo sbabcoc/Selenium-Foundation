@@ -143,16 +143,16 @@ public enum ContainerMethodInterceptor {
                     }
                 }
                 
-                if (detectsCompletion) {
-                    newChild.getWait(WaitType.PAGE_LOAD).until(DetectsLoadCompletion.pageLoadIsComplete());
-                } else if (reference != null) {
-                    WaitType.PAGE_LOAD.getWait(driver).until(Coordinators.stalenessOf(reference));
-                }
-                
                 result = newChild.enhanceContainer(newChild);
                 if (newHandle != null) {
                     ((Page) result).setWindowHandle(newHandle);
                     ComponentContainer.waitForLandingPage((Page) result);
+                }
+                
+                if (detectsCompletion) {
+                    ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD).until(DetectsLoadCompletion.pageLoadIsComplete());
+                } else if (reference != null) {
+                    WaitType.PAGE_LOAD.getWait(driver).until(Coordinators.stalenessOf(reference));
                 }
             }
             
