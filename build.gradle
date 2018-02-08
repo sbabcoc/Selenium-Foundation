@@ -7,6 +7,8 @@ import org.gradle.api.internal.file.copy.DestinationRootCopySpec
 import org.gradle.api.internal.file.copy.FileCopyAction
 import org.gradle.internal.reflect.Instantiator
 
+import java.util.concurrent.Callable;
+
 plugins {
   id 'io.codearte.nexus-staging' version '0.11.0'
   id 'net.researchgate.release' version '2.6.0'
@@ -329,6 +331,14 @@ dependencies {
 }
 
 class PomCopy extends Tar {
+
+    public PomCopy() {
+        getConventionMapping().map("extension", new Callable<Object>(){
+            public Object call() throws Exception {
+                return 'pom';
+            }
+        });
+    }
 
     @Override
     protected CopyAction createCopyAction() {
