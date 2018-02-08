@@ -638,7 +638,7 @@ public abstract class ComponentContainer
      * 
      * @param pageObj page object whose landing page is to be verified
      */
-    private static void verifyLandingPage(Page pageObj) {
+    private static void verifyLandingPage(final Page pageObj) {
         Class<?> pageClass = getContainerClass(pageObj);
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
         if (pageUrl != null) {
