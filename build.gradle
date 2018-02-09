@@ -51,7 +51,7 @@ if (verBits.length > 1) {
 project.version = archiveVer
   
 def archiveBase = rootProject.name + '-' + archiveVer
-def pomSourceName = "${profile}-pom.xml"
+def pomSourceName = "pom.xml"
 def pomTargetName = archiveBase + ".pom"
 def doPomCopy = true
 def buildRoot = null
@@ -144,10 +144,7 @@ task pomCopy(type: PomCopy) {
   
   onlyIf { doPomCopy }
 
-  def tokens = [projectGroupId: project.group,
-                projectArtifactId: rootProject.name,
-                projectVersion: archiveVer,
-                projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
+  def tokens = [projectVersion: archiveVer, projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
   
   destinationDir = libsDir
   archiveName = pomTargetName
@@ -165,11 +162,7 @@ task("${profile}Jar", type: Jar) {
   description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
   
   def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
-  
-  def tokens = [projectGroupId: project.group,
-                projectArtifactId: rootProject.name,
-                projectVersion: archiveVer,
-                projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
+  def tokens = [projectVersion: archiveVer, projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
   
   from(sourceSets["${profile}"].output) { }
   from('.') {
