@@ -322,9 +322,9 @@ dependencies {
   selenium2Compile group: 'com.google.guava', name: 'guava', version: '21.0'
   
   selenium3Compile configurations.compile
-  selenium3Compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'3.9.1'
+  selenium3Compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'3.8.1'
   selenium3Compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
-  selenium3Compile group: 'com.codeborne', name: 'phantomjsdriver', version: '1.4.2'
+  selenium3Compile group: 'com.codeborne', name: 'phantomjsdriver', version: '1.4.4'
   
   testCompile configurations["${profile}Compile"]
   testCompile group: 'org.mockito', name: 'mockito-all', version:'1.10.19'

@@ -34,7 +34,7 @@
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
     <settings.version>2.0.7</settings.version>
-    <selenium.version>3.9.1</selenium.version>
+    <selenium.version>3.8.1</selenium.version>
     <testng-foundation.version>1.6.0</testng-foundation.version>
     <junit-foundation.version>3.1.5</junit-foundation.version>
     <guava.version>23.5-jre</guava.version>
@@ -48,7 +48,7 @@
     <gpg-plugin.version>1.6</gpg-plugin.version>
     <staging-plugin.version>1.6.7</staging-plugin.version>
     <release-plugin.version>2.5.3</release-plugin.version>
-    <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
+    <phantomjsdriver.version>1.4.4</phantomjsdriver.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
   </properties>
   
