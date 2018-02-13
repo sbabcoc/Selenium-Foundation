@@ -18,9 +18,9 @@ To add a dependency on **Selenium Foundation** using Maven, use the following:
   <groupId>com.nordstrom.ui-tools</groupId>
   <artifactId>selenium-foundation</artifactId>
   <!-- either Selenium 2 support: -->
-  <version>14.1.14-s2</version>
+  <version>14.1.16-s2</version>
   <!-- or Selenium 3 support: -->
-  <version>14.1.14-s3</version>
+  <version>14.1.16-s3</version>
 </dependency>
 ```
 
@@ -29,9 +29,9 @@ To add a dependency using Gradle:
 ```java
 dependencies {
   // either Selenium 2 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:14.1.14-s2'
+  compile 'com.nordstrom.ui-tools:selenium-foundation:14.1.16-s2'
   // or Selenium 3 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:14.1.14-s3'
+  compile 'com.nordstrom.ui-tools:selenium-foundation:14.1.16-s3'
 }
 ```
 
