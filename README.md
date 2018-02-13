@@ -47,14 +47,14 @@ For Eclipse, we recommend enabling Gradle integration through the official [Buil
 
 Both configurations of **Selenium Foundation** can by built from the command line. 
 
-> **`gradle build --info`** `# build Selenium 3 configuration`
+> **`gradle build --info`** `# build Selenium 3 configuration`  
 > **`gradle build -Pprofile=selenium2 --info`** `# build Selenium 2 configuration`  
 
 #### Maven Support
 
 Although Gradle is used to produce official releases, **Selenium Foundation** also includes a fully-functional Maven POM file.
 
-> **`mvn install -Pselenium3`** `# build Selenium 3 configuration`
+> **`mvn install -Pselenium3`** `# build Selenium 3 configuration`  
 > **`mvn install -Pselenium2`** `# build Selenium 2 configuration`
 
 Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at `META-INF\maven\com.nordstrom.ui-tools\selenium-foundation\pom.xml`
