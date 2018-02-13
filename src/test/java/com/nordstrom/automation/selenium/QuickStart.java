@@ -161,7 +161,7 @@ public class QuickStart extends TestNgBase {
     @Test
     public void dummyTest() {
         SeleniumConfig config = SeleniumConfig.getConfig();
-        LOGGER.info("The configured browser is: " + config.getString(SeleniumSettings.BROWSER_NAME.key()));
+        LOGGER.info("The configured browser is: " + config.getBrowserCaps().getBrowserName());
         ExamplePage examplePage = (ExamplePage) getInitialPage();
         assertEquals(examplePage.getTitle(), PAGE_TITLE, "Unexpeced page title");
     }

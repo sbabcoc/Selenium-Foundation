@@ -10,8 +10,12 @@ import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Sleeper;
+import org.openqa.selenium.support.ui.SystemClock;
+import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
@@ -96,22 +100,18 @@ public final class DriverManager {
             
             // if driver not yet acquired
             if ( ! optDriver.isPresent()) {
-                WebDriver driver;
                 long prior = System.currentTimeMillis();
-                // if test class provides its own drivers
-                if (instance instanceof DriverProvider) {
-                    driver = ((DriverProvider) instance).provideDriver(instance, method);
-                } else {
-                    driver = GridUtility.getDriver();
-                }
                 
-                if (driver != null) {
-                    setDriverTimeouts(driver, config);
-                    optDriver = instance.setDriver(driver);
-                    if (instance.isTest(method)) {
-                        long after = System.currentTimeMillis();
-                        instance.adjustTimeout(after - prior);
-                    }
+                long timeOutInSeconds = config.getLong(SeleniumSettings.HOST_TIMEOUT.key());
+                DriverSessionWait wait = new DriverSessionWait(instance, timeOutInSeconds);
+                wait.ignoring(WebDriverException.class);
+                WebDriver driver = wait.until(driverIsAcquired(method));
+                
+                setDriverTimeouts(driver, config);
+                optDriver = instance.setDriver(driver);
+                if (instance.isTest(method)) {
+                    long after = System.currentTimeMillis();
+                    instance.adjustTimeout(after - prior);
                 }
             }
             
@@ -234,5 +234,46 @@ public final class DriverManager {
         }
         
         return optDriver;
+    }
+    
+    /**
+     * Returns a 'wait' proxy that acquires a driver session.
+     * 
+     * @param method test method
+     * @return new driver session
+     * @throws WebDriverException If acquisition attempt fails.
+     */
+    private static Function<TestBase, WebDriver> driverIsAcquired(final Method method) {
+        return new Function<TestBase, WebDriver>() {
+
+            @Override
+            public WebDriver apply(TestBase instance) {
+                // if test class provides its own drivers
+                if (instance instanceof DriverProvider) {
+                    return ((DriverProvider) instance).provideDriver(instance, method);
+                } else {
+                    return GridUtility.getDriver();
+                }
+            }
+            
+            @Override
+            public String toString() {
+                return "driver to be aquired";
+            }
+        };
+    }
+    
+    /**
+     * This class extends {@link FluentWait}, specifying {@link TestBase} as the type parameter. This 'wait' object
+     * will repeatedly apply specified 'wait' proxies until they complete successfully or the specified timeout has
+     * expired, pausing 500 mS between iterations.
+     */
+    public static class DriverSessionWait extends FluentWait<TestBase> {
+        
+        public DriverSessionWait(TestBase context, long timeOutInSeconds) {
+            super(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER);
+            withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
+        }
+
     }
 }
