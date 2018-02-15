@@ -2,10 +2,12 @@ package com.nordstrom.automation.selenium.utility;
 
 import java.util.Optional;
 
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 
 public final class ScreenshotUtils {
@@ -24,14 +26,14 @@ public final class ScreenshotUtils {
     public static boolean canGetArtifact(Optional<WebDriver> optDriver, Logger logger) {
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
-            if (driver instanceof TakesScreenshot) {
+            if (driver instanceof HasCapabilities) {
+                if (((HasCapabilities) driver).getCapabilities().is(CapabilityType.TAKES_SCREENSHOT)) {
+                    return true;
+                }
+            } else if (driver instanceof TakesScreenshot) {
                 return true;
-            } else {
-                String message = "This driver is not capable of taking a screenshot.  If a screenshot is desired, use"
-                        + " a WebDriver implementation that supports screenshots. For more information, see https://"
-                        + "seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/TakesScreenshot.html";
-                logger.warn(message);
             }
+            logger.warn("This driver is not able to take screenshots.");
         }
         return false;
     }

@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.junit;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -16,7 +17,9 @@ public class ScreenshotCaptureTest extends JUnitBase {
     
     @Test
     public void testScreenshotCapture() {
-        Optional<Path> optArtifactPath = getLinkedRule(ScreenshotCapture.class).captureArtifact(null);
+        ScreenshotCapture collector = getLinkedRule(ScreenshotCapture.class);
+        assumeTrue(collector.getArtifactProvider().canGetArtifact(this));
+        Optional<Path> optArtifactPath = collector.captureArtifact(null);
         assertTrue(optArtifactPath.isPresent());
     }
 
