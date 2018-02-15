@@ -36,6 +36,8 @@ public final class PageSourceUtils {
                 } else {
                     return true;
                 }
+            } else {
+                logger.warn("Unable to determine if this driver can capture page source.");
             }
         }
         return false;

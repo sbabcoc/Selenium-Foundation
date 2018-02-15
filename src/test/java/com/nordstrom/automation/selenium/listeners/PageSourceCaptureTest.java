@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.testng.Reporter;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -17,9 +18,13 @@ public class PageSourceCaptureTest extends TestNgBase {
     
     @Test
     public void testPageSourceCapture() {
-        Optional<Path> optArtifactPath = 
-                        getLinkedListener(PageSourceCapture.class).captureArtifact(Reporter.getCurrentTestResult());
-        assertTrue(optArtifactPath.isPresent());
+        PageSourceCapture collector = getLinkedListener(PageSourceCapture.class);
+        if (collector.getArtifactProvider().canGetArtifact(Reporter.getCurrentTestResult())) {
+            Optional<Path> optArtifactPath = collector.captureArtifact(Reporter.getCurrentTestResult());
+            assertTrue(optArtifactPath.isPresent());
+        } else {
+            throw new SkipException("This driver is not able to capture page source."); 
+        }
     }
 
 }

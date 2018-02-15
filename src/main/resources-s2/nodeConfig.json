@@ -20,6 +20,11 @@
       "browserName": "phantomjs",
       "maxInstances": 5,
       "seleniumProtocol": "WebDriver"
+    },
+    {
+      "browserName": "htmlunit",
+      "maxInstances": 5,
+      "seleniumProtocol": "WebDriver"
     }
   ],
   "configuration": 
