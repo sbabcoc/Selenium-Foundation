@@ -162,19 +162,19 @@ task("${profile}Jar", type: Jar) {
   description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
   
   def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
-  def tokens = [projectVersion: archiveVer, projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
+  def pomTokens = [projectVersion: archiveVer, projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
+  def propTokens = [projectVersion: archiveVer, projectGroupId: project.group, projectArtifactId: rootProject.name]
   
   from(sourceSets["${profile}"].output) { }
   from('.') {
-    include("${profile}-pom.xml")
-    rename(/.*/, 'pom.xml')
+    include('pom.xml')
     into(destPath)
-    filter(ReplaceTokens, tokens: tokens)
+    filter(ReplaceTokens, tokens: pomTokens)
   }
   from('.') {
     include('pom.properties')
     into(destPath)
-    filter(ReplaceTokens, tokens: tokens)
+    filter(ReplaceTokens, tokens: propTokens)
   }
   archiveName = archiveBase + '.jar'
   destinationDir = libsDir
