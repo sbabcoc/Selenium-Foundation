@@ -19,7 +19,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
-import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
@@ -27,6 +26,7 @@ import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.selenium.Capabilities;
@@ -253,21 +253,25 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      */
     public URI getTargetUri() {
         if (targetUri == null) {
-            UriBuilder builder = UriBuilder.fromPath(getString(SeleniumSettings.TARGET_PATH.key()))
-                    .scheme(getString(SeleniumSettings.TARGET_SCHEME.key()))
-                    .host(getString(SeleniumSettings.TARGET_HOST.key()));
+            URIBuilder builder = new URIBuilder().setPath(getString(SeleniumSettings.TARGET_PATH.key()))
+                    .setScheme(getString(SeleniumSettings.TARGET_SCHEME.key()))
+                    .setHost(getString(SeleniumSettings.TARGET_HOST.key()));
             
             String creds = getString(SeleniumSettings.TARGET_CREDS.key());
             if (creds != null) {
-                builder.userInfo(creds);
+                builder.setUserInfo(creds);
             }
             
             String port = getString(SeleniumSettings.TARGET_PORT.key());
             if (port != null) {
-                builder.port(Integer.parseInt(port));
+                builder.setPort(Integer.parseInt(port));
             }
             
-            targetUri = builder.build();
+            try {
+                targetUri = builder.build();
+            } catch (URISyntaxException e) {
+                // Eat this exception
+            }
         }
         return targetUri;
     }

@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.By;
@@ -492,8 +491,8 @@ public abstract class ComponentContainer
      * @return new instance of the specified page class
      */
     public <T extends Page> T openPageAtPath(Class<T> pageClass, String path, boolean newWindow) {
-        UriBuilder builder = UriBuilder.fromUri(SeleniumConfig.getConfig().getTargetUri()).path(path);
-        return openPageAtUrl(pageClass, builder.build().toString(), newWindow);
+        URIBuilder builder = new URIBuilder(SeleniumConfig.getConfig().getTargetUri()).setPath(path);
+        return openPageAtUrl(pageClass, builder.toString(), newWindow);
     }
     
     /**
@@ -558,29 +557,29 @@ public abstract class ComponentContainer
             String host = pageUrl.host();
             String port = pageUrl.port();
             
-            UriBuilder builder = UriBuilder.fromUri(targetUri);
+            URIBuilder builder = new URIBuilder(targetUri);
             
             if (!PLACEHOLDER.equals(scheme)) {
-                builder.scheme(scheme.isEmpty() ? null : scheme);
+                builder.setScheme(scheme.isEmpty() ? null : scheme);
             }
             
             if (!path.isEmpty()) {
-                builder.path(path);
+                builder.setPath(path);
             }
             
             if (!PLACEHOLDER.equals(userInfo)) {
-                builder.userInfo(userInfo.isEmpty() ? null : userInfo);
+                builder.setUserInfo(userInfo.isEmpty() ? null : userInfo);
             }
             
             if (!PLACEHOLDER.equals(host)) {
-                builder.host(host.isEmpty() ? null : host);
+                builder.setHost(host.isEmpty() ? null : host);
             }
             
             if (!PLACEHOLDER.equals(port)) {
-                builder.port(port.isEmpty() ? -1 : Integer.parseInt(port));
+                builder.setPort(port.isEmpty() ? -1 : Integer.parseInt(port));
             }
             
-            result = builder.build().toString();
+            result = builder.toString();
         }
         
         return result;

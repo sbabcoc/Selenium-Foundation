@@ -36,7 +36,6 @@
     <settings.version>2.0.7</settings.version>
     <testng-foundation.version>1.7.0</testng-foundation.version>
     <junit-foundation.version>3.1.5</junit-foundation.version>
-    <resteasy.version>3.1.2.Final</resteasy.version>
     <bytebuddy.version>1.7.9</bytebuddy.version>
     <logback.version>1.2.2</logback.version>
     <logback-testng.version>1.0.0</logback-testng.version>
@@ -76,16 +75,6 @@
         <version>${junit-foundation.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxrs</artifactId>
-        <version>${resteasy.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-client</artifactId>
-        <version>${resteasy.version}</version>
-      </dependency>
-      <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
         <version>${bytebuddy.version}</version>
@@ -123,14 +112,6 @@
     <dependency>
       <groupId>com.nordstrom.tools</groupId>
       <artifactId>junit-foundation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-client</artifactId>
     </dependency>
     <dependency>
       <groupId>net.bytebuddy</groupId>
