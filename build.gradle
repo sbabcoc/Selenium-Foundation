@@ -1,14 +1,3 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.api.InvalidUserDataException
-import org.gradle.api.internal.file.FileResolver
-import org.gradle.api.internal.file.copy.CopyAction
-import org.gradle.api.internal.file.copy.CopySpecInternal
-import org.gradle.api.internal.file.copy.DestinationRootCopySpec
-import org.gradle.api.internal.file.copy.FileCopyAction
-import org.gradle.internal.reflect.Instantiator
-
-import java.util.concurrent.Callable;
-
 plugins {
   id 'io.codearte.nexus-staging' version '0.11.0'
   id 'net.researchgate.release' version '2.6.0'
@@ -51,9 +40,6 @@ if (verBits.length > 1) {
 project.version = archiveVer
   
 def archiveBase = rootProject.name + '-' + archiveVer
-def pomSourceName = "pom.xml"
-def pomTargetName = archiveBase + ".pom"
-def doPomCopy = true
 def buildRoot = null
 def libsDir = null
 
@@ -68,20 +54,6 @@ case "selenium3":
   break
 }
   
-gradle.taskGraph.whenReady { taskGraph ->
-  if (!taskGraph.hasTask(clean)) {
-    def targetFile = new File(libsDir, pomTargetName)
-    if (targetFile.exists()) {
-      def sourceFile = file(pomSourceName)
-      def sourceTime = sourceFile.lastModified()
-      def targetTime = targetFile.lastModified()
-      if (sourceTime < targetTime) {
-        doPomCopy = false
-      }
-    }
-  }
-}
-
 sourceSets {
   selenium2 {
     java {
@@ -138,44 +110,11 @@ task("${profile}Javadoc", type: Javadoc) {
   classpath = configurations.compile + configurations["${profile}Compile"]
 }
 
-task pomCopy(type: PomCopy) {
-  group 'Build'
-  description 'Copies and filters the POM file for the active profile.'
-  
-  onlyIf { doPomCopy }
-
-  def tokens = [projectVersion: archiveVer, projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
-  
-  destinationDir = libsDir
-  archiveName = pomTargetName
-  
-  from '.'
-  include pomSourceName
-  rename(/.*/, pomTargetName)
-  into destinationDir
-  filter(ReplaceTokens, tokens: tokens)
-  inputs.properties(tokens)
-}
-
 task("${profile}Jar", type: Jar) {
   group 'Build'
-  description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
-  
-  def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
-  def pomTokens = [projectVersion: archiveVer, projectTimestamp: Long.valueOf(System.currentTimeMillis()).toString()]
-  def propTokens = [projectVersion: archiveVer, projectGroupId: project.group, projectArtifactId: rootProject.name]
+  description "Assembles a jar archive containing the '${profile}' classes."
   
   from(sourceSets["${profile}"].output) { }
-  from('.') {
-    include('pom.xml')
-    into(destPath)
-    filter(ReplaceTokens, tokens: pomTokens)
-  }
-  from('.') {
-    include('pom.properties')
-    into(destPath)
-    filter(ReplaceTokens, tokens: propTokens)
-  }
   archiveName = archiveBase + '.jar'
   destinationDir = libsDir
 }
@@ -218,18 +157,61 @@ signing {
   sign tasks["${profile}Jar"]
   sign tasks["${profile}SourcesJar"]
   sign tasks["${profile}JavadocJar"]
-  sign pomCopy
 }
 
 uploadArchives {
   repositories {
     mavenDeployer {
+      beforeDeployment {
+        MavenDeployment deployment -> signing.signPom(deployment)
+      }
+      
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
         authentication(userName: ossrhUsername, password: ossrhPassword)
       }
 
       snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
         authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.scopeMappings.with {
+        mappings.clear()
+        addMapping(300, configurations.compile, 'compile')
+        addMapping(300, configurations["${profile}Compile"], 'compile')
+      }
+            
+      pom.project {
+        name 'Selenium Foundation'
+        groupId project.group
+        artifactId rootProject.name
+        version archiveVer
+        packaging 'jar'
+        description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
+        url 'https://github.com/Nordstrom/Selenium-Foundation'
+
+        scm {
+          connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+          developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+          url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
+          tag 'HEAD'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'scoba'
+            name 'Scott Babcock'
+            email 'scoba@hotmail.com'
+            organization 'Nordstrom'
+            organizationUrl 'https://shop.nordstrom.com'
+          }
+        }
       }
     }
   }
@@ -244,7 +226,6 @@ artifacts {
   archives tasks["${profile}Jar"]
   archives tasks["${profile}SourcesJar"]
   archives tasks["${profile}JavadocJar"]
-  archives pomCopy
 }
 
 repositories {
@@ -275,57 +256,4 @@ dependencies {
   
   testCompile configurations["${profile}Compile"]
   testCompile group: 'org.mockito', name: 'mockito-all', version:'1.10.19'
-}
-
-class PomCopy extends Tar {
-
-    public PomCopy() {
-        getConventionMapping().map("extension", new Callable<Object>(){
-            public Object call() throws Exception {
-                return 'pom';
-            }
-        });
-    }
-
-    @Override
-    protected CopyAction createCopyAction() {
-        File destinationDir = getDestinationDir();
-        if (destinationDir == null) {
-            throw new InvalidUserDataException("No copy destination directory has been specified, use 'into' to specify a target directory.");
-        }
-        return new FileCopyAction(getFileLookup().getFileResolver(destinationDir));
-    }
-
-    @Override
-    protected CopySpecInternal createRootSpec() {
-        Instantiator instantiator = getInstantiator();
-        FileResolver fileResolver = getFileResolver();
-
-        return instantiator.newInstance(DestinationRootCopySpec.class, fileResolver, super.createRootSpec());
-    }
-
-    @Override
-    public DestinationRootCopySpec getRootSpec() {
-        return (DestinationRootCopySpec) super.getRootSpec();
-    }
-
-    /**
-     * Returns the directory to copy files into.
-     *
-     * @return The destination dir.
-     */
-    @OutputDirectory
-    public File getDestinationDir() {
-        return getRootSpec().getDestinationDir();
-    }
-
-    /**
-     * Sets the directory to copy files into. This is the same as calling {@link #into(Object)} on this task.
-     *
-     * @param destinationDir The destination directory. Must not be null.
-     */
-    public void setDestinationDir(File destinationDir) {
-        into(destinationDir);
-    }
-  
 }
