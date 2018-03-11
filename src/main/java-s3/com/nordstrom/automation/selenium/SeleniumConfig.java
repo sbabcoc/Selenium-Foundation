@@ -253,7 +253,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      */
     public URI getTargetUri() {
         if (targetUri == null) {
-            URIBuilder builder = new URIBuilder().setPath(getString(SeleniumSettings.TARGET_PATH.key()))
+            URIBuilder builder = new URIBuilder().setPath(getString(SeleniumSettings.TARGET_PATH.key()) + "/")
                     .setScheme(getString(SeleniumSettings.TARGET_SCHEME.key()))
                     .setHost(getString(SeleniumSettings.TARGET_HOST.key()));
             
@@ -268,7 +268,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             }
             
             try {
-                targetUri = builder.build();
+                targetUri = builder.build().normalize();
             } catch (URISyntaxException e) {
                 // Eat this exception
             }

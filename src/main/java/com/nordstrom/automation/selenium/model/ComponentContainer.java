@@ -491,7 +491,8 @@ public abstract class ComponentContainer
      * @return new instance of the specified page class
      */
     public <T extends Page> T openPageAtPath(Class<T> pageClass, String path, boolean newWindow) {
-        URIBuilder builder = new URIBuilder(SeleniumConfig.getConfig().getTargetUri()).setPath(path);
+        URIBuilder builder = new URIBuilder(SeleniumConfig.getConfig().getTargetUri());
+        builder.setPath(URI.create(builder.getPath() + "/").resolve("./" + path).getPath());
         return openPageAtUrl(pageClass, builder.toString(), newWindow);
     }
     
@@ -564,7 +565,7 @@ public abstract class ComponentContainer
             }
             
             if (!path.isEmpty()) {
-                builder.setPath(path);
+                builder.setPath(URI.create(builder.getPath() + "/").resolve("./" + path).getPath());
             }
             
             if (!PLACEHOLDER.equals(userInfo)) {
