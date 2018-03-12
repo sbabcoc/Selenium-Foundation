@@ -1,11 +1,15 @@
 package com.nordstrom.automation.selenium.model;
 
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -13,8 +17,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.testng.annotations.Test;
 
+import com.nordstrom.automation.selenium.annotations.PageUrl;
+
 public class ComponentContainerTest {
 
+    private static final URI targetUri = URI.create("http://target.com/basepath");
+    
     @Test
     public void updateTextInputSameValue() {
         WebElement elementWithValue = mockElement("input", "Nordstrom", false);
@@ -90,6 +98,64 @@ public class ComponentContainerTest {
             throw e.getTargetException();
         }
     }
+    
+    @Test
+    public void getRelativePageUrl() {
+        String url = ComponentContainer.getPageUrl(pageUrl(PageOne.class), targetUri);
+        assertEquals(url, "http://target.com/basepath/page-one");
+    }
+    
+    @Test
+    public void getAbsolutePageUrl() {
+        String url = ComponentContainer.getPageUrl(pageUrl(PageTwo.class), targetUri);
+        assertEquals(url, "http://example.com/page-two");
+    }
+    
+    @Test
+    public void getPageUrlWithScheme() {
+        String url = ComponentContainer.getPageUrl(pageUrl(PageThree.class), targetUri);
+        assertEquals(url, "https://target.com/basepath/page-three");
+    }
+    
+    @Test
+    public void getPageUrlWithHost() {
+        String url = ComponentContainer.getPageUrl(pageUrl(PageFour.class), targetUri);
+        assertEquals(url, "http://new-host.org/basepath/page-four");
+    }
+    
+    @Test
+    public void getPageUrlWithPort() {
+        String url = ComponentContainer.getPageUrl(pageUrl(PageFive.class), targetUri);
+        assertEquals(url, "http://target.com:2020/basepath/page-five");
+    }
+    
+    @Test
+    public void getPageUrlWithUserInfo() {
+        String url = ComponentContainer.getPageUrl(pageUrl(PageSix.class), targetUri);
+        assertEquals(url, "http://user:pass@target.com/basepath/page-six");
+    }
+    
+    @Test
+    public void getResourceFilePageUrl() {
+        String url = ComponentContainer.getPageUrl(pageUrl(FilePage.class), targetUri);
+        
+        // create URI from URL
+        URI uri = URI.create(url);
+        // verify scheme
+        assertEquals(uri.getScheme(), "file");
+        // get URI path
+        String path = uri.getPath();
+        // get index of "resources" segment
+        int index = path.indexOf("resources");
+        // verify segment exists
+        assertNotEquals(index, -1);
+        // verify resource file path
+        assertEquals(path.substring(index), "resources/test/ExamplePage.html");
+        // create File from URI
+        File file = new File(uri);
+        // verify file exists
+        assertTrue(file.exists());
+    }
 
     /**
      * Create mocked {@link WebElement} object.
@@ -128,4 +194,35 @@ public class ComponentContainerTest {
         when(executor.executeScript(any(String.class), anyVararg())).thenReturn(null);
         return driver;
     }
+    
+    /**
+     * Get {@link PageUrl} annotation for the specified page class
+     * 
+     * @param pageClass page class
+     * @return {@link PageUrl} annotation object
+     */
+    private PageUrl pageUrl(Class<?> pageClass) {
+        return pageClass.getAnnotation(PageUrl.class);
+    }
+    
+    @PageUrl("/page-one")
+    static class PageOne { }
+    
+    @PageUrl("http://example.com/page-two")
+    static class PageTwo { }
+    
+    @PageUrl(scheme="https", value="/page-three")
+    static class PageThree { }
+    
+    @PageUrl(host="new-host.org", value="/page-four")
+    static class PageFour { }
+    
+    @PageUrl(port="2020", value="/page-five")
+    static class PageFive { }
+    
+    @PageUrl(userInfo="user:pass", value="/page-six")
+    static class PageSix { }
+    
+    @PageUrl(scheme="file", value="ExamplePage.html")
+    static class FilePage{ }
 }

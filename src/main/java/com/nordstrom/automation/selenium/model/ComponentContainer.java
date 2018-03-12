@@ -560,12 +560,17 @@ public abstract class ComponentContainer
             
             URIBuilder builder = new URIBuilder(targetUri);
             
-            if (!PLACEHOLDER.equals(scheme)) {
-                builder.setScheme(scheme.isEmpty() ? null : scheme);
+            if (!path.isEmpty()) {
+                URI pathUri = URI.create(path);
+                if (pathUri.isAbsolute()) {
+                    return pathUri.toString();
+                } else {
+                    builder.setPath(URI.create(builder.getPath() + "/").resolve("./" + path).getPath());
+                }
             }
             
-            if (!path.isEmpty()) {
-                builder.setPath(URI.create(builder.getPath() + "/").resolve("./" + path).getPath());
+            if (!PLACEHOLDER.equals(scheme)) {
+                builder.setScheme(scheme.isEmpty() ? null : scheme);
             }
             
             if (!PLACEHOLDER.equals(userInfo)) {
@@ -895,6 +900,10 @@ public abstract class ComponentContainer
      */
     public <T extends Frame> Map<Object, T> newFrameMap(Class<T> frameType, By locator) {
         return new FrameMap<>(this, frameType, locator);
+    }
+    
+    private URI resolve() {
+        return null;
     }
     
     @Override
