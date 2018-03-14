@@ -143,18 +143,10 @@ public class ComponentContainerTest {
         URI uri = URI.create(url);
         // verify scheme
         assertEquals(uri.getScheme(), "file");
-        // get URI path
-        String path = uri.getPath();
-        // get index of "resources" segment
-        int index = path.indexOf("resources");
-        // verify segment exists
-        assertNotEquals(index, -1);
         // verify resource file path
-        assertEquals(path.substring(index), "resources/test/ExamplePage.html");
-        // create File from URI
-        File file = new File(uri);
+        assertTrue(uri.getPath().endsWith("/ExamplePage.html"));
         // verify file exists
-        assertTrue(file.exists());
+        assertTrue(new File(uri).exists());
     }
 
     /**
