@@ -14,6 +14,9 @@ public final class PageSourceUtils {
     
     private static final String TAKES_ELEMENT_SCREENSHOT = "takesElementScreenshot";
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private PageSourceUtils() {
         throw new AssertionError("PageSourceUtils is a static utility class that cannot be instantiated");
     }
@@ -25,19 +28,19 @@ public final class PageSourceUtils {
      * @param logger SLF4J logger object
      * @return 'true' if driver can produce page source; otherwise 'false
      */
-    public static boolean canGetArtifact(Optional<WebDriver> optDriver, Logger logger) {
+    public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             if (driver instanceof HasCapabilities) {
                 Capabilities caps = ((HasCapabilities) driver).getCapabilities();
                 // if driver explicitly reports that it cannot produce page source
                 if (Boolean.FALSE.equals(caps.getCapability(TAKES_ELEMENT_SCREENSHOT))) {
-                    logger.warn("This driver is not capable of producing page source.");
+                    logger.warn("This driver is not capable of producing page source."); //NOSONAR
                 } else {
                     return true;
                 }
             } else {
-                logger.warn("Unable to determine if this driver can capture page source.");
+                logger.warn("Unable to determine if this driver can capture page source."); //NOSONAR
             }
         }
         return false;
@@ -51,7 +54,9 @@ public final class PageSourceUtils {
      * @param logger SLF4J logger object
      * @return page source; if capture fails, an empty string is returned
      */
-    public static String getArtifact(Optional<WebDriver> optDriver, Throwable reason, Logger logger) {
+    public static String getArtifact(
+                    final Optional<WebDriver> optDriver, final Throwable reason, final Logger logger) {
+        
         if (canGetArtifact(optDriver, logger)) {
             try {
                 WebDriver driver = optDriver.get();
@@ -74,7 +79,7 @@ public final class PageSourceUtils {
      * @param driver web driver object
      * @return the [sourceBuilder] object
      */
-    private static StringBuilder insertBaseElement(StringBuilder sourceBuilder, WebDriver driver) {
+    private static StringBuilder insertBaseElement(final StringBuilder sourceBuilder, final WebDriver driver) {
         int offset = sourceBuilder.indexOf("<head>") + 6;
         
         // if no head found
@@ -118,7 +123,7 @@ public final class PageSourceUtils {
      * @param reason impetus for capture request; may be 'null'
      * @return the [sourceBuilder] object
      */
-    private static StringBuilder insertBreakpointInfo(StringBuilder sourceBuilder, Throwable reason) {
+    private static StringBuilder insertBreakpointInfo(final StringBuilder sourceBuilder, final Throwable reason) {
         if (reason != null) {
             Throwable cause = WebDriverUtils.getReportableCause(reason);
             StackTraceElement breakpoint = WebDriverUtils.getClientBreakpoint(cause);
@@ -156,7 +161,7 @@ public final class PageSourceUtils {
      * @param driver web driver object
      * @return the [sourceBuilder] object
      */
-    private static StringBuilder insertOriginalUrl(StringBuilder sourceBuilder, WebDriver driver) {
+    private static StringBuilder insertOriginalUrl(final StringBuilder sourceBuilder, final WebDriver driver) {
         sourceBuilder.insert(0, " -->\n")
                 .insert(0, driver.getCurrentUrl())
                 .insert(0, "<!-- Original URL: ");

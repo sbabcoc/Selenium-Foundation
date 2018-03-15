@@ -15,4 +15,4 @@ import org.openqa.selenium.SearchContext;
  * 
  * @param <T> The return type
  */
-public interface Coordinator<T> extends Function<SearchContext, T>{}
+public interface Coordinator<T> extends Function<SearchContext, T> { }

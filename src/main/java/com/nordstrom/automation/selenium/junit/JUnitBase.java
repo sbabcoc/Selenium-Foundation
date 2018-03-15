@@ -32,7 +32,7 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     
     /** This class rule performs end-of-class clean-up of drivers and local Grid. */
     @ClassRule
-    public static final ExternalResource resource = DriverWatcher.getClassWatcher();
+    public static final ExternalResource RESOURCE = DriverWatcher.getClassWatcher();
     
     /** This method rule manages driver lifetimes and opens initial pages. */
     
@@ -45,53 +45,83 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
     private Optional<WebDriver> optDriver = Optional.empty();
     private Optional<Page> optInitialPage = Optional.empty();
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<WebDriver> nabDriver() {
         return optDriver;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Optional<WebDriver> setDriver(WebDriver driver) {
+    public Optional<WebDriver> setDriver(final WebDriver driver) {
         optDriver = TestBase.optionalOf(driver);
         return optDriver;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Page> nabInitialPage() {
         return optInitialPage;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Optional<Page> setInitialPage(Page pageObj) {
+    public Optional<Page> setInitialPage(final Page pageObj) {
         optInitialPage = TestBase.optionalOf(pageObj);
         return optInitialPage;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isTest(Method method) {
+    public boolean isTest(final Method method) {
         return null != method.getAnnotation(Test.class);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isBeforeMethod(Method method) {
+    public boolean isBeforeMethod(final Method method) {
         return null != method.getAnnotation(Before.class);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isAfterMethod(Method method) {
+    public boolean isAfterMethod(final Method method) {
         return null != method.getAnnotation(After.class);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isBeforeClass(Method method) {
+    public boolean isBeforeClass(final Method method) {
         return null != method.getAnnotation(BeforeClass.class);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isAfterClass(Method method) {
+    public boolean isAfterClass(final Method method) {
         return null != method.getAnnotation(AfterClass.class);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Description getDescription() {
         return getLinkedRule(ScreenshotCapture.class).getDescription();
@@ -104,7 +134,7 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
      * @param testRuleType test rule type
      * @return {@link ScreenshotCapture} test rule
      */
-    public <T extends TestRule> T getLinkedRule(Class<T> testRuleType) {
+    public <T extends TestRule> T getLinkedRule(final Class<T> testRuleType) {
         Optional<T> optional = RuleChainWalker.getAttachedRule(ruleChain, testRuleType);
         if (optional.isPresent()) {
             return optional.get();

@@ -24,7 +24,7 @@ public class ScreenshotArtifact implements ArtifactType {
      * {@inheritDoc}
      */
     @Override
-    public boolean canGetArtifact(Object instance) {
+    public boolean canGetArtifact(final Object instance) {
         Optional<WebDriver> optDriver = DriverManager.nabDriver(instance);
         return ScreenshotUtils.canGetArtifact(optDriver, LOGGER);
     }
@@ -33,7 +33,7 @@ public class ScreenshotArtifact implements ArtifactType {
      * {@inheritDoc}
      */
     @Override
-    public byte[] getArtifact(Object instance, Throwable reason) {
+    public byte[] getArtifact(final Object instance, final Throwable reason) {
         Optional<WebDriver> optDriver = DriverManager.nabDriver(instance);
         return ScreenshotUtils.getArtifact(optDriver, reason, LOGGER);
     }
@@ -42,7 +42,7 @@ public class ScreenshotArtifact implements ArtifactType {
      * {@inheritDoc}
      */
     @Override
-    public Path getArtifactPath(Object instance) {
+    public Path getArtifactPath(final Object instance) {
         return ArtifactType.super.getArtifactPath(instance).resolve(ARTIFACT_PATH);
     }
     

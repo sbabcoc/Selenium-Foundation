@@ -19,7 +19,7 @@ public class ContainerVacatedException extends RuntimeException {
      *
      * @param vacater method that caused the container to be vacated
      */
-    public ContainerVacatedException(Method vacater) {
+    public ContainerVacatedException(final Method vacater) {
         super(getMessage(vacater));
         this.vacater = vacater;
     }
@@ -39,7 +39,7 @@ public class ContainerVacatedException extends RuntimeException {
      * @param method method that vacated the target object.
      * @return message for this exception
      */
-    private static String getMessage(Method method) {
+    private static String getMessage(final Method method) {
         String className = method.getDeclaringClass().getSimpleName();
         String signature = ReflectUtil.getSignature(method);
         return PREAMBLE + className + ":" + signature;

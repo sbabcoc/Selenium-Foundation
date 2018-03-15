@@ -78,6 +78,7 @@ public abstract class ComponentContainer
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
+    private static final String ELEMENT_MESSAGE = "[element] must be non-null";
     
     private final Logger logger;
     
@@ -87,7 +88,7 @@ public abstract class ComponentContainer
      * @param context container search context
      * @param parent container parent (may be {@code null} for {@link Page} objects
      */
-    public ComponentContainer(SearchContext context, ComponentContainer parent) {
+    public ComponentContainer(final SearchContext context, final ComponentContainer parent) {
         Objects.requireNonNull(context, "[context] must be non-null");
         validateParent(parent);
         
@@ -103,7 +104,7 @@ public abstract class ComponentContainer
      * 
      * @param parent container parent
      */
-    protected void validateParent(ComponentContainer parent) {
+    protected void validateParent(final ComponentContainer parent) {
         Objects.requireNonNull(parent, "[parent] must be non-null");
     }
 
@@ -164,7 +165,7 @@ public abstract class ComponentContainer
      * @param waitType wait type being requested
      * @return {@link SearchContextWait} object of the specified type for this container
      */
-    public SearchContextWait getWait(WaitType waitType) {
+    public SearchContextWait getWait(final WaitType waitType) {
         return waitType.getWait(this);
     }
     
@@ -189,9 +190,12 @@ public abstract class ComponentContainer
      */
     static Coordinator<SearchContext> contextIsSwitched(final ComponentContainer context) {
         return new Coordinator<SearchContext>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public SearchContext apply(SearchContext ignore) {
+            public SearchContext apply(final SearchContext ignore) {
                 if (context.parent != null) {
                     context.parent.switchTo();
                 }
@@ -203,6 +207,9 @@ public abstract class ComponentContainer
                 }
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "context to be switched";
@@ -240,7 +247,7 @@ public abstract class ComponentContainer
      * 
      * @param vacater vacating method
      */
-    void setVacater(Method vacater) {
+    void setVacater(final Method vacater) {
         this.vacater = vacater;
         if (parent != null) {
             parent.setVacater(vacater);
@@ -262,7 +269,7 @@ public abstract class ComponentContainer
      * @param constant the locator constant
      * @return a list of all WebElements, or an empty list if nothing matches
      */
-    public List<WebElement> findElements(ByEnum constant) {
+    public List<WebElement> findElements(final ByEnum constant) {
         return findElements(constant.locator());
     }
     
@@ -273,7 +280,7 @@ public abstract class ComponentContainer
      * @return a list of all WebElements, or an empty list if nothing matches
      */
     @Override
-    public List<WebElement> findElements(By by) {
+    public List<WebElement> findElements(final By by) {
         return RobustElementWrapper.getElements(this, by);
     }
     
@@ -283,7 +290,7 @@ public abstract class ComponentContainer
      * @param constant the locator constant
      * @return the first matching element on the current context
      */
-    public WebElement findElement(ByEnum constant) {
+    public WebElement findElement(final ByEnum constant) {
         return findElement(constant.locator());
     }
     
@@ -294,7 +301,7 @@ public abstract class ComponentContainer
      * @return the first matching element on the current context
      */
     @Override
-    public WebElement findElement(By by) {
+    public WebElement findElement(final By by) {
         return RobustElementWrapper.getElement(this, by);
     }
     
@@ -306,7 +313,7 @@ public abstract class ComponentContainer
      * @param constant the locator constant
      * @return robust web element
      */
-    public RobustWebElement findOptional(ByEnum constant) {
+    public RobustWebElement findOptional(final ByEnum constant) {
         return findOptional(constant.locator());
     }
     
@@ -318,7 +325,7 @@ public abstract class ComponentContainer
      * @param by the locating mechanism
      * @return robust web element
      */
-    public RobustWebElement findOptional(By by) {
+    public RobustWebElement findOptional(final By by) {
         return (RobustWebElement) RobustElementWrapper.getElement(this, by, RobustElementWrapper.OPTIONAL);
     }
     
@@ -339,8 +346,8 @@ public abstract class ComponentContainer
      * @param value desired value
      * @return 'true' if element value changed; otherwise 'false'
      */
-    public static boolean updateValue(WebElement element, boolean value) {
-        Objects.requireNonNull(element, "[element] must be non-null");
+    public static boolean updateValue(final WebElement element, final boolean value) {
+        Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
         String tagName = element.getTagName().toLowerCase();
         if ("input".equals(tagName) && "checkbox".equals(element.getAttribute("type"))) {
@@ -362,8 +369,8 @@ public abstract class ComponentContainer
      * @param value desired value
      * @return 'true' if element value changed; otherwise 'false'
      */
-    public static boolean updateValue(WebElement element, String value) {
-        Objects.requireNonNull(element, "[element] must be non-null");
+    public static boolean updateValue(final WebElement element, final String value) {
+        Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
         String tagName = element.getTagName().toLowerCase();
         if ("input".equals(tagName)) {
@@ -392,8 +399,8 @@ public abstract class ComponentContainer
      * @param value desired value
      * @return 'true' if element has the desired value; otherwise 'false'
      */
-    private static boolean valueEquals(WebElement element, String value) {
-        Objects.requireNonNull(element, "[element] must be non-null");
+    private static boolean valueEquals(final WebElement element, final String value) {
+        Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
         String exist = element.getAttribute("value");
         return (exist != null) ? exist.equals(value) : (value == null);
@@ -405,21 +412,30 @@ public abstract class ComponentContainer
      * @param element target element
      * @return the specified element
      */
-    public static WebElement scrollIntoView(WebElement element) {
+    public static WebElement scrollIntoView(final WebElement element) {
         WebDriverUtils.getExecutor(element).executeScript("arguments[0].scrollIntoView(true);", element);
         return element;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     Class<?>[] getArgumentTypes() {
         return Arrays.copyOf(ARG_TYPES, ARG_TYPES.length);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     Object[] getArguments() {
         return new Object[] {context, parent};
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<Class<?>> getBypassClasses() {
         if (bypassClasses == null) {
@@ -438,6 +454,9 @@ public abstract class ComponentContainer
         return Arrays.copyOf(BYPASS_CLASSES, BYPASS_CLASSES.length);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<String> getBypassMethods() {
         if (bypassMethods == null) {
@@ -473,7 +492,7 @@ public abstract class ComponentContainer
      * @param newWindow 'true' to open page in new window; 'false' to open page in current window
      * @return new instance of the specified page class
      */
-    public <T extends Page> T openAnnotatedPage(Class<T> pageClass, boolean newWindow) {
+    public <T extends Page> T openAnnotatedPage(final Class<T> pageClass, final boolean newWindow) {
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
         String url = getPageUrl(pageUrl, SeleniumConfig.getConfig().getTargetUri());
         Objects.requireNonNull(url, pageClass.toString() 
@@ -490,7 +509,7 @@ public abstract class ComponentContainer
      * @param newWindow 'true' to open page in new window; 'false' to open page in current window
      * @return new instance of the specified page class
      */
-    public <T extends Page> T openPageAtPath(Class<T> pageClass, String path, boolean newWindow) {
+    public <T extends Page> T openPageAtPath(final Class<T> pageClass, final String path, final boolean newWindow) {
         URIBuilder builder = new URIBuilder(SeleniumConfig.getConfig().getTargetUri());
         builder.setPath(URI.create(builder.getPath() + "/").resolve("./" + path).getPath());
         return openPageAtUrl(pageClass, builder.toString(), newWindow);
@@ -505,7 +524,7 @@ public abstract class ComponentContainer
      * @param newWindow 'true' to open page in new window; 'false' to open page in current window
      * @return new instance of the specified page class
      */
-    public <T extends Page> T openPageAtUrl(Class<T> pageClass, String url, boolean newWindow) {
+    public <T extends Page> T openPageAtUrl(final Class<T> pageClass, final String url, final boolean newWindow) {
         Objects.requireNonNull(pageClass, "[pageClass] must be non-null");
         Objects.requireNonNull(url, "[url] must be non-null");
         
@@ -542,7 +561,7 @@ public abstract class ComponentContainer
      * @param targetUri target URI
      * @return defined page URL as a string (may be 'null')
      */
-    public static String getPageUrl(PageUrl pageUrl, URI targetUri) {
+    public static String getPageUrl(final PageUrl pageUrl, final URI targetUri) {
         if (pageUrl == null || PLACEHOLDER.equals(pageUrl.value())) {
             return null;
         }
@@ -596,7 +615,7 @@ public abstract class ComponentContainer
      * 
      * @param pageObj target page object
      */
-    static void waitForLandingPage(Page pageObj) {
+    static void waitForLandingPage(final Page pageObj) {
         SearchContextWait wait = (SearchContextWait)
                 pageObj.getWait(WaitType.PAGE_LOAD).ignoring(LandingPageMismatchException.class);
         wait.until(landingPageAppears());
@@ -609,13 +628,19 @@ public abstract class ComponentContainer
      */
     private static Coordinator<Boolean> landingPageAppears() {
         return new Coordinator<Boolean>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public Boolean apply(SearchContext context) {
+            public Boolean apply(final SearchContext context) {
                 verifyLandingPage((Page) context);
                 return Boolean.TRUE;
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "expected landing page to appear";
@@ -724,7 +749,7 @@ public abstract class ComponentContainer
      * @param expectUri expected landing page URI
      * @return list of expected query parameters
      */
-    private static List<NameValuePair> getExpectedParams(PageUrl pageUrl, URI expectUri) {
+    private static List<NameValuePair> getExpectedParams(final PageUrl pageUrl, final URI expectUri) {
         List<NameValuePair> expectParams = new ArrayList<>();
         String[] params = pageUrl.params();
         if (params.length > 0) {
@@ -752,7 +777,7 @@ public abstract class ComponentContainer
      * @param expectPair expected query parameters
      * @return 'true' of actual query parameters include all expected name/value pairs; otherwise 'false'
      */
-    private static boolean hasExpectedParam(List<NameValuePair> actualParams, NameValuePair expectPair) {
+    private static boolean hasExpectedParam(final List<NameValuePair> actualParams, final NameValuePair expectPair) {
         Iterator<NameValuePair> iterator = actualParams.iterator();
         while (iterator.hasNext()) {
             NameValuePair actualPair = iterator.next();
@@ -775,7 +800,7 @@ public abstract class ComponentContainer
      * @return method object for getKey(SearchContext) 
      * @throws UnsupportedOperationException The required method is missing
      */
-    static <T extends ComponentContainer> Method getKeyMethod(Class<T> containerType) {
+    static <T extends ComponentContainer> Method getKeyMethod(final Class<T> containerType) {
         try {
             Method method = containerType.getMethod("getKey", SearchContext.class);
             if (Modifier.isStatic(method.getModifiers())) {
@@ -795,7 +820,7 @@ public abstract class ComponentContainer
      * @param containerType target container type
      * @throws UnsupportedOperationException The required constructor is missing
      */
-    static <T extends ComponentContainer> void verifyCollectible(Class<T> containerType) {
+    static <T extends ComponentContainer> void verifyCollectible(final Class<T> containerType) {
         try {
             containerType.getConstructor(COLLECTIBLE_ARGS);
         } catch (NoSuchMethodException | SecurityException e) {
@@ -824,7 +849,7 @@ public abstract class ComponentContainer
      * @return new container of the specified type
      */
     static <T extends ComponentContainer> T newContainer(
-                    Class<T> containerType, Class<?>[] argumentTypes, Object[] arguments) {
+                    final Class<T> containerType, final Class<?>[] argumentTypes, final Object[] arguments) {
         try {
             Constructor<T> ctor = containerType.getConstructor(argumentTypes);
             return ctor.newInstance(arguments);
@@ -847,7 +872,7 @@ public abstract class ComponentContainer
      * @return list of page components
      * @see #verifyCollectible
      */
-    public <T extends PageComponent> List<T> newComponentList(Class<T> componentType, By locator) {
+    public <T extends PageComponent> List<T> newComponentList(final Class<T> componentType, final By locator) {
         return new ComponentList<>(this, componentType, locator);
     }
     
@@ -865,7 +890,7 @@ public abstract class ComponentContainer
      * @see #verifyCollectible
      * @see #getKeyMethod
      */
-    public <T extends PageComponent> Map<Object, T> newComponentMap(Class<T> componentType, By locator) {
+    public <T extends PageComponent> Map<Object, T> newComponentMap(final Class<T> componentType, final By locator) {
         return new ComponentMap<>(this, componentType, locator);
     }
     
@@ -880,7 +905,7 @@ public abstract class ComponentContainer
      * @return list of frames
      * @see #verifyCollectible
      */
-    public <T extends Frame> List<T> newFrameList(Class<T> frameType, By locator) {
+    public <T extends Frame> List<T> newFrameList(final Class<T> frameType, final By locator) {
         return new FrameList<>(this, frameType, locator);
     }
     
@@ -898,7 +923,7 @@ public abstract class ComponentContainer
      * @see #verifyCollectible
      * @see #getKeyMethod
      */
-    public <T extends Frame> Map<Object, T> newFrameMap(Class<T> frameType, By locator) {
+    public <T extends Frame> Map<Object, T> newFrameMap(final Class<T> frameType, final By locator) {
         return new FrameMap<>(this, frameType, locator);
     }
     
@@ -906,6 +931,9 @@ public abstract class ComponentContainer
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -916,9 +944,12 @@ public abstract class ComponentContainer
         result = prime * result + ((bypassMethods == null) ? 0 : bypassMethods.hashCode());
         return result;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)

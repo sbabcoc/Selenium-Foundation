@@ -63,6 +63,9 @@ public final class JsUtility {
     private static final String CLASS_NAME_KEY = "className";
     private static final String MESSAGE_KEY = "message";
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private JsUtility() {
         throw new AssertionError("JsUtility is a static utility class that cannot be instantiated");
     }
@@ -87,7 +90,7 @@ public final class JsUtility {
      * @param args The arguments to the script. May be empty
      * @see JavascriptExecutor#executeScript(String, Object...)
      */
-    public static void run(WebDriver driver, String js, Object... args) {
+    public static void run(final WebDriver driver, final String js, final Object... args) {
         Object result = WebDriverUtils.getExecutor(driver).executeScript(js, args);
         if (result != null) {
             LOGGER.warn("The specified JavaScript returned a non-null result");
@@ -132,7 +135,7 @@ public final class JsUtility {
      * @see JavascriptExecutor#executeScript(String, Object...)
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
-    public static <T> T runAndReturn(WebDriver driver, String js, Object... args) {
+    public static <T> T runAndReturn(final WebDriver driver, final String js, final Object... args) {
         return (T) WebDriverUtils.getExecutor(driver).executeScript(js, args);
     }
     
@@ -141,7 +144,7 @@ public final class JsUtility {
      * 
      * @param driver A handle to the currently running Selenium test window.
      */
-    public static void injectGlueLib(WebDriver driver) {
+    public static void injectGlueLib(final WebDriver driver) {
         JavascriptExecutor executor = WebDriverUtils.getExecutor(driver);
         if ((boolean) executor.executeScript("return (typeof isObject != 'function');")) {
             executor.executeScript(getScriptResource(JsUtility.JAVA_GLUE_LIB));
@@ -154,7 +157,7 @@ public final class JsUtility {
      * @param resource resource filename
      * @return resource file content
      */
-    public static String getScriptResource(String resource) {
+    public static String getScriptResource(final String resource) {
         URL url = Resources.getResource(resource);
         try {
             return Resources.toString(url, Charsets.UTF_8);
@@ -169,47 +172,84 @@ public final class JsUtility {
      * @param exception web driver exception to propagate
      * @return nothing (this method always throws the specified exception)
      */
-    public static RuntimeException propagate(WebDriverException exception) {
+    public static RuntimeException propagate(final WebDriverException exception) {
         Throwable thrown = exception;
+        // if exception is a WebDriverException (not a sub-class)
         if (exception.getClass().equals(WebDriverException.class)) { 
             String message = exception.getMessage();
             // only retain the first line
-            message = message.split("\n")[0];
+            message = message.split("\n")[0].trim();
             // remove prefix if present
-            int index = message.indexOf(':');
-            if ((index != -1) && ERROR_PREFIX.equals(message.substring(0, index))) {
-                message = message.substring(index + 1).trim();
-            }
+            message = removePrefix(message);
             // remove wrapper object if present
-            if (message.contains("\"" + ERROR_MESSAGE_KEY + "\"")) {
-                JsonObject obj = DataUtils.deserializeObject(message);
-                if (obj != null) {
-                    message = obj.get(ERROR_MESSAGE_KEY).getAsString();
-                }
-            }
-            // if message appears to be an encoded exception object
-            if (message.contains("\"" + CLASS_NAME_KEY + "\"") && message.contains("\"" + MESSAGE_KEY + "\"")) {
-                // deserialize encoded exception object
-                JsonObject obj = DataUtils.deserializeObject(message);
-                // if successful
-                if (obj != null) {
-                    String className = obj.get(CLASS_NAME_KEY).getAsString();
-                    try {
-                        Class<?> clazz = Class.forName(className);
-                        Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
-                        thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).getAsString(), exception);
-                        thrown.setStackTrace(new Throwable().getStackTrace());
-                    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-                            | InstantiationException | IllegalAccessException | IllegalArgumentException
-                            | InvocationTargetException eaten)
-                    {
-                        LOGGER.warn("Unable to instantiate exception: {}", className, eaten);
-                    }
-                } else {
-                    LOGGER.warn("Unable to deserialize encoded exception object: {}", message);
-                }
+            message = removeWrapper(message);
+            // deserialize encoded exception object if present
+            thrown = deserializeException(exception, message);
+        }
+        // throw resolved exception as unchecked
+        throw UncheckedThrow.throwUnchecked(thrown);
+    }
+    
+    /**
+     * Remove the error prefix from the specified exception message
+     * 
+     * @param message exception message
+     * @return exception message with error prefix removed
+     */
+    private static String removePrefix(final String message) {
+        int index = message.indexOf(':');
+        if ((index != -1) && ERROR_PREFIX.equals(message.substring(0, index))) {
+            return message.substring(index + 1).trim();
+        }
+        return message;
+    }
+    
+    /**
+     * Remove the wrapper object from the specified JSON string
+     * 
+     * @param jsonStr JSON string
+     * @return if present, value of [errorMessage] property; otherwise, JSON string as specified
+     */
+    private static String removeWrapper(final String jsonStr) {
+        if (jsonStr.contains("\"" + ERROR_MESSAGE_KEY + "\"")) {
+            JsonObject obj = DataUtils.deserializeObject(jsonStr);
+            if (obj != null) {
+                return obj.get(ERROR_MESSAGE_KEY).getAsString();
             }
         }
-        throw UncheckedThrow.throwUnchecked(thrown);
+        return jsonStr;
+    }
+    
+    /**
+     * De-serialize the specified JSON-encoded exception
+     * 
+     * @param exception web driver exception to propagate
+     * @param jsonStr JSON string
+     * @return if present, exception decoded from JSON; otherwise, original WebDriverException object
+     */
+    private static Throwable deserializeException(final WebDriverException exception, final String jsonStr) {
+        Throwable thrown = exception;
+        // if message appears to be an encoded exception object
+        if (jsonStr.contains("\"" + CLASS_NAME_KEY + "\"") && jsonStr.contains("\"" + MESSAGE_KEY + "\"")) {
+            // deserialize encoded exception object
+            JsonObject obj = DataUtils.deserializeObject(jsonStr);
+            // if successful
+            if (obj != null) {
+                String className = obj.get(CLASS_NAME_KEY).getAsString();
+                try {
+                    Class<?> clazz = Class.forName(className);
+                    Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
+                    thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).getAsString(), exception);
+                    thrown.setStackTrace(new Throwable().getStackTrace());
+                } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
+                        | InstantiationException | IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException eaten) {
+                    LOGGER.warn("Unable to instantiate exception: {}", className, eaten);
+                }
+            } else {
+                LOGGER.warn("Unable to deserialize encoded exception object: {}", jsonStr);
+            }
+        }
+        return thrown;
     }
 }

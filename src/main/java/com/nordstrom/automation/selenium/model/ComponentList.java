@@ -12,7 +12,14 @@ import org.openqa.selenium.By;
  */
 public class ComponentList<E extends PageComponent> extends ContainerList<E> {
 
-    ComponentList(ComponentContainer parent, Class<E> componentType, By locator) {
+    /**
+     * Constructor for component list with parent, type, and locator
+     * 
+     * @param parent parent container
+     * @param containerType container type
+     * @param locator container context element locator
+     */
+    ComponentList(final ComponentContainer parent, final Class<E> componentType, final By locator) {
         super(parent, componentType, locator);
     }
 

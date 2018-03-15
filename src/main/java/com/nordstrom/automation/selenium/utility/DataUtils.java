@@ -14,6 +14,9 @@ public final class DataUtils {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DataUtils.class);
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private DataUtils() {
         throw new AssertionError("DataUtils is a static utility class that cannot be instantiated");
     }
@@ -24,7 +27,7 @@ public final class DataUtils {
      * @param json JSON object string
      * @return de-serialized {@link JsonObject} 
      */
-    public static JsonObject deserializeObject(String json) {
+    public static JsonObject deserializeObject(final String json) {
         try {
             return new Gson().fromJson(json, JsonObject.class);
         } catch (JsonSyntaxException e) {

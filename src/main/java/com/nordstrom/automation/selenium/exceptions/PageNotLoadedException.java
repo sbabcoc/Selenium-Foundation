@@ -28,15 +28,15 @@ import com.nordstrom.automation.selenium.support.Coordinator;
 public class PageNotLoadedException extends RuntimeException {
     private static final long serialVersionUID = -8491929915611599716L;
 
-    public PageNotLoadedException(String message) {
+    public PageNotLoadedException(final String message) {
         super(message);
     }
     
-    public PageNotLoadedException(Throwable cause) {
+    public PageNotLoadedException(final Throwable cause) {
         super(cause);
     }
 
-    public PageNotLoadedException(String message, Throwable cause) {
+    public PageNotLoadedException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

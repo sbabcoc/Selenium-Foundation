@@ -19,7 +19,7 @@ public class InvalidGridHostException extends RuntimeException {
      * @param host Grid server host specifier
      * @param cause the cause of this exception
      */
-    public InvalidGridHostException(String role, HttpHost host, MalformedURLException cause) {
+    public InvalidGridHostException(final String role, final HttpHost host, final MalformedURLException cause) {
         super(getMessage(role, host), cause);
     }
     
@@ -30,7 +30,7 @@ public class InvalidGridHostException extends RuntimeException {
      * @param host Grid server host specifier
      * @return exception message for the specified role and host
      */
-    private static String getMessage(String role, HttpHost host) {
+    private static String getMessage(final String role, final HttpHost host) {
         return String.format(TEMPLATE, role, host.toURI());
     }
 }

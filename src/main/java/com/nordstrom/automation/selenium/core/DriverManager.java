@@ -42,6 +42,9 @@ import com.nordstrom.automation.selenium.model.Page;
  */
 public final class DriverManager {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private DriverManager() {
         throw new AssertionError("DriverManager is a static utility class that cannot be instantiated");
     }
@@ -58,8 +61,8 @@ public final class DriverManager {
      * @param obj test class instance
      * @param method test method
      */
-    public static void beforeInvocation(Object obj, Method method) {
-        if ( ! (obj instanceof TestBase)) {
+    public static void beforeInvocation(final Object obj, final Method method) {
+        if (!(obj instanceof TestBase)) {
             return;
         }
         
@@ -79,7 +82,7 @@ public final class DriverManager {
             // if getting a driver
             if (getDriver) {
                 // if method lacks @InitialPage and none specified by @BeforeMethod
-                if ((initialPage == null) && ! instance.hasInitialPage()) {
+                if ((initialPage == null) && !instance.hasInitialPage()) {
                     // get @InitialPage from class that declares invoked method
                     initialPage = method.getDeclaringClass().getAnnotation(InitialPage.class);
                 }
@@ -99,7 +102,7 @@ public final class DriverManager {
             SeleniumConfig config = SeleniumConfig.getConfig();
             
             // if driver not yet acquired
-            if ( ! optDriver.isPresent()) {
+            if (!optDriver.isPresent()) {
                 long prior = System.currentTimeMillis();
                 
                 long timeOutInSeconds = config.getLong(SeleniumSettings.HOST_TIMEOUT.key());
@@ -132,10 +135,10 @@ public final class DriverManager {
      * @param obj test class instance
      * @param method test method
      */
-    public static void afterInvocation(Object obj, Method method) {
+    public static void afterInvocation(final Object obj, final Method method) {
         if (obj instanceof TestBase) {
             TestBase instance = (TestBase) obj;
-            if ( ! (instance.isTest(method) || instance.isBeforeMethod(method))) {
+            if (!(instance.isTest(method) || instance.isBeforeMethod(method))) {
                 closeDriver(instance);
             }
         }
@@ -159,7 +162,7 @@ public final class DriverManager {
      * @param driver driver object in which to configure timeout intervals
      * @param config configuration object that specifies timeout intervals
      */
-    public static void setDriverTimeouts(WebDriver driver, SeleniumConfig config) {
+    public static void setDriverTimeouts(final WebDriver driver, final SeleniumConfig config) {
         Timeouts timeouts = driver.manage().timeouts();
         timeouts.setScriptTimeout(WaitType.SCRIPT.getInterval(config), TimeUnit.SECONDS);
         timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);
@@ -172,7 +175,7 @@ public final class DriverManager {
      * @param obj test class instance
      * @return (optional) driver from the specified test result
      */
-    public static Optional<WebDriver> nabDriver(Object obj) {
+    public static Optional<WebDriver> nabDriver(final Object obj) {
         if (obj instanceof TestBase) {
             return ((TestBase) obj).nabDriver();
         } else {
@@ -186,7 +189,7 @@ public final class DriverManager {
      * @param obj test class instance
      * @return 'true' if a driver is present; otherwise 'false'
      */
-    public static boolean hasDriver(Object obj) {
+    public static boolean hasDriver(final Object obj) {
         return nabDriver(obj).isPresent();
     }
     
@@ -198,7 +201,7 @@ public final class DriverManager {
      * @param driver driver object
      * @return optional session ID (see NOTES) 
      */
-    public static Optional<SessionId> getSessionId(WebDriver driver) {
+    public static Optional<SessionId> getSessionId(final WebDriver driver) {
         if (driver instanceof RemoteWebDriver) {
             SessionId sessionId = ((RemoteWebDriver) driver).getSessionId();
             return Optional.of(sessionId);
@@ -212,20 +215,20 @@ public final class DriverManager {
      * @param obj test class instance
      * @return an empty {@link Optional} object
      */
-    public static Optional<WebDriver> closeDriver(Object obj) {
+    public static Optional<WebDriver> closeDriver(final Object obj) {
         Optional<WebDriver> optDriver = nabDriver(obj);
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             
             try {
                 ((JavascriptExecutor) driver).executeScript("return window.stop");
-            } catch (WebDriverException | UnsupportedOperationException e) {
+            } catch (WebDriverException | UnsupportedOperationException e) { //NOSONAR
                 // Let's make sure our graceful shutdown process doesn't cause failures.
             }
             
             try {
                 driver.switchTo().alert().dismiss();
-            } catch (WebDriverException e) {
+            } catch (WebDriverException e) { //NOSONAR
                 // The driver throws an exception if no alert is present. This is normal and unavoidable.
             }
             
@@ -245,9 +248,12 @@ public final class DriverManager {
      */
     private static Function<TestBase, WebDriver> driverIsAcquired(final Method method) {
         return new Function<TestBase, WebDriver>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public WebDriver apply(TestBase instance) {
+            public WebDriver apply(final TestBase instance) {
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
                     return ((DriverProvider) instance).provideDriver(instance, method);
@@ -256,6 +262,9 @@ public final class DriverManager {
                 }
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "driver to be aquired";
@@ -270,10 +279,15 @@ public final class DriverManager {
      */
     public static class DriverSessionWait extends FluentWait<TestBase> {
         
-        public DriverSessionWait(TestBase context, long timeOutInSeconds) {
+        /**
+         * Constructor for driver session 'wait' object
+         * 
+         * @param context Selenium Foundation test class object
+         * @param timeOutInSeconds 'wait' timeout in seconds
+         */
+        public DriverSessionWait(final TestBase context, final long timeOutInSeconds) {
             super(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER);
             withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
         }
-
     }
 }

@@ -17,7 +17,7 @@ public class UnknownGridHostException extends RuntimeException {
      * @param hostName Grid server host name
      * @param cause the cause of this exception
      */
-    public UnknownGridHostException(String role, String hostName, UnknownHostException cause) {
+    public UnknownGridHostException(final String role, final String hostName, final UnknownHostException cause) {
         super(getMessage(role, hostName), cause);
     }
     
@@ -28,7 +28,7 @@ public class UnknownGridHostException extends RuntimeException {
      * @param hostName Grid server host name
      * @return exception message to the specified role and host name
      */
-    private static String getMessage(String role, String hostName) {
+    private static String getMessage(final String role, final String hostName) {
         return String.format(TEMPLATE, role, hostName);
     }
 }

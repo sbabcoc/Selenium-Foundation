@@ -16,7 +16,7 @@ public class OptionalElementNotAcquiredException extends RuntimeException {
      * 
      * @param cause the cause of this exception
      */
-    public OptionalElementNotAcquiredException(NoSuchElementException cause) {
+    public OptionalElementNotAcquiredException(final NoSuchElementException cause) {
         super("Unable to acquire reference for optional element", cause);
     }
 

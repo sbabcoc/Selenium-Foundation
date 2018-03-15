@@ -45,7 +45,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * @param testResult test result object for the method that's about to be invoked
      */
     @Override
-    public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
+    public void beforeInvocation(final IInvokedMethod invokedMethod, final ITestResult testResult) {
         // ensure current test result is set
         Reporter.setCurrentTestResult(testResult);
         
@@ -65,7 +65,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * @param testResult test result object for the method that's just been invoked
      */
     @Override
-    public void afterInvocation(IInvokedMethod invokedMethod, ITestResult testResult) {
+    public void afterInvocation(final IInvokedMethod invokedMethod, final ITestResult testResult) {
         // ensure current test result is set
         Reporter.setCurrentTestResult(testResult);
         
@@ -85,7 +85,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * @param testContext execution context for the test suite that just finished
      */
     @Override
-    public void onFinish(ITestContext testContext) {
+    public void onFinish(final ITestContext testContext) {
         DriverManager.onFinish();
     }
     
@@ -93,7 +93,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * {@inheritDoc}
      */
     @Override
-    public void onStart(ITestContext testContext) {
+    public void onStart(final ITestContext testContext) {
         // no pre-run processing
     }
 
@@ -101,7 +101,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * {@inheritDoc}
      */
     @Override
-    public void onTestFailedButWithinSuccessPercentage(ITestResult testResult) {
+    public void onTestFailedButWithinSuccessPercentage(final ITestResult testResult) {
         DriverManager.closeDriver(testResult.getInstance());
     }
 
@@ -109,7 +109,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * {@inheritDoc}
      */
     @Override
-    public void onTestFailure(ITestResult testResult) {
+    public void onTestFailure(final ITestResult testResult) {
         DriverManager.closeDriver(testResult.getInstance());
     }
 
@@ -117,7 +117,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * {@inheritDoc}
      */
     @Override
-    public void onTestSkipped(ITestResult testResult) {
+    public void onTestSkipped(final ITestResult testResult) {
         DriverManager.closeDriver(testResult.getInstance());
     }
 
@@ -125,7 +125,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * {@inheritDoc}
      */
     @Override
-    public void onTestStart(ITestResult testResult) {
+    public void onTestStart(final ITestResult testResult) {
         // no pre-test processing
     }
 
@@ -133,7 +133,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      * {@inheritDoc}
      */
     @Override
-    public void onTestSuccess(ITestResult testResult) {
+    public void onTestSuccess(final ITestResult testResult) {
         DriverManager.closeDriver(testResult.getInstance());
     }
     

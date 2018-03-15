@@ -47,14 +47,18 @@ import net.bytebuddy.implementation.bind.annotation.This;
 public enum ContainerMethodInterceptor {
     INSTANCE;
     
-    private static final ThreadLocal<Integer> depth = new InheritableThreadLocal<Integer>() {
+    private static final ThreadLocal<Integer> DEPTH = new InheritableThreadLocal<Integer>() {
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected Integer initialValue() {
             return Integer.valueOf(0);
         }
     };
     
-    private static final ThreadLocal<ComponentContainer> target = new InheritableThreadLocal<>();
+    private static final ThreadLocal<ComponentContainer> TARGET = new InheritableThreadLocal<>();
 
     /**
      * This is the method that intercepts component container methods in "enhanced" model objects.
@@ -67,10 +71,10 @@ public enum ContainerMethodInterceptor {
      * @throws Exception {@code anything} (exception thrown by the intercepted method)
      */
     @RuntimeType
-    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
-                    @SuperCall Callable<?> proxy) throws Exception
-    {
-        if ( ! (obj instanceof ComponentContainer)) {
+    public Object intercept(@This final Object obj, @Origin final Method method, @AllArguments final Object[] args,
+                    @SuperCall final Callable<?> proxy) throws Exception {
+        
+        if (!(obj instanceof ComponentContainer)) {
             return proxy.call();
         }
         
@@ -85,9 +89,9 @@ public enum ContainerMethodInterceptor {
             
             WebDriver driver = container.getDriver();
     
-            if (target.get() != container) {
+            if (TARGET.get() != container) {
                 container.switchTo();
-                target.set(container);
+                TARGET.set(container);
             }
             
             WebElement reference = null;
@@ -115,11 +119,11 @@ public enum ContainerMethodInterceptor {
                 parentPage = parentPage.getSpawningPage();
                 if (parentPage != null) {
                     parentPage.switchTo();
-                    target.set(parentPage);
+                    TARGET.set(parentPage);
                 } else {
                     String windowHandle = driver.getWindowHandles().iterator().next();
                     driver.switchTo().window(windowHandle);
-                    target.set(null);
+                    TARGET.set(null);
                 }
                 container.setVacater(method);
                 reference = null;
@@ -169,17 +173,33 @@ public enum ContainerMethodInterceptor {
         }
     }
     
+    /**
+     * Increment intercept depth counter
+     * 
+     * @return updated depth count
+     */
     private static int increaseDepth() {
         return adjustDepth(1);
     }
     
+    /**
+     * Decrement intercept depth counter
+     * 
+     * @return updated depth count
+     */
     private static int decreaseDepth() {
         return adjustDepth(-1);
     }
     
-    private static int adjustDepth(int delta) {
-        int i = depth.get().intValue() + delta;
-        depth.set(Integer.valueOf(i));
+    /**
+     * Apply the specified delta to intercept depth counter
+     * 
+     * @param delta depth counter delta
+     * @return updated depth count
+     */
+    private static int adjustDepth(final int delta) {
+        int i = DEPTH.get().intValue() + delta;
+        DEPTH.set(Integer.valueOf(i));
         return i;
     }
 }

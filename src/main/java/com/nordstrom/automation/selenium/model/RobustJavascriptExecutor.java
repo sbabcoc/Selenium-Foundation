@@ -32,7 +32,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
      * 
      * @param driver driver object
      */
-    public RobustJavascriptExecutor(WebDriver driver) {
+    public RobustJavascriptExecutor(final WebDriver driver) {
         if (driver instanceof JavascriptExecutor) {
             executor = (JavascriptExecutor) driver;
         } else {
@@ -44,7 +44,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
      * {@inheritDoc}
      */
     @Override
-    public Object executeAsyncScript(String script, Object... args) {
+    public Object executeAsyncScript(final String script, final Object... args) {
         Object result = null;
         try {
             result = executor.executeAsyncScript(script, args);
@@ -62,7 +62,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
      * {@inheritDoc}
      */
     @Override
-    public Object executeScript(String script, Object... args) {
+    public Object executeScript(final String script, final Object... args) {
         Object result = null;
         try {
             result = executor.executeScript(script, args);
@@ -91,7 +91,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
      * @param args arguments array to scan for {@link RobustWebElement} objects
      * @return 'true' if at least one {@link RobustWebElement} object was refreshed; otherwise 'false'
      */
-    private static boolean refreshReferences(StaleElementReferenceException e, Object... args) {
+    private static boolean refreshReferences(final StaleElementReferenceException e, final Object... args) {
         boolean didRefresh = false;
         
         for (int i = 0; i < args.length; i++) {
