@@ -79,7 +79,7 @@ public final class PageSourceUtils {
      * @param driver web driver object
      * @return the [sourceBuilder] object
      */
-    private static StringBuilder insertBaseElement(StringBuilder sourceBuilder, final WebDriver driver) {
+    private static StringBuilder insertBaseElement(final StringBuilder sourceBuilder, final WebDriver driver) {
         int offset = sourceBuilder.indexOf("<head>") + 6;
         
         // if no head found
