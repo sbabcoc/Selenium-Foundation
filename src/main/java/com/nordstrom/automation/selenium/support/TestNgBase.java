@@ -90,7 +90,7 @@ public abstract class TestNgBase implements TestBase {
      * {@inheritDoc}
      */
     @Override
-    public Optional<WebDriver> setDriver(WebDriver driver) {
+    public Optional<WebDriver> setDriver(final WebDriver driver) {
         return TestAttribute.DRIVER.set(driver);
     }
     
