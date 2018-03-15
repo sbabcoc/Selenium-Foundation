@@ -186,7 +186,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
              * {@inheritDoc}
              */
             @Override
-            public PageComponent apply(SearchContext context) {
+            public PageComponent apply(final SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isDisplayed()) ? component : null;
             }
@@ -213,7 +213,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
              * {@inheritDoc}
              */
             @Override
-            public PageComponent apply(SearchContext context) {
+            public PageComponent apply(final SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isInvisible()) ? component : null;
             }

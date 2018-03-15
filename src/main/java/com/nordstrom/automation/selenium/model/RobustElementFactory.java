@@ -399,7 +399,7 @@ public final class RobustElementFactory {
                  * {@inheritDoc}
                  */
                 @Override
-                public RobustElementWrapper apply(SearchContext context) {
+                public RobustElementWrapper apply(final SearchContext context) {
                     try {
                         return acquireReference(wrapper);
                     } catch (StaleElementReferenceException e) {
