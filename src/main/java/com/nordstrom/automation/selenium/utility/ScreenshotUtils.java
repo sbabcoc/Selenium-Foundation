@@ -10,6 +10,9 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 
+/**
+ * This utility class contains low-level methods that support screenshot artifact capture.
+ */
 public final class ScreenshotUtils {
     
     /**

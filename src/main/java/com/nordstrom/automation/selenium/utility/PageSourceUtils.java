@@ -10,6 +10,9 @@ import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
+/**
+ * This utility class contains low-level methods that support page source artifact capture.
+ */
 public final class PageSourceUtils {
     
     private static final String TAKES_ELEMENT_SCREENSHOT = "takesElementScreenshot";

@@ -27,15 +27,31 @@ import com.nordstrom.automation.selenium.support.Coordinator;
  */
 public class PageNotLoadedException extends RuntimeException {
     private static final long serialVersionUID = -8491929915611599716L;
-
+    
+    /**
+     * Constructor for {@code page not loaded} exception with specified detail message.
+     * 
+     * @param message detail message
+     */
     public PageNotLoadedException(final String message) {
         super(message);
     }
     
+    /**
+     * Constructor for {@code page not loaded} exception with specified cause.
+     * 
+     * @param cause cause of this exception
+     */
     public PageNotLoadedException(final Throwable cause) {
         super(cause);
     }
-
+    
+    /**
+     * Constructor for {@code page not loaded} exception with specified detail message and cause.
+     * 
+     * @param message detail message
+     * @param cause cause of this exception
+     */
     public PageNotLoadedException(final String message, final Throwable cause) {
         super(message, cause);
     }

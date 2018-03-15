@@ -927,10 +927,6 @@ public abstract class ComponentContainer
         return new FrameMap<>(this, frameType, locator);
     }
     
-    private URI resolve() {
-        return null;
-    }
-    
     /**
      * {@inheritDoc}
      */

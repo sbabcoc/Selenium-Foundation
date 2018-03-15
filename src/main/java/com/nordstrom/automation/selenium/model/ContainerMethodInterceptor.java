@@ -154,7 +154,8 @@ public enum ContainerMethodInterceptor {
                 }
                 
                 if (detectsCompletion) {
-                    ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD).until(DetectsLoadCompletion.pageLoadIsComplete());
+                    ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD)
+                            .until(DetectsLoadCompletion.pageLoadIsComplete());
                 } else if (reference != null) {
                     WaitType.PAGE_LOAD.getWait(driver).until(Coordinators.stalenessOf(reference));
                 }

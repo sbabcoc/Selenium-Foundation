@@ -11,6 +11,9 @@ import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
  */
 public final class ByType {
     
+    private static final String UNSUPPORTED_FOR_CSS = "Cannot get CSS locator string for '{}' locator";
+    private static final String UNSUPPORTED_FOR_XPATH = "Cannot get XPath locator string for '{}' locator";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(ByType.class);
     
     /**
@@ -47,15 +50,15 @@ public final class ByType {
         } else if (locator instanceof By.ById) {
             return "#" + val;
         } else if (locator instanceof By.ByLinkText) {
-            LOGGER.warn("Cannot get CSS locator string for '{}' locator", "ByLinkText");
+            LOGGER.warn(UNSUPPORTED_FOR_CSS, "ByLinkText");
         } else if (locator instanceof By.ByName) {
             return "[name=" + val + "]";
         } else if (locator instanceof By.ByPartialLinkText) {
-            LOGGER.warn("Cannot get CSS locator string for '{}' locator", "ByPartialLinkText");
+            LOGGER.warn(UNSUPPORTED_FOR_CSS, "ByPartialLinkText");
         } else if (locator instanceof By.ByTagName) {
             return val;
         } else if (locator instanceof By.ByXPath) {
-            LOGGER.warn("Cannot get CSS locator string for '{}' locator", "ByXPath");
+            LOGGER.warn(UNSUPPORTED_FOR_CSS, "ByXPath");
         }
         
         return null;
@@ -84,7 +87,7 @@ public final class ByType {
         if (locator instanceof By.ByClassName) {
             return ".//*[contains(concat(' ',@class,' '),' " + val + " ')]";
         } else if (locator instanceof By.ByCssSelector) {
-            LOGGER.warn("Cannot get XPath locator string for '{}' locator", "ByCssSelector");
+            LOGGER.warn(UNSUPPORTED_FOR_XPATH, "ByCssSelector");
         } else if (locator instanceof By.ById) {
             return ".//*[@id='" + val + "']";
         } else if (locator instanceof By.ByLinkText) {

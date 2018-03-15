@@ -26,7 +26,8 @@ import com.nordstrom.common.file.PathUtils;
 /**
  * This abstract class implements the contract for Selenium Foundation test classes for TestNG.
  */
-@LinkedListeners({ScreenshotCapture.class, PageSourceCapture.class, DriverListener.class, ExecutionFlowController.class})
+@LinkedListeners(
+        {ScreenshotCapture.class, PageSourceCapture.class, DriverListener.class, ExecutionFlowController.class})
 public abstract class TestNgBase implements TestBase {
     
     /**
