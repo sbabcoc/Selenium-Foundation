@@ -29,18 +29,21 @@ import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
  */
 public final class WebDriverUtils {
     
-    private static final List<Class<? extends WebDriverException>> reportableException =
+    private static final List<Class<? extends WebDriverException>> REPORTABLE_EXCEPTION =
                     Collections.unmodifiableList(
                             Arrays.asList(
                                     NotFoundException.class, ElementNotVisibleException.class,
                                     UnhandledAlertException.class, StaleElementReferenceException.class,
                                     TimeoutException.class));
     
-    private static final Pattern frameworkPackage = Pattern.compile(
-                    "^(?:sun\\.reflect|java\\.lang|"
-                    + "org\\.(?:openqa|testng|junit|hamcrest)|"
-                    + "com\\.nordstrom\\.automation\\.selenium)\\.");
+    private static final Pattern FRAMEWORK_PACKAGE = Pattern.compile(
+                    "^(?:sun\\.reflect|java\\.lang"
+                    + "|org\\.(?:openqa|testng|junit|hamcrest)"
+                    + "|com\\.nordstrom\\.automation\\.selenium)\\.");
             
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private WebDriverUtils() {
         throw new AssertionError("WebDriverUtils is a static utility class that cannot be instantiated");
     }
@@ -51,7 +54,7 @@ public final class WebDriverUtils {
      * @param context search context
      * @return search context driver
      */
-    public static WebDriver getDriver(SearchContext context) {
+    public static WebDriver getDriver(final SearchContext context) {
         if (context instanceof WebDriver) {
             return (WebDriver) context;
         } else if (context instanceof WrapsDriver) {
@@ -67,7 +70,7 @@ public final class WebDriverUtils {
      * @param context search context
      * @return context-specific {@link JavascriptExecutor}
      */
-    public static JavascriptExecutor getExecutor(SearchContext context) {
+    public static JavascriptExecutor getExecutor(final SearchContext context) {
         WebDriver driver = getDriver(context);
         if (driver instanceof JavascriptExecutor) {
             return new RobustJavascriptExecutor(driver);
@@ -82,7 +85,7 @@ public final class WebDriverUtils {
      * @param context search context
      * @return context browser name
      */
-    public static String getBrowserName(SearchContext context) {
+    public static String getBrowserName(final SearchContext context) {
         return getCapabilities(context).getBrowserName();
     }
     
@@ -92,7 +95,7 @@ public final class WebDriverUtils {
      * @param context search context
      * @return context capabilities
      */
-    public static Capabilities getCapabilities(SearchContext context) {
+    public static Capabilities getCapabilities(final SearchContext context) {
         WebDriver driver = getDriver(context);
         
         if (driver instanceof HasCapabilities) {
@@ -108,10 +111,10 @@ public final class WebDriverUtils {
      * @param elements list of elements
      * @return 'true' if no visible elements were found; otherwise 'false'
      */
-    public static boolean filterHidden(List<WebElement> elements) {
+    public static boolean filterHidden(final List<WebElement> elements) {
         Iterator<WebElement> iter = elements.iterator();
         while (iter.hasNext()) {
-            if ( ! iter.next().isDisplayed()) {
+            if (!iter.next().isDisplayed()) {
                 iter.remove();
             }
         }
@@ -124,13 +127,13 @@ public final class WebDriverUtils {
      * @param exception exception to be unwrapped
      * @return report-able cause for the specified exception
      */
-    public static Throwable getReportableCause(Throwable exception) {
+    public static Throwable getReportableCause(final Throwable exception) {
         for (Throwable throwable = exception; throwable != null; throwable = throwable.getCause()) {
             Class<?> clazz = throwable.getClass();
             if (clazz == WebDriverException.class) {
                 return throwable;
             }
-            for (Class<? extends WebDriverException> reportable : reportableException) {
+            for (Class<? extends WebDriverException> reportable : REPORTABLE_EXCEPTION) {
                 if (reportable.isAssignableFrom(clazz)) {
                     return throwable;
                 }
@@ -145,7 +148,7 @@ public final class WebDriverUtils {
      * @param exception exception whose stack trace is to be analyzed
      * @return first stack trace element that exists in client code; 'null' if unable to identify breakpoint
      */
-    public static StackTraceElement getClientBreakpoint(Throwable exception) {
+    public static StackTraceElement getClientBreakpoint(final Throwable exception) {
         if (exception != null) {
             for (StackTraceElement element : exception.getStackTrace()) {
                 // if line number is unavailable
@@ -153,7 +156,7 @@ public final class WebDriverUtils {
                     continue;
                 }
                 
-                Matcher matcher = frameworkPackage.matcher(element.getClassName());
+                Matcher matcher = FRAMEWORK_PACKAGE.matcher(element.getClassName());
                 
                 // if not in framework code
                 if (!matcher.lookingAt()) {

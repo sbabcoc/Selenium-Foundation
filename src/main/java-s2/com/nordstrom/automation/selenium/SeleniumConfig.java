@@ -58,6 +58,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     /** value: 5555 */
     private static final Integer DEFAULT_NODE_PORT = Integer.valueOf(5555);
     
+    private static final String HOST = "host";
+    
     /**
      * This enumeration declares the settings that enable you to control the parameters used by
      * <b>Selenium Foundation</b>.
@@ -111,7 +113,13 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         private String propertyName;
         private String defaultValue;
         
-        SeleniumSettings(String propertyName, String defaultValue) {
+        /**
+         * Constructor for SeleniumSettings enumeration
+         *  
+         * @param propertyName setting property name
+         * @param defaultValue setting default value
+         */
+        SeleniumSettings(final String propertyName, final  String defaultValue) {
             this.propertyName = propertyName;
             this.defaultValue = defaultValue;
         }
@@ -164,7 +172,12 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         private SeleniumSettings timeoutSetting;
         private Long timeoutInterval;
         
-        WaitType(SeleniumSettings timeoutSetting) {
+        /**
+         * Constructor for WaitType enumeration
+         * 
+         * @param timeoutSetting timeout setting constant
+         */
+        WaitType(final SeleniumSettings timeoutSetting) {
             this.timeoutSetting = timeoutSetting;
         }
         
@@ -183,7 +196,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
          * @param config {@link SeleniumConfig} object to interrogate
          * @return wait type timeout interval
          */
-        public long getInterval(SeleniumConfig config) {
+        public long getInterval(final SeleniumConfig config) {
             if (timeoutInterval == null) {
                 Objects.requireNonNull(config, "[config] must be non-null");
                 timeoutInterval = config.getLong(timeoutSetting.key());
@@ -197,7 +210,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
          * @param context context for which timeout is needed
          * @return {@link SearchContextWait} object for the specified context
          */
-        public SearchContextWait getWait(SearchContext context) {
+        public SearchContextWait getWait(final SearchContext context) {
             return new SearchContextWait(context, getInterval());
         }
         
@@ -209,7 +222,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         try {
             seleniumConfig = new SeleniumConfig();
         } catch (ConfigurationException | IOException e) {
-            throw new RuntimeException("Failed to instantiate settings", e);
+            throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
         }
     }
     
@@ -270,7 +283,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             try {
                 targetUri = builder.build();
             } catch (URISyntaxException e) {
-                // Eat this exception
+                LOGGER.debug("Specified target URI '{}' could not be parsed: {}", builder.toString(), e.getMessage());
             }
         }
         return targetUri;
@@ -315,7 +328,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         if (nodeArgs == null) {
             String configPath = getNodeConfigPath();
             Map<String, Object> config = getNodeConfig().getConfiguration();
-            nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get("host"),
+            nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get(HOST),
                     "-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
         }
         return Arrays.copyOf(nodeArgs, nodeArgs.length);
@@ -327,15 +340,15 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @param nodeConfig node configuration with unresolved settings
      * @return node configuration with resolved settings
      */
-    private RegistrationRequest resolveNodeSettings(RegistrationRequest nodeConfig) {
+    private RegistrationRequest resolveNodeSettings(final RegistrationRequest nodeConfig) {
         Map<String, Object> config = nodeConfig.getConfiguration();
         
         String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
         if (nodeHost != null) {
-            config.put("host", nodeHost);
+            config.put(HOST, nodeHost);
         }
-        if (config.get("host") == null) {
-            config.put("host", getLocalHost());
+        if (config.get(HOST) == null) {
+            config.put(HOST, getLocalHost());
         }
         
         config.put("port", getInteger(SeleniumSettings.NODE_PORT.key(), DEFAULT_NODE_PORT));
@@ -392,7 +405,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @param hubConfig node configuration with unresolved settings
      * @return hub configuration with resolved settings
      */
-    private GridHubConfiguration resolveHubSettings(GridHubConfiguration hubConfig) {
+    private GridHubConfiguration resolveHubSettings(final GridHubConfiguration hubConfig) {
         String hubHost = getString(SeleniumSettings.HUB_HOST.key());
         if (hubHost != null) {
             hubConfig.setHost(hubHost);
@@ -435,23 +448,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      */
     public Capabilities getBrowserCaps() {
         if (browserCaps == null) {
-            String jsonStr = null;
-            String nameStr = getString(SeleniumSettings.BROWSER_NAME.key());
-            if (nameStr != null) {
-                InputStream inputStream = 
-                        Thread.currentThread().getContextClassLoader().getResourceAsStream(nameStr + "Caps.json");
-                if (inputStream != null) {
-                    try {
-                        jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                    } catch (IOException eaten) {
-                        LOGGER.warn("Unable to get browser configuration file contents: {}", eaten.getMessage());
-                    }
-                }
-                
-                if (jsonStr == null) {
-                    jsonStr = String.format(CAPS_PATTERN, nameStr);
-                }
-            }
+            String jsonStr = getJsonForName(getString(SeleniumSettings.BROWSER_NAME.key()));
             
             if (jsonStr == null) {
                 jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
@@ -462,6 +459,35 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         }
         return browserCaps;
     }
+    
+    /**
+     * Get browser capabilities JSON for the specified name.
+     * 
+     * @param nameStr browser name
+     * @return browser capabilities JSON
+     */
+    private String getJsonForName(final String nameStr) {
+        String jsonStr = null;
+        
+        if (nameStr != null) {
+            InputStream inputStream = 
+                    Thread.currentThread().getContextClassLoader().getResourceAsStream(nameStr + "Caps.json");
+            
+            if (inputStream != null) {
+                try {
+                    jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                } catch (IOException eaten) {
+                    LOGGER.warn("Unable to get browser configuration file contents: {}", eaten.getMessage());
+                }
+            }
+            
+            if (jsonStr == null) {
+                jsonStr = String.format(CAPS_PATTERN, nameStr);
+            }
+        }
+        
+        return jsonStr;
+    }
 
     /**
      * Get the path to the specified configuration file.
@@ -469,7 +495,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
      * @param path configuration file path (absolute, relative, or simple filename)
      * @return resolved absolute path of specified file; 'null' if file not found
      */
-    private static String getConfigPath(String path) {
+    private static String getConfigPath(final String path) {
         FileHandler handler = new FileHandler();
         handler.setPath(path);
         
@@ -480,22 +506,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         URL url = strategy.locate(fileSystem, locator);
         if (url != null) {
             try {
-                URI uri = url.toURI();
-                if ("jar".equals(uri.getScheme())) {
-                    try {
-                        FileSystems.newFileSystem(uri, Collections.emptyMap());
-                    } catch (FileSystemAlreadyExistsException eaten) {
-                        LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
-                    } 
-                    
-                    String outputDir = PathUtils.getBaseDir();
-                    File outputFile = new File(outputDir, path);
-                    Path outputPath = outputFile.toPath();
-                    if (!outputPath.toFile().exists()) {
-                        Files.copy(Paths.get(uri), outputPath);
-                    }
-                    uri = outputPath.toUri();
-                }
+                URI uri = getConfigUri(path, url);
                 File file = new File(uri);
                 return file.getAbsolutePath();
             } catch (URISyntaxException eaten) {
@@ -505,6 +516,35 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             }
         }
         return null;
+    }
+    
+    /**
+     * Get the URI of the specified configuration file from its resolved URL.
+     * 
+     * @param path configuration file path (absolute, relative, or simple filename)
+     * @param url resolved configuration file URL
+     * @return resolved configuration file URI 
+     * @throws URISyntaxException if specified URL is invalid
+     * @throws IOException on failure to construct file system or extract configuration file
+     */
+    private static URI getConfigUri(final String path, final URL url) throws URISyntaxException, IOException {
+        URI uri = url.toURI();
+        if ("jar".equals(uri.getScheme())) {
+            try {
+                FileSystems.newFileSystem(uri, Collections.emptyMap());
+            } catch (FileSystemAlreadyExistsException eaten) {
+                LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
+            } 
+            
+            String outputDir = PathUtils.getBaseDir();
+            File outputFile = new File(outputDir, path);
+            Path outputPath = outputFile.toPath();
+            if (!outputPath.toFile().exists()) {
+                Files.copy(Paths.get(uri), outputPath);
+            }
+            uri = outputPath.toUri();
+        }
+        return uri;
     }
     
     @Override

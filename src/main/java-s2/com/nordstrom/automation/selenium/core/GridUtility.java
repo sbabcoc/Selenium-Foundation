@@ -50,6 +50,9 @@ public final class GridUtility {
     private static Process nodeProcess;
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private GridUtility() {
         throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
     }
@@ -89,7 +92,7 @@ public final class GridUtility {
      * 
      * @throws TimeoutException If Grid server took too long to activate.
      */
-    private static void startGridServer(GridServerParms serverParms) throws TimeoutException {
+    private static void startGridServer(final GridServerParms serverParms) throws TimeoutException {
         Process serverProcess = GridProcess.start(serverParms.processArgs);
         new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
         setProcess(serverParms.processRole, serverProcess);
@@ -101,7 +104,7 @@ public final class GridUtility {
      * @param processRole Selenium Grid server role (either HUB or NODE)
      * @param serverProcess Selenium Grid server process
      */
-    private static void setProcess(GridRole processRole, Process serverProcess) {
+    private static void setProcess(final GridRole processRole, final Process serverProcess) {
         switch (processRole) {
             case HUB:
                 setHubProcess(serverProcess);
@@ -120,7 +123,7 @@ public final class GridUtility {
      * @param hubConfig hub configuration object
      * @return 'true' if configured hub is active; otherwise 'false'
      */
-    static boolean isHubActive(GridHubConfiguration hubConfig) {
+    static boolean isHubActive(final GridHubConfiguration hubConfig) {
         return isHostActive(getHubHost(hubConfig), HUB_STATUS);
     }
     
@@ -130,7 +133,7 @@ public final class GridUtility {
      * @param hubConfig hub configuration object
      * @return HttpHost object for configured hub
      */
-    static HttpHost getHubHost(GridHubConfiguration hubConfig) {
+    static HttpHost getHubHost(final GridHubConfiguration hubConfig) {
         return new HttpHost(hubConfig.getHost(), hubConfig.getPort());
     }
 
@@ -140,7 +143,7 @@ public final class GridUtility {
      * @param nodeConfig node configuration object
      * @return 'true' if configured node is active; otherwise 'false'
      */
-    static boolean isNodeActive(RegistrationRequest nodeConfig) {
+    static boolean isNodeActive(final RegistrationRequest nodeConfig) {
         return isHostActive(getNodeHost(nodeConfig), NODE_STATUS);
     }
     
@@ -150,7 +153,7 @@ public final class GridUtility {
      * @param nodeConfig node configuration object
      * @return HttpHost object for configured node
      */
-    static HttpHost getNodeHost(RegistrationRequest nodeConfig) {
+    static HttpHost getNodeHost(final RegistrationRequest nodeConfig) {
         Map<String, Object> config = nodeConfig.getConfiguration();
         return new HttpHost((String) config.get("host"), (Integer) config.get("port"));
     }
@@ -162,7 +165,7 @@ public final class GridUtility {
      * @param request request path (may include parameters)
      * @return 'true' if specified host is active; otherwise 'false'
      */
-    private static boolean isHostActive(HttpHost host, String request) {
+    private static boolean isHostActive(final HttpHost host, final String request) {
         try {
             HttpResponse response = getHttpResponse(host, request);
             return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
@@ -179,7 +182,7 @@ public final class GridUtility {
      * @return host response for the specified GET request
      * @throws IOException The request triggered an I/O exception
      */
-    public static HttpResponse getHttpResponse(HttpHost host, String request) throws IOException {
+    public static HttpResponse getHttpResponse(final HttpHost host, final String request) throws IOException {
         HttpClient client = HttpClientBuilder.create().build();
         URL sessionURL = new URL(host.toURI() + request);
         BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
@@ -208,7 +211,7 @@ public final class GridUtility {
      * @param localOnly 'true' to target only local Grid node server
      * @return 'false' if [localOnly] and node is remote; otherwise 'true'
      */
-    public static boolean stopGridNode(boolean localOnly) {
+    public static boolean stopGridNode(final boolean localOnly) {
         if (localOnly && !isLocalNode()) {
             return false;
         }
@@ -217,8 +220,9 @@ public final class GridUtility {
         if (isNodeActive(nodeConfig)) {
             HttpHost nodeHost = GridUtility.getNodeHost(nodeConfig);
             try {
+                URL hostUrl = URI.create(nodeHost.toURI()).toURL();
                 GridUtility.getHttpResponse(nodeHost, NODE_SHUTDOWN);
-                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, URI.create(nodeHost.toURI()).toURL());
+                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, hostUrl);
             } catch (IOException | TimeoutException e) {
                 throw UncheckedThrow.throwUnchecked(e);
             }
@@ -234,7 +238,7 @@ public final class GridUtility {
      * @param localOnly 'true' to target only local Grid hub server
      * @return 'false' if [localOnly] and hub is remote; otherwise 'true'
      */
-    public static boolean stopGridHub(boolean localOnly) {
+    public static boolean stopGridHub(final boolean localOnly) {
         if (localOnly && !isLocalHub()) {
             return false;
         }
@@ -243,8 +247,9 @@ public final class GridUtility {
         if (isHubActive(hubConfig)) {
             HttpHost hubHost = GridUtility.getHubHost(hubConfig);
             try {
+                URL hubUrl = URI.create(hubHost.toURI()).toURL();
                 GridUtility.getHttpResponse(hubHost, HUB_SHUTDOWN);
-                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, URI.create(hubHost.toURI()).toURL());
+                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, hubUrl);
             } catch (IOException | TimeoutException e) {
                 throw UncheckedThrow.throwUnchecked(e);
             }
@@ -294,7 +299,7 @@ public final class GridUtility {
      * @param addr Internet protocol address object
      * @return 'true' if the specified address is local; otherwise 'false'
      */
-    public static boolean isThisMyIpAddress(InetAddress addr) {
+    public static boolean isThisMyIpAddress(final InetAddress addr) {
         // Check if the address is a valid special local or loop back
         if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
             return true;
@@ -326,7 +331,7 @@ public final class GridUtility {
          * @param config WebDriver/Grid configuration
          * @return Grid hub parameters object
          */
-        public static GridServerParms getHubParms(SeleniumConfig config) {
+        public static GridServerParms getHubParms(final SeleniumConfig config) {
             GridServerParms parms = new GridServerParms();
             parms.processRole = GridRole.HUB;
             parms.processArgs = config.getHubArgs();
@@ -348,7 +353,7 @@ public final class GridUtility {
          * @param config WebDriver/Grid configuration
          * @return Grid node parameters object
          */
-        public static GridServerParms getNodeParms(SeleniumConfig config) {
+        public static GridServerParms getNodeParms(final SeleniumConfig config) {
             GridServerParms parms = new GridServerParms();
             parms.processRole = GridRole.NODE;
             parms.processArgs = config.getNodeArgs();
@@ -371,7 +376,7 @@ public final class GridUtility {
      * @param process Selenium Grid server process; 'null' to stop process
      * @return 'true' if existing hub process was stopped; otherwise 'false'
      */
-    private static synchronized boolean setHubProcess(Process process) {
+    private static synchronized boolean setHubProcess(final Process process) {
         boolean hasHubProcess = (hubProcess != null);
         if (hasHubProcess) {
             LOGGER.debug("Destroying current Grid hub process {}", hubProcess);
@@ -390,7 +395,7 @@ public final class GridUtility {
      * @param process Selenium Grid server process; 'null' to stop process
      * @return 'true' if existing node process was stopped; otherwise 'false'
      */
-    private static synchronized boolean setNodeProcess(Process process) {
+    private static synchronized boolean setNodeProcess(final Process process) {
         boolean hasNodeProcess = (nodeProcess != null);
         if (hasNodeProcess) {
             LOGGER.debug("Destroying current Grid node process {}", nodeProcess);

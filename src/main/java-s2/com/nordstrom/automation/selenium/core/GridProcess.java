@@ -31,9 +31,12 @@ import com.nordstrom.common.file.PathUtils;
 final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
-    private static final Class<?>[] dependencies = { GridLauncher.class };
+    private static final Class<?>[] DEPENDENCIES = {GridLauncher.class};
     private static final String LOGS_PATH = "logs";
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private GridProcess() {
         throw new AssertionError("GridProcess is a static utility class that cannot be instantiated");
     }
@@ -44,15 +47,16 @@ final class GridProcess {
      * 
      * @return Java {@link Process} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
-     * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">Getting Command-Line Help<a>
+     * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
+     *      Getting Command-Line Help<a>
      */
-    static Process start(String[] args) {
+    static Process start(final String[] args) {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
         
         argsList.add(0, GridLauncher.class.getName());
-        argsList.add(0, getClasspath(dependencies));
+        argsList.add(0, getClasspath(DEPENDENCIES));
         argsList.add(0, "-cp");
         argsList.add(0, System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         
@@ -62,11 +66,11 @@ final class GridProcess {
         String outputDir = PathUtils.getBaseDir();
         
         try {
-            outputPath = Paths.get(outputDir, LOGS_PATH);
-            if (!outputPath.toFile().exists()) {
-                Files.createDirectories(outputPath);
+            Path logsPath = Paths.get(outputDir, LOGS_PATH);
+            if (!logsPath.toFile().exists()) {
+                Files.createDirectories(logsPath);
             }
-            outputPath = PathUtils.getNextPath(outputPath, "grid-" + gridRole, "log");
+            outputPath = PathUtils.getNextPath(logsPath, "grid-" + gridRole, "log");
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
@@ -75,7 +79,6 @@ final class GridProcess {
         builder.redirectOutput(outputPath.toFile());
         
         try {
-            Files.createDirectories(outputPath.getParent());
             return builder.start();
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
@@ -88,7 +91,7 @@ final class GridProcess {
      * @param dependencies array of dependencies
      * @return classpath array
      */
-    private static String getClasspath(Class<?>[] dependencies) {
+    private static String getClasspath(final Class<?>[] dependencies) {
         List<String> pathList = new ArrayList<>();
         for (Class<?> clazz : dependencies) {
             pathList.add(findJarPathFor(clazz));
@@ -110,7 +113,7 @@ final class GridProcess {
      *           other way (such as via HTTP, from a database, or some other
      *           custom class-loading device).
      */
-    public static String findJarPathFor(Class<?> context) {
+    public static String findJarPathFor(final Class<?> context) {
         String rawName = context.getName();
         int idx = rawName.lastIndexOf('.');
         
@@ -127,8 +130,8 @@ final class GridProcess {
         if (!uri.startsWith("jar:file:")) {
             idx = uri.indexOf(':');
             String protocol = (idx > -1) ? uri.substring(0, idx) : "(unknown)";
-            throw new IllegalStateException("This class has been loaded remotely via the " + protocol +
-                    " protocol. Only loading from a jar on the local file system is supported.");
+            throw new IllegalStateException("This class has been loaded remotely via the " + protocol
+                    + " protocol. Only loading from a jar on the local file system is supported.");
         }
 
         idx = uri.indexOf('!');

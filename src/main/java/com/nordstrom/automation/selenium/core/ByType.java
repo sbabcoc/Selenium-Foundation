@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.core;
 
 import org.openqa.selenium.By;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
 
@@ -9,6 +11,11 @@ import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
  */
 public final class ByType {
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(ByType.class);
+    
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private ByType() {
         throw new AssertionError("ByType is a static utility class that cannot be instantiated");
     }
@@ -19,7 +26,7 @@ public final class ByType {
      * @param constant locator constant
      * @return CSS locator string; 'null' if unconvertible
      */
-    public static String cssLocatorFor(ByEnum constant) {
+    public static String cssLocatorFor(final ByEnum constant) {
         return cssLocatorFor(constant.locator());
     }
     
@@ -29,7 +36,7 @@ public final class ByType {
      * @param locator Selenium locator
      * @return CSS locator string; 'null' if unconvertible
      */
-    public static String cssLocatorFor(By locator) {
+    public static String cssLocatorFor(final By locator) {
         
         String val = valueOf(locator);
         
@@ -40,15 +47,15 @@ public final class ByType {
         } else if (locator instanceof By.ById) {
             return "#" + val;
         } else if (locator instanceof By.ByLinkText) {
-            // unsupported
+            LOGGER.warn("Cannot get CSS locator string for '{}' locator", "ByLinkText");
         } else if (locator instanceof By.ByName) {
             return "[name=" + val + "]";
         } else if (locator instanceof By.ByPartialLinkText) {
-            // unsupported
+            LOGGER.warn("Cannot get CSS locator string for '{}' locator", "ByPartialLinkText");
         } else if (locator instanceof By.ByTagName) {
             return val;
         } else if (locator instanceof By.ByXPath) {
-            // unsupported
+            LOGGER.warn("Cannot get CSS locator string for '{}' locator", "ByXPath");
         }
         
         return null;
@@ -60,7 +67,7 @@ public final class ByType {
      * @param constant locator constant
      * @return XPath locator string; 'null' if unconvertible
      */
-    public static String xpathLocatorFor(ByEnum constant) {
+    public static String xpathLocatorFor(final ByEnum constant) {
         return xpathLocatorFor(constant.locator());
     }
     
@@ -70,14 +77,14 @@ public final class ByType {
      * @param locator Selenium locator
      * @return XPath locator string; 'null' if unconvertible
      */
-    public static String xpathLocatorFor(By locator) {
+    public static String xpathLocatorFor(final By locator) {
         
         String val = valueOf(locator);
         
         if (locator instanceof By.ByClassName) {
             return ".//*[contains(concat(' ',@class,' '),' " + val + " ')]";
         } else if (locator instanceof By.ByCssSelector) {
-            // unsupported
+            LOGGER.warn("Cannot get XPath locator string for '{}' locator", "ByCssSelector");
         } else if (locator instanceof By.ById) {
             return ".//*[@id='" + val + "']";
         } else if (locator instanceof By.ByLinkText) {
@@ -101,7 +108,7 @@ public final class ByType {
      * @param locator Selenium locator
      * @return value extracted from the specified locator
      */
-    private static String valueOf(By locator) {
+    private static String valueOf(final By locator) {
         String str = locator.toString();
         int i = str.indexOf(':');
         return str.substring(i + 1).trim();
