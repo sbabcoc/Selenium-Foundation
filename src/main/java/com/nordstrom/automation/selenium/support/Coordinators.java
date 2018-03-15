@@ -20,6 +20,9 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
  */
 public final class Coordinators {
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private Coordinators() {
         throw new AssertionError("Coordinators is a static utility class that cannot be instantiated");
     }
@@ -32,9 +35,12 @@ public final class Coordinators {
      */
     public static Coordinator<String> newWindowIsOpened(final Set<String> initialHandles) {
         return new Coordinator<String>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public String apply(SearchContext context) {
+            public String apply(final SearchContext context) {
                 Set<String> currentHandles = WebDriverUtils.getDriver(context).getWindowHandles();
                 currentHandles.removeAll(initialHandles);
                 if (currentHandles.isEmpty()) {
@@ -44,6 +50,9 @@ public final class Coordinators {
                 }
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "new window to be opened";
@@ -60,13 +69,19 @@ public final class Coordinators {
      */
     public static Coordinator<Boolean> windowIsClosed(final String windowHandle) {
         return new Coordinator<Boolean>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public Boolean apply(SearchContext context) {
+            public Boolean apply(final SearchContext context) {
                 Set<String> currentHandles = WebDriverUtils.getDriver(context).getWindowHandles();
                 return Boolean.valueOf( ! currentHandles.contains(windowHandle));
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "window with handle '" + windowHandle + "' to be closed";
@@ -82,16 +97,22 @@ public final class Coordinators {
      */
     public static Coordinator<WebElement> visibilityOfElementLocated(final By locator) {
         return new Coordinator<WebElement>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public WebElement apply(SearchContext context) {
+            public WebElement apply(final SearchContext context) {
                 try {
                     return elementIfVisible(context.findElement(locator));
                 } catch (StaleElementReferenceException e) {
                     return null;
                 }
             }
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "visibility of element located by " + locator;
@@ -108,9 +129,12 @@ public final class Coordinators {
      */
     public static Coordinator<WebElement> visibilityOfAnyElementLocated(final By locator) {
         return new Coordinator<WebElement>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public WebElement apply(SearchContext context) {
+            public WebElement apply(final SearchContext context) {
                 try {
                     List<WebElement> visible = context.findElements(locator);
                     return (WebDriverUtils.filterHidden(visible)) ? null : visible.get(0);
@@ -118,7 +142,10 @@ public final class Coordinators {
                     return null;
                 }
             }
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "visibility of element located by " + locator;
@@ -136,8 +163,11 @@ public final class Coordinators {
     public static Coordinator<Boolean> invisibilityOfElementLocated(final By locator) {
         return new Coordinator<Boolean>() {
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public Boolean apply(SearchContext context) {
+            public Boolean apply(final SearchContext context) {
                 try {
                     return !(context.findElement(locator).isDisplayed());
                 } catch (NoSuchElementException | StaleElementReferenceException e) {
@@ -146,7 +176,10 @@ public final class Coordinators {
                     return true;
                 }
             }
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "element to no longer be visible: " + locator;
@@ -160,7 +193,7 @@ public final class Coordinators {
      * @param element element whose visibility is in question
      * @return specified element reference; 'null' if element is hidden
      */
-    private static WebElement elementIfVisible(WebElement element) {
+    private static WebElement elementIfVisible(final WebElement element) {
         return element.isDisplayed() ? element : null;
     }
     
@@ -182,12 +215,18 @@ public final class Coordinators {
                     return ExpectedConditions.stalenessOf(element);
                 }
             }
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public Boolean apply(SearchContext ignored) {
+            public Boolean apply(final SearchContext ignored) {
                 return condition.apply(null);
             }
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return condition.toString();

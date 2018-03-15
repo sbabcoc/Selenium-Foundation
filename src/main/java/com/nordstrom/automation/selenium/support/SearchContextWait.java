@@ -37,7 +37,7 @@ public class SearchContextWait extends FluentWait<SearchContext> {
      *            The timeout in seconds when an expectation is called
      * @see SearchContextWait#ignoring(java.lang.Class)
      */
-    public SearchContextWait(SearchContext context, long timeOutInSeconds) {
+    public SearchContextWait(final SearchContext context, final long timeOutInSeconds) {
         this(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER, timeOutInSeconds, DEFAULT_SLEEP_TIMEOUT);
     }
 
@@ -55,7 +55,7 @@ public class SearchContextWait extends FluentWait<SearchContext> {
      *            The duration in milliseconds to sleep between polls.
      * @see SearchContextWait#ignoring(java.lang.Class)
      */
-    public SearchContextWait(SearchContext context, long timeOutInSeconds, long sleepInMillis) {
+    public SearchContextWait(final SearchContext context, final long timeOutInSeconds, final long sleepInMillis) {
         this(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER, timeOutInSeconds, sleepInMillis);
     }
 
@@ -76,8 +76,9 @@ public class SearchContextWait extends FluentWait<SearchContext> {
      * @param sleepTimeOut
      *            The timeout used whilst sleeping. Defaults to 500ms called.
      */
-    public SearchContextWait(SearchContext context, Clock clock, Sleeper sleeper, long timeOutInSeconds,
-            long sleepTimeOut) {
+    public SearchContextWait(final SearchContext context, final Clock clock, final Sleeper sleeper,
+                    final long timeOutInSeconds, final long sleepTimeOut) {
+        
         super(context, clock, sleeper);
         withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
         pollingEvery(sleepTimeOut, TimeUnit.MILLISECONDS);
@@ -89,7 +90,7 @@ public class SearchContextWait extends FluentWait<SearchContext> {
      * {@inheritDoc}
      */
     @Override
-    protected RuntimeException timeoutException(String message, Throwable lastException) {
+    protected RuntimeException timeoutException(final String message, final Throwable lastException) {
         TimeoutException ex = new TimeoutException(message, lastException);
         ex.addInfo(WebDriverException.DRIVER_INFO, context.getClass().getName());
         WebDriver driver = WebDriverUtils.getDriver(context);

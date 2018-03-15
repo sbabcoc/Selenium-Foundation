@@ -50,6 +50,9 @@ public final class RobustElementFactory {
     
     private static Map<String, InstanceCreator> creatorMap = new HashMap<>();
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private RobustElementFactory() {
         throw new AssertionError("RobustElementFactory is a static utility class that cannot be instantiated");
     }
@@ -61,7 +64,7 @@ public final class RobustElementFactory {
      * @param locator element locator
      * @return robust web element
      */
-    public static WebElement makeRobustElement(WrapsContext context, By locator) {
+    public static WebElement makeRobustElement(final WrapsContext context, final By locator) {
         return makeRobustElement(null, context, locator, RobustElementWrapper.CARDINAL);
     }
     
@@ -73,7 +76,9 @@ public final class RobustElementFactory {
      * @param locator element locator
      * @return robust web element
      */
-    public static WebElement makeRobustElement(WebElement element, WrapsContext context, By locator) {
+    public static WebElement makeRobustElement(
+                    final WebElement element, final WrapsContext context, final By locator) {
+        
         return makeRobustElement(element, context, locator, RobustElementWrapper.CARDINAL);
     }
     
@@ -86,7 +91,9 @@ public final class RobustElementFactory {
      * @param index element index
      * @return robust web element
      */
-    public static WebElement makeRobustElement(WebElement element, WrapsContext context, By locator, int index) {
+    public static WebElement makeRobustElement(
+                    final WebElement element, final WrapsContext context, final By locator, final int index) {
+        
         InstanceCreator creator = getCreator(context);
         RobustElementWrapper interceptor = new RobustElementWrapper(element, context, locator, index);
         WebElement robust = (WebElement) creator.makeInstance();
@@ -100,7 +107,7 @@ public final class RobustElementFactory {
      * @param context target context
      * @return robust web element factory
      */
-    private static synchronized InstanceCreator getCreator(WrapsContext context) {
+    private static synchronized InstanceCreator getCreator(final WrapsContext context) {
         WebDriver driver = context.getWrappedDriver();
         String driverName = driver.getClass().getName();
         if (creatorMap.containsKey(driverName)) {
@@ -217,7 +224,8 @@ public final class RobustElementFactory {
          * @param locator element locator
          * @param index element index
          */
-        public RobustElementWrapper(WebElement element, WrapsContext context, By locator, int index) {
+        public RobustElementWrapper(
+                        final WebElement element, final WrapsContext context, final By locator, final int index) {
             
             // if specified element is already robust
             if (element instanceof RobustWebElement) {
@@ -285,8 +293,8 @@ public final class RobustElementFactory {
          */
         @RuntimeType
         @BindingPriority(Integer.MAX_VALUE)
-        public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args) throws Exception
-        {
+        public Object intercept(@This final Object obj, @Origin final Method method,
+                        @AllArguments final Object[] args) throws Exception { //NOSONAR
             try {
                 return method.invoke(getWrappedElement(), args);
             } catch (InvocationTargetException ite) {
@@ -317,7 +325,7 @@ public final class RobustElementFactory {
         /**
          * {@inheritDoc}
          */
-        public WebElement findOptional(By by) {
+        public WebElement findOptional(final By by) {
             return getElement(this, by, OPTIONAL);
         }
 
@@ -386,7 +394,10 @@ public final class RobustElementFactory {
          */
         private static Coordinator<RobustElementWrapper> referenceIsRefreshed(final RobustElementWrapper wrapper) {
             return new Coordinator<RobustElementWrapper>() {
-
+                
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public RobustElementWrapper apply(SearchContext context) {
                     try {
@@ -396,7 +407,10 @@ public final class RobustElementFactory {
                         return acquireReference(wrapper);
                     }
                 }
-
+                
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public String toString() {
                     return "element reference to be refreshed";
@@ -411,7 +425,7 @@ public final class RobustElementFactory {
          * @param wrapper robust element wrapper
          * @return wrapped element reference
          */
-        private static RobustElementWrapper acquireReference(RobustElementWrapper wrapper) {
+        private static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
             SearchContext context = wrapper.context.getWrappedContext();
             
             if (wrapper.strategy == Strategy.LOCATOR) {
@@ -480,7 +494,7 @@ public final class RobustElementFactory {
          * {@inheritDoc}
          */
         @Override
-        public SearchContext refreshContext(long expiration) {
+        public SearchContext refreshContext(final long expiration) {
             // refresh wrapped element reference if it's past the expiration
             return (expiration >= acquiredAt()) ? refreshReference(null) : this;
         }
@@ -508,7 +522,7 @@ public final class RobustElementFactory {
          * @param locator element locator
          * @return list of robust elements in context that match the locator
          */
-        public static List<WebElement> getElements(WrapsContext context, By locator) {
+        public static List<WebElement> getElements(final WrapsContext context, final By locator) {
             List<WebElement> elements;
             try {
                 elements = context.getWrappedContext().findElements(locator);
@@ -529,7 +543,7 @@ public final class RobustElementFactory {
          * @param locator element locator
          * @return robust element in context that matches the locator
          */
-        public static WebElement getElement(WrapsContext context, By locator) {
+        public static WebElement getElement(final WrapsContext context, final By locator) {
             return getElement(context, locator, CARDINAL);
         }
         
@@ -542,7 +556,7 @@ public final class RobustElementFactory {
          * @param index element index
          * @return indexed robust element in context that matches the locator
          */
-        public static WebElement getElement(WrapsContext context, By locator, int index) {
+        public static WebElement getElement(final WrapsContext context, final By locator, final int index) {
             return RobustElementFactory.makeRobustElement(null, context, locator, index);
         }
         
@@ -585,12 +599,12 @@ public final class RobustElementFactory {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
             if (obj == null)
                 return false;
-            if ( ! (obj instanceof RobustWebElement))
+            if (!(obj instanceof RobustWebElement)) //NOSONAR
                 return false;
             RobustElementWrapper other = ((InterceptionAccessor) obj).getInterceptor();
             if (!context.equals(other.context))
@@ -606,7 +620,7 @@ public final class RobustElementFactory {
          * {@inheritDoc}
          */
         @Override
-        public WebElement findElement(By locator) {
+        public WebElement findElement(final By locator) {
             return RobustElementWrapper.getElement(this, locator);
         }
 
@@ -614,7 +628,7 @@ public final class RobustElementFactory {
          * {@inheritDoc}
          */
         @Override
-        public List<WebElement> findElements(By locator) {
+        public List<WebElement> findElements(final By locator) {
             return RobustElementWrapper.getElements(this, locator);
         }
     }

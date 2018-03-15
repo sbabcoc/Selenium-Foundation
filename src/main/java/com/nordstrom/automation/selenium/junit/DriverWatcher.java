@@ -30,14 +30,20 @@ import com.nordstrom.automation.selenium.core.TestBase;
  * @see GridUtility
  */
 public class DriverWatcher implements MethodWatcher {
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void beforeInvocation(Object obj, Method method, Object[] args) {
+    public void beforeInvocation(final Object obj, final Method method, final Object[] args) {
         DriverManager.beforeInvocation(obj, method);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void afterInvocation(Object obj, Method method, Object[] args) {
+    public void afterInvocation(final Object obj, final Method method, final Object[] args) {
         DriverManager.afterInvocation(obj, method);
     }
     
@@ -50,7 +56,7 @@ public class DriverWatcher implements MethodWatcher {
     public static TestWatcher getTestWatcher(final TestBase obj) {
         return new TestWatcher() {
             @Override
-            protected void finished(Description description) {
+            protected void finished(final Description description) {
                 DriverManager.closeDriver(obj);
             }
         };

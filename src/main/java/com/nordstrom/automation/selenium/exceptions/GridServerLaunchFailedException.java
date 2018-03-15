@@ -16,7 +16,7 @@ public class GridServerLaunchFailedException extends RuntimeException {
      * @param role Grid server role specifier ({@code hub} or {@code node})
      * @param cause the cause of this exception
      */
-    public GridServerLaunchFailedException(String role, IOException cause) {
+    public GridServerLaunchFailedException(final String role, final IOException cause) {
         super(getMessage(role), cause);
     }
     
@@ -26,7 +26,7 @@ public class GridServerLaunchFailedException extends RuntimeException {
      * @param role Grid server role specifier ({@code hub} or {@code node})
      * @return exception message for the specified server role
      */
-    private static String getMessage(String role) {
+    private static String getMessage(final String role) {
         return String.format(TEMPLATE, role);
     }
 }

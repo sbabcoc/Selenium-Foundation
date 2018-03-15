@@ -248,7 +248,10 @@ public final class DriverManager {
      */
     private static Function<TestBase, WebDriver> driverIsAcquired(final Method method) {
         return new Function<TestBase, WebDriver>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public WebDriver apply(final TestBase instance) {
                 // if test class provides its own drivers
@@ -259,6 +262,9 @@ public final class DriverManager {
                 }
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "driver to be aquired";

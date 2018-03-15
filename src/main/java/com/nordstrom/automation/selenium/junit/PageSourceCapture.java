@@ -12,7 +12,7 @@ public class PageSourceCapture extends ArtifactCollector<PageSourceArtifact> {
      * 
      * @param instance JUnit test class instance
      */
-    public PageSourceCapture(Object instance) {
+    public PageSourceCapture(final Object instance) {
         super(instance, new PageSourceArtifact());
     }
 

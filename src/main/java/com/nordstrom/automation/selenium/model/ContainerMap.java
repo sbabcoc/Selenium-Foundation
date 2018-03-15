@@ -47,7 +47,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @param locator container context element locator
      */
     @SuppressWarnings("unchecked")
-    ContainerMap(ComponentContainer parent, Class<V> containerType, By locator) {
+    ContainerMap(final ComponentContainer parent, final Class<V> containerType, final By locator) {
         Objects.requireNonNull(parent, "[parent] must be non-null");
         Objects.requireNonNull(containerType, "[containerType] must be non-null");
         Objects.requireNonNull(locator, "[locator] must be non-null");
@@ -73,7 +73,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean containsValue(Object value) {
+    public boolean containsValue(final Object value) {
         if (value.getClass() == containerType) {
             V container = (V) value;
             SearchContext context = container.getContext();
@@ -96,7 +96,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @param key key of desired entry
      * @return entry for the specified key; 'null' if not found
      */
-    final ContainerEntry<V> getEntry(Object key) {
+    final ContainerEntry<V> getEntry(final Object key) {
         if (table.length == 0) {
             return null;
         }
@@ -124,7 +124,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * @param element container map context element
      * @return array of constructor argument values
      */
-    Object[] getArguments(WebElement element) {
+    Object[] getArguments(final WebElement element) {
         return new Object[] {(RobustWebElement) element, parent};
     }
     
@@ -140,7 +140,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (!super.equals(obj))
@@ -182,7 +182,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
          * @param element container context element
          * @param next link to the next container entry ('null' for final entry)
          */
-        ContainerEntry(ContainerMap<V> map, RobustWebElement element, ContainerEntry<V> next) {
+        ContainerEntry(final ContainerMap<V> map, final RobustWebElement element, final ContainerEntry<V> next) {
             this.map = map;
             this.element = element;
             this.next = next;
@@ -213,7 +213,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
 
         @Override
-        public V setValue(V value) {
+        public V setValue(final V value) {
             throw new UnsupportedOperationException();
         }
         
@@ -228,7 +228,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
             if (obj == null)
@@ -268,7 +268,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
         
         @Override
-        public final boolean contains(Object o) {
+        public final boolean contains(final Object o) {
             if (!(o instanceof Map.Entry)) {
                 return false;
             }
@@ -284,12 +284,12 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
         
         @Override
-        public final boolean remove(Object o) {
+        public final boolean remove(final Object o) {
             throw new UnsupportedOperationException();
         }
         
         @Override
-        public boolean removeAll(Collection<?> c) {
+        public boolean removeAll(final Collection<?> c) {
             throw new UnsupportedOperationException();
         }
     }
@@ -311,12 +311,18 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         ContainerEntryIterator() {
             findNextEntry();
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final boolean hasNext() {
             return next != null;
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public ContainerEntry<V> next() {
             if (next == null) {
@@ -330,6 +336,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
             return current;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final void remove() {
             throw new UnsupportedOperationException();

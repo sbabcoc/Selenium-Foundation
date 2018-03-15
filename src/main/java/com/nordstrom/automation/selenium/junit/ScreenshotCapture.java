@@ -12,7 +12,7 @@ public class ScreenshotCapture extends ArtifactCollector<ScreenshotArtifact> {
      * 
      * @param instance JUnit test class instance
      */
-    public ScreenshotCapture(Object instance) {
+    public ScreenshotCapture(final Object instance) {
         super(instance, new ScreenshotArtifact());
     }
 

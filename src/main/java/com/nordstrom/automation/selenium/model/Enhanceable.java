@@ -67,7 +67,7 @@ public abstract class Enhanceable<T> {
      * @return enhanced container object
      */
     @SuppressWarnings("unchecked")
-    public <C extends T> C enhanceContainer(C container) {
+    public <C extends T> C enhanceContainer(final C container) {
         if (container instanceof Enhanced) {
             return container;
         }
@@ -120,7 +120,7 @@ public abstract class Enhanceable<T> {
      * @param container container object
      * @return class of container object
      */
-    public static Class<?> getContainerClass(Object container) {
+    public static Class<?> getContainerClass(final Object container) {
         Class<?> clazz = container.getClass();      
         return (container instanceof Enhanced) ? clazz.getSuperclass() : clazz;
     }

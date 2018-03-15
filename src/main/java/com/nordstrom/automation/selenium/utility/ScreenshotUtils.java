@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 
 public final class ScreenshotUtils {
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private ScreenshotUtils() {
         throw new AssertionError("ScreenshotUtils is a static utility class that cannot be instantiated");
     }
@@ -23,7 +26,7 @@ public final class ScreenshotUtils {
      * @param logger SLF4J logger object
      * @return 'true' if driver can take screenshots; otherwise 'false
      */
-    public static boolean canGetArtifact(Optional<WebDriver> optDriver, Logger logger) {
+    public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             if (driver instanceof HasCapabilities) {
@@ -33,7 +36,7 @@ public final class ScreenshotUtils {
             } else if (driver instanceof TakesScreenshot) {
                 return true;
             }
-            logger.warn("This driver is not able to take screenshots.");
+            logger.warn("This driver is not able to take screenshots."); //NOSONAR
         }
         return false;
     }
@@ -46,7 +49,9 @@ public final class ScreenshotUtils {
      * @param logger SLF4J logger object
      * @return page source; if capture fails, an empty string is returned
      */
-    public static byte[] getArtifact(Optional<WebDriver> optDriver, Throwable reason, Logger logger) {
+    public static byte[] getArtifact(
+                    final Optional<WebDriver> optDriver, final Throwable reason, final Logger logger) { //NOSONAR
+        
         if (canGetArtifact(optDriver, logger)) {
             try {
                 WebDriver driver = optDriver.get();

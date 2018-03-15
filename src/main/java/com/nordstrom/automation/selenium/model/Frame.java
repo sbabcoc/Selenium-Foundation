@@ -49,7 +49,7 @@ public class Frame extends Page {
      * @param locator frame element locator
      * @param parent frame parent
      */
-    public Frame(By locator, ComponentContainer parent) {
+    public Frame(final By locator, final ComponentContainer parent) {
         this(locator, -1, parent);
         
         argumentTypes = ARG_TYPES_1;
@@ -63,7 +63,7 @@ public class Frame extends Page {
      * @param index frame element index
      * @param parent frame parent
      */
-    public Frame(By locator, int index, ComponentContainer parent) {
+    public Frame(final By locator, final int index, final ComponentContainer parent) {
         this((RobustWebElement) RobustElementWrapper.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
@@ -76,7 +76,7 @@ public class Frame extends Page {
      * @param element frame context element
      * @param parent frame parent
      */
-    public Frame(RobustWebElement element, ComponentContainer parent) {
+    public Frame(final RobustWebElement element, final ComponentContainer parent) {
         super(parent.driver, parent);
         this.frameSelect = FrameSelect.ELEMENT;
         this.element = element;
@@ -92,7 +92,7 @@ public class Frame extends Page {
      * @param index (zero-based) frame index
      * @param parent frame parent
      */
-    public Frame(int index, ComponentContainer parent) {
+    public Frame(final int index, final ComponentContainer parent) {
         super(parent.driver, parent);
         this.frameSelect = FrameSelect.INDEX;
         this.index = index;
@@ -108,7 +108,7 @@ public class Frame extends Page {
      *            &lt;iframe&gt; element, or the (zero-based) frame index
      * @param parent frame parent
      */
-    public Frame(String nameOrId, ComponentContainer parent) {
+    public Frame(final String nameOrId, final ComponentContainer parent) {
         super(parent.driver, parent);
         this.frameSelect = FrameSelect.NAME_OR_ID;
         this.nameOrId = nameOrId;
@@ -116,7 +116,10 @@ public class Frame extends Page {
         argumentTypes = ARG_TYPES_5;
         arguments = new Object[] {nameOrId, parent};
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SearchContext switchToContext() {
         switch (frameSelect) {
@@ -144,7 +147,7 @@ public class Frame extends Page {
      * @param element frame context element
      * @return parent search context
      */
-    public static SearchContext switchToParentFrame(RobustWebElement element) {
+    public static SearchContext switchToParentFrame(final RobustWebElement element) {
         if (canSwitchToParentFrame) {
             try {
                 return element.getWrappedDriver().switchTo().parentFrame();
@@ -159,8 +162,11 @@ public class Frame extends Page {
         return element.switchTo();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public SearchContext refreshContext(long expiration) {
+    public SearchContext refreshContext(final long expiration) {
         if (frameSelect == FrameSelect.ELEMENT) {
             element.refreshContext(expiration);
         } else {
@@ -168,7 +174,10 @@ public class Frame extends Page {
         }
         return switchToContext();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long acquiredAt() {
         if (frameSelect == FrameSelect.ELEMENT) {
@@ -177,17 +186,26 @@ public class Frame extends Page {
             return parent.acquiredAt();
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<?>[] getArgumentTypes() {
         return argumentTypes;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object[] getArguments() {
         return arguments;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -198,9 +216,12 @@ public class Frame extends Page {
         result = prime * result + ((nameOrId == null) ? 0 : nameOrId.hashCode());
         return result;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (!super.equals(obj))

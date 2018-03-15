@@ -38,7 +38,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @param locator component context element locator
      * @param parent component parent container
      */
-    public PageComponent(By locator, ComponentContainer parent) {
+    public PageComponent(final By locator, final ComponentContainer parent) {
         this(locator, -1, parent);
         
         argumentTypes = ARG_TYPES_1;
@@ -52,7 +52,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @param index component context index (-1 = non-indexed)
      * @param parent component parent container
      */
-    public PageComponent(By locator, int index, ComponentContainer parent) {
+    public PageComponent(final By locator, final int index, final ComponentContainer parent) {
         this((RobustWebElement) RobustElementWrapper.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
@@ -65,25 +65,34 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @param element component context element
      * @param parent component parent
      */
-    public PageComponent(RobustWebElement element, ComponentContainer parent) {
+    public PageComponent(final RobustWebElement element, final ComponentContainer parent) {
         super(element, parent);
         
         argumentTypes = ComponentContainer.getCollectibleArgs();
         arguments = new Object[] {element, parent};
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SearchContext switchToContext() {
         return this;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchContext getWrappedContext() {
         return ((RobustWebElement) context).getWrappedContext();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public SearchContext refreshContext(long expiration) {
+    public SearchContext refreshContext(final long expiration) {
         // if this context is past the expiration
         if (expiration >= acquiredAt()) {
             // refresh context ancestry
@@ -93,22 +102,34 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
         }
         return this;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long acquiredAt() {
         return ((RobustWebElement) context).acquiredAt();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<?>[] getArgumentTypes() {
         return Arrays.copyOf(argumentTypes, argumentTypes.length);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object[] getArguments() {
         return Arrays.copyOf(arguments, arguments.length);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WebElement getWrappedElement() {
         return (WebElement) context;
@@ -160,13 +181,19 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      */
     public static Coordinator<PageComponent> componentIsVisible() {
         return new Coordinator<PageComponent>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public PageComponent apply(SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isDisplayed()) ? component : null;
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "page component to be visible";
@@ -181,13 +208,19 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      */
     public static Coordinator<PageComponent> componentIsHidden() {
         return new Coordinator<PageComponent>() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public PageComponent apply(SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isInvisible()) ? component : null;
             }
             
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return "page component to be absent or hidden";
@@ -202,7 +235,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @return search context as page component (throws an exception otherwise)
      * @throws UnsupportedOperationException The specified search context isn't a page component
      */
-    private static PageComponent verifyContext(SearchContext context) {
+    private static PageComponent verifyContext(final SearchContext context) {
         if (context instanceof PageComponent) {
             return (PageComponent) context;
         }
@@ -210,6 +243,9 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
         throw new UnsupportedOperationException("Wait object search context is not a page component");
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -218,9 +254,12 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
         result = prime * result + Arrays.hashCode(arguments);
         return result;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (!super.equals(obj))

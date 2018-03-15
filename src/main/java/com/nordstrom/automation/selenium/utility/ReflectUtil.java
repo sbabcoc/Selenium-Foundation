@@ -23,6 +23,9 @@ import java.lang.reflect.Method;
  */
 public final class ReflectUtil {
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private ReflectUtil() {
         throw new AssertionError("ReflectUtil is a static utility class that cannot be instantiated");
     }
@@ -33,7 +36,7 @@ public final class ReflectUtil {
      * @param method method from which to derive parameter type string
      * @return parameter type string
      */
-    public static String parametersAsString(Method method) {
+    public static String parametersAsString(final Method method) {
         return parametersAsString(method, false);
     }
     
@@ -44,7 +47,7 @@ public final class ReflectUtil {
      * @param longTypeNames 'true' to return long type names; 'false' to return short type names
      * @return method signature
      */
-    public static String getSignature(Method method, boolean longTypeNames) {
+    public static String getSignature(final Method method, final boolean longTypeNames) {
         return method.getName() + "(" + parametersAsString(method, longTypeNames) + ")";
     }
     
@@ -55,7 +58,7 @@ public final class ReflectUtil {
      * @param longTypeNames 'true' to return long type names; 'false' to return short type names
      * @return parameter type string
      */
-    public static String parametersAsString(Method method, boolean longTypeNames) {
+    public static String parametersAsString(final Method method, final boolean longTypeNames) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 0)
             return "";
@@ -74,7 +77,7 @@ public final class ReflectUtil {
      * @param method method from which to derive signature
      * @return method signature
      */
-    public static String getSignature(Method method) {
+    public static String getSignature(final Method method) {
         return getSignature(method, false);
     }
 

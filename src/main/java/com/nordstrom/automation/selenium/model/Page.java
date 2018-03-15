@@ -52,7 +52,7 @@ public class Page extends ComponentContainer {
      * 
      * @param driver driver object
      */
-    public Page(WebDriver driver) {
+    public Page(final WebDriver driver) {
         super(driver, null);
         
         argumentTypes = ARG_TYPES_1;
@@ -67,18 +67,24 @@ public class Page extends ComponentContainer {
      * @param driver driver object
      * @param parent page parent
      */
-    Page(WebDriver driver, ComponentContainer parent) {
+    Page(final WebDriver driver, final ComponentContainer parent) {
         super(driver, parent);
         
         argumentTypes = ARG_TYPES_2;
         arguments = new Object[] {driver, parent};
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void validateParent(ComponentContainer parent) {
+    protected void validateParent(final ComponentContainer parent) {
         // Page objects can omit parent 
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SearchContext switchToContext() {
         driver.switchTo().window(windowHandle);
@@ -90,7 +96,7 @@ public class Page extends ComponentContainer {
      * 
      * @param windowHandle page object window handle
      */
-    public void setWindowHandle(String windowHandle) {
+    public void setWindowHandle(final String windowHandle) {
         this.windowHandle = windowHandle;
     }
     
@@ -108,7 +114,7 @@ public class Page extends ComponentContainer {
      * 
      * @param pageObj page from which this page was spawned
      */
-    public void setSpawningPage(Page pageObj) {
+    public void setSpawningPage(final Page pageObj) {
         this.spawningPage = pageObj;
     }
     
@@ -127,7 +133,7 @@ public class Page extends ComponentContainer {
      * @param windowState page object {@link WindowState}
      * @return this {@link Page} object
      */
-    public Page setWindowState(WindowState windowState) {
+    public Page setWindowState(final WindowState windowState) {
         this.windowState = windowState;
         return this;
     }
@@ -160,7 +166,9 @@ public class Page extends ComponentContainer {
      * @return page object defined by the specified annotation
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Page> T openInitialPage(InitialPage initialPage, WebDriver driver, URI targetUri) {
+    public static <T extends Page> T openInitialPage(
+                    final InitialPage initialPage, final WebDriver driver, final URI targetUri) {
+        
         String url = getInitialUrl(initialPage, targetUri);
         if (url == null) {
             throw new InitialPageNotSpecifiedException();
@@ -177,7 +185,7 @@ public class Page extends ComponentContainer {
      * @param targetUri target URI
      * @return defined initial URL as a string (may be 'null')
      */
-    private static String getInitialUrl(InitialPage initialPage, URI targetUri) {
+    private static String getInitialUrl(final InitialPage initialPage, final URI targetUri) {
         String url = getPageUrl(initialPage.pageUrl(), targetUri);
         if (url == null) {
             Class<? extends Page> pageClass = initialPage.value();
@@ -195,31 +203,49 @@ public class Page extends ComponentContainer {
         return driver.getCurrentUrl();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchContext getWrappedContext() {
         return getWrappedDriver();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public SearchContext refreshContext(long expiration) {
+    public SearchContext refreshContext(final long expiration) {
         return this;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long acquiredAt() {
         return System.currentTimeMillis();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<?>[] getArgumentTypes() {
         return argumentTypes;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object[] getArguments() {
         return arguments;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     String[] myBypassMethods() {
         return ArrayUtils.addAll(super.myBypassMethods(), BYPASS_METHODS);
@@ -233,7 +259,7 @@ public class Page extends ComponentContainer {
      * @return enhanced container object
      */
     @Override
-    public <C extends ComponentContainer> C enhanceContainer(C container) {
+    public <C extends ComponentContainer> C enhanceContainer(final C container) {
         if (container instanceof Enhanced) {
             return container;
         }
@@ -244,6 +270,9 @@ public class Page extends ComponentContainer {
         return enhanced;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -255,9 +284,12 @@ public class Page extends ComponentContainer {
         result = prime * result + ((spawningPage == null) ? 0 : spawningPage.hashCode());
         return result;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (!super.equals(obj))

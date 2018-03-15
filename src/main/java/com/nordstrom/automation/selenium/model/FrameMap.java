@@ -12,7 +12,14 @@ import org.openqa.selenium.By;
  */
 public class FrameMap<V extends Frame> extends ContainerMap<V> {
 
-    FrameMap(ComponentContainer parent, Class<V> containerType, By locator) {
+    /**
+     * Constructor for frame map with parent, type, and locator
+     * 
+     * @param parent parent container
+     * @param containerType container type
+     * @param locator container context element locator
+     */
+    FrameMap(final ComponentContainer parent, final Class<V> containerType, final By locator) {
         super(parent, containerType, locator);
     }
 

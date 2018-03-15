@@ -25,13 +25,16 @@ public interface DetectsLoadCompletion {
      * 
      * @return 'true' if the page has finished loading; otherwise 'false'
      */
-    // FIXME - This method performs an unchecked cast to DetectsLoadCompletion
     static Coordinator<Boolean> pageLoadIsComplete() {
         return new Coordinator<Boolean>() {
 
             @Override
-            public Boolean apply(SearchContext context) {
-                return Boolean.valueOf(((DetectsLoadCompletion) context).isLoadComplete());
+            public Boolean apply(final SearchContext context) {
+                if (context instanceof DetectsLoadCompletion) {
+                    return Boolean.valueOf(((DetectsLoadCompletion) context).isLoadComplete());
+                }
+                throw new IllegalArgumentException(String.format("Search context type '%s' doesn't implement the "
+                                + "DetectsLoadCompletion interface", context.getClass().getName()));
             }
             
             @Override

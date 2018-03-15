@@ -17,7 +17,7 @@ public class LandingPageMismatchException extends WebDriverException {
      * @param pageClass landing page class that defines the path/parameter pattern
      * @param url landing page URL that doesn't match the defined pattern
      */
-    public LandingPageMismatchException(Class<?> pageClass, String url) {
+    public LandingPageMismatchException(final Class<?> pageClass, final String url) {
         super(getMessage(pageClass, url));
     }
     
@@ -29,7 +29,8 @@ public class LandingPageMismatchException extends WebDriverException {
      * @param actual actual value of the property that doesn't match
      * @param expect expected value of the property that doesn't match
      */
-    public LandingPageMismatchException(Class<?> pageClass, String propName, String actual, String expect) {
+    public LandingPageMismatchException(
+                    final Class<?> pageClass, final String propName, final String actual, final String expect) {
         super(getMessage(propName, pageClass, actual, expect));
     }
     
@@ -40,7 +41,7 @@ public class LandingPageMismatchException extends WebDriverException {
      * @param url landing page URL that doesn't match the defined pattern
      * @return message for pattern-based landing page mismatch exception
      */
-    private static String getMessage(Class<?> pageClass, String url) {
+    private static String getMessage(final Class<?> pageClass, final String url) {
         return "Landing page for '" + pageClass.getSimpleName() + "' doesn't match expected pattern:\nactual: "
                 + url + "\npattern: " + pageClass.getAnnotation(PageUrl.class).pattern();
     }
