@@ -220,9 +220,9 @@ public final class GridUtility {
         if (isNodeActive(nodeConfig)) {
             HttpHost nodeHost = GridUtility.getNodeHost(nodeConfig);
             try {
-                URL hostUrl = URI.create(nodeHost.toURI()).toURL();
+                URL nodeUrl = URI.create(nodeHost.toURI()).toURL();
                 GridUtility.getHttpResponse(nodeHost, NODE_SHUTDOWN);
-                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, hostUrl);
+                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, nodeUrl);
             } catch (IOException | TimeoutException e) {
                 throw UncheckedThrow.throwUnchecked(e);
             }
