@@ -281,7 +281,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             try {
                 targetUri = builder.build().normalize();
             } catch (URISyntaxException e) {
-                LOGGER.error("Specified target URI '{}' could not be parsed", builder.toString(), e);
+                LOGGER.error("Specified target URI '{}' could not be parsed: {}", builder.toString(), e.getMessage());
             }
         }
         return targetUri;
