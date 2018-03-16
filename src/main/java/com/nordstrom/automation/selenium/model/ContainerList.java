@@ -16,7 +16,6 @@ import org.openqa.selenium.WebElement;
  *
  * @param <E> the class of container objects collected by this list
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 abstract class ContainerList<E extends ComponentContainer> extends AbstractList<E> {
 
     protected ComponentContainer parent;

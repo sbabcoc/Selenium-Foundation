@@ -348,7 +348,6 @@ public abstract class ComponentContainer
      * @param value desired value
      * @return 'true' if element value changed; otherwise 'false'
      */
-    @SuppressWarnings("squid:S1142")
     public static boolean updateValue(final WebElement element, final boolean value) {
         Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
@@ -372,6 +371,7 @@ public abstract class ComponentContainer
      * @param value desired value
      * @return 'true' if element value changed; otherwise 'false'
      */
+    @SuppressWarnings("squid:S1142")
     public static boolean updateValue(final WebElement element, final String value) {
         Objects.requireNonNull(element, ELEMENT_MESSAGE);
         

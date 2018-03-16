@@ -71,6 +71,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public boolean containsValue(final Object value) {
@@ -82,6 +85,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         return false;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<Map.Entry<Object, V>> entrySet() {
         if (entrySet == null) {
@@ -128,6 +134,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         return new Object[] {(RobustWebElement) element, parent};
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -138,8 +147,12 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
         result = prime * result + elements.hashCode();
         return result;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @SuppressWarnings({"squid:S1142", "squid:S1126"})
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
@@ -167,6 +180,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * 
      * @param <V> the class of container object held by this entry
      */
+    @SuppressWarnings("squid:S2972")
     static class ContainerEntry<V extends ComponentContainer> implements Map.Entry<Object, V> {
 
         private ContainerMap<V> map;
@@ -194,11 +208,17 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
             }
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getKey() {
             return key;
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public V getValue() {
             V v = value;
@@ -211,23 +231,36 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
             }
             return v;
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public V setValue(final V value) {
             throw new UnsupportedOperationException();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int hashCode() {
             final int PRIME = 31;
             int result = 1;
             result = PRIME * result + map.hashCode();
             result = PRIME * result + element.hashCode();
-            result = PRIME * result + ((key == null) ? 0 : key.hashCode());
+            result = PRIME * result;
+            if (key != null) {
+                result += key.hashCode();
+            }
             return result;
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
+        @SuppressWarnings("squid:S1142")
         public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
@@ -255,18 +288,28 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * <b>NOTE</b>: This class implements a read-only set; all methods that would alter the composition of the
      * collection (e.g. - {@link #remove}) result in {@link UnsupportOperationException}.
      */
+    @SuppressWarnings("squid:S2972")
     class ContainerEntrySet extends AbstractSet<Map.Entry<Object, V>> {
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final int size()                 {
             return size;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final Iterator<Map.Entry<Object, V>> iterator() {
             return new ContainerEntryIterator();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final boolean contains(final Object o) {
             if (!(o instanceof Map.Entry)) {
@@ -278,16 +321,25 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
             return candidate != null && candidate.equals(e);
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final void clear() {
             throw new UnsupportedOperationException();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final boolean remove(final Object o) {
             throw new UnsupportedOperationException();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean removeAll(final Collection<?> c) {
             throw new UnsupportedOperationException();
@@ -300,6 +352,7 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * <b>NOTE</b>: This class implements a read-only iterator; all methods that would alter the composition of the
      * collection (e.g. - {@link #remove}) result in {@link UnsupportOperationException}.
      */
+    @SuppressWarnings("squid:S2972")
     class ContainerEntryIterator implements Iterator<Map.Entry<Object, V>> {
         
         private ContainerEntry<V> next;
