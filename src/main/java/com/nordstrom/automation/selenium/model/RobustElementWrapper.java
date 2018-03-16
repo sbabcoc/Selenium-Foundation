@@ -40,6 +40,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
  * implementations for methods that acquire web element references and recover from StaleElementReferenceException
  * failures.  
  */
+@SuppressWarnings("squid:S1200")
 public class RobustElementWrapper implements ReferenceFetcher {
     
     /** wraps 1st matched reference */
