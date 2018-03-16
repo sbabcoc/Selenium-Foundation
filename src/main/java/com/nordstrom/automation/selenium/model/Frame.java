@@ -63,7 +63,7 @@ public class Frame extends Page {
      * @param parent frame parent
      */
     public Frame(final By locator, final int index, final ComponentContainer parent) {
-        this((RobustWebElement) RobustElementWrapper.getElement(parent, locator, index), parent);
+        this((RobustWebElement) RobustElementFactory.getElement(parent, locator, index), parent);
         
         argumentTypes = ARG_TYPES_2;
         arguments = new Object[] {locator, index, parent};

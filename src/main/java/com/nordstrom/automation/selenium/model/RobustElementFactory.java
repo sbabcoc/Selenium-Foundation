@@ -1,9 +1,11 @@
 package com.nordstrom.automation.selenium.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -160,5 +162,49 @@ public final class RobustElementFactory {
          * @return robust web element
          */
         Object makeInstance();
+    }
+
+    /**
+     * Get the list of elements that match the specified locator in the indicated context.
+     * 
+     * @param context element search context
+     * @param locator element locator
+     * @return list of robust elements in context that match the locator
+     */
+    public static List<WebElement> getElements(final WrapsContext context, final By locator) {
+        List<WebElement> elements;
+        try {
+            elements = context.getWrappedContext().findElements(locator);
+            for (int index = 0; index < elements.size(); index++) {
+                elements.set(index, makeRobustElement(elements.get(index), context, locator, index));
+            }
+        } catch (StaleElementReferenceException e) { //NOSONAR
+            elements = context.refreshContext(context.acquiredAt()).findElements(locator);
+        }
+        return elements;
+    }
+
+    /**
+     * Get the first element that matches the specified locator in the indicated context.
+     * 
+     * @param context element search context
+     * @param locator element locator
+     * @return robust element in context that matches the locator
+     */
+    public static WebElement getElement(final WrapsContext context, final By locator) {
+        return getElement(context, locator, RobustElementWrapper.CARDINAL);
+    }
+
+    /**
+     * Get the item at the specified index in the list of elements matching the specified 
+     * locator in the indicated context.
+     * 
+     * @param context element search context
+     * @param locator element locator
+     * @param index element index
+     * @return indexed robust element in context that matches the locator
+     */
+    public static WebElement getElement(final WrapsContext context, final By locator, final int index) {
+        return makeRobustElement(null, context, locator, index);
     }
 }

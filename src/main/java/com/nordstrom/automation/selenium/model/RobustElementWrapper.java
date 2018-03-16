@@ -182,7 +182,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * @return web element
      */
     public WebElement findOptional(final By by) {
-        return getElement(this, locator, OPTIONAL);
+        return RobustElementFactory.getElement(this, locator, OPTIONAL);
     }
 
     /**
@@ -377,51 +377,6 @@ public class RobustElementWrapper implements ReferenceFetcher {
     }
     
     /**
-     * Get the list of elements that match the specified locator in the indicated context.
-     * 
-     * @param context element search context
-     * @param locator element locator
-     * @return list of robust elements in context that match the locator
-     */
-    public static List<WebElement> getElements(final WrapsContext context, final By locator) {
-        List<WebElement> elements;
-        try {
-            elements = context.getWrappedContext().findElements(locator);
-            for (int index = 0; index < elements.size(); index++) {
-                elements.set(index, 
-                        RobustElementFactory.makeRobustElement(elements.get(index), context, locator, index));
-            }
-        } catch (StaleElementReferenceException e) { //NOSONAR
-            elements = context.refreshContext(context.acquiredAt()).findElements(locator);
-        }
-        return elements;
-    }
-    
-    /**
-     * Get the first element that matches the specified locator in the indicated context.
-     * 
-     * @param context element search context
-     * @param locator element locator
-     * @return robust element in context that matches the locator
-     */
-    public static WebElement getElement(final WrapsContext context, final By locator) {
-        return getElement(context, locator, CARDINAL);
-    }
-    
-    /**
-     * Get the item at the specified index in the list of elements matching the specified 
-     * locator in the indicated context.
-     * 
-     * @param context element search context
-     * @param locator element locator
-     * @param index element index
-     * @return indexed robust element in context that matches the locator
-     */
-    public static WebElement getElement(final WrapsContext context, final By locator, final int index) {
-        return RobustElementFactory.makeRobustElement(null, context, locator, index);
-    }
-    
-    /**
      * Throw the deferred exception that was stored upon failing to acquire the reference for an optional element.
      * <br><p>
      * <b>NOTE</b>:
@@ -483,7 +438,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
      */
     @Override
     public WebElement findElement(final By locator) {
-        return RobustElementWrapper.getElement(this, locator);
+        return RobustElementFactory.getElement(this, locator);
     }
 
     /**
@@ -491,6 +446,6 @@ public class RobustElementWrapper implements ReferenceFetcher {
      */
     @Override
     public List<WebElement> findElements(final By locator) {
-        return RobustElementWrapper.getElements(this, locator);
+        return RobustElementFactory.getElements(this, locator);
     }
 }

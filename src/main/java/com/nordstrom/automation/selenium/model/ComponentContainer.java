@@ -282,7 +282,7 @@ public abstract class ComponentContainer
      */
     @Override
     public List<WebElement> findElements(final By by) {
-        return RobustElementWrapper.getElements(this, by);
+        return RobustElementFactory.getElements(this, by);
     }
     
     /**
@@ -303,7 +303,7 @@ public abstract class ComponentContainer
      */
     @Override
     public WebElement findElement(final By by) {
-        return RobustElementWrapper.getElement(this, by);
+        return RobustElementFactory.getElement(this, by);
     }
     
     /**
@@ -327,7 +327,7 @@ public abstract class ComponentContainer
      * @return robust web element
      */
     public RobustWebElement findOptional(final By by) {
-        return (RobustWebElement) RobustElementWrapper.getElement(this, by, RobustElementWrapper.OPTIONAL);
+        return (RobustWebElement) RobustElementFactory.getElement(this, by, RobustElementWrapper.OPTIONAL);
     }
     
     /**
