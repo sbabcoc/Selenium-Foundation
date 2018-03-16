@@ -280,8 +280,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             
             try {
                 targetUri = builder.build().normalize();
-            } catch (URISyntaxException e) {
-                LOGGER.error("Specified target URI '{}' could not be parsed: {}", builder.toString(), e.getMessage());
+            } catch (URISyntaxException eaten) { //NOSONAR
+                LOGGER.error("Specified target URI '{}' could not be parsed: {}", builder, eaten.getMessage());
             }
         }
         return targetUri;
@@ -427,7 +427,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             // use Google Public DNS to discover preferred local IP
             socket.connect(InetAddress.getByName(host), port);
             return socket.getLocalAddress().getHostAddress();
-        } catch (SocketException | UnknownHostException eaten) {
+        } catch (SocketException | UnknownHostException eaten) { //NOSONAR
             LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
             return "localhost";
         }
@@ -469,7 +469,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
             if (inputStream != null) {
                 try {
                     jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                } catch (IOException eaten) {
+                } catch (IOException eaten) { //NOSONAR
                     LOGGER.warn("Unable to get browser configuration file contents: {}", eaten.getMessage());
                 }
             }
@@ -502,9 +502,9 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                 URI uri = getConfigUri(path, url);
                 File file = new File(uri);
                 return file.getAbsolutePath();
-            } catch (URISyntaxException eaten) {
+            } catch (URISyntaxException eaten) { //NOSONAR
                 LOGGER.warn("Invalid URL '{}' returned by file locator: {}", url.toString(), eaten.getMessage());
-            } catch (IOException eaten) {
+            } catch (IOException eaten) { //NOSONAR
                 LOGGER.warn("Failed to construct file system or extract configuration file: {}", eaten.getMessage());
             }
         }
@@ -525,7 +525,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         if ("jar".equals(uri.getScheme())) {
             try {
                 FileSystems.newFileSystem(uri, Collections.emptyMap());
-            } catch (FileSystemAlreadyExistsException eaten) {
+            } catch (FileSystemAlreadyExistsException eaten) { //NOSONAR
                 LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
             } 
             

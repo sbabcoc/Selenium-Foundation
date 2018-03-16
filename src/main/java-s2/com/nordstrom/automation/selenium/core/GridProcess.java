@@ -28,6 +28,7 @@ import com.nordstrom.common.file.PathUtils;
  * <b>NOTE</b>: If no test context is specified, the log file will be stored in the "current" directory of the parent
  * Java process.  
  */
+@SuppressWarnings("squid:S1774")
 final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
