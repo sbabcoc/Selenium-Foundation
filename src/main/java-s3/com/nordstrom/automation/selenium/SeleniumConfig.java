@@ -45,6 +45,7 @@ import com.nordstrom.common.file.PathUtils;
  * 
  * @see SettingsCore
  */
+@SuppressWarnings({"squid:S1200", "squid:S2972"})
 public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings> {
     
     private static final String SETTINGS_FILE = "settings.properties";

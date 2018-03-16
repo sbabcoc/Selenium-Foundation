@@ -39,6 +39,7 @@ public final class ByType {
      * @param locator Selenium locator
      * @return CSS locator string; 'null' if unconvertible
      */
+    @SuppressWarnings("squid:S1142")
     public static String cssLocatorFor(final By locator) {
         
         String val = valueOf(locator);
@@ -80,6 +81,7 @@ public final class ByType {
      * @param locator Selenium locator
      * @return XPath locator string; 'null' if unconvertible
      */
+    @SuppressWarnings("squid:S1142")
     public static String xpathLocatorFor(final By locator) {
         
         String val = valueOf(locator);

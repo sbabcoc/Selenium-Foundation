@@ -167,7 +167,7 @@ public final class GridUtility {
         try {
             HttpResponse response = getHttpResponse(host, request);
             return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
-        } catch (IOException e) {
+        } catch (IOException e) { //NOSONAR
             return false;
         }
     }
@@ -306,7 +306,7 @@ public final class GridUtility {
         // Check if the address is defined on any interface
         try {
             return NetworkInterface.getByInetAddress(addr) != null;
-        } catch (SocketException e) {
+        } catch (SocketException e) { //NOSONAR
             LOGGER.warn("Attempt to associate IP address with adapter triggered I/O exception: {}", e.getMessage());
             return false;
         }
@@ -315,6 +315,7 @@ public final class GridUtility {
     /**
      * This private class encapsulated the parameters for a Selenium Grid server.
      */
+    @SuppressWarnings("squid:S2972")
     private static class GridServerParms {
         
         private GridRole processRole;

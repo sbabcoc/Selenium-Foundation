@@ -43,6 +43,7 @@ import com.nordstrom.common.base.UncheckedThrow;
 /**
  * This is a abstract base class for all of the container classes defined by <b>Selenium Foundation</b>.
  */
+@SuppressWarnings({"squid:S1200", "squid:S1774"})
 public abstract class ComponentContainer
                         extends Enhanceable<ComponentContainer> 
                         implements SearchContext, WrapsContext {
@@ -79,6 +80,7 @@ public abstract class ComponentContainer
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
     private static final String ELEMENT_MESSAGE = "[element] must be non-null";
+    private static final int PARAM_BIT_COUNT = 2;
     
     private final Logger logger;
     
@@ -202,7 +204,7 @@ public abstract class ComponentContainer
                 
                 try {
                     return context.switchToContext();
-                } catch (StaleElementReferenceException e) {
+                } catch (StaleElementReferenceException e) { //NOSONAR
                     return context.refreshContext(context.acquiredAt());
                 }
             }
@@ -346,6 +348,7 @@ public abstract class ComponentContainer
      * @param value desired value
      * @return 'true' if element value changed; otherwise 'false'
      */
+    @SuppressWarnings("squid:S1142")
     public static boolean updateValue(final WebElement element, final boolean value) {
         Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
@@ -561,6 +564,7 @@ public abstract class ComponentContainer
      * @param targetUri target URI
      * @return defined page URL as a string (may be 'null')
      */
+    @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity"})
     public static String getPageUrl(final PageUrl pageUrl, final URI targetUri) {
         if (pageUrl == null || PLACEHOLDER.equals(pageUrl.value())) {
             return null;
@@ -668,6 +672,7 @@ public abstract class ComponentContainer
      * 
      * @param pageObj page object whose landing page is to be verified
      */
+    @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity", "squid:S134"})
     private static void verifyLandingPage(final Page pageObj) {
         Class<?> pageClass = getContainerClass(pageObj);
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
@@ -755,7 +760,7 @@ public abstract class ComponentContainer
         if (params.length > 0) {
             for (String param : params) {
                 String[] nameValueBits = param.split("=");
-                if (nameValueBits.length == 2) {
+                if (nameValueBits.length == PARAM_BIT_COUNT) {
                     String name = nameValueBits[0].trim();
                     String value = nameValueBits[1].trim();
                     expectParams.add(new BasicNameValuePair(name, value));
@@ -806,7 +811,7 @@ public abstract class ComponentContainer
             if (Modifier.isStatic(method.getModifiers())) {
                 return method;
             }
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) { //NOSONAR
             // fall through to 'throw' statement below
         }
         throw new UnsupportedOperationException(
@@ -823,7 +828,7 @@ public abstract class ComponentContainer
     static <T extends ComponentContainer> void verifyCollectible(final Class<T> containerType) {
         try {
             containerType.getConstructor(COLLECTIBLE_ARGS);
-        } catch (NoSuchMethodException | SecurityException e) {
+        } catch (NoSuchMethodException | SecurityException e) { //NOSONAR
             String format = 
                     "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
             throw new UnsupportedOperationException(String.format(format, containerType.getSimpleName()));
@@ -853,7 +858,7 @@ public abstract class ComponentContainer
         try {
             Constructor<T> ctor = containerType.getConstructor(argumentTypes);
             return ctor.newInstance(arguments);
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) { //NOSONAR
             throw UncheckedThrow.throwUnchecked(e.getCause());
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException |
                 NoSuchMethodException | InstantiationException e) {
@@ -945,6 +950,7 @@ public abstract class ComponentContainer
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings({"squid:S3776", "squid:S1142"})
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;

@@ -325,9 +325,10 @@ public final class RobustElementFactory {
         /**
          * Search for the specified optional element
          * 
-         * @param locator element locator
+         * @param by the locating mechanism
+         * @return web element
          */
-        public WebElement findOptional(final By locator) {
+        public WebElement findOptional(final By by) {
             return getElement(this, locator, OPTIONAL);
         }
 

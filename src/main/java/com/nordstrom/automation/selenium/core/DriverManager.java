@@ -61,6 +61,7 @@ public final class DriverManager {
      * @param obj test class instance
      * @param method test method
      */
+    @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity"})
     public static void beforeInvocation(final Object obj, final Method method) {
         if (!(obj instanceof TestBase)) {
             return;
