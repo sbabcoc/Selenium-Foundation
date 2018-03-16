@@ -35,7 +35,6 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
-import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.common.base.UncheckedThrow;

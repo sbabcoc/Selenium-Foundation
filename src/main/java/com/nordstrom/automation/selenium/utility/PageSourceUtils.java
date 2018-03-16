@@ -16,6 +16,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 public final class PageSourceUtils {
     
     private static final String TAKES_ELEMENT_SCREENSHOT = "takesElementScreenshot";
+    private static final int HEAD_TAG_LENGTH = 6;
     
     /**
      * Private constructor to prevent instantiation.
@@ -83,10 +84,10 @@ public final class PageSourceUtils {
      * @return the [sourceBuilder] object
      */
     private static StringBuilder insertBaseElement(final StringBuilder sourceBuilder, final WebDriver driver) {
-        int offset = sourceBuilder.indexOf("<head>") + 6;
+        int offset = sourceBuilder.indexOf("<head>") + HEAD_TAG_LENGTH;
         
-        // if no head found
-        if (offset < 6) {
+        // if no head tag found
+        if (offset < HEAD_TAG_LENGTH) {
             return sourceBuilder;
         }
         

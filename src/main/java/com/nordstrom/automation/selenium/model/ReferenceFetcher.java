@@ -7,7 +7,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
-import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 
 /**
  * This interface defines the methods that are added to {@link WebElement} to create {@link RobustElementWrapper}.

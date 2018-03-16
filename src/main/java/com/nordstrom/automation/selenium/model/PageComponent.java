@@ -8,7 +8,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
-import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 import com.nordstrom.automation.selenium.support.Coordinator;
 
 /**
@@ -141,7 +140,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * <b>NOTE</b>: The default implementation of this method returns the component's context element. If the context
      * element is always hidden, override this method to return the component's largest visible container element.
      * 
-     * @return 'true' if component is visible; otherwise 'false'
+     * @return page component viewport element
      */
     public RobustWebElement getViewport() {
         return (RobustWebElement) context;
@@ -154,7 +153,10 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      */
     public boolean isDisplayed() {
         RobustWebElement element = getViewport();
-        return (element.hasReference()) ? element.isDisplayed() : false;
+        if (element.hasReference()) {
+            return element.isDisplayed();
+        }
+        return false;
     }
     
     /**
@@ -186,6 +188,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
              * {@inheritDoc}
              */
             @Override
+            @SuppressWarnings("squid:S1774")
             public PageComponent apply(final SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isDisplayed()) ? component : null;
@@ -213,6 +216,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
              * {@inheritDoc}
              */
             @Override
+            @SuppressWarnings("squid:S1774")
             public PageComponent apply(final SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isInvisible()) ? component : null;
@@ -259,6 +263,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings({"squid:S1142", "squid:S1126"})
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;

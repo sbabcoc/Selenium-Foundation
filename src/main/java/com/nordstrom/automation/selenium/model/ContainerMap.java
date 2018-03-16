@@ -244,15 +244,13 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
          * {@inheritDoc}
          */
         @Override
+        @SuppressWarnings("squid:S1774")
         public int hashCode() {
             final int PRIME = 31;
             int result = 1;
             result = PRIME * result + map.hashCode();
             result = PRIME * result + element.hashCode();
-            result = PRIME * result;
-            if (key != null) {
-                result += key.hashCode();
-            }
+            result = PRIME * result + ((key == null) ? 0 : key.hashCode());
             return result;
         }
         

@@ -105,7 +105,7 @@ public final class Coordinators {
             public WebElement apply(final SearchContext context) {
                 try {
                     return elementIfVisible(context.findElement(locator));
-                } catch (StaleElementReferenceException e) {
+                } catch (StaleElementReferenceException e) { //NOSONAR
                     return null;
                 }
             }
@@ -137,8 +137,11 @@ public final class Coordinators {
             public WebElement apply(final SearchContext context) {
                 try {
                     List<WebElement> visible = context.findElements(locator);
-                    return (WebDriverUtils.filterHidden(visible)) ? null : visible.get(0);
-                } catch (StaleElementReferenceException e) {
+                    if (WebDriverUtils.filterHidden(visible)) {
+                        return null;
+                    }
+                    return visible.get(0);
+                } catch (StaleElementReferenceException e) { //NOSONAR
                     return null;
                 }
             }
@@ -170,7 +173,7 @@ public final class Coordinators {
             public Boolean apply(final SearchContext context) {
                 try {
                     return !(context.findElement(locator).isDisplayed());
-                } catch (NoSuchElementException | StaleElementReferenceException e) {
+                } catch (NoSuchElementException | StaleElementReferenceException e) { //NOSONAR
                     // NoSuchElementException: The element is not present in DOM.
                     // StaleElementReferenceException: Implies that element no longer exists in the DOM.
                     return true;
@@ -193,6 +196,7 @@ public final class Coordinators {
      * @param element element whose visibility is in question
      * @return specified element reference; 'null' if element is hidden
      */
+    @SuppressWarnings("squid:S1774")
     private static WebElement elementIfVisible(final WebElement element) {
         return element.isDisplayed() ? element : null;
     }

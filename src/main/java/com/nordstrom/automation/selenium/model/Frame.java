@@ -6,7 +6,6 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriverException;
 
 import com.google.common.base.Throwables;
-import com.nordstrom.automation.selenium.model.RobustElementFactory.RobustElementWrapper;
 
 /**
  * Extend this class when modeling a browser frame element.
@@ -207,6 +206,7 @@ public class Frame extends Page {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("squid:S1774")
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -221,6 +221,7 @@ public class Frame extends Page {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("squid:S1142")
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;

@@ -105,7 +105,7 @@ public abstract class Enhanceable<T> {
             
             return proxyType.getConstructor(argumentTypes).newInstance(arguments);
             
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) { //NOSONAR
             throw UncheckedThrow.throwUnchecked(e.getCause());
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException
                         | NoSuchMethodException | InstantiationException e)
@@ -121,8 +121,11 @@ public abstract class Enhanceable<T> {
      * @return class of container object
      */
     public static Class<?> getContainerClass(final Object container) {
-        Class<?> clazz = container.getClass();      
-        return (container instanceof Enhanced) ? clazz.getSuperclass() : clazz;
+        Class<?> clazz = container.getClass();
+        if (container instanceof Enhanced) {
+            clazz = clazz.getSuperclass();
+        }
+        return clazz;
     }
 
 }
