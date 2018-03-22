@@ -212,7 +212,7 @@ The hierarchy of evaluation produces the following results:
 
 ## INSTALLING DRIVERS 
 
-Whichever browser you choose to run your automation on, you need to make sure to install the latest driver for that browser compatible with **Selenium WebDriver 2.53.1**, along with a compatible release of the browser itself. We recommend that you install the drivers and browsers on the file search path to avoid the need to provide additional configuration details via scenario-specific means. 
+Whichever browser you choose to run your automation on, you need to make sure to install the latest driver for that browser compatible with your target version of **Selenium WebDriver**, along with a compatible release of the browser itself. We recommend that you install the drivers and browsers on the file search path to avoid the need to provide additional configuration details via scenario-specific means. 
 
 Here are the official homes for several of the major drivers: 
 
