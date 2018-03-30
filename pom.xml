@@ -209,9 +209,10 @@
     <profile>
       <id>selenium3</id>
       <properties>
-        <selenium.version>3.8.1</selenium.version>
-        <guava.version>23.5-jre</guava.version>
-        <phantomjs.version>1.4.4</phantomjs.version>
+        <selenium.version>3.11.0</selenium.version>
+        <guava.version>23.6-jre</guava.version>
+        <phantomjs.version>2.1.0</phantomjs.version>
+        <jcommander.version>1.72</jcommander.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -221,14 +222,24 @@
             <version>${selenium.version}</version>
           </dependency>
           <dependency>
-            <groupId>com.codeborne</groupId>
-            <artifactId>phantomjsdriver</artifactId>
-            <version>${phantomjs.version}</version>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
+            <version>${selenium.version}</version>
           </dependency>
           <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.github.detro</groupId>
+            <artifactId>ghostdriver</artifactId>
+            <version>${phantomjs.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>${jcommander.version}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -238,8 +249,8 @@
           <artifactId>selenium-server-standalone</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.codeborne</groupId>
-          <artifactId>phantomjsdriver</artifactId>
+          <groupId>com.github.detro</groupId>
+          <artifactId>ghostdriver</artifactId>
         </dependency>
       </dependencies>
       <build>
