@@ -218,7 +218,7 @@
       <activation>
         <property>
           <name>${selenium-api}</name>
-          <value>s2</value>
+          <value>s3</value>
         </property>
       </activation>
       <properties>
