@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens	
+
 plugins {
   id 'io.codearte.nexus-staging' version '0.11.0'
   id 'net.researchgate.release' version '2.6.0'
@@ -112,9 +114,24 @@ task("${profile}Javadoc", type: Javadoc) {
 
 task("${profile}Jar", type: Jar) {
   group 'Build'
-  description "Assembles a jar archive containing the '${profile}' classes."
+  description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
+  
+  def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
+  def timestamp = Long.valueOf(System.currentTimeMillis()).toString()
+  def pomTokens = [projectVersion: archiveVer, projectTimestamp: timestamp, seleniumApi: seleniumApi]
+  def propTokens = [projectVersion: archiveVer, projectGroupId: project.group, projectArtifactId: rootProject.name]
   
   from(sourceSets["${profile}"].output) { }
+  from('.') {
+    include('pom.xml')
+    into(destPath)
+    filter(ReplaceTokens, tokens: pomTokens)
+  }
+  from('.') {
+    include('pom.properties')
+    into(destPath)
+    filter(ReplaceTokens, tokens: propTokens)
+  }
   archiveName = archiveBase + '.jar'
   destinationDir = libsDir
 }
