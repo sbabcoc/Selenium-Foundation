@@ -11,7 +11,7 @@
 
 The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Artifacts whose versions have the `s2` suffix support the **Selenium 2** API. Artifacts whose versions have the `s3` suffix support the **Selenium 3** API.
 
-To add a dependency on **Selenium Foundation** using Maven, use the following:
+To add a dependency on **Selenium Foundation** for Maven, use the following:
 
 ```xml
 <dependency>
@@ -24,7 +24,7 @@ To add a dependency on **Selenium Foundation** using Maven, use the following:
 </dependency>
 ```
 
-To add a dependency using Gradle:
+To add a dependency for Gradle:
 
 ```java
 dependencies {
