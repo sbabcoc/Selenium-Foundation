@@ -21,12 +21,14 @@ import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
@@ -158,6 +160,32 @@ public abstract class ComponentContainer
             wait = WaitType.WAIT.getWait(this);
         }
         return wait;
+    }
+    
+    /**
+     * Get SearchContextWait object with 10 second timeout
+     * 
+     * @param context search context
+     * @return new SearchContextWait object
+     */
+    public static SearchContextWait getWait(SearchContext context) {
+        return new SearchContextWait(context, WaitType.WAIT.getInterval());
+    }
+    
+    /**
+     * Wait until with specified condition is met
+     * 
+     * @param condition 'condition' function object
+     */
+    public <T> T waitUntil(Function<SearchContext, T> condition) {
+        try {
+            return getWait().until(condition);
+        } catch (TimeoutException e) {
+            if (e.getClass().equals(TimeoutException.class) && (condition instanceof Coordinator)) {
+                e = ((Coordinator<T>) condition).differentiateTimeout(e);
+            }
+            throw e;
+        }
     }
     
     /**

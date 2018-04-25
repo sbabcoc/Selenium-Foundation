@@ -7,12 +7,26 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.exceptions.ConditionStillInvalidTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ConditionStillValidTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementAbsentOrHiddenTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementAttributeTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementNotClickableTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementNotPresentTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementSelectionStateTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementStillFreshTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementStillVisibleTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ElementTextContentTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.NoWindowAppearedTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.WindowStillExistsTimeoutException;
 
 /**
  * This utility class defines a collection of coordinator objects that enable you to synchronize your automation with
@@ -57,8 +71,15 @@ public final class Coordinators {
             public String toString() {
                 return "new window to be opened";
             }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new NoWindowAppearedTimeoutException(e.getMessage(), e.getCause());
+            }
         };
-
     }
     
     /**
@@ -76,7 +97,7 @@ public final class Coordinators {
             @Override
             public Boolean apply(final SearchContext context) {
                 Set<String> currentHandles = WebDriverUtils.getDriver(context).getWindowHandles();
-                return Boolean.valueOf( ! currentHandles.contains(windowHandle));
+                return ! currentHandles.contains(windowHandle);
             }
             
             /**
@@ -85,6 +106,50 @@ public final class Coordinators {
             @Override
             public String toString() {
                 return "window with handle '" + windowHandle + "' to be closed";
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new WindowStillExistsTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking that an element is present on the DOM of a page. This does not
+     * necessarily mean that the element is visible.
+     * 
+     * @param locator used to find the element
+     * @return the WebElement once it is located
+     */
+    public static Coordinator<WebElement> presenceOfElementLocated(final By locator) {
+        return new Coordinator<WebElement>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public WebElement apply(SearchContext context) {
+                return context.findElement(locator);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return "presence of element located by: " + locator;
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementNotPresentTimeoutException(e.getMessage(), e.getCause());
             }
         };
     }
@@ -117,8 +182,15 @@ public final class Coordinators {
             public String toString() {
                 return "visibility of element located by " + locator;
             }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementAbsentOrHiddenTimeoutException(e.getMessage(), e.getCause());
+            }
         };
-
     }
     
     /**
@@ -153,8 +225,15 @@ public final class Coordinators {
             public String toString() {
                 return "visibility of element located by " + locator;
             }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementAbsentOrHiddenTimeoutException(e.getMessage(), e.getCause());
+            }
         };
-
     }
     
     /**
@@ -187,6 +266,51 @@ public final class Coordinators {
             public String toString() {
                 return "element to no longer be visible: " + locator;
             }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementStillVisibleTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking that an element, known to be present on the
+     * DOM of a page, is visible. Visibility means that the element is not only
+     * displayed but also has a height and width that is greater than 0.
+     *
+     * @param element the WebElement
+     * @return the (same) WebElement once it is visible
+     */
+    public static Coordinator<WebElement> visibilityOf(final WebElement element) {
+        return new Coordinator<WebElement>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public WebElement apply(SearchContext context) {
+                return elementIfVisible(element);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return "visibility of " + element;
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementAbsentOrHiddenTimeoutException(e.getMessage(), e.getCause());
+            }
         };
     }
 
@@ -201,6 +325,407 @@ public final class Coordinators {
         return element.isDisplayed() ? element : null;
     }
     
+    /**
+     * An expectation for checking that an element is visible and enabled such that you can click it.
+     * 
+     * @param locator used to find the element
+     * @return the WebElement once it is located and clickable (visible and enabled)
+     */
+    public static Coordinator<WebElement> elementToBeClickable(final By locator) {
+        return new Coordinator<WebElement>() {
+
+            private final Coordinator<WebElement> visibilityOfElementLocated = visibilityOfElementLocated(locator);
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public WebElement apply(SearchContext context) {
+                WebElement element = visibilityOfElementLocated.apply(context);
+                try {
+                    if (element != null && element.isEnabled()) {
+                        return element;
+                    } else {
+                        return null;
+                    }
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return null;
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return "element to be clickable: " + locator;
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementNotClickableTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking an element is visible and enabled such that
+     * you can click it.
+     *
+     * @param element the WebElement
+     * @return the (same) WebElement once it is clickable (visible and enabled)
+     */
+    public static Coordinator<WebElement> elementToBeClickable(final WebElement element) {
+        return new Coordinator<WebElement>() {
+
+            private final Coordinator<WebElement> visibilityOfElement = visibilityOf(element);
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public WebElement apply(SearchContext context) {
+                WebElement element = visibilityOfElement.apply(context);
+                try {
+                    if (element != null && element.isEnabled()) {
+                        return element;
+                    } else {
+                        return null;
+                    }
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return null;
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return "element to be clickable: " + element;
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementNotClickableTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking that an indicated element is selected
+     * 
+     * @param locator used to find the element
+     * @return 'true' once the indicated element is selected
+     */
+    public static Coordinator<Boolean> elementToBeSelected(final By locator) {
+        return elementSelectionStateToBe(locator, true);
+    }
+
+    /**
+     * An expectation for checking that an indicated element has acquired the desired selection state
+     * 
+     * @param locator used to find the element
+     * @param selected desired selection state
+     * @return 'true' once the indicated element acquired the desired selection state
+     */
+    public static Coordinator<Boolean> elementSelectionStateToBe(final By locator, final boolean selected) {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                try {
+                    WebElement element = context.findElement(locator);
+                    return (element.isSelected() == selected);
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return null; //NOSONAR
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return String.format("element found by %s to %sbe selected", locator, (selected ? "" : "not "));
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementSelectionStateTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking if the given text is present in the element that matches the
+     * given locator.
+     * 
+     * @param locator used to find the element
+     * @param text to be present in the element found by the locator
+     * @return true once the first element located by locator contains the given text
+     */
+    public static Coordinator<Boolean> textToBePresentInElementLocated(final By locator, final String text) {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                try {
+                    String elementText = context.findElement(locator).getText();
+                    return elementText.contains(text);
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return null; //NOSONAR
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return String.format("text ('%s') to be present in element found by %s", text, locator);
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementTextContentTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking if text is present in the element that matches the given locator.
+     *
+     * @param locator used to find the element
+     * @return true once the first element located by locator does not have empty text
+     */
+    public static Coordinator<Boolean> textToNotBeEmptyInElementLocated(final By locator) {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                try {
+                    String elementText = context.findElement(locator).getText();
+                    return ! ((elementText == null) || elementText.isEmpty());
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return null; //NOSONAR
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return String.format("element found by %s to be non-empty", locator);
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementTextContentTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking if the given text is present in the specified elements value
+     * attribute.
+     * 
+     * @param locator used to find the element
+     * @param text to be present in the value attribute of the element found by the locator
+     * @return true once the value attribute of the first element located by locator contains the
+     *         given text
+     */
+    public static Coordinator<Boolean> textToBePresentInElementValue(final By locator, final String text) {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                try {
+                    String elementText = context.findElement(locator).getAttribute("value");
+                    return elementText != null && elementText.contains(text);
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return null; //NOSONAR
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return String.format("text ('%s') to be the value of element located by %s", text, locator);
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementAttributeTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking if the given value is present in the specified elements value
+     * attribute.
+     * 
+     * @param locator used to find the element
+     * @param attribute that will be checked in the element found by the locator
+     * @param value the specified attribute will attain in the element found by the locator
+     * @return true once the specified attribute of the first element located by locator contains
+     *         the given value
+     */
+    public static Coordinator<Boolean> elementToHaveAttributeValue(final By locator,
+            final String attribute, final String value) {
+        
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                try {
+                    String attrib = context.findElement(locator).getAttribute(attribute);
+                    if (attrib != null) {
+                        return attrib.equals(value);
+                    } else {
+                        return (value == null);
+                    }
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return null; //NOSONAR
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return String.format("text ('%s') to be the value of element located by %s", value, locator);
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementAttributeTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * Boolean wrapper for a condition, which returns 'true' if the expectation is met.
+     * 
+     * @param condition expected condition
+     * @return 'true' if the specified condition returns a 'positive' result
+     */
+    public static Coordinator<Boolean> has(final Function<SearchContext, ?> condition) {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                Object result = condition.apply(context);
+                if (result != null) {
+                    if (result instanceof Boolean) {
+                        return (Boolean) result;
+                    } else {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return "condition to be valid: " + condition;
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                if (condition instanceof Coordinator) {
+                    return ((Coordinator<?>) condition).differentiateTimeout(e);
+                }
+                return new ConditionStillInvalidTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
+     * Inverse wrapper for a condition, which returns 'false' if the expectation is met.
+     * 
+     * @param condition expected condition
+     * @return 'true' if the specified condition returns a 'negative' result
+     */
+    public static Coordinator<Boolean> not(final Function<SearchContext, ?> condition) {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                Object result = condition.apply(context);
+                return result == null || result == Boolean.FALSE;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return "condition to not be valid: " + condition;
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ConditionStillValidTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
     /**
      * Returns a 'wait' proxy that determines if the specified element reference has gone stale.
      *
@@ -235,7 +760,14 @@ public final class Coordinators {
             public String toString() {
                 return condition.toString();
             }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementStillFreshTimeoutException(e.getMessage(), e.getCause());
+            }
         };
     }
-
 }

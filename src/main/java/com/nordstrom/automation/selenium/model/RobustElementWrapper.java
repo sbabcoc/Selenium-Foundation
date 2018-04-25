@@ -23,6 +23,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
 import com.nordstrom.automation.selenium.exceptions.OptionalElementNotAcquiredException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.RobustElementFactory.InterceptionAccessor;
@@ -233,7 +234,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             return this;
         } catch (TimeoutException e) { //NOSONAR
             if (refreshTrigger == null) {
-                throw UncheckedThrow.throwUnchecked(e.getCause());
+                throw new ElementReferenceRefreshFailureException(e.getMessage(), e.getCause());
             }
         } catch (WebDriverException e) {
             if (refreshTrigger == null) {

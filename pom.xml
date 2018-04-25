@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>1.3.3</java-utils.version>
+    <java-utils.version>1.6.0</java-utils.version>
     <surefire-plugin.version>2.20.1</surefire-plugin.version>
     <compiler-plugin.version>3.6.0</compiler-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>

@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.support;
 import com.google.common.base.Function;
 
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 
 /**
  * Models a condition that might reasonably be expected to eventually evaluate to something that is
@@ -15,4 +16,16 @@ import org.openqa.selenium.SearchContext;
  * 
  * @param <T> The return type
  */
-public interface Coordinator<T> extends Function<SearchContext, T> { }
+public interface Coordinator<T> extends Function<SearchContext, T> {
+    
+    /**
+     * This method can be overridden by implementations of {@link Condition} to provide a context-specific
+     * timeout exception associated with the implemented condition.
+     * 
+     * @param e The original {@link TimeoutException} object thrown by the framework "wait" implementation
+     * @return an instance of a context-specific sub-class of {@link TimeoutException} 
+     */
+    public default TimeoutException differentiateTimeout(TimeoutException e) {
+        return e;
+    }
+}
