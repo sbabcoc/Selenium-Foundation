@@ -9,10 +9,10 @@ import org.openqa.selenium.TimeoutException;
  */
 public class ElementNotClickableTimeoutException extends TimeoutException {
 
-	public ElementNotClickableTimeoutException(String message, Throwable cause) {
+    private static final long serialVersionUID = -8475358618203763123L;
+
+    public ElementNotClickableTimeoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	private static final long serialVersionUID = -774138381198597605L;
 
 }

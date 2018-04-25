@@ -10,9 +10,9 @@ import org.openqa.selenium.TimeoutException;
  */
 public class ElementStillVisibleTimeoutException extends TimeoutException {
 
-	private static final long serialVersionUID = -7411789651126284323L;
-	
-	public ElementStillVisibleTimeoutException(String message, Throwable cause) {
+    private static final long serialVersionUID = -3777087787464228714L;
+
+    public ElementStillVisibleTimeoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

@@ -8,9 +8,9 @@ import org.openqa.selenium.TimeoutException;
  */
 public class ComponentStillDisplayedTimeoutException extends TimeoutException {
 
-	private static final long serialVersionUID = 3799757291228589698L;
-	
-	public ComponentStillDisplayedTimeoutException(String message, Throwable cause) {
+    private static final long serialVersionUID = 5397614393701035129L;
+
+    public ComponentStillDisplayedTimeoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

@@ -8,7 +8,7 @@ import org.openqa.selenium.TimeoutException;
  */
 public class ConditionStillInvalidTimeoutException extends TimeoutException { //NOSONAR
 
-    private static final long serialVersionUID = -1880267435884796147L;
+    private static final long serialVersionUID = -5012103332012897882L;
 
     public ConditionStillInvalidTimeoutException(String message, Throwable cause) {
 		super(message, cause);

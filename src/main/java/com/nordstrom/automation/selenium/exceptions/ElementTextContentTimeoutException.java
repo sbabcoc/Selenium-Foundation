@@ -9,9 +9,9 @@ import org.openqa.selenium.TimeoutException;
  */
 public class ElementTextContentTimeoutException extends TimeoutException {
 
-	private static final long serialVersionUID = 8381016541789662353L;
+    private static final long serialVersionUID = -2893297898946904937L;
 
-	public ElementTextContentTimeoutException(String message, Throwable cause) {
+    public ElementTextContentTimeoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

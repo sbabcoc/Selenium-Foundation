@@ -8,9 +8,9 @@ import org.openqa.selenium.StaleElementReferenceException;
  */
 public class ElementReferenceRefreshFailureException extends StaleElementReferenceException {
 
-	private static final long serialVersionUID = 7540634703326798310L;
+    private static final long serialVersionUID = 417132799562814181L;
 
-	public ElementReferenceRefreshFailureException(String message, Throwable cause) {
+    public ElementReferenceRefreshFailureException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

@@ -8,9 +8,9 @@ import org.openqa.selenium.TimeoutException;
  */
 public class PageTransitionRefreshTimeoutException extends TimeoutException {
 
-	private static final long serialVersionUID = 2006827712348698991L;
+    private static final long serialVersionUID = 6396536840195276179L;
 
-	public PageTransitionRefreshTimeoutException(String message, Throwable cause) {
+    public PageTransitionRefreshTimeoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

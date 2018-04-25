@@ -9,9 +9,9 @@ import org.openqa.selenium.TimeoutException;
  */
 public class ElementNotPresentTimeoutException extends TimeoutException {
 
-	private static final long serialVersionUID = 7873204741351029900L;
+    private static final long serialVersionUID = 7039645286156391657L;
 
-	public ElementNotPresentTimeoutException(String message, Throwable cause) {
+    public ElementNotPresentTimeoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

@@ -8,9 +8,9 @@ import org.openqa.selenium.TimeoutException;
  */
 public class NoWindowAppearedTimeoutException extends TimeoutException {
 
-	private static final long serialVersionUID = -1889630752856702597L;
+    private static final long serialVersionUID = 1178667313414119377L;
 
-	public NoWindowAppearedTimeoutException(String message, Throwable cause) {
+    public NoWindowAppearedTimeoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
