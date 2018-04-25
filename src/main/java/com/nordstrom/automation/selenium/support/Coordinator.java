@@ -19,7 +19,7 @@ import org.openqa.selenium.TimeoutException;
 public interface Coordinator<T> extends Function<SearchContext, T> {
     
     /**
-     * This method can be overridden by implementations of {@link Condition} to provide a context-specific
+     * This method can be overridden by implementations of {@link Coordinator} to provide a context-specific
      * timeout exception associated with the implemented condition.
      * 
      * @param e The original {@link TimeoutException} object thrown by the framework "wait" implementation
