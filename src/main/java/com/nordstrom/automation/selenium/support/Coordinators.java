@@ -326,6 +326,45 @@ public final class Coordinators {
     }
     
     /**
+     *  Returns a 'wait' proxy that determines if an element is either hidden or non-existent.
+     * 
+     * @param element web element reference
+     * @return 'true' if the specified element is hidden
+     */
+    public static Coordinator<Boolean> invisibilityOf(final WebElement element) {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(SearchContext context) {
+                try {
+                    return ! element.isDisplayed();
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                    return true;
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+              return String.format("element (%s) to be invisible", element);
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ElementStillVisibleTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
+    }
+
+    /**
      * An expectation for checking that an element is visible and enabled such that you can click it.
      * 
      * @param locator used to find the element
