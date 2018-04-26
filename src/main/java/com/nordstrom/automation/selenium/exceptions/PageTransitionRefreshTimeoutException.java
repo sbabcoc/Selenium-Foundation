@@ -6,7 +6,7 @@ import org.openqa.selenium.TimeoutException;
  * This exception is associated with {@link PageMethodInterceptor#intercept(Object, Method, Object[], MethodProxy)}
  * and indicates that the parent page reference element failed to go "stale" within the timeout interval.
  */
-public class PageTransitionRefreshTimeoutException extends TimeoutException {
+public class PageTransitionRefreshTimeoutException extends TimeoutException { //NOSONAR
 
     private static final long serialVersionUID = 6396536840195276179L;
 

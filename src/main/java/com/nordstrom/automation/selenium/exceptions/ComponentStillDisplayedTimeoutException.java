@@ -6,7 +6,7 @@ import org.openqa.selenium.TimeoutException;
  * This exception is associated with the {@link PageComponent#componentInvisible()} condition and indicates that the
  * indicated page component was still displayed when the timeout interval expired.
  */
-public class ComponentStillDisplayedTimeoutException extends TimeoutException {
+public class ComponentStillDisplayedTimeoutException extends TimeoutException { //NOSONAR
 
     private static final long serialVersionUID = 5397614393701035129L;
 
