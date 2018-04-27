@@ -5,9 +5,12 @@ import java.util.Arrays;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
+import com.nordstrom.automation.selenium.exceptions.ComponentStillDisplayedTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.ComponentStillInvisibleTimeoutException;
 import com.nordstrom.automation.selenium.support.Coordinator;
 
 /**
@@ -201,6 +204,14 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
             public String toString() {
                 return "page component to be visible";
             }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ComponentStillInvisibleTimeoutException(e.getMessage(), e.getCause());
+            }
         };
     }
     
@@ -228,6 +239,14 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
             @Override
             public String toString() {
                 return "page component to be absent or hidden";
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ComponentStillDisplayedTimeoutException(e.getMessage(), e.getCause());
             }
         };
     }

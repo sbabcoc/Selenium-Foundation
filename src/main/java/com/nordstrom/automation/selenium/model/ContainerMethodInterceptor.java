@@ -5,14 +5,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
+import com.nordstrom.automation.selenium.exceptions.PageLoadRendererTimeoutException;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinators;
+import com.nordstrom.common.base.ExceptionUnwrapper;
 
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
@@ -59,6 +62,8 @@ public enum ContainerMethodInterceptor {
     };
     
     private static final ThreadLocal<ComponentContainer> TARGET = new InheritableThreadLocal<>();
+    
+    private static final String RENDERER_TIMEOUT_MESSAGE = "receiving message from renderer";
 
     /**
      * This is the method that intercepts component container methods in "enhanced" model objects.
@@ -73,7 +78,7 @@ public enum ContainerMethodInterceptor {
     @RuntimeType
     @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity", "squid:S1698", "squid:S134"})
     public Object intercept(@This final Object obj, @Origin final Method method, @AllArguments final Object[] args,
-                    @SuperCall final Callable<?> proxy) throws Exception {
+                    @SuperCall final Callable<?> proxy) throws Throwable {
         
         if (!(obj instanceof ComponentContainer)) {
             return proxy.call();
@@ -163,6 +168,12 @@ public enum ContainerMethodInterceptor {
             }
             
             return result;
+        } catch (Throwable t) { //NOSONAR
+            Throwable thrown = ExceptionUnwrapper.unwrap(t);
+            if (thrown instanceof TimeoutException) {
+                thrown = differentiateTimeout((TimeoutException) thrown);
+            }
+            throw thrown;
         } finally {
             int level = decreaseDepth();
             long interval = System.currentTimeMillis() - initialTime;
@@ -204,4 +215,21 @@ public enum ContainerMethodInterceptor {
         DEPTH.set(Integer.valueOf(i));
         return i;
     }
+    
+    /**
+     * Differentiate browser renderer timeouts
+     * 
+     * @param e undifferentiated timeout exception
+     * @return differentiated timeout exception
+     */
+    private static TimeoutException differentiateTimeout(TimeoutException e) {
+        if (e.getClass().equals(TimeoutException.class)) {
+            String m = e.getMessage();
+            if ((m != null) && m.contains(RENDERER_TIMEOUT_MESSAGE)) {
+                return new PageLoadRendererTimeoutException(m, e.getCause());
+            }
+        }
+        return e;
+    }
+    
 }
