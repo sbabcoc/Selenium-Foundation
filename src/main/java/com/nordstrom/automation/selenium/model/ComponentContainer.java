@@ -175,7 +175,9 @@ public abstract class ComponentContainer
     /**
      * Wait until with specified condition is met
      * 
+     * @param <T> return type of the specified condition
      * @param condition 'condition' function object
+     * @return output of the specified condition
      */
     public <T> T waitUntil(Function<SearchContext, T> condition) {
         try {

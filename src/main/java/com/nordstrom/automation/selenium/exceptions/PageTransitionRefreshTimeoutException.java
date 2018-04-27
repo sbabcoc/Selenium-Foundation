@@ -2,8 +2,10 @@ package com.nordstrom.automation.selenium.exceptions;
 
 import org.openqa.selenium.TimeoutException;
 
+import com.nordstrom.automation.selenium.model.ContainerMethodInterceptor;
+
 /**
- * This exception is associated with {@link PageMethodInterceptor#intercept(Object, Method, Object[], MethodProxy)}
+ * This exception is associated with {@link ContainerMethodInterceptor#intercept(Object, Method, Object[], Callable)}
  * and indicates that the parent page reference element failed to go "stale" within the timeout interval.
  */
 public class PageTransitionRefreshTimeoutException extends TimeoutException { //NOSONAR
