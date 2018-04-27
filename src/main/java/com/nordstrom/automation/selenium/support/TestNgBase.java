@@ -21,6 +21,7 @@ import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.automation.testng.TestNGConfig.TestNGSettings;
 import com.nordstrom.common.file.PathUtils;
 
 /**
@@ -29,6 +30,10 @@ import com.nordstrom.common.file.PathUtils;
 @LinkedListeners(
         {ScreenshotCapture.class, PageSourceCapture.class, DriverListener.class, ExecutionFlowController.class})
 public abstract class TestNgBase implements TestBase {
+    
+    static {
+        System.setProperty(TestNGSettings.RETRY_ANALYZER.key(), RetryAnalyzer.class.getName());
+    }
     
     /**
      * This enumeration is responsible for storing and retrieving values in the attributes collection of the current

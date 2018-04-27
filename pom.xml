@@ -35,7 +35,7 @@
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
     <settings.version>2.0.7</settings.version>
-    <testng-foundation.version>1.7.0</testng-foundation.version>
+    <testng-foundation.version>1.8.0</testng-foundation.version>
     <junit-foundation.version>3.1.5</junit-foundation.version>
     <bytebuddy.version>1.7.9</bytebuddy.version>
     <logback.version>1.2.2</logback.version>
