@@ -21,6 +21,7 @@ import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.automation.testng.TestNGConfig;
 import com.nordstrom.automation.testng.TestNGConfig.TestNGSettings;
 import com.nordstrom.common.file.PathUtils;
 
@@ -32,7 +33,12 @@ import com.nordstrom.common.file.PathUtils;
 public abstract class TestNgBase implements TestBase {
     
     static {
-        System.setProperty(TestNGSettings.RETRY_ANALYZER.key(), RetryAnalyzer.class.getName());
+        TestNGConfig config = TestNGConfig.getConfig();
+        String defaultAnalyzer = TestNGSettings.RETRY_ANALYZER.val();
+        String definedAnalyzer = config.getString(TestNGSettings.RETRY_ANALYZER.key());
+        if ((definedAnalyzer == null) || (definedAnalyzer.equals(defaultAnalyzer))) {
+            config.setProperty(TestNGSettings.RETRY_ANALYZER.key(), RetryAnalyzer.class.getName());
+        }
     }
     
     /**
