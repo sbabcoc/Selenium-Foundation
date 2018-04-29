@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
-import org.testng.IRetryAnalyzer;
 import org.testng.ITestNGListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -36,8 +35,8 @@ public abstract class TestNgBase implements TestBase {
     static {
         TestNGConfig config = TestNGConfig.getConfig();
         String defaultAnalyzer = TestNGSettings.RETRY_ANALYZER.val();
-        Class<IRetryAnalyzer> retryAnalyzerClass = config.getRetryAnalyzerClass();
-        if ((retryAnalyzerClass != null) && (retryAnalyzerClass.getName().equals(defaultAnalyzer))) { //NOSONAR
+        String definedAnalyzer = config.getString(TestNGSettings.RETRY_ANALYZER.key());
+        if ((definedAnalyzer == null) || (definedAnalyzer.equals(defaultAnalyzer))) {
             config.setProperty(TestNGSettings.RETRY_ANALYZER.key(), RetryAnalyzer.class.getName());
         }
     }
