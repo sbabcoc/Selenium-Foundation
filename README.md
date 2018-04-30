@@ -18,9 +18,9 @@ To add a dependency on **Selenium Foundation** for Maven, use the following:
   <groupId>com.nordstrom.ui-tools</groupId>
   <artifactId>selenium-foundation</artifactId>
   <!-- either Selenium 2 support: -->
-  <version>15.1.0-s2</version>
+  <version>15.2.1-s2</version>
   <!-- or Selenium 3 support: -->
-  <version>15.1.0-s3</version>
+  <version>15.2.1-s3</version>
 </dependency>
 ```
 
@@ -29,9 +29,9 @@ To add a dependency for Gradle:
 ```java
 dependencies {
   // either Selenium 2 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:15.1.0-s2'
+  compile 'com.nordstrom.ui-tools:selenium-foundation:15.2.1-s2'
   // or Selenium 3 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:15.1.0-s3'
+  compile 'com.nordstrom.ui-tools:selenium-foundation:15.2.1-s3'
 }
 ```
 
@@ -111,6 +111,21 @@ The following is an outline of the elements that must be included in every TestN
  [_before_ method] → [test method] → [_after_ method]
 
 The **`@LinkedListeners`** annotation is processed by the **ListenerChain**, which must be activated so that the other core listeners will be connected and functioning correctly. Although you can use the standard TestNG **`@Listeners`** annotation to activate **ListenerChain**, we recommend that you use the **ServiceLoader** mechanism for this purpose in your actual project. This is the technique employed by the test suite of the **Selenium Foundation** project. For details, see [Selenium Foundation Test Support](docs/SeleniumFoundationTestSupport.md).
+
+## AUTOMATIC RETRY OF FAILED TESTS
+
+**Selenium Foundation** includes a context-specific extension of the [RetryManager](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/RetryManager.java) analyzer of [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation). This retry analyzer considers any test that fails due to a **WebDriverException** to be retriable. By default, this retry analyzer is disabled. To enable automatic retry of **WebDriverException** failures, specify a positive value for the **MAX_RETRY** setting of **TestNG Foundation**:
+
+<table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
+    <tr style="text-align: left; border: 1px solid black;">
+        <th><i>testng.properties</i></th>
+    </tr>
+    <tr>
+        <td>testng.max.retry=2</td>
+    </tr>
+</table>
+
+The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation) documentation for more details.
 
 ## DEMONSTRATED FEATURES
 
