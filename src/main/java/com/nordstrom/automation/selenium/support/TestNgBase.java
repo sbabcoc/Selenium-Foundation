@@ -83,13 +83,14 @@ public abstract class TestNgBase implements TestBase {
         private void track(final Object obj) {
             ITestResult result = Reporter.getCurrentTestResult();
             if (obj != null) {
-                result.setAttribute(key, new TrackedObject<>(key, obj));
+                new TrackedObject<>(result, key, obj);
             } else {
                 Object val = result.getAttribute(key);
                 if (val instanceof TrackedObject) {
                     ((TrackedObject<?>) val).release();
+                } else {
+                    result.removeAttribute(key);
                 }
-                result.removeAttribute(key);
             }
         }
         
