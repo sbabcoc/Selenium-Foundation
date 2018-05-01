@@ -23,6 +23,7 @@ import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
 import com.nordstrom.automation.testng.TestNGConfig;
 import com.nordstrom.automation.testng.TestNGConfig.TestNGSettings;
+import com.nordstrom.automation.testng.TrackedObject;
 import com.nordstrom.common.file.PathUtils;
 
 /**
@@ -64,13 +65,32 @@ public abstract class TestNgBase implements TestBase {
          * Store the specified object in the attributes collection.
          * 
          * @param obj object to be stored; 'null' to discard value
-         * @return (optional) specified object
          */
-        private <T> Optional<T> set(final T obj) {
+        private void set(final Object obj) {
             ITestResult result = Reporter.getCurrentTestResult();
-            Optional<T> val = TestBase.optionalOf(obj);
-            result.setAttribute(key, val);
-            return val;
+            if (obj != null) {
+                result.setAttribute(key, obj);
+            } else {
+                result.removeAttribute(key);
+            }
+        }
+        
+        /**
+         * Store the specified object in the attributes collection, tracking reference propagation.
+         * 
+         * @param obj object to be stored; 'null' to discard value and release tracked references
+         */
+        private void track(final Object obj) {
+            ITestResult result = Reporter.getCurrentTestResult();
+            if (obj != null) {
+                result.setAttribute(key, new TrackedObject<>(key, obj));
+            } else {
+                Object val = result.getAttribute(key);
+                if (val instanceof TrackedObject) {
+                    ((TrackedObject<?>) val).release();
+                }
+                result.removeAttribute(key);
+            }
         }
         
         /**
@@ -79,13 +99,15 @@ public abstract class TestNgBase implements TestBase {
          * @return (optional) stored object
          */
         private Optional<?> nab() {
+            Object obj;
             ITestResult result = Reporter.getCurrentTestResult();
             Object val = result.getAttribute(key);
-            if (val != null) {
-                return (Optional<?>) val;
+            if (val instanceof TrackedObject) {
+                obj = ((TrackedObject<?>) val).getValue();
             } else {
-                return set(null);
+                obj = val;
             }
+            return TestBase.optionalOf(obj);
         }
     }
     
@@ -102,8 +124,8 @@ public abstract class TestNgBase implements TestBase {
      * {@inheritDoc}
      */
     @Override
-    public Optional<WebDriver> setDriver(final WebDriver driver) {
-        return TestAttribute.DRIVER.set(driver);
+    public void setDriver(final WebDriver driver) {
+        TestAttribute.DRIVER.track(driver);
     }
     
     /**
@@ -119,8 +141,8 @@ public abstract class TestNgBase implements TestBase {
      * {@inheritDoc}
      */
     @Override
-    public Optional<Page> setInitialPage(final Page initialPage) {
-        return TestAttribute.INITIAL_PAGE.set(initialPage);
+    public void setInitialPage(final Page initialPage) {
+        TestAttribute.INITIAL_PAGE.set(initialPage);
     }
     
     /**
