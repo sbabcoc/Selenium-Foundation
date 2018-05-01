@@ -234,9 +234,10 @@ public final class DriverManager {
                 // The driver throws an exception if no alert is present. This is normal and unavoidable.
             }
             
-            driver.quit();
+            ((TestBase) obj).setInitialPage(null);
             ((TestBase) obj).setDriver(null);
             optDriver = Optional.empty();
+            driver.quit();
         }
         
         return optDriver;

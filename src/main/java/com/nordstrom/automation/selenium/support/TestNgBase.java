@@ -143,7 +143,7 @@ public abstract class TestNgBase implements TestBase {
      */
     @Override
     public void setInitialPage(final Page initialPage) {
-        TestAttribute.INITIAL_PAGE.set(initialPage);
+        TestAttribute.INITIAL_PAGE.track(initialPage);
     }
     
     /**
