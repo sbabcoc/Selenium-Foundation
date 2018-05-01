@@ -49,9 +49,8 @@ public interface TestBase {
      * Set the driver for the current test.
      * 
      * @param driver driver for the current test; 'null' to discard driver
-     * @return (optional) driver for the current test
      */
-    Optional<WebDriver> setDriver(WebDriver driver);
+    void setDriver(WebDriver driver);
     
     /**
      * Prepare the specified page object for use:
@@ -109,9 +108,8 @@ public interface TestBase {
      * Set the initial page for the current test.
      * 
      * @param pageObj initial page for the current test
-     * @return (optional) initial page for the current test
      */
-    Optional<Page> setInitialPage(Page pageObj);
+    void setInitialPage(Page pageObj);
     
     /**
      * Get test run output directory.

@@ -42,24 +42,23 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
             .around(new PageSourceCapture(this))
             .around(DriverWatcher.getTestWatcher(this));
     
-    private Optional<WebDriver> optDriver = Optional.empty();
-    private Optional<Page> optInitialPage = Optional.empty();
+    private WebDriver driver = null;
+    private Page initialPage = null;
     
     /**
      * {@inheritDoc}
      */
     @Override
     public Optional<WebDriver> nabDriver() {
-        return optDriver;
+        return TestBase.optionalOf(driver);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<WebDriver> setDriver(final WebDriver driver) {
-        optDriver = TestBase.optionalOf(driver);
-        return optDriver;
+    public void setDriver(final WebDriver driver) {
+        this.driver = driver;
     }
     
     /**
@@ -67,16 +66,15 @@ public abstract class JUnitBase implements TestBase, ArtifactParams {
      */
     @Override
     public Optional<Page> nabInitialPage() {
-        return optInitialPage;
+        return TestBase.optionalOf(initialPage);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<Page> setInitialPage(final Page pageObj) {
-        optInitialPage = TestBase.optionalOf(pageObj);
-        return optInitialPage;
+    public void setInitialPage(final Page pageObj) {
+        initialPage = pageObj;
     }
     
     /**

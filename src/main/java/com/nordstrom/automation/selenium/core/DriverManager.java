@@ -112,7 +112,8 @@ public final class DriverManager {
                 WebDriver driver = wait.until(driverIsAcquired(method));
                 
                 setDriverTimeouts(driver, config);
-                optDriver = instance.setDriver(driver);
+                instance.setDriver(driver);
+                optDriver = Optional.of(driver);
                 if (instance.isTest(method)) {
                     long after = System.currentTimeMillis();
                     instance.adjustTimeout(after - prior);
@@ -234,7 +235,8 @@ public final class DriverManager {
             }
             
             driver.quit();
-            optDriver = ((TestBase) obj).setDriver(null);
+            ((TestBase) obj).setDriver(null);
+            optDriver = Optional.empty();
         }
         
         return optDriver;
@@ -286,6 +288,7 @@ public final class DriverManager {
          * @param context Selenium Foundation test class object
          * @param timeOutInSeconds 'wait' timeout in seconds
          */
+        @SuppressWarnings("deprecation")
         public DriverSessionWait(final TestBase context, final long timeOutInSeconds) {
             super(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER);
             withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
