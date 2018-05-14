@@ -239,7 +239,7 @@ Here are the official homes for several of the major drivers:
 
 # JUNIT 4 SUPPORT
 
-In addition to the TestNG support documented above, **Selenium Foundation** also includes support for **JUnit 4**. This support is built upon **JUnit Foundation**, which provides the framework for method interception (used for driver management) and artifact capture (used to acquire screenshots).
+In addition to the TestNG support documented above, **Selenium Foundation** also includes support for **JUnit 4**. This support is built upon **JUnit Foundation**, which provides the framework for method interception (used for driver management), artifact capture (used to acquire screenshots), and automatic retry of failed tests.
 
 ## JUnit 4 Required Elements
 
@@ -256,11 +256,11 @@ The following is an outline of the elements that must be included in every JUnit
 * [@MethodWatchers](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatchers.java):  
 The **MethodWatchers** annotation is assigned to test classes and enables you to attach one or more method watcher class, which implement the **MethodWatcher** interface. To activate this feature, run with the **HookInstallingRunner**.
 * [DriverWatcher](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
-**DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions and local Selenium Grid servers. It provides initial page support, and it also supplies two JUnit 4 rules:
-  * **`DriverWatcher.getClassWatcher()`**:  
-  The class rule returned by this static method is responsible for shutting down the local Selenium Grid servers.
+**DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions and local Selenium Grid servers. It provides initial page support, and it also supplies a JUnit 4:
   * **`DriverWatcher.getTestWatcher()`**:  
   The test rule returned by this static method is responsible for closing the driver attached to the current test method.
+* [DriverListener](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverListener.java):  
+**DriverListener** implements the **JUnit Foundation** [ShutdownListener](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/ShutdownListener.java) interface to shut down the local Selenium Grid serves at the end of the run.
 * [RuleChain](http://junit.org/junit4/javadoc/latest/org/junit/rules/RuleChain.html):  
  Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies two watchers that manage core features of **Selenium Foundation**:
   * [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/ScreenshotCapture.java):  
@@ -268,7 +268,31 @@ The **MethodWatchers** annotation is assigned to test classes and enables you to
   * [DriverWatcher](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
   As described previously, the test watcher returned by `DriverWatcher.getTestWatcher()` closes the driver attached to the current test method.
 
-### DEMONSTRATED FEATURES
+## AUTOMATIC RETRY OF FAILED TESTS
+
+**Selenium Foundation** includes an implementation of the [JUnitRetryAnalyzer](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/JUnitRetryAnalyzer.java) interface of [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation). This retry analyzer considers any test that fails due to a **WebDriverException** to be retriable. By default, this retry analyzer is disabled. To enable automatic retry of **WebDriverException** failures:
+
+* Add a service loader retry analyzer configuration file in the **_META-INF/services_** folder:
+
+###### com.nordstrom.automation.junit.JUnitRetryAnalyzer
+```
+com.nordstrom.automation.selenium.junit.RetryAnalyzer
+```
+
+* Specify a positive value for the **MAX_RETRY** setting of **JUnit Foundation**:
+
+<table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
+    <tr style="text-align: left; border: 1px solid black;">
+        <th><i>junit.properties</i></th>
+    </tr>
+    <tr>
+        <td>junit.max.retry=2</td>
+    </tr>
+</table>
+
+In this example, these two configurations will enable **JUnit Foundation** to retry tests that fail with **WebDriverException** twice before counting them as failures. See the [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation) documentation for more details.
+
+## DEMONSTRATED FEATURES
 
 The **JUnitBase** class demonstrates several features of the **Selenium Foundation** API:
 
