@@ -6,10 +6,8 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -30,12 +28,7 @@ import com.nordstrom.automation.selenium.model.Page;
 @MethodWatchers({DriverWatcher.class})
 public abstract class JUnitBase implements TestBase, ArtifactParams {
     
-    /** This class rule performs end-of-class clean-up of drivers and local Grid. */
-    @ClassRule
-    public static final ExternalResource RESOURCE = DriverWatcher.getClassWatcher();
-    
     /** This method rule manages driver lifetimes and opens initial pages. */
-    
     @Rule
     public final RuleChain ruleChain = RuleChain
             .outerRule(new ScreenshotCapture(this))

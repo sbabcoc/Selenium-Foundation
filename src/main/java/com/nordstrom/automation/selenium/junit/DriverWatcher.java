@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium.junit;
 
 import java.lang.reflect.Method;
 
-import org.junit.rules.ExternalResource;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -59,21 +58,6 @@ public class DriverWatcher implements MethodWatcher {
             protected void finished(final Description description) {
                 DriverManager.closeDriver(obj);
             }
-        };
-    }
-    
-    /**
-     * Get class watcher to manage local Grid servers.
-     * 
-     * @return external resource object
-     */
-    public static ExternalResource getClassWatcher() {
-        return new ExternalResource() {
-            @Override
-            protected void after() {
-                DriverManager.onFinish();
-            }
-            
         };
     }
 }
