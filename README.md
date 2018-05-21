@@ -65,26 +65,46 @@ The [QuickStart](https://github.com/Nordstrom/Selenium-Foundation/blob/master/sr
 
 ## HIGHLIGHTS
 
+### Automatic Driver Targeting
+
 **Selenium Foundation** provides a complete set of base classes for building well-factored page models. This includes page components and frames. **Selenium Foundation** allows you to focus on modeling your application (instead of managing which window or frame the driver is addressing) by handling all driver targeting for you. You'll never see `driver.switchTo(...)` in page model automation built with **Selenium Foundation**, because the framework automatically ensures that the driver is addressing the window or frame associated with each page model method before it's invoked.
+
+### Landing Page Verification / Model-Directed Navigation
 
 Page classes can be explicitly associated with web application paths through the **`@PageUrl`** annotation. These associations can be declared as either fixed paths or patterns, and these declarations are used by **Selenium Foundation** to verify landing page paths at page transitions. You can also perform direct navigation to web application paths associated with page classes through the **`@PageUrl`** annotation.
 
+### Collection Classes
+
 **Selenium Foundation** also includes collection classes ([ComponentList](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentList.java), [ComponentMap](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentMap.java), [FrameList](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameList.java), and [FrameMap](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameMap.java)) that enable you to define collections of components for your page models. For example, you can define a **SearchResultTile** component and include a map of these tiles keyed by product ID in your **SearchResultsPage** class. **Selenium Foundation** collections are lazy-initialized automatically - the composition of the collection is determined when it's instantiated, but each item in the collection is only populated when it's explicitly referenced.
+
+### Automatic Stale Element Reference Protection
 
 One of the most impactful features of **Selenium Foundation** saves your automation from the dreaded **StaleElementReferenceException** failure. Web element search operations performed within the **Selenium Foundation** framework return enhanced references, which retain all of the parameters needed to re-acquire the reference if it goes stale. Every web element method call is guarded by an automatic recovery feature. If a reference goes stale, **Selenium Foundation** re-acquires the reference and re-issues the web element method call that encountered the exception. Your automation continues on normally, blissfully unaware of the disaster that was averted.
 
+### Optional Elements
+
 Another useful extension provided by **Selenium Foundation** is the optional element. This feature enables you to model elements that only exist on the page under specific conditions. For example, you can model an error message that only exists when a form is submitted with no value in a required field. Determining if the element exists is as easy as calling the `hasReference()` method of the optional element object.
 
+### Page-Load Synchronization
+
 **Selenium Foundation** automatically synchronizes your automation with ordinary page transitions, ensuring that tests don't get tripped up by application hesitation. Synchronizing your automation with dynamic content creation is easily done by implementing a simple interface (**DetectsLoadCompletion**). This greatly simplifies the modeling of single-page applications and pages rendered with dynamic content loading.
+
+### Grid-Based Driver Creation
 
 To avoid divergent behavior between local and remote execution, **Selenium Foundation** acquires driver sessions for local runs from a local instance of **Selenium Grid**. In addition to eliminating ordinary behavioral differences, this strategy provides two major benefits:
 
 1. Adding support for a new driver is a simple configuration change - No need to crack open the code!
 2. You get explicit control over the maximum number of concurrent sessions, so you can run your tests in parallel without over-taxing your system.
 
+### Automatic Phase-to-Phase Driver Hand-Off
+
 Drivers allocated for per-test configuration setup methods (i.e. - **`@BeforeMethod`**) are automatically handed off to the tests for which configuration is being performed. Drivers allocated for tests are automatically handed off to per-test configuration cleanup methods (i.e. - **`@AfterMethod`**).  This hand-off behavior greatly simplifies the implementation of generic setup and cleanup processing that interacts with your application under test.
 
+### Automatic Capture of Screenshots and Page Source
+
 To assist in root-cause analysis, **Selenium Foundation** automatically captures a screenshot and page source for each failed test. By using the **ReporterAppender**, the log output of each **TestNG** test is captured as part of the test result object. This information is automatically shown on test result pages in **Jenkins**. No more digging through intermingled output in console logs!
+
+### Support for TestNG and JUnit
 
 **Selenium Foundation** includes support for both **TestNG** and **JUnit 4**. Feature parity is enabled by several core abstractions, and through features provided by the **TestNG Foundation** and **JUnit Foundation** libraries.
 
