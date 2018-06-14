@@ -20,7 +20,7 @@ import com.nordstrom.automation.testng.ListenerChain;
  * <b>INTRODUCTION</b>
  * <p>
  * <b>Selenium Foundation</b> is an automation framework designed to extend and enhance the capabilities provided
- * by <b>Selenium 2.0</b> (<i>WebDriver</i>). The last stable release of Selenium 2.0 is <b>2.53.1</b>. 
+ * by <b>Selenium WebDriver</b>. Support is provided for both <b>Selenium 2</b> and <b>Selenium 3</b>.
  * <p>
  * This <b>QuickStart</b> class provides a fully-functional example of a test class built around <b>Selenium
  * Foundation</b>, <b>TestNG Foundation</b>, and the <b>Settings API</b>. It demonstrates how to set up required 
@@ -135,17 +135,17 @@ import com.nordstrom.automation.testng.ListenerChain;
  * <b>INSTALLING DRIVERS</b>
  * <p>
  * Whichever browser you choose to run your automation on, you need to make sure to install the latest driver for that
- * browser compatible with <b>Selenium WebDriver 2.53.1</b>, along with a compatible release of the browser itself. We
- * recommend that you install the drivers and browsers on the file search path to avoid the need to provide additional
- * configuration details via scenario-specific means.
+ * browser compatible with your chosen version of <b>Selenium WebDriver</b>, along with a compatible release of the
+ * browser itself. We recommend that you install the drivers and browsers on the file search path to avoid the need to
+ * provide additional configuration details via scenario-specific means.
  * <p>
  * Here are the official homes for several of the major drivers: <ul>
  *     <li>GhostDriver (PhantomJS) - <a href="http://phantomjs.org/download.html">
  *     http://phantomjs.org/download.html</a></li>
  *     <li>ChromeDriver - <a href="https://sites.google.com/a/chromium.org/chromedriver/downloads">
  *     https://sites.google.com/a/chromium.org/chromedriver/downloads</a></li>
- *     <li>IEDriver - <a href="http://selenium-release.storage.googleapis.com/index.html?path=2.53/">
- *     http://selenium-release.storage.googleapis.com/index.html?path=2.53/</a></li>
+ *     <li>IEDriver - <a href="https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver">
+ *     https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver</a></li>
  * </ul>
  * <b>NOTE</b>: GhostDriver and ChromeDriver are simple binary installations, but several system configuration changes
  * must be applied for IEDriver to work properly. For details, visit the InternetExplorerDriver project Wiki on GitHub
