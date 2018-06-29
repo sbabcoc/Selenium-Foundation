@@ -42,7 +42,22 @@ import com.nordstrom.automation.selenium.model.ComponentContainer;
  *         {@link PageUrl} annotation is unspecified, this method returns {@code null}.
  *     <li>If {@code scheme} of the specified {@code pageUrl} argument is unspecified or set to {@code http/https},
  *         the specified {@code targetUri} is overlaid by the elements of the {@link PageUrl} annotation to
- *         produce the fully-qualified <b>HTTP</b> target page URL.</li>
+ *         produce the fully-qualified <b>HTTP</b> target page URL.<ul>
+ *         <li>If the {@code value} element specifies an absolute path, this path is returned as-is.</li>
+ *         <li>If the {@code value} element specifies a relative path, this is appended to the path specified by
+ *             {@code targetUri} to resolve the page URL.</li>
+ *         <li>If the {@code scheme} element is specified, its value overrides the scheme of {@code targetUri}.
+ *             If the value of the {@code scheme} element is empty, the scheme of {@code targetUri} is set to
+ *             {@code null}.</li>
+ *         <li>If the {@code userInfo} element is specified, its value overrides the userInfo of {@code targetUrl}.
+ *             If the value of the {@code userInfo} element is empty, the userInfo of {@code targetUri} is set to
+ *             {@code null}.</li>
+ *         <li>If the {@code host} element is specified, its value overrides the host of {@code targetUrl}. If the
+ *             value of the {@code host} element is empty, the host of {@code targetUri} is set to {@code null}.
+ *             </li>
+ *         <li>If the {@code port} element is specified, its value overrides the port of {@code targetUri}. If the
+ *             value of the {@code port} element is empty, the port of {@code targetUri} is set to <b>-1</b>.</li>
+ *     </ul></li>
  *     <li>For <b>HTTP</b> URLs that require query parameters, these parameters must be included in the
  *         {@code value} element of the specified {@link PageUrl} annotation. The {@code params} element of the
  *         annotation is only used for pattern-based landing page verification.</li>

@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -82,6 +83,7 @@ public abstract class ComponentContainer
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
     private static final String ELEMENT_MESSAGE = "[element] must be non-null";
     private static final int PARAM_BIT_COUNT = 2;
+    private static final Charset UTF8 = Charset.forName("UTF-8");
     
     private final Logger logger;
     
@@ -578,7 +580,22 @@ public abstract class ComponentContainer
      *         {@link PageUrl} annotation is unspecified, this method returns {@code null}.
      *     <li>If {@code scheme} of the specified {@code pageUrl} argument is unspecified or set to {@code http/https},
      *         the specified {@code targetUri} is overlaid by the elements of the {@link PageUrl} annotation to
-     *         produce the fully-qualified <b>HTTP</b> target page URL.</li>
+     *         produce the fully-qualified <b>HTTP</b> target page URL.<ul>
+     *         <li>If the {@code value} element specifies an absolute path, this path is returned as-is.</li>
+     *         <li>If the {@code value} element specifies a relative path, this is appended to the path specified by
+     *             {@code targetUri} to resolve the page URL.</li>
+     *         <li>If the {@code scheme} element is specified, its value overrides the scheme of {@code targetUri}.
+     *             If the value of the {@code scheme} element is empty, the scheme of {@code targetUri} is set to
+     *             {@code null}.</li>
+     *         <li>If the {@code userInfo} element is specified, its value overrides the userInfo of {@code targetUrl}.
+     *             If the value of the {@code userInfo} element is empty, the userInfo of {@code targetUri} is set to
+     *             {@code null}.</li>
+     *         <li>If the {@code host} element is specified, its value overrides the host of {@code targetUrl}. If the
+     *             value of the {@code host} element is empty, the host of {@code targetUri} is set to {@code null}.
+     *             </li>
+     *         <li>If the {@code port} element is specified, its value overrides the port of {@code targetUri}. If the
+     *             value of the {@code port} element is empty, the port of {@code targetUri} is set to <b>-1</b>.</li>
+     *     </ul></li>
      *     <li>For <b>HTTP</b> URLs that require query parameters, these parameters must be included in the
      *         {@code value} element of the specified {@link PageUrl} annotation. The {@code params} element of the
      *         annotation is only used for pattern-based landing page verification.</li>
@@ -765,7 +782,7 @@ public abstract class ComponentContainer
                 }
             }
             
-            List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
+            List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, UTF8);
             
             for (NameValuePair expectPair : getExpectedParams(pageUrl, expectUri)) {
                 if (!hasExpectedParam(actualParams, expectPair)) {
@@ -799,7 +816,7 @@ public abstract class ComponentContainer
                 }
             }
         } else if (expectUri != null) {
-            expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
+            expectParams = URLEncodedUtils.parse(expectUri, UTF8);
         }
         return expectParams;
     }
