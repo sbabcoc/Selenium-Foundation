@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,7 +82,6 @@ public abstract class ComponentContainer
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
     private static final String ELEMENT_MESSAGE = "[element] must be non-null";
     private static final int PARAM_BIT_COUNT = 2;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
     
     private final Logger logger;
     
@@ -782,7 +780,7 @@ public abstract class ComponentContainer
                 }
             }
             
-            List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, UTF8);
+            List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
             
             for (NameValuePair expectPair : getExpectedParams(pageUrl, expectUri)) {
                 if (!hasExpectedParam(actualParams, expectPair)) {
@@ -816,7 +814,7 @@ public abstract class ComponentContainer
                 }
             }
         } else if (expectUri != null) {
-            expectParams = URLEncodedUtils.parse(expectUri, UTF8);
+            expectParams = URLEncodedUtils.parse(expectUri, "UTF-8");
         }
         return expectParams;
     }
