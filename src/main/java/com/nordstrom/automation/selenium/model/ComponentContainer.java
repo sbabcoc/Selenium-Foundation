@@ -781,6 +781,7 @@ public abstract class ComponentContainer
                     throw new LandingPageMismatchException(pageClass, "path", actual, expect);
                 }
             }
+            
             List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, UTF8);
             
             for (NameValuePair expectPair : getExpectedParams(pageUrl, expectUri)) {
