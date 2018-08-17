@@ -11,12 +11,9 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
-import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.junit.ArtifactParams;
-import com.nordstrom.automation.junit.HookInstallingRunner;
-import com.nordstrom.automation.junit.MethodWatchers;
 import com.nordstrom.automation.junit.RuleChainWalker;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.model.Page;
@@ -24,8 +21,6 @@ import com.nordstrom.automation.selenium.model.Page;
 /**
  * This abstract class implements the contract for Selenium Foundation test classes for JUnit.
  */
-@RunWith(HookInstallingRunner.class)
-@MethodWatchers({DriverWatcher.class})
 public abstract class JUnitBase implements TestBase, ArtifactParams {
     
     /** This method rule manages driver lifetimes and opens initial pages. */

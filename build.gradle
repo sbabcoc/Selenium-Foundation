@@ -1,4 +1,4 @@
-import org.apache.tools.ant.filters.ReplaceTokens	
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
   id 'io.codearte.nexus-staging' version '0.11.0'
@@ -163,11 +163,13 @@ task("${profile}JavadocJar", type: Jar, dependsOn: "${profile}Javadoc") {
 task testNG(type: Test) {
   useTestNG()
   reports.html.destination = file("${buildDir}/reports/testng")
+  testLogging.showStandardStreams = true
 }
 
 test {
   dependsOn testNG
   reports.html.destination = file("${buildDir}/reports/junit")
+  testLogging.showStandardStreams = true
 }
 
 signing {
@@ -253,14 +255,24 @@ repositories {
    maven { url 'http://repo.maven.apache.org/maven2' }
 }
 
+configurations {
+    junitAgent
+}
+
+test.doFirst {
+    jvmArgs "-javaagent:${configurations.junitAgent.files.iterator().next()}"
+}
+
 dependencies {
   compile group: 'com.nordstrom.tools', name: 'java-utils', version:'1.3.3'
   compile group: 'com.nordstrom.tools', name: 'settings', version:'2.0.7'
   compile group: 'com.nordstrom.tools', name: 'testng-foundation', version:'1.9.3'
-  compile group: 'com.nordstrom.tools', name: 'junit-foundation', version:'3.2.0'
+  compile group: 'com.nordstrom.tools', name: 'junit-foundation', version:'6.0.1'
   compile group: 'net.bytebuddy', name: 'byte-buddy', version:'1.7.9'
   compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.2'
   compile group: 'com.github.sbabcoc', name: 'logback-testng', version:'1.0.0'
+  
+  junitAgent group: 'com.nordstrom.tools', name: 'junit-foundation', version: '6.0.1'
   
   selenium2Compile configurations.compile
   selenium2Compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'2.53.0'
