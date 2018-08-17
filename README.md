@@ -47,8 +47,8 @@ For Eclipse, we recommend enabling Gradle integration through the official [Buil
 
 Both configurations of **Selenium Foundation** can by built from the command line. 
 
-> **`gradle build --info`** `# build Selenium 3 configuration`  
-> **`gradle build -Pprofile=selenium2 --info`** `# build Selenium 2 configuration`  
+> **`gradle build`** `# build Selenium 3 configuration`  
+> **`gradle build -Pprofile=selenium2`** `# build Selenium 2 configuration`  
 
 #### Maven Support
 

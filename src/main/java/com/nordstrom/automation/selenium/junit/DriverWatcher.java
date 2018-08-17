@@ -1,9 +1,8 @@
 package com.nordstrom.automation.selenium.junit;
 
-import java.lang.reflect.Method;
-
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runners.model.FrameworkMethod;
 
 import com.nordstrom.automation.junit.MethodWatcher;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
@@ -34,16 +33,16 @@ public class DriverWatcher implements MethodWatcher {
      * {@inheritDoc}
      */
     @Override
-    public void beforeInvocation(final Object obj, final Method method, final Object[] args) {
-        DriverManager.beforeInvocation(obj, method);
+    public void beforeInvocation(final Object obj, final FrameworkMethod method, final Object... params) {
+        DriverManager.beforeInvocation(obj, method.getMethod());
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void afterInvocation(final Object obj, final Method method, final Object[] args) {
-        DriverManager.afterInvocation(obj, method);
+    public void afterInvocation(final Object obj, final FrameworkMethod method, final Throwable thrown) {
+        DriverManager.afterInvocation(obj, method.getMethod());
     }
     
     /**
