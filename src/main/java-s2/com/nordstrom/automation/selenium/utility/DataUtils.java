@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 /**
@@ -22,14 +21,16 @@ public final class DataUtils {
     }
     
     /**
-     * Transform the specified JSON string into the corresponding {@link JsonObject}.
+     * Transform the specified JSON string into the specified type.
      * 
+     * @param <T> desired object type
      * @param json JSON object string
-     * @return de-serialized {@link JsonObject} 
+     * @param type target object type
+     * @return new instance of the specified type
      */
-    public static JsonObject deserializeObject(final String json) {
+    public static <T> T fromString(final String json, final Class<T> type) {
         try {
-            return new Gson().fromJson(json, JsonObject.class);
+            return new Gson().fromJson(json, type);
         } catch (JsonSyntaxException e) {
             LOGGER.debug("Failed to deserialize JSON object string: " + json, e);
             return null;

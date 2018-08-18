@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -31,11 +32,11 @@ import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.json.Json;
+import org.openqa.selenium.json.JsonInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.file.PathUtils;
@@ -447,8 +448,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                 jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
             }
             
-            JsonObject json = new JsonParser().parse(JSON_HEAD + jsonStr + JSON_TAIL).getAsJsonObject();
-            GridNodeConfiguration config = GridNodeConfiguration.loadFromJSON(json);
+            JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + jsonStr + JSON_TAIL));
+            GridNodeConfiguration config = GridNodeConfiguration.loadFromJSON(input);
             browserCaps = config.capabilities.get(0);
         }
         return browserCaps;
@@ -504,7 +505,7 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
                 File file = new File(uri);
                 return file.getAbsolutePath();
             } catch (URISyntaxException eaten) { //NOSONAR
-                LOGGER.warn("Invalid URL '{}' returned by file locator: {}", url.toString(), eaten.getMessage());
+                LOGGER.warn("Invalid URL '{}' returned by file locator: {}", url, eaten.getMessage());
             } catch (IOException eaten) { //NOSONAR
                 LOGGER.warn("Failed to construct file system or extract configuration file: {}", eaten.getMessage());
             }

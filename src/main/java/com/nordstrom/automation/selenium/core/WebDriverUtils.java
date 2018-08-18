@@ -19,8 +19,8 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsDriver;
 
+import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
 
 /**
@@ -57,8 +57,8 @@ public final class WebDriverUtils {
     public static WebDriver getDriver(final SearchContext context) {
         if (context instanceof WebDriver) {
             return (WebDriver) context;
-        } else if (context instanceof WrapsDriver) {
-            return ((WrapsDriver) context).getWrappedDriver();
+        } else if (WrapsDriver.isAssignableFrom(context)) {
+            return WrapsDriver.getWrappedDriver(context);
         } else {
             throw new UnsupportedOperationException("Unable to extract the driver from the specified context");
         }

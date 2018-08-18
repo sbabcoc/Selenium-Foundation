@@ -30,7 +30,7 @@
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
     <java-utils.version>1.6.0</java-utils.version>
-    <surefire-plugin.version>2.20.1</surefire-plugin.version>
+    <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <compiler-plugin.version>3.6.0</compiler-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
@@ -213,7 +213,7 @@
         </property>
       </activation>
       <properties>
-        <selenium.version>3.11.0</selenium.version>
+        <selenium.version>3.14.0</selenium.version>
         <guava.version>23.6-jre</guava.version>
         <phantomjs.version>2.1.0</phantomjs.version>
         <jcommander.version>1.72</jcommander.version>
