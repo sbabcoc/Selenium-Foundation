@@ -13,10 +13,10 @@ import java.net.URI;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsDriver;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.PageUrl;
+import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 
 public class ComponentContainerTest {
 
@@ -157,7 +157,7 @@ public class ComponentContainerTest {
      * @return mocked WebElement object
      */
     private static WebElement mockElement(String type, String value, boolean isCheckbox) {
-        WebElement element = mock(WebElement.class, withSettings().extraInterfaces(WrapsDriver.class));
+        WebElement element = mock(WebElement.class, withSettings().extraInterfaces(WrapsDriver.getType()));
         when(element.getTagName()).thenReturn(type);
         if (isCheckbox) {
             when(element.getAttribute("type")).thenReturn("checkbox");
@@ -170,7 +170,7 @@ public class ComponentContainerTest {
         }
 
         WebDriver driver = mockDriver();
-        when(((WrapsDriver) element).getWrappedDriver()).thenReturn(driver);
+        when(WrapsDriver.getWrappedDriver(element)).thenReturn(driver);
         return element;
     }
 

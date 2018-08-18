@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.interfaces;
 
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.internal.WrapsDriver;
 
 /**
  * Classes implement this interface to provide access to their underlying native Selenium

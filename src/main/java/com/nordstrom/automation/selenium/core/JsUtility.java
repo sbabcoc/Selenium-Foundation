@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -12,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import com.google.gson.JsonObject;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -182,8 +184,6 @@ public final class JsUtility {
             message = message.split("\n")[0].trim();
             // remove prefix if present
             message = removePrefix(message);
-            // remove wrapper object if present
-            message = removeWrapper(message);
             // deserialize encoded exception object if present
             thrown = deserializeException(exception, message);
         }
@@ -206,41 +206,32 @@ public final class JsUtility {
     }
     
     /**
-     * Remove the wrapper object from the specified JSON string
-     * 
-     * @param jsonStr JSON string
-     * @return if present, value of [errorMessage] property; otherwise, JSON string as specified
-     */
-    private static String removeWrapper(final String jsonStr) {
-        if (jsonStr.contains("\"" + ERROR_MESSAGE_KEY + "\"")) {
-            JsonObject obj = DataUtils.deserializeObject(jsonStr);
-            if (obj != null) {
-                return obj.get(ERROR_MESSAGE_KEY).getAsString();
-            }
-        }
-        return jsonStr;
-    }
-    
-    /**
      * De-serialize the specified JSON-encoded exception
      * 
      * @param exception web driver exception to propagate
      * @param jsonStr JSON string
      * @return if present, exception decoded from JSON; otherwise, original WebDriverException object
      */
-    private static Throwable deserializeException(final WebDriverException exception, final String jsonStr) {
-        Throwable thrown = exception;
+    @SuppressWarnings("unchecked")
+    private static Throwable deserializeException(final WebDriverException cause, final String jsonStr) {
+        Throwable thrown = cause;
         // if message appears to be an encoded exception object
         if (jsonStr.contains("\"" + CLASS_NAME_KEY + "\"") && jsonStr.contains("\"" + MESSAGE_KEY + "\"")) {
-            // deserialize encoded exception object
-            JsonObject obj = DataUtils.deserializeObject(jsonStr);
+            Map<String, ?> obj = DataUtils.fromString(jsonStr, HashMap.class);
+            
             // if successful
             if (obj != null) {
-                String className = obj.get(CLASS_NAME_KEY).getAsString();
+                if (obj.containsKey(ERROR_MESSAGE_KEY)) {
+                    obj = (Map<String, String>) obj.get(ERROR_MESSAGE_KEY);
+                }
+                
+                String className = (String) obj.get(CLASS_NAME_KEY);
+                String message = (String) obj.get(MESSAGE_KEY);
+                
                 try {
                     Class<?> clazz = Class.forName(className);
                     Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
-                    thrown = (Throwable) ctor.newInstance(obj.get(MESSAGE_KEY).getAsString(), exception);
+                    thrown = (Throwable) ctor.newInstance(message, cause);
                     thrown.setStackTrace(new Throwable().getStackTrace());
                 } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
                         | InstantiationException | IllegalAccessException | IllegalArgumentException

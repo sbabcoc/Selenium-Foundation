@@ -30,7 +30,7 @@
 	}
 	
 	function Throwable(className, message) {
-	    CustomError.call(this, JSON.stringify({ className:className, message:message }));
+	    CustomError.call(this, { className:className, message:message });
 	    this.name = className;
 	}
 	
