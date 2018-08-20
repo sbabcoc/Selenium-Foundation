@@ -1,4 +1,4 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nordstrom.ui-tools/selenium-foundation)
+[![Maven Central](https://img.shields.io/maven-central/v/com.nordstrom.tools/selenium-foundation.svg)](https://mvnrepository.com/artifact/com.nordstrom.tools/selenium-foundation)
 
 # INTRODUCTION
 **Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium** (_WebDriver_).
