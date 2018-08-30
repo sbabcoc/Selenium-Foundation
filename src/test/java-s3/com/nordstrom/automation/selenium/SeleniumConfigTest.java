@@ -90,7 +90,7 @@ public class SeleniumConfigTest {
         Field configFile = GridNodeCliOptions.class.getDeclaredField("configFile");
         configFile.setAccessible(true);
         String path = (String) configFile.get(cliOptions);
-        assertTrue(path.endsWith("nodeConfig.json"));
+        assertTrue(path.endsWith("nodeConfig-s3.json"));
     }
     
     @Test

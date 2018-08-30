@@ -86,7 +86,7 @@ public class SeleniumConfigTest {
         CommandLineOptionHelper helper = new CommandLineOptionHelper(nodeArgs);
         assertEquals(helper.getParamValue("-role"), "node");
         String path = helper.getParamValue("-nodeConfig");
-        assertTrue(path.endsWith("nodeConfig.json"));
+        assertTrue(path.endsWith("nodeConfig-s2.json"));
     }
     
     @Test
