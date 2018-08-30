@@ -176,19 +176,6 @@
                 </configuration>
               </execution>
               <execution>
-                <id>add-resource</id>
-                <goals>
-                  <goal>add-resource</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>src/main/resources-s2</directory>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-              <execution>
                 <id>add-test-source</id>
                 <goals>
                   <goal>add-test-source</goal>
@@ -273,19 +260,6 @@
                   <sources>
                     <source>src/main/java-s3</source>
                   </sources>
-                </configuration>
-              </execution>
-              <execution>
-                <id>add-resource</id>
-                <goals>
-                  <goal>add-resource</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>src/main/resources-s3</directory>
-                    </resource>
-                  </resources>
                 </configuration>
               </execution>
               <execution>

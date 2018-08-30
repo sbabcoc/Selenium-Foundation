@@ -63,7 +63,7 @@ sourceSets {
       outputDir = new File(buildRoot, 'classes')
     }
     resources {
-      srcDirs = [ 'src/main/resources', 'src/main/resources-s2' ]
+      srcDirs = [ 'src/main/resources' ]
     }
     compileClasspath = sourceSets.main.output + configurations.selenium2Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium2Runtime
@@ -74,7 +74,7 @@ sourceSets {
       outputDir = new File(buildRoot, 'classes')
     }
     resources {
-      srcDirs = [ 'src/main/resources', 'src/main/resources-s3' ]
+      srcDirs = [ 'src/main/resources' ]
     }
     compileClasspath = sourceSets.main.output + configurations.selenium3Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium3Runtime

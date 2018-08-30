@@ -86,8 +86,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
         HUB_HOST("selenium.hub.host", null),
         /** name: <b>selenium.hub.port</b> <br> default: <b>4444</b> */
         HUB_PORT("selenuim.hub.port", "4444"),
-        /** name: <b>selenium.node.config</b> <br> default: <b>nodeConfig.json</b> */
-        NODE_CONFIG("selenium.node.config", "nodeConfig.json"),
+        /** name: <b>selenium.node.config</b> <br> default: <b>nodeConfig-s2.json</b> */
+        NODE_CONFIG("selenium.node.config", "nodeConfig-s2.json"),
         /** name: <b>selenium.node.host</b> <br> default: {@code null} */
         NODE_HOST("selenium.node.host", null),
         /** name: <b>selenium.node.port</b> <br> default: <b>5555</b> */
