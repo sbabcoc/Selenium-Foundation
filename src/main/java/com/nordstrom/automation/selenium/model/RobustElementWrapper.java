@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.model;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +49,8 @@ public class RobustElementWrapper implements ReferenceFetcher {
     public static final int CARDINAL = -1;
     /** wraps an optional reference */
     public static final int OPTIONAL = -2;
+    /** boolean methods that return 'false' when optional element is absent */
+    private static final List<String> BOOLEAN_METHODS = Arrays.asList("isDisplayed", "isEnabled");
     
     private static final String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
     private static final String LOCATE_BY_XPATH = JsUtility.getScriptResource("locateByXpath.js");
@@ -151,18 +154,35 @@ public class RobustElementWrapper implements ReferenceFetcher {
     public Object intercept(@This final Object obj, @Origin final Method method,
                     @AllArguments final Object[] args) throws Exception { //NOSONAR
         try {
-            return method.invoke(getWrappedElement(), args);
-        } catch (InvocationTargetException ite) { //NOSONAR
-            Throwable t = ite.getCause();
-            if (t instanceof StaleElementReferenceException) {
-                try {
-                    StaleElementReferenceException sere = (StaleElementReferenceException) t;
-                    return method.invoke(refreshReference(sere).getWrappedElement(), args);
-                } catch (NullPointerException npe) { //NOSONAR
-                    throw deferredException();
-                }
+            return invoke(method, args);
+        } catch (StaleElementReferenceException sere) {
+            refreshReference(sere);
+            return invoke(method, args);
+        }
+    }
+    
+    /**
+     * Invoke the specified method with arguments provided.
+     * 
+     * @param method {@link Method} object for the method to be invoked
+     * @param args method invocation arguments
+     * @return {@code anything} (the result of invoking the specified method)
+     * @throws Exception {@code anything} (exception thrown by the specified method)
+     */
+    private Object invoke(Method method, Object... args) throws Exception { // NOSONAR
+        WebElement target = getWrappedElement();
+        
+        if (target == null) {
+            if (BOOLEAN_METHODS.contains(method.getName())) {
+                return Boolean.FALSE;
             }
-            throw UncheckedThrow.throwUnchecked(t);
+            throw deferredException();
+        }
+        
+        try {
+            return method.invoke(target, args);
+        } catch (InvocationTargetException ite) {
+            throw UncheckedThrow.throwUnchecked(ite.getCause());
         }
     }
     
@@ -285,6 +305,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
      */
     @SuppressWarnings({"squid:S3776", "squid:S134"})
     private static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
+        NoSuchElementException thrown = null;
         SearchContext context = wrapper.context.getWrappedContext();
         
         if (wrapper.strategy == Strategy.LOCATOR) {
@@ -295,20 +316,17 @@ public class RobustElementWrapper implements ReferenceFetcher {
                     if (wrapper.index < elements.size()) {
                         wrapper.wrapped = elements.get(wrapper.index);
                     } else {
-                        throw new NoSuchElementException(
+                        thrown = new NoSuchElementException(
                                 String.format("Too few elements located %s: need: %d; have: %d", 
                                         wrapper.locator, wrapper.index + 1, elements.size()));
                     }
                 } else {
-                    wrapper.wrapped = context.findElement(wrapper.locator);
+                    try {
+                        wrapper.wrapped = context.findElement(wrapper.locator);
+                    } catch (NoSuchElementException e) {
+                        thrown = e;
+                    }
                 }
-            } catch (NoSuchElementException e) {
-                if (wrapper.index != OPTIONAL) {
-                    throw e;
-                }
-                
-                wrapper.deferredException = e;
-                wrapper.wrapped = null;
             } finally {
                 timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
             }
@@ -331,9 +349,26 @@ public class RobustElementWrapper implements ReferenceFetcher {
             }
             
             wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, js, args.toArray());
+            
+            if (wrapper.wrapped == null) {
+                String message;
+                if (wrapper.index > 0) {
+                    message = String.format("Cannot locate an element at index %d using %s",
+                            wrapper.index, wrapper.selector);
+                } else {
+                    message = String.format("Cannot locate an element using %s", wrapper.selector);
+                }
+                thrown = new NoSuchElementException(message);
+            }
         }
         
-        if (wrapper.wrapped != null) {
+        if (thrown != null) {
+            wrapper.wrapped = null;
+            if (wrapper.index != OPTIONAL) {
+                throw thrown;
+            }
+            wrapper.deferredException = thrown;
+        } else {
             wrapper.acquiredAt = System.currentTimeMillis();
             wrapper.deferredException = null;
         }
