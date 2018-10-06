@@ -69,14 +69,14 @@ public class SeleniumConfigTest {
         assertNotNull(nodeConfig);
         assertEquals(nodeConfig.role, "node");
         
-        boolean hasPhantomJS = false;
+        boolean hasHtmlUnit = false;
         for (MutableCapabilities capability : nodeConfig.capabilities) {
-            if ("phantomjs".equals(capability.getBrowserName())) {
-                hasPhantomJS = true;
+            if ("htmlunit".equals(capability.getBrowserName())) {
+                hasHtmlUnit = true;
                 break;
             }
         }
-        assertTrue(hasPhantomJS);
+        assertTrue(hasHtmlUnit);
     }
     
     @Test

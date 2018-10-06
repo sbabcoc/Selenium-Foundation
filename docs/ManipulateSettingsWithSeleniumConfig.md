@@ -88,7 +88,7 @@ The `getBrowserCaps()` converts the configured browser settings into a **Capabil
     * Otherwise, a basic JSON configuration is assembled from the browser name.
 * Otherwise, the JSON configuration is acquired from **BROWSER_CAPS**.
 
-As indicated by the sequence above, the desired browser can be specified solely by name. This name can be associated with a JSON configuration file, or it may simply specify the name associated with a particular browser by its corresponding driver. If browser name is omitted, a fully-specified JSON capabilities record is acquired from the settings collection. (By default, the browser capabilities setting specifies the PhantomJS browser.)
+As indicated by the sequence above, the desired browser can be specified solely by name. This name can be associated with a JSON configuration file, or it may simply specify the name associated with a particular browser by its corresponding driver. If browser name is omitted, a fully-specified JSON capabilities record is acquired from the settings collection. (By default, the browser capabilities setting specifies the HtmlUnit browser.)
 
 This process yields the configured JSON capabilities record, which `getBrowserCaps()` uses to instantiate a standard **RegistrationRequest** object. The **Capabilities** object embedded in this request is then extracted and returned to the caller.
 

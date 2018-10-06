@@ -55,8 +55,8 @@ public class SeleniumConfig extends SettingsCore<SeleniumConfig.SeleniumSettings
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
-    /** value: {"browserName": "phantomjs"} */
-    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "phantomjs");
+    /** value: {"browserName": "htmlunit"} */
+    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
     /** value: 5555 */
     private static final Integer DEFAULT_NODE_PORT = Integer.valueOf(5555);
     

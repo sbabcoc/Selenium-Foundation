@@ -264,14 +264,14 @@ test.doFirst {
 }
 
 dependencies {
-  compile group: 'com.nordstrom.tools', name: 'java-utils', version:'1.3.3'
-  compile group: 'com.nordstrom.tools', name: 'settings', version:'2.0.7'
-  compile group: 'com.nordstrom.tools', name: 'testng-foundation', version:'1.9.3'
-  compile group: 'com.nordstrom.tools', name: 'junit-foundation', version:'6.0.1'
+  compile group: 'com.nordstrom.tools', name: 'java-utils', version:'1.7.2'
+  compile group: 'com.nordstrom.tools', name: 'settings', version:'2.2.1'
+  compile group: 'com.nordstrom.tools', name: 'testng-foundation', version:'1.10.1'
+  compile group: 'com.nordstrom.tools', name: 'junit-foundation', version:'6.1.2'
   compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.2'
-  compile group: 'com.github.sbabcoc', name: 'logback-testng', version:'1.0.0'
+  compile group: 'com.github.sbabcoc', name: 'logback-testng', version:'1.0.1'
   
-  junitAgent group: 'com.nordstrom.tools', name: 'junit-foundation', version: '6.0.1'
+  junitAgent group: 'com.nordstrom.tools', name: 'junit-foundation', version: '6.1.2'
   
   selenium2Compile configurations.compile
   selenium2Compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'2.53.0'
