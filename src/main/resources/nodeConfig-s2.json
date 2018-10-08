@@ -24,7 +24,8 @@
     {
       "browserName": "htmlunit",
       "maxInstances": 5,
-      "seleniumProtocol": "WebDriver"
+      "seleniumProtocol": "WebDriver",
+      "javascriptEnabled": true
     }
   ],
   "configuration": 

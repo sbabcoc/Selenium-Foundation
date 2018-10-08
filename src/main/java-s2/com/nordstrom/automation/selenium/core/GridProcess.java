@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.grid.selenium.GridLauncher;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.file.PathUtils;
@@ -32,7 +33,7 @@ import com.nordstrom.common.file.PathUtils;
 final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
-    private static final Class<?>[] DEPENDENCIES = {GridLauncher.class};
+    private static final Class<?>[] DEPENDENCIES = {GridLauncher.class, HtmlUnitDriver.class};
     private static final String LOGS_PATH = "logs";
     
     /**

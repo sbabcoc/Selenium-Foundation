@@ -35,9 +35,9 @@
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
-    <settings.version>2.2.1</settings.version>
-    <testng-foundation.version>1.10.1</testng-foundation.version>
-    <junit-foundation.version>6.1.2</junit-foundation.version>
+    <settings.version>2.2.2</settings.version>
+    <testng-foundation.version>1.10.2</testng-foundation.version>
+    <junit-foundation.version>6.1.3</junit-foundation.version>
     <logback.version>1.2.2</logback.version>
     <logback-testng.version>1.0.1</logback-testng.version>
     <sonar.language>java</sonar.language>
@@ -45,6 +45,8 @@
     <mockito.version>1.10.19</mockito.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
     <dependency-plugin.version>3.1.1</dependency-plugin.version>
+    <external-dependency-plugin.version>0.5</external-dependency-plugin.version>
+    <selenium.version>${selenium-major-minor}.${selenium-patch}</selenium.version>
   </properties>
   
   <scm>
@@ -135,8 +137,10 @@
         </property>
       </activation>
       <properties>
-        <selenium.version>2.53.0</selenium.version>
+        <selenium-major-minor>2.53</selenium-major-minor>
+        <selenium-patch>0</selenium-patch>
         <guava.version>21.0</guava.version>
+        <htmlunit.version>2.21</htmlunit.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -150,12 +154,21 @@
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
           </dependency>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>htmlunit-driver-standalone</artifactId>
+            <version>${htmlunit.version}</version>
+          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-server-standalone</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>htmlunit-driver-standalone</artifactId>
         </dependency>
       </dependencies>
       <build>
@@ -189,6 +202,62 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>com.savage7.maven.plugins</groupId>
+            <artifactId>maven-external-dependency-plugin</artifactId>
+            <configuration>
+              <stagingDirectory>
+                ${project.build.directory}/dependencies/
+              </stagingDirectory>
+              <createChecksum>true</createChecksum>
+              <skipChecksumVerification>false</skipChecksumVerification>
+              <force>false</force>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.seleniumhq.selenium</groupId>
+                  <artifactId>selenium-server-standalone</artifactId>
+                  <version>${selenium.version}</version>
+                  <packaging>jar</packaging>
+                  <downloadUrl>
+                    https://selenium-release.storage.googleapis.com/${selenium-major-minor}/{artifactId}-{selenium.version}.jar
+                  </downloadUrl>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.seleniumhq.selenium</groupId>
+                  <artifactId>htmlunit-driver-standalone</artifactId>
+                  <version>${htmlunit.version}</version>
+                  <packaging>jar</packaging>
+                  <downloadUrl>
+                    https://github.com/SeleniumHQ/htmlunit-driver/releases/download/${htmlunit.version}/htmlunit-driver-standalone-${htmlunit.version}.jar
+                  </downloadUrl>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+            <executions>
+              <execution>
+                <id>clean-external-dependencies</id>
+                <phase>clean</phase>
+                <goals>
+                  <goal>clean-external</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>resolve-install-external-dependencies</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>resolve-external</goal>
+                  <goal>install-external</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>deploy-external-dependencies</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-external</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -201,7 +270,8 @@
         </property>
       </activation>
       <properties>
-        <selenium.version>3.14.0</selenium.version>
+        <selenium-major-minor>3.14</selenium-major-minor>
+        <selenium-patch>0</selenium-patch>
         <guava.version>23.6-jre</guava.version>
         <phantomjs.version>2.1.0</phantomjs.version>
         <jcommander.version>1.72</jcommander.version>
@@ -334,9 +404,28 @@
                     <execute />
                   </action>
                 </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>com.savage7.maven.plugins</groupId>
+                    <artifactId>maven-external-dependency-plugin</artifactId>
+                    <versionRange>[0.1,)</versionRange>
+                    <goals>
+                      <goal>resolve-external</goal>
+                      <goal>install-external</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.savage7.maven.plugins</groupId>
+          <artifactId>maven-external-dependency-plugin</artifactId>
+          <version>${external-dependency-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

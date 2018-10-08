@@ -110,7 +110,7 @@ public enum ContainerMethodInterceptor {
             boolean detectsCompletion = returnsContainer && DetectsLoadCompletion.class.isAssignableFrom(returnType);
             
             if (returnsPage && !detectsCompletion) {
-                reference = driver.findElement(By.tagName("*"));
+                reference = driver.findElement(By.cssSelector("*"));
             }
             
             Object result = proxy.call();

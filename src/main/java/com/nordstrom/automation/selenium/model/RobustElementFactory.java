@@ -95,7 +95,7 @@ public final class RobustElementFactory {
             return creatorMap.get(driverName);
         }
         
-        WebElement reference = driver.findElement(By.tagName("*"));
+        WebElement reference = driver.findElement(By.cssSelector("*"));
         Class<? extends WebElement> refClass = reference.getClass();
         
         Class<? extends WebElement> wrapperClass = new ByteBuddy()
