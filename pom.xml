@@ -346,6 +346,53 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>com.savage7.maven.plugins</groupId>
+            <artifactId>maven-external-dependency-plugin</artifactId>
+            <configuration>
+              <stagingDirectory>
+                ${project.build.directory}/dependencies/
+              </stagingDirectory>
+              <createChecksum>true</createChecksum>
+              <skipChecksumVerification>false</skipChecksumVerification>
+              <force>false</force>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.seleniumhq.selenium</groupId>
+                  <artifactId>selenium-server-standalone</artifactId>
+                  <version>${selenium.version}</version>
+                  <packaging>jar</packaging>
+                  <downloadUrl>
+                    https://selenium-release.storage.googleapis.com/${selenium-major-minor}/{artifactId}-{selenium.version}.jar
+                  </downloadUrl>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+            <executions>
+              <execution>
+                <id>clean-external-dependencies</id>
+                <phase>clean</phase>
+                <goals>
+                  <goal>clean-external</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>resolve-install-external-dependencies</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>resolve-external</goal>
+                  <goal>install-external</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>deploy-external-dependencies</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-external</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>

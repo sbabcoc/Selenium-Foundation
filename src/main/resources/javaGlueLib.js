@@ -1,13 +1,13 @@
 (function(root) {
-	function CustomError(message) {
-	    Object.defineProperty(this, 'name', {
-	        enumerable: false,
+	function CustomError(className, message) {
+	    Object.defineProperty(this, 'className', {
+	        enumerable: true,
 	        writable: true,
-	        value: 'CustomError'
+	        value: className
 	    });
 	
 	    Object.defineProperty(this, 'message', {
-	        enumerable: false,
+	        enumerable: true,
 	        writable: true,
 	        value: message
 	    });
@@ -16,7 +16,7 @@
 	        Error.captureStackTrace(this, this.constructor);
 	    } else {
 	        Object.defineProperty(this, 'stack', {
-	            enumerable: false,
+	            enumerable: true,
 	            writable: false,
 	            value: (new Error()).stack
 	        });
@@ -30,8 +30,7 @@
 	}
 	
 	function Throwable(className, message) {
-	    CustomError.call(this, { className:className, message:message });
-	    this.name = className;
+	    CustomError.call(this, className, message);
 	}
 	
 	if (typeof Object.setPrototypeOf == 'function') {
@@ -42,7 +41,8 @@
 	
 	function throwNew(className, message) {
 		createErrorFor(className);
-		eval("throw new " + className + "('" + message + "');");
+		var throwable = eval("new " + className + "('" + message + "');")
+		throw JSON.stringify(throwable);
 	}
 	
 	function createErrorFor(className) {
