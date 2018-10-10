@@ -146,7 +146,7 @@
         <dependencies>
           <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server-standalone</artifactId>
+            <artifactId>selenium-server</artifactId>
             <version>${selenium.version}</version>
           </dependency>
           <dependency>
@@ -164,7 +164,7 @@
       <dependencies>
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-server-standalone</artifactId>
+          <artifactId>selenium-server</artifactId>
         </dependency>
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
@@ -213,15 +213,6 @@
               <skipChecksumVerification>false</skipChecksumVerification>
               <force>false</force>
               <artifactItems>
-                <artifactItem>
-                  <groupId>org.seleniumhq.selenium</groupId>
-                  <artifactId>selenium-server-standalone</artifactId>
-                  <version>${selenium.version}</version>
-                  <packaging>jar</packaging>
-                  <downloadUrl>
-                    https://selenium-release.storage.googleapis.com/${selenium-major-minor}/{artifactId}-{selenium.version}.jar
-                  </downloadUrl>
-                </artifactItem>
                 <artifactItem>
                   <groupId>org.seleniumhq.selenium</groupId>
                   <artifactId>htmlunit-driver-standalone</artifactId>
@@ -363,7 +354,7 @@
                   <version>${selenium.version}</version>
                   <packaging>jar</packaging>
                   <downloadUrl>
-                    https://selenium-release.storage.googleapis.com/${selenium-major-minor}/{artifactId}-{selenium.version}.jar
+                    https://selenium-release.storage.googleapis.com/${selenium-major-minor}/{artifactId}-${selenium.version}.jar
                   </downloadUrl>
                 </artifactItem>
               </artifactItems>

@@ -61,7 +61,6 @@ public final class JsUtility {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
     private static final String JAVA_GLUE_LIB = "javaGlueLib.js";
-    private static final String ERROR_PREFIX = "unknown error";
     private static final String ERROR_MESSAGE_KEY = "errorMessage";
     private static final String CLASS_NAME_KEY = "className";
     private static final String MESSAGE_KEY = "message";
@@ -182,8 +181,8 @@ public final class JsUtility {
             String message = exception.getMessage();
             // only retain the first line
             message = message.split("\n")[0].trim();
-            // remove prefix if present
-            message = removePrefix(message);
+            // extract JSON string from message
+            message = extractJsonString(message);
             // deserialize encoded exception object if present
             thrown = deserializeException(exception, message);
         }
@@ -197,10 +196,11 @@ public final class JsUtility {
      * @param message exception message
      * @return exception message with error prefix removed
      */
-    private static String removePrefix(final String message) {
-        int index = message.indexOf(':');
-        if ((index != -1) && ERROR_PREFIX.equals(message.substring(0, index))) {
-            return message.substring(index + 1).trim();
+    private static String extractJsonString(final String message) {
+        int beginIndex = message.indexOf('{');
+        int endIndex = message.lastIndexOf('}');
+        if ((beginIndex != -1) && (endIndex != -1)) {
+            return message.substring(beginIndex, endIndex + 1);
         }
         return message;
     }

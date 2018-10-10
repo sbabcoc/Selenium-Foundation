@@ -12,9 +12,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openqa.grid.selenium.GridLauncher;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import javax.servlet.http.HttpServletResponse;
 
+import org.openqa.grid.selenium.GridLauncher;
+import org.openqa.jetty.util.MultiException;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.remote.JsonToBeanConverter;
+import org.seleniumhq.jetty9.util.thread.ThreadPool;
+
+import com.google.gson.JsonIOException;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.file.PathUtils;
 
@@ -33,7 +39,9 @@ import com.nordstrom.common.file.PathUtils;
 final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
-    private static final Class<?>[] DEPENDENCIES = {GridLauncher.class, HtmlUnitDriver.class};
+    private static final Class<?>[] DEPENDENCIES = {GridLauncher.class, HtmlUnitDriver.class,
+                    JsonIOException.class, JsonToBeanConverter.class, ThreadPool.class,
+                    HttpServletResponse.class, MultiException.class};
     private static final String LOGS_PATH = "logs";
     
     /**
