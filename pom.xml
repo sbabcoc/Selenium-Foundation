@@ -150,14 +150,14 @@
       <dependencyManagement>
         <dependencies>
           <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server</artifactId>
-            <version>${selenium.version}</version>
-          </dependency>
-          <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server</artifactId>
+            <version>${selenium.version}</version>
           </dependency>
           <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -227,24 +227,25 @@
       <dependencyManagement>
         <dependencies>
           <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server-standalone</artifactId>
-            <version>${selenium.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-remote-driver</artifactId>
-            <version>${selenium.version}</version>
-          </dependency>
-          <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
           </dependency>
           <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server-standalone</artifactId>
+            <version>${selenium.version}</version>
+          </dependency>
+          <dependency>
             <groupId>com.github.detro</groupId>
             <artifactId>ghostdriver</artifactId>
             <version>${phantomjs.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-remote-driver</artifactId>
+              </exclusion>
+            </exclusions>
           </dependency>
           <dependency>
             <groupId>com.beust</groupId>
