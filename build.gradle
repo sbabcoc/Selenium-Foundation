@@ -15,6 +15,9 @@ processResources.enabled = false
 classes.enabled = false
 jar.enabled = false
 
+// remove default JAR artifact
+configurations.archives.artifacts.removeAll { it.provider.name == 'jar' }
+  
 afterReleaseBuild.dependsOn uploadArchives
 
 group = 'com.nordstrom.ui-tools'
@@ -55,7 +58,7 @@ case "selenium3":
   libsDir = new File(buildRoot, 'libs')
   break
 }
-  
+
 sourceSets {
   selenium2 {
     java {
