@@ -182,7 +182,6 @@ signing {
 }
 
 uploadArchives {
-  println artifacts.getFiles()
   repositories {
     mavenDeployer {
       beforeDeployment {
