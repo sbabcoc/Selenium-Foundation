@@ -12,17 +12,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 
+import org.apache.commons.codec.Encoder;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.openqa.grid.selenium.GridLauncher;
 import org.openqa.jetty.util.MultiException;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.JsonToBeanConverter;
-import org.seleniumhq.jetty9.util.thread.ThreadPool;
+import org.seleniumhq.jetty9.util.Jetty;
+import org.yaml.snakeyaml.Yaml;
 
+import com.beust.jcommander.JCommander;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.gson.JsonIOException;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.file.PathUtils;
+
+import mx4j.remote.HeartBeat;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -39,10 +48,12 @@ import com.nordstrom.common.file.PathUtils;
 final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
-    private static final Class<?>[] DEPENDENCIES = {GridLauncher.class, HtmlUnitDriver.class,
-                    JsonIOException.class, JsonToBeanConverter.class, ThreadPool.class,
-                    HttpServletResponse.class, MultiException.class};
     private static final String LOGS_PATH = "logs";
+    private static final Class<?>[] DEPENDENCIES = {SimpleTimeLimiter.class, HtmlUnitDriver.class,
+                    GridLauncher.class, JCommander.class, Encoder.class, HttpServlet.class,
+                    HeartBeat.class, ThreadSafe.class, BlockCipher.class, PEMKeyPair.class,
+                    Jetty.class, MultiException.class, Yaml.class, JsonIOException.class,
+                    JsonToBeanConverter.class};
     
     /**
      * Private constructor to prevent instantiation.
