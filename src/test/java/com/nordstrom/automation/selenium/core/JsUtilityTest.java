@@ -70,7 +70,7 @@ public class JsUtilityTest extends TestNgBase {
         assertTrue(hasFunction);
     }
     
-    @Test(enabled = false)
+    @Test
     public void testPropagate() {
         ExamplePage page = getPage();
         try {
