@@ -69,7 +69,7 @@ public abstract class Enhanceable<T> {
      * @return enhanced container object
      */
     @SuppressWarnings("unchecked")
-    public synchronized <C extends T> C enhanceContainer(final C container) {
+    public <C extends T> C enhanceContainer(final C container) {
         if (container instanceof Enhanced) {
             return container;
         }
