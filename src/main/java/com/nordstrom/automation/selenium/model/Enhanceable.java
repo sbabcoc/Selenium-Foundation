@@ -75,6 +75,7 @@ public abstract class Enhanceable<T> {
         }
         
         Class<?> containerClass = container.getClass();
+        
         Enhanceable<T> enhanceable = (Enhanceable<T>) container; 
         Class<?>[] argumentTypes = enhanceable.getArgumentTypes();
         Object[] arguments = enhanceable.getArguments();
