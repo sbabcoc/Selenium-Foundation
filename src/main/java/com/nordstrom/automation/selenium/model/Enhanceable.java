@@ -4,8 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;
@@ -26,6 +27,7 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 public abstract class Enhanceable<T> {
     
     private static final List<Class<?>> BYPASS = Arrays.asList(Enhanceable.class);
+    private static final Map<Class<?>, Class<?>> proxyMap = new HashMap<>();
     
     /**
      * Get the types of the arguments used to instantiate this object.
@@ -77,34 +79,44 @@ public abstract class Enhanceable<T> {
         Enhanceable<T> enhanceable = (Enhanceable<T>) container;
         Class<?>[] argumentTypes = enhanceable.getArgumentTypes();
         Object[] arguments = enhanceable.getArguments();
-        List<Class<?>> bypassClasses = enhanceable.getBypassClasses();
-        List<String> methodNames = enhanceable.getBypassMethods();
         
-        ElementMatcher.Junction<MethodDescription> matcher = ElementMatchers.none();
+        Class<C> proxyType;
         
-        for (Class<?> bypassClass : bypassClasses) {
-            for (Method method : bypassClass.getMethods()) {
-                matcher = matcher.or(is(method));
+        synchronized(Enhanceable.class) {
+            if (proxyMap.containsKey(containerClass)) {
+                proxyType = (Class<C>) proxyMap.get(containerClass);
+            } else {
+                List<Class<?>> bypassClasses = enhanceable.getBypassClasses();
+                List<String> methodNames = enhanceable.getBypassMethods();
+                
+                ElementMatcher.Junction<MethodDescription> matcher = ElementMatchers.none();
+                
+                for (Class<?> bypassClass : bypassClasses) {
+                    for (Method method : bypassClass.getMethods()) {
+                        matcher = matcher.or(is(method));
+                    }
+                }
+                
+                for (String methodName : methodNames) {
+                    matcher = matcher.or(hasMethodName(methodName));
+                }
+                
+                proxyType = (Class<C>) new ByteBuddy()
+                                .subclass(containerClass)
+                                .name(containerClass.getPackage().getName() + ".Enhanced" + containerClass.getSimpleName())
+                                .method(not(matcher))
+                                .intercept(MethodDelegation.to(ContainerMethodInterceptor.INSTANCE))
+                                .implement(Enhanced.class)
+                                .make()
+                                .load(containerClass.getClassLoader())
+                                .getLoaded();
+                
+                proxyMap.put(containerClass, proxyType);
             }
         }
         
-        for (String methodName : methodNames) {
-            matcher = matcher.or(hasMethodName(methodName));
-        }
-        
         try {
-            
-            Class<C> proxyType = (Class<C>) new ByteBuddy()
-                    .subclass(containerClass)
-                    .method(not(matcher))
-                    .intercept(MethodDelegation.to(ContainerMethodInterceptor.INSTANCE))
-                    .implement(Enhanced.class)
-                    .make()
-                    .load(containerClass.getClassLoader())
-                    .getLoaded();
-            
             return proxyType.getConstructor(argumentTypes).newInstance(arguments);
-            
         } catch (InvocationTargetException e) { //NOSONAR
             throw UncheckedThrow.throwUnchecked(e.getCause());
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException

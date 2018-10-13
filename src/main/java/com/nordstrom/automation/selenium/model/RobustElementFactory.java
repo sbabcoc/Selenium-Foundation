@@ -29,7 +29,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  */
 public final class RobustElementFactory {
     
-    private static Map<String, InstanceCreator> creatorMap = new HashMap<>();
+    private static final Map<String, InstanceCreator> creatorMap = new HashMap<>();
     
     /**
      * Private constructor to prevent instantiation.
