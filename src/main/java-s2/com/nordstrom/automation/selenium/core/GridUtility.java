@@ -26,8 +26,9 @@ import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.exceptions.InvalidGridHostException;
 import com.nordstrom.automation.selenium.exceptions.UnknownGridHostException;

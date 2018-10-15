@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.github.sbabcoc.logback.testng.ReporterAppender;
-import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;

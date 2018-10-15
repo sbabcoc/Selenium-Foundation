@@ -14,9 +14,9 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Sleeper;
 import org.openqa.selenium.support.ui.SystemClock;
 import com.google.common.base.Function;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
-import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
@@ -289,7 +289,6 @@ public final class DriverManager {
          * @param context Selenium Foundation test class object
          * @param timeOutInSeconds 'wait' timeout in seconds
          */
-        @SuppressWarnings("deprecation")
         public DriverSessionWait(final TestBase context, final long timeOutInSeconds) {
             super(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER);
             withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
