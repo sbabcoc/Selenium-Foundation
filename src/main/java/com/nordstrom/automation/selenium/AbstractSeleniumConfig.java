@@ -26,6 +26,7 @@ import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
@@ -110,11 +111,17 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
             this.defaultValue = defaultValue;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String key() {
             return propertyName;
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String val() {
             return defaultValue;
@@ -228,6 +235,66 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
     }
     
     /**
+     * Get name for Selenium Grid hub server.
+     * 
+     * @return Selenium Grid hub server name
+     */
+    public abstract String getHubHost();
+    
+    /**
+     * Get port for Selenium Grid hub server.
+     * 
+     * @return Selenium Grid hub server port
+     */
+    public abstract Integer getHubPort();
+    
+    /**
+     * Get authority for Selenium Grid hub server.
+     * 
+     * @return Selenium Grid hub server authority
+     */
+    public HttpHost getHubAuthority() {
+        return new HttpHost(getHubHost(), getHubPort());
+    }
+    
+    /**
+     * Get the arguments needed to launch a local Selenium Grid hub.
+     * 
+     * @return array of hub launch arguments
+     */
+    public abstract String[] getHubArgs();
+    
+    /**
+     * Get name for Selenium Grid node server.
+     * 
+     * @return Selenium Grid node server name
+     */
+    public abstract String getNodeHost();
+    
+    /**
+     * Get port for Selenium Grid node server.
+     * 
+     * @return Selenium Grid node server port
+     */
+    public abstract Integer getNodePort();
+    
+    /**
+     * Get shutdown request string for Selenium Grid node server.
+     * 
+     * @return Selenium Grid node server shutdown request string
+     */
+    public abstract String getNodeShutdownRequest();
+    
+    /**
+     * Get authority for Selenium Grid node server.
+     * 
+     * @return Selenium Grid node server authority
+     */
+    public HttpHost getNodeAuthority() {
+        return new HttpHost(getNodeHost(), getNodePort());
+    }
+    
+    /**
      * Get the arguments needed to launch a local Selenium Grid node.
      * 
      * @return array of node launch arguments
@@ -246,7 +313,7 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
      */
     public URI getTargetUri() {
         if (targetUri == null) {
-            URIBuilder builder = new URIBuilder().setPath(getString(SeleniumSettings.TARGET_PATH.key()))
+            URIBuilder builder = new URIBuilder().setPath(getString(SeleniumSettings.TARGET_PATH.key()) + "/")
                     .setScheme(getString(SeleniumSettings.TARGET_SCHEME.key()))
                     .setHost(getString(SeleniumSettings.TARGET_HOST.key()));
             
@@ -261,7 +328,7 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
             }
             
             try {
-                targetUri = builder.build();
+                targetUri = builder.build().normalize();
             } catch (URISyntaxException eaten) { //NOSONAR
                 LOGGER.error("Specified target URI '{}' could not be parsed: {}", builder, eaten.getMessage());
             }
@@ -294,6 +361,13 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
         }
         return hubConfigPath;
     }
+    
+    /**
+     * Convert the configured browser specification from JSON to {@link Capabilities} object.
+     * 
+     * @return {@link Capabilities} object for the configured browser specification
+     */
+    public abstract Capabilities getBrowserCaps();
     
     /**
      * Get Internet protocol (IP) address for the machine we're running on.
@@ -401,6 +475,9 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
         return uri;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getSettingsPath() {
         return SETTINGS_FILE;

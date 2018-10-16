@@ -17,19 +17,16 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.openqa.grid.common.GridRole;
-import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
-import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.exceptions.InvalidGridHostException;
-import com.nordstrom.automation.selenium.exceptions.UnknownGridHostException;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -39,11 +36,10 @@ public final class GridUtility {
     
     private static final String GRID_ENDPOINT = "/wd/hub/";
     private static final String HUB_STATUS = "/grid/api/hub/";
-    private static final String NODE_STATUS = "/wd/hub/status/";
+    private static final String NODE_STATUS = "/wd/hub/status";
     
     private static final long SHUTDOWN_DELAY = 15;
     private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
-    private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
     
     private static Process hubProcess;
     private static Process nodeProcess;
@@ -63,19 +59,15 @@ public final class GridUtility {
      * @return 'true' if configured hub is active; otherwise 'false'
      */
     public static boolean isHubActive() {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-        GridHubConfiguration hubConfig = config.getHubConfig();
-        
-        boolean isActive = isHubActive(hubConfig);
+        AbstractSeleniumConfig config = AbstractSeleniumConfig.getConfig();
+        boolean isActive = isHubActive(config);
         
         try {
-            if (!isActive && isThisMyIpAddress(InetAddress.getByName(hubConfig.host))) {
+            if (!isActive && isLocalHost(config.getHubAuthority())) {
                 startGridServer(GridServerParms.getHubParms(config));
                 startGridServer(GridServerParms.getNodeParms(config));
                 isActive = true;
             }
-        } catch (UnknownHostException e) {
-            throw new UnknownGridHostException("hub", hubConfig.host, e);
         } catch (GridServerLaunchFailedException e) {
             LOGGER.warn("Unable to launch Selenium Grid server", e);
         } catch (TimeoutException e) {
@@ -84,17 +76,29 @@ public final class GridUtility {
         
         return isActive;
     }
+    
+    /**
+     * Determine if the configured Selenium Grid hub is active.
+     * 
+     * @param config Selenium configuration object
+     * @return 'true' if configured hub is active; otherwise 'false'
+     */
+    public static boolean isHubActive(AbstractSeleniumConfig config) {
+        return isHostActive(config.getHubAuthority(), HUB_STATUS);
+    }
 
     /**
      * Start the specified Selenium Grid server.
-     * @param serverParms Selenium Grid server parameters
      * 
+     * @param serverParms Selenium Grid server parameters
      * @throws TimeoutException If Grid server took too long to activate.
      */
     private static void startGridServer(final GridServerParms serverParms) throws TimeoutException {
-        Process serverProcess = GridProcess.start(serverParms.processArgs);
-        new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
-        setProcess(serverParms.processRole, serverProcess);
+        if (!isHostActive(serverParms.serverHost, serverParms.statusRequest)) {
+            Process serverProcess = GridProcess.start(serverParms.processArgs);
+            new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
+            setProcess(serverParms.processRole, serverProcess);
+        }
     }
     
     /**
@@ -116,46 +120,6 @@ public final class GridUtility {
         }
     }
 
-    /**
-     * Determine if the configured Selenium Grid hub is active.
-     * 
-     * @param hubConfig hub configuration object
-     * @return 'true' if configured hub is active; otherwise 'false'
-     */
-    static boolean isHubActive(final GridHubConfiguration hubConfig) {
-        return isHostActive(getHubHost(hubConfig), HUB_STATUS);
-    }
-    
-    /**
-     * Get an {@link HttpHost} object for the configured Selenium Grid hub.
-     * 
-     * @param hubConfig hub configuration object
-     * @return HttpHost object for configured hub
-     */
-    static HttpHost getHubHost(final GridHubConfiguration hubConfig) {
-        return new HttpHost(hubConfig.host, hubConfig.port);
-    }
-
-    /**
-     * Determine if the configured Selenium Grid node is active.
-     * 
-     * @param nodeConfig node configuration
-     * @return 'true' if configured node is active; otherwise 'false'
-     */
-    static boolean isNodeActive(final GridNodeConfiguration nodeConfig) {
-        return isHostActive(getNodeHost(nodeConfig), NODE_STATUS);
-    }
-    
-    /**
-     * Get an {@link HttpHost} object for the configured Selenium Grid node.
-     * 
-     * @param nodeConfig node configuration
-     * @return HttpHost object for configured node
-     */
-    static HttpHost getNodeHost(final GridNodeConfiguration nodeConfig) {
-        return new HttpHost((String) nodeConfig.host, nodeConfig.port);
-    }
-    
     /**
      * Determine if the specified Selenium Grid host (hub or node) is active.
      * 
@@ -194,7 +158,7 @@ public final class GridUtility {
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver() {
-        SeleniumConfig config = SeleniumConfig.getConfig();
+        AbstractSeleniumConfig config = AbstractSeleniumConfig.getConfig();
         GridServerParms hubParms = GridServerParms.getHubParms(config);
         if (isHubActive()) {
             return new RemoteWebDriver(hubParms.endpointUrl, config.getBrowserCaps());
@@ -210,24 +174,7 @@ public final class GridUtility {
      * @return 'false' if [localOnly] and node is remote; otherwise 'true'
      */
     public static boolean stopGridNode(final boolean localOnly) {
-        if (localOnly && !isLocalNode()) {
-            return false;
-        }
-        
-        GridNodeConfiguration nodeConfig = SeleniumConfig.getConfig().getNodeConfig();
-        if (isNodeActive(nodeConfig)) {
-            HttpHost nodeHost = GridUtility.getNodeHost(nodeConfig);
-            try {
-                URL nodeUrl = URI.create(nodeHost.toURI()).toURL();
-                GridUtility.getHttpResponse(nodeHost, NODE_SHUTDOWN);
-                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, nodeUrl);
-            } catch (IOException | TimeoutException e) {
-                throw UncheckedThrow.throwUnchecked(e);
-            }
-        }
-        
-        setNodeProcess(null);
-        return true;
+        return stopGridServer(GridServerParms.getNodeParms(AbstractSeleniumConfig.getConfig()), localOnly);
     }
     
     /**
@@ -237,23 +184,32 @@ public final class GridUtility {
      * @return 'false' if [localOnly] and hub is remote; otherwise 'true'
      */
     public static boolean stopGridHub(final boolean localOnly) {
-        if (localOnly && !isLocalHub()) {
+        return stopGridServer(GridServerParms.getHubParms(AbstractSeleniumConfig.getConfig()), localOnly);
+    }
+    
+    /**
+     * Stop the specified Selenium Grid server.
+     * 
+     * @param serverParms Selenium Grid server parameters
+     * @param localOnly 'true' to target only local Grid server
+     * @return 'false' if [localOnly] and server is remote; otherwise 'true'
+     */
+    public static boolean stopGridServer(final GridServerParms serverParms, final boolean localOnly) {
+        if (localOnly && !isLocalHost(serverParms.serverHost)) {
             return false;
         }
         
-        GridHubConfiguration hubConfig = SeleniumConfig.getConfig().getHubConfig();
-        if (isHubActive(hubConfig)) {
-            HttpHost hubHost = GridUtility.getHubHost(hubConfig);
+        if (isHostActive(serverParms.serverHost, serverParms.statusRequest)) {
             try {
-                URL hubUrl = URI.create(hubHost.toURI()).toURL();
-                GridUtility.getHttpResponse(hubHost, HUB_SHUTDOWN);
-                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, hubUrl);
+                URL hostUrl = URI.create(serverParms.serverHost.toURI()).toURL();
+                GridUtility.getHttpResponse(serverParms.serverHost, serverParms.shutdownRequest);
+                new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, hostUrl);
             } catch (IOException | TimeoutException e) {
                 throw UncheckedThrow.throwUnchecked(e);
             }
         }
         
-        setHubProcess(null);
+        setProcess(serverParms.processRole, null);
         return true;
     }
     
@@ -263,15 +219,7 @@ public final class GridUtility {
      * @return 'true' if Grid node is local host; otherwise 'false'
      */
     public static boolean isLocalNode() {
-        GridNodeConfiguration nodeConfig = SeleniumConfig.getConfig().getNodeConfig();
-        HttpHost nodeHost = GridUtility.getNodeHost(nodeConfig);
-        try {
-            InetAddress nodeAddr = InetAddress.getByName(nodeHost.getHostName());
-            return (GridUtility.isThisMyIpAddress(nodeAddr));
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Unable to get IP address for '{}'", nodeHost.getHostName(), e);
-            return false;
-        }
+        return isLocalHost(AbstractSeleniumConfig.getConfig().getNodeAuthority());
     }
     
     /**
@@ -280,13 +228,21 @@ public final class GridUtility {
      * @return 'true' if Grid hub is local host; otherwise 'false'
      */
     public static boolean isLocalHub() {
-        GridHubConfiguration hubConfig = SeleniumConfig.getConfig().getHubConfig();
-        HttpHost hubHost = GridUtility.getHubHost(hubConfig);
+        return isLocalHost(AbstractSeleniumConfig.getConfig().getHubAuthority());
+    }
+    
+    /**
+     * Determine if the specified server is the local host.
+     * 
+     * @param host HTTP host connection to be checked
+     * @return 'true' if server is local host; otherwise 'false'
+     */
+    public static boolean isLocalHost(HttpHost host) {
         try {
-            InetAddress hubAddr = InetAddress.getByName(hubHost.getHostName());
-            return (GridUtility.isThisMyIpAddress(hubAddr));
+            InetAddress addr = InetAddress.getByName(host.getHostName());
+            return (GridUtility.isThisMyIpAddress(addr));
         } catch (UnknownHostException e) {
-            LOGGER.warn("Unable to get IP address for '{}'", hubHost.getHostName(), e);
+            LOGGER.warn("Unable to get IP address for '{}'", host.getHostName(), e);
             return false;
         }
     }
@@ -322,7 +278,9 @@ public final class GridUtility {
         private String[] processArgs;
         private HttpHost serverHost;
         private URL endpointUrl;
+        private String statusRequest;
         private URL statusUrl;
+        private String shutdownRequest;
 
         /**
          * Assemble parameters object for the configured Selenium Grid hub.
@@ -330,15 +288,17 @@ public final class GridUtility {
          * @param config WebDriver/Grid configuration
          * @return Grid hub parameters object
          */
-        public static GridServerParms getHubParms(final SeleniumConfig config) {
+        public static GridServerParms getHubParms(final AbstractSeleniumConfig config) {
             GridServerParms parms = new GridServerParms();
             parms.processRole = GridRole.HUB;
             parms.processArgs = config.getHubArgs();
-            parms.serverHost = GridUtility.getHubHost(config.getHubConfig());
+            parms.serverHost = config.getHubAuthority();
+            parms.statusRequest = HUB_STATUS;
+            parms.shutdownRequest = HUB_SHUTDOWN;
             
             try {
                 parms.endpointUrl = URI.create(parms.serverHost.toURI() + GRID_ENDPOINT).toURL();
-                parms.statusUrl = URI.create(parms.serverHost.toURI() + HUB_STATUS).toURL();
+                parms.statusUrl = URI.create(parms.serverHost.toURI() + parms.statusRequest).toURL();
             } catch (MalformedURLException e) {
                 throw new InvalidGridHostException("hub", parms.serverHost, e);
             }
@@ -352,15 +312,17 @@ public final class GridUtility {
          * @param config WebDriver/Grid configuration
          * @return Grid node parameters object
          */
-        public static GridServerParms getNodeParms(final SeleniumConfig config) {
+        public static GridServerParms getNodeParms(final AbstractSeleniumConfig config) {
             GridServerParms parms = new GridServerParms();
             parms.processRole = GridRole.NODE;
             parms.processArgs = config.getNodeArgs();
-            parms.serverHost = GridUtility.getNodeHost(config.getNodeConfig());
+            parms.serverHost = config.getHubAuthority();
+            parms.statusRequest = NODE_STATUS;
+            parms.shutdownRequest = config.getNodeShutdownRequest();
             
             try {
                 parms.endpointUrl = URI.create(parms.serverHost.toURI() + GRID_ENDPOINT).toURL();
-                parms.statusUrl = URI.create(parms.serverHost.toURI() + NODE_STATUS).toURL();
+                parms.statusUrl = URI.create(parms.serverHost.toURI() + parms.statusRequest).toURL();
             } catch (MalformedURLException e) {
                 throw new InvalidGridHostException("node", parms.serverHost, e);
             }

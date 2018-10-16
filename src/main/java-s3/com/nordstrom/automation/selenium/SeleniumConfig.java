@@ -67,9 +67,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     }
     
     /**
-     * Get the arguments needed to launch a local Selenium Grid node.
-     * 
-     * @return array of node launch arguments
+     * {@inheritDoc}
      */
     @Override
     public String[] getNodeArgs() {
@@ -118,10 +116,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     }
     
     /**
-     * Get the arguments needed to launch a local Selenium Grid hub.
-     * 
-     * @return array of hub launch arguments
+     * {@inheritDoc}
      */
+    @Override
     public String[] getHubArgs() {
         if (hubArgs == null) {
             String configPath = getHubConfigPath();
@@ -156,10 +153,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     }
 
     /**
-     * Convert the configured browser specification from JSON to {@link Capabilities} object.
-     * 
-     * @return {@link Capabilities} object for the configured browser specification
+     * {@inheritDoc}
      */
+    @Override
     public Capabilities getBrowserCaps() {
         if (browserCaps == null) {
             String jsonStr = getJsonForName(getString(SeleniumSettings.BROWSER_NAME.key()));
@@ -185,5 +181,45 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         defaults.put(SeleniumSettings.NODE_PORT.key(), "5556");
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), "nodeConfig-s3.json");
         return defaults;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getHubHost() {
+        return getConfig().getHubConfig().host;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer getHubPort() {
+        return getConfig().getHubConfig().port;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getNodeHost() {
+        return getConfig().getNodeConfig().host;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer getNodePort() {
+        return getConfig().getNodeConfig().port;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getNodeShutdownRequest() {
+        return "/extra/LifecycleServlet?action=shutdown";
     }
 }
