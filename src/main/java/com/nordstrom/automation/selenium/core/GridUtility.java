@@ -95,7 +95,11 @@ public final class GridUtility {
      */
     private static void startGridServer(final GridServerParms serverParms) throws TimeoutException {
         if (!isHostActive(serverParms.serverHost, serverParms.statusRequest)) {
-            Process serverProcess = GridProcess.start(serverParms.processArgs);
+            AbstractSeleniumConfig config = AbstractSeleniumConfig.getConfig();
+            String launcherClassName = config.getLauncherClassName();
+            String[] dependencyContexts = config.getDependencyContexts();
+            
+            Process serverProcess = GridProcess.start(launcherClassName, dependencyContexts, serverParms.processArgs);
             new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
             setProcess(serverParms.processRole, serverProcess);
         }

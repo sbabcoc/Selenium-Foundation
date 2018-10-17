@@ -45,7 +45,7 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
 
     private static final String SETTINGS_FILE = "settings.properties";
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
-    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
+    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "phantomjs");
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSeleniumConfig.class);
     
     static {
@@ -242,6 +242,20 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
         }
         throw new IllegalStateException("SELENIUM_CONFIG must be populated by subclass static initializer");
     }
+    
+    /**
+     * Get fully-qualified name of {@code GridLauncher} class.
+     * 
+     * @return {@code GridLauncher} class name
+     */
+    public abstract String getLauncherClassName();
+    
+    /**
+     * Get fully-qualified names of context classes for Selenium Grid dependencies.
+     * 
+     * @return context class names for Selenium Grid dependencies
+     */
+    public abstract String[] getDependencyContexts();
     
     /**
      * Get name for Selenium Grid hub server.

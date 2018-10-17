@@ -3,12 +3,12 @@ package com.nordstrom.automation.selenium;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+
 import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
-
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -22,6 +22,17 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String HOST = "host";
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
+    
+    private static final String[] DEPENDENCY_CONTEXTS = {
+                    "com.google.common.util.concurrent.SimpleTimeLimiter",
+                    "org.openqa.selenium.htmlunit.HtmlUnitDriver",
+                    "org.openqa.grid.selenium.GridLauncher", "com.beust.jcommander.JCommander",
+                    "org.apache.commons.codec.Encoder", "javax.servlet.http.HttpServlet",
+                    "mx4j.remote.HeartBeat", "net.jcip.annotations.ThreadSafe",
+                    "org.bouncycastle.crypto.BlockCipher", "org.bouncycastle.openssl.PEMKeyPair",
+                    "org.seleniumhq.jetty9.util.Jetty", "org.openqa.jetty.util.MultiException",
+                    "org.yaml.snakeyaml.Yaml", "com.google.gson.JsonIOException",
+                    "org.openqa.selenium.remote.JsonToBeanConverter"};
     
     static {
         try {
@@ -230,5 +241,21 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public String getNodeShutdownRequest() {
         return "/selenium-server/driver/?cmd=shutDownSeleniumServer";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLauncherClassName() {
+        return "org.openqa.grid.selenium.GridLauncher";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getDependencyContexts() {
+        return DEPENDENCY_CONTEXTS;
     }
 }

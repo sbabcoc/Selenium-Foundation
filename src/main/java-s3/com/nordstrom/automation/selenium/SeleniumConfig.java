@@ -23,6 +23,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "] }";
     
+    private static final String[] DEPENDENCY_CONTEXTS = {
+                    "org.openqa.grid.selenium.GridLauncherV3", "org.openqa.selenium.phantomjs.PhantomJSDriver"};
+    
     static {
         try {
             SELENIUM_CONFIG = new SeleniumConfig();
@@ -221,5 +224,21 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public String getNodeShutdownRequest() {
         return "/extra/LifecycleServlet?action=shutdown";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLauncherClassName() {
+        return "org.openqa.grid.selenium.GridLauncherV3";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getDependencyContexts() {
+        return DEPENDENCY_CONTEXTS;
     }
 }
