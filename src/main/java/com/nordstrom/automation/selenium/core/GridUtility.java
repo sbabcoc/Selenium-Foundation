@@ -316,7 +316,7 @@ public final class GridUtility {
             GridServerParms parms = new GridServerParms();
             parms.processRole = GridRole.NODE;
             parms.processArgs = config.getNodeArgs();
-            parms.serverHost = config.getHubAuthority();
+            parms.serverHost = config.getNodeAuthority();
             parms.statusRequest = NODE_STATUS;
             parms.shutdownRequest = config.getNodeShutdownRequest();
             

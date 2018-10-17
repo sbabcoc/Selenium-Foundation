@@ -23,14 +23,6 @@ import com.nordstrom.automation.selenium.support.TestNgBase;
 @LinkedListeners({DriverListener.class, ExecutionFlowController.class})
 public class GridUtilityTest extends TestNgBase {
     
-    static {
-        try {
-            Class.forName("com.nordstrom.automation.selenium.SeleniumConfig");
-        } catch (ClassNotFoundException e) {
-            UncheckedThrow.throwUnchecked(e);
-        }
-    }
-    
     @BeforeClass
     public void stopLocalGrid() throws UnknownHostException, TimeoutException {
         if (!GridUtility.stopGridNode(true)) {

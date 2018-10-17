@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
+import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 
 /**
@@ -46,6 +47,14 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSeleniumConfig.class);
+    
+    static {
+        try {
+            Class.forName("com.nordstrom.automation.selenium.SeleniumConfig");
+        } catch (ClassNotFoundException e) {
+            UncheckedThrow.throwUnchecked(e);
+        }
+    }
     
     /**
      * This enumeration declares the settings that enable you to control the parameters used by
