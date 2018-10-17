@@ -45,7 +45,7 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
 
     private static final String SETTINGS_FILE = "settings.properties";
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
-    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "phantomjs");
+    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSeleniumConfig.class);
     
     static {
