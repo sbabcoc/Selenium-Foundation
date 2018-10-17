@@ -91,15 +91,21 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * @return node configuration with resolved settings
      */
     private GridNodeConfiguration resolveNodeSettings(final GridNodeConfiguration nodeConfig) {
+        // get configured (or default) Grid node host
         String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
+        // if host specified
         if (nodeHost != null) {
+            // store specified host
             nodeConfig.host = nodeHost;
-        }
-        if (nodeConfig.host == null) {
+        // otherwise, if host unspecified
+        } else if (nodeConfig.host == null) {
+            // use 'localhost'
             nodeConfig.host = getLocalHost();
         }
         
+        // set configured (or default) Grid node port
         nodeConfig.port = getInteger(SeleniumSettings.NODE_PORT.key(), null);
+        // set Grid hub registration URL
         nodeConfig.hub = "http://" + getHubConfig().host + ":" + getHubConfig().port + "/grid/register/";
         
         return nodeConfig;
@@ -139,16 +145,23 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * @return hub configuration with resolved settings
      */
     private GridHubConfiguration resolveHubSettings(final GridHubConfiguration hubConfig) {
+        // get configured (or default) Grid hub host
         String hubHost = getString(SeleniumSettings.HUB_HOST.key());
+        // if host specified
         if (hubHost != null) {
+            // store specified host
             hubConfig.host = hubHost;
-        }
-        if (hubConfig.host == null) {
+        // otherwise, if host unspecified
+        } else if (hubConfig.host == null) {
+            // use 'localhost'
             hubConfig.host = getLocalHost();
         }
         
+        // get configured (or default) Grid hub port
         Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), null);
+        // if port specified
         if (hubPort != null) {
+            // store specified port
             hubConfig.port = hubPort;
         }
         
