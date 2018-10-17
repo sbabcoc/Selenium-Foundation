@@ -9,7 +9,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.PageLoadRendererTimeoutException;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;

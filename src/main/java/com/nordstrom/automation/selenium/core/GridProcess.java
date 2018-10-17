@@ -10,28 +10,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.servlet.http.HttpServlet;
-
-import org.apache.commons.codec.Encoder;
-import org.bouncycastle.crypto.BlockCipher;
-import org.bouncycastle.openssl.PEMKeyPair;
-import org.openqa.grid.selenium.GridLauncher;
-import org.openqa.jetty.util.MultiException;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.JsonToBeanConverter;
-import org.seleniumhq.jetty9.util.Jetty;
-import org.yaml.snakeyaml.Yaml;
-
-import com.beust.jcommander.JCommander;
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.gson.JsonIOException;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
-
-import mx4j.remote.HeartBeat;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -49,11 +34,6 @@ final class GridProcess {
     
     private static final String OPT_ROLE = "-role";
     private static final String LOGS_PATH = "logs";
-    private static final Class<?>[] DEPENDENCIES = {SimpleTimeLimiter.class, HtmlUnitDriver.class,
-                    GridLauncher.class, JCommander.class, Encoder.class, HttpServlet.class,
-                    HeartBeat.class, ThreadSafe.class, BlockCipher.class, PEMKeyPair.class,
-                    Jetty.class, MultiException.class, Yaml.class, JsonIOException.class,
-                    JsonToBeanConverter.class};
     
     /**
      * Private constructor to prevent instantiation.
@@ -64,20 +44,22 @@ final class GridProcess {
     
     /**
      * Start a Selenium Grid server with the specified arguments in a separate process.
-     * @param args Selenium server command line arguments (check {@code See Also} below)
      * 
+     * @param launcherClassName fully-qualified name of {@code GridLauncher} class
+     * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
+     * @param args Selenium server command line arguments (check {@code See Also} below)
      * @return Java {@link Process} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help<a>
      */
-    static Process start(final String[] args) {
+    static Process start(final String launcherClassName, final String[] dependencyContexts, final String[] args) {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
         
-        argsList.add(0, GridLauncher.class.getName());
-        argsList.add(0, getClasspath(DEPENDENCIES));
+        argsList.add(0, launcherClassName);
+        argsList.add(0, getClasspath(dependencyContexts));
         argsList.add(0, "-cp");
         argsList.add(0, System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         
@@ -109,13 +91,13 @@ final class GridProcess {
     /**
      * Assemble a classpath array from the specified array of dependencies.
      * 
-     * @param dependencies array of dependencies
+     * @param dependencyContexts array of dependency contexts
      * @return classpath array
      */
-    private static String getClasspath(final Class<?>[] dependencies) {
-        List<String> pathList = new ArrayList<>();
-        for (Class<?> clazz : dependencies) {
-            pathList.add(findJarPathFor(clazz));
+    private static String getClasspath(final String[] dependencyContexts) {
+        Set<String> pathList = new HashSet<>();
+        for (String contextClassName : dependencyContexts) {
+            pathList.add(findJarPathFor(contextClassName));
         }
         return String.join(File.pathSeparator, pathList);
     }
@@ -124,7 +106,7 @@ final class GridProcess {
      * If the provided class has been loaded from a JAR file that is on the
      * local file system, will find the absolute path to that JAR file.
      * 
-     * @param context
+     * @param contextClassName
      *            The JAR file that contained the class file that represents
      *            this class will be found.
      * @return absolute path to the JAR file from which the specified class was
@@ -134,15 +116,23 @@ final class GridProcess {
      *           other way (such as via HTTP, from a database, or some other
      *           custom class-loading device).
      */
-    public static String findJarPathFor(final Class<?> context) {
-        String rawName = context.getName();
-        int idx = rawName.lastIndexOf('.');
+    public static String findJarPathFor(final String contextClassName) {
+        Class<?> contextClass;
         
-        if (idx > -1) {
-            rawName = rawName.substring(idx + 1);
+        try {
+            contextClass = Class.forName(contextClassName);
+        } catch (ClassNotFoundException e) {
+            throw UncheckedThrow.throwUnchecked(e);
         }
         
-        String uri = context.getResource(rawName + ".class").toString();
+        String shortName = contextClassName;
+        int idx = shortName.lastIndexOf('.');
+        
+        if (idx > -1) {
+            shortName = shortName.substring(idx + 1);
+        }
+        
+        String uri = contextClass.getResource(shortName + ".class").toString();
         
         if (uri.startsWith("file:")) {
             throw new IllegalStateException("This class has been loaded from a directory and not from a jar file.");

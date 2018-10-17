@@ -7,12 +7,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.net.UnknownHostException;
-import org.openqa.grid.internal.utils.GridHubConfiguration;
+
 import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
@@ -35,9 +35,8 @@ public class GridUtilityTest extends TestNgBase {
     @Test
     @NoDriver
     public void testIsActive() {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-        GridHubConfiguration hubConfig = config.getHubConfig();
-        assertFalse(GridUtility.isHubActive(hubConfig), "Configured local hub should initially be inactive");
+        AbstractSeleniumConfig config = AbstractSeleniumConfig.getConfig();
+        assertFalse(GridUtility.isHubActive(config), "Configured local hub should initially be inactive");
         assertTrue(GridUtility.isHubActive(), "Configured local hub should have been activated");
     }
     

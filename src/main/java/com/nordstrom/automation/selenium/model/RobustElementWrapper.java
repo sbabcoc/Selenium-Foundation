@@ -20,7 +20,7 @@ import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
 
-import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;

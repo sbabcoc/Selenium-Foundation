@@ -17,8 +17,8 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.Test;
 
-import com.nordstrom.automation.selenium.SeleniumConfig.SeleniumSettings;
-import com.nordstrom.automation.selenium.SeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 
 public class SeleniumConfigTest {
