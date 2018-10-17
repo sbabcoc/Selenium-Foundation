@@ -20,6 +20,9 @@ import com.nordstrom.automation.settings.SettingsCore;
 public class SeleniumConfig extends AbstractSeleniumConfig {
     
     private static final String HOST = "host";
+    private static final String PORT = "port";
+    private static final String HUB = "hub";
+    
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
     
@@ -86,7 +89,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             String configPath = getNodeConfigPath();
             Map<String, Object> config = getNodeConfig().getConfiguration();
             nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get(HOST),
-                    "-port", config.get("port").toString(), "-hub", (String) config.get("hub")};
+                    "-port", config.get(PORT).toString(), "-hub", (String) config.get(HUB)};
         }
         return Arrays.copyOf(nodeArgs, nodeArgs.length);
     }
@@ -113,9 +116,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         }
         
         // set configured (or default) Grid node port
-        config.put("port", getInteger(SeleniumSettings.NODE_PORT.key(), null));
+        config.put(PORT, getInteger(SeleniumSettings.NODE_PORT.key(), null));
         // set Grid hub registration URL
-        config.put("hub", "http://" + getHubConfig().getHost() + ":" + getHubConfig().getPort() + "/grid/register/");
+        config.put(HUB, "http://" + getHubConfig().getHost() + ":" + getHubConfig().getPort() + "/grid/register/");
         
         return nodeConfig;
     }
@@ -143,7 +146,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         if (hubArgs == null) {
             String configPath = getHubConfigPath();
             GridHubConfiguration config = getHubConfig();
-            hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
+            hubArgs = new String[] {"-role", HUB, "-hubConfig", configPath, 
                     "-host", config.getHost(), "-port", Integer.toString(config.getPort())};
         }
         return Arrays.copyOf(hubArgs, hubArgs.length);
@@ -231,7 +234,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public String getNodeHost() {
-        return (String) getConfig().getNodeConfig().getConfiguration().get("host");
+        return (String) getConfig().getNodeConfig().getConfiguration().get(HOST);
     }
     
     /**
@@ -239,7 +242,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public Integer getNodePort() {
-        return (Integer) getConfig().getNodeConfig().getConfiguration().get("port");
+        return (Integer) getConfig().getNodeConfig().getConfiguration().get(PORT);
     }
     
     /**
