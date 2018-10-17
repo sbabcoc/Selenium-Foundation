@@ -191,4 +191,44 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), "nodeConfig-s2.json");
         return defaults;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getHubHost() {
+        return getConfig().getHubConfig().getHost();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer getHubPort() {
+        return getConfig().getHubConfig().getPort();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getNodeHost() {
+        return (String) getConfig().getNodeConfig().getConfiguration().get("host");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer getNodePort() {
+        return (Integer) getConfig().getNodeConfig().getConfiguration().get("port");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getNodeShutdownRequest() {
+        return "/selenium-server/driver/?cmd=shutDownSeleniumServer";
+    }
 }

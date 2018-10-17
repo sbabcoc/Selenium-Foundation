@@ -16,7 +16,6 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
-import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.support.TestNgBase;
 
