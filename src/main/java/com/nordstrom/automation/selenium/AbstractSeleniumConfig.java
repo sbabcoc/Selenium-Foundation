@@ -41,7 +41,8 @@ import com.nordstrom.common.file.PathUtils;
 /**
  * This class declares settings and methods related to WebDriver and Grid configuration for Selenium 2 and Selenium 3.
  */
-public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleniumConfig.SeleniumSettings> {
+public abstract class AbstractSeleniumConfig extends
+                SettingsCore<AbstractSeleniumConfig.SeleniumSettings> implements DriverPlugin {
 
     private static final String SETTINGS_FILE = "settings.properties";
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
@@ -249,13 +250,6 @@ public abstract class AbstractSeleniumConfig extends SettingsCore<AbstractSeleni
      * @return {@code GridLauncher} class name
      */
     public abstract String getLauncherClassName();
-    
-    /**
-     * Get fully-qualified names of context classes for Selenium Grid dependencies.
-     * 
-     * @return context class names for Selenium Grid dependencies
-     */
-    public abstract String[] getDependencyContexts();
     
     /**
      * Get name for Selenium Grid hub server.

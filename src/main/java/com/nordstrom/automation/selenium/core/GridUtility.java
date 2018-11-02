@@ -8,7 +8,9 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -24,6 +26,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
+import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.exceptions.InvalidGridHostException;
@@ -98,6 +101,19 @@ public final class GridUtility {
             AbstractSeleniumConfig config = AbstractSeleniumConfig.getConfig();
             String launcherClassName = config.getLauncherClassName();
             String[] dependencyContexts = config.getDependencyContexts();
+            
+            if (serverParms.processRole == GridRole.NODE) {
+                String browserName = config.getBrowserName();
+                for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+                    if (browserName.equals(driverPlugin.getBrowserName())) {
+                        String[] driverContexts = driverPlugin.getDependencyContexts();
+                        dependencyContexts = Stream
+                                        .concat(Stream.of(dependencyContexts), Stream.of(driverContexts))
+                                        .toArray(String[]::new);
+                        break;
+                    }
+                }
+            }
             
             Process serverProcess = GridProcess.start(launcherClassName, dependencyContexts, serverParms.processArgs);
             new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);

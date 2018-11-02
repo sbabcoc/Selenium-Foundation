@@ -1,0 +1,2 @@
+com.nordstrom.automation.selenium.plugins.PhantomJsPlugin
+com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin

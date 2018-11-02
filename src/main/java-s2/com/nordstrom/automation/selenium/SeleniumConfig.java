@@ -26,16 +26,141 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
     
+    /**
+     * <b>com.google.common.util.concurrent.SimpleTimeLimiter</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
+     *   &lt;artifactId&gt;guava&lt;/artifactId&gt;
+     *   &lt;version&gt;21.0&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.selenium.htmlunit.HtmlUnitDriver</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *   &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
+     *   &lt;version&gt;2.21&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.selenium.WebDriverException</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *   &lt;artifactId&gt;selenium-api&lt;/artifactId&gt;
+     *   &lt;version&gt;2.53.0&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.grid.selenium.GridLauncher</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *   &lt;artifactId&gt;selenium-server&lt;/artifactId&gt;
+     *   &lt;version&gt;2.53.0&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>com.beust.jcommander.JCommander</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;com.beust&lt;/groupId&gt;
+     *   &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
+     *   &lt;version&gt;1.48&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>javax.servlet.http.HttpServlet</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+     *   &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+     *   &lt;version&gt;3.1.0&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>mx4j.remote.HeartBeat</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;mx4j&lt;/groupId&gt;
+     *   &lt;artifactId&gt;mx4j-tools&lt;/artifactId&gt;
+     *   &lt;version&gt;3.0.1&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>net.jcip.annotations.ThreadSafe</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;net.jcip&lt;/groupId&gt;
+     *   &lt;artifactId&gt;jcip-annotations&lt;/artifactId&gt;
+     *   &lt;version&gt;1.0&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.bouncycastle.crypto.BlockCipher</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.bouncycastle&lt;/groupId&gt;
+     *   &lt;artifactId&gt;bcprov-jdk15on&lt;/artifactId&gt;
+     *   &lt;version&gt;1.48&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.bouncycastle.openssl.PEMKeyPair</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.bouncycastle&lt;/groupId&gt;
+     *   &lt;artifactId&gt;bcpkix-jdk15on&lt;/artifactId&gt;
+     *   &lt;version&gt;1.48&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.seleniumhq.jetty9.util.Jetty</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *   &lt;artifactId&gt;jetty-repacked&lt;/artifactId&gt;
+     *   &lt;version&gt;9.2.13.v20150730&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.jetty.util.MultiException</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *   &lt;artifactId&gt;jetty-rc-repacked&lt;/artifactId&gt;
+     *   &lt;version&gt;5&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.yaml.snakeyaml.Yaml</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.yaml&lt;/groupId&gt;
+     *   &lt;artifactId&gt;snakeyaml&lt;/artifactId&gt;
+     *   &lt;version&gt;1.8&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>com.google.gson.JsonIOException</b> (for selenium-remote-driver)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;com.google.code.gson&lt;/groupId&gt;
+     *   &lt;artifactId&gt;gson&lt;/artifactId&gt;
+     *   &lt;version&gt;2.3.1&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.selenium.remote.JsonToBeanConverter</b> (for selenium-support)
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *   &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
+     *   &lt;version&gt;2.53.0&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "com.google.common.util.concurrent.SimpleTimeLimiter",
-                    "org.openqa.selenium.htmlunit.HtmlUnitDriver",
+                    "org.apache.http.conn.HttpClientConnectionManager",
+                    "org.apache.http.config.RegistryBuilder",
+                    "org.apache.commons.logging.LogFactory",
+                    "org.openqa.selenium.support.events.WebDriverEventListener",
+                    "org.openqa.selenium.WebDriverException",
                     "org.openqa.grid.selenium.GridLauncher", "com.beust.jcommander.JCommander",
-                    "org.apache.commons.codec.Encoder", "javax.servlet.http.HttpServlet",
-                    "mx4j.remote.HeartBeat", "net.jcip.annotations.ThreadSafe",
-                    "org.bouncycastle.crypto.BlockCipher", "org.bouncycastle.openssl.PEMKeyPair",
-                    "org.seleniumhq.jetty9.util.Jetty", "org.openqa.jetty.util.MultiException",
-                    "org.yaml.snakeyaml.Yaml", "com.google.gson.JsonIOException",
-                    "org.openqa.selenium.remote.JsonToBeanConverter"};
+                    "javax.servlet.http.HttpServlet", "mx4j.remote.HeartBeat",
+                    "net.jcip.annotations.ThreadSafe", "org.bouncycastle.crypto.BlockCipher",
+                    "org.bouncycastle.openssl.PEMKeyPair", "org.seleniumhq.jetty9.util.Jetty",
+                    "org.openqa.jetty.util.MultiException", "org.yaml.snakeyaml.Yaml",
+                    "com.google.gson.JsonIOException",
+                    "org.openqa.selenium.remote.JsonToBeanConverter"                    };
     
     static {
         try {
@@ -189,7 +314,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     public Capabilities getBrowserCaps() {
         if (browserCaps == null) {
-            String jsonStr = getJsonForName(getString(SeleniumSettings.BROWSER_NAME.key()));
+            String jsonStr = getJsonForName(getBrowserName());
             
             if (jsonStr == null) {
                 jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
@@ -267,5 +392,13 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getBrowserName() {
+        return getString(SeleniumSettings.BROWSER_NAME.key());
     }
 }

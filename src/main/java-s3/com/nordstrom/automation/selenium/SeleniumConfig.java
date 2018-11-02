@@ -23,6 +23,29 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "] }";
     
+    /**
+     * <b>org.openqa.grid.selenium.GridLauncherV3</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *   &lt;artifactId&gt;selenium-server-standalone&lt;/artifactId&gt;
+     *   &lt;version&gt;3.14.0&lt;/version&gt;
+     * &lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.selenium.phantomjs.PhantomJSDriver</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *   &lt;groupId&gt;com.github.detro&lt;/groupId&gt;
+     *   &lt;artifactId&gt;ghostdriver&lt;/artifactId&gt;
+     *   &lt;version&gt;2.1.0&lt;/version&gt;
+     *   &lt;exclusions&gt;
+     *     &lt;exclusion&gt;
+     *       &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *       &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
+     *     &lt;/exclusion&gt;
+     *   &lt;/exclusions&gt;
+     * &lt;/dependency&gt;</pre>
+     */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.grid.selenium.GridLauncherV3", "org.openqa.selenium.phantomjs.PhantomJSDriver"};
     
