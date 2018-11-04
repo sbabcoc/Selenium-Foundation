@@ -53,6 +53,7 @@
     <mockito.version>1.10.19</mockito.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
     <dependency-plugin.version>3.1.1</dependency-plugin.version>
+    <clean-plugin.version>3.1.0</clean-plugin.version>
   </properties>
   
   <scm>
@@ -336,6 +337,7 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>htmlunit-driver</artifactId>
+          <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>com.codeborne</groupId>
@@ -394,6 +396,11 @@
           <version>${dependency-plugin.version}</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${clean-plugin.version}</version>
+        </plugin>
+        <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${jacoco.version}</version>
@@ -445,6 +452,26 @@
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>logs</directory>
+              <includes>
+                <include>**/*</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>target</directory>
+              <includes>
+                <include>**/*</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
