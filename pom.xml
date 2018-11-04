@@ -246,9 +246,11 @@
       </activation>
       <properties>
         <selenium.version>3.14.0</selenium.version>
-        <guava.version>23.6-jre</guava.version>
-        <phantomjs.version>2.1.0</phantomjs.version>
+        <guava.version>25.0-jre</guava.version>
+        <phantomjs.version>1.4.4</phantomjs.version>
+        <htmlunit.version>2.30.0</htmlunit.version>
         <jcommander.version>1.72</jcommander.version>
+        <commons-io.version>2.6</commons-io.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -258,20 +260,24 @@
             <version>${guava.version}</version>
           </dependency>
           <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+          </dependency>
+          <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server-standalone</artifactId>
+            <artifactId>selenium-server</artifactId>
             <version>${selenium.version}</version>
           </dependency>
           <dependency>
-            <groupId>com.github.detro</groupId>
-            <artifactId>ghostdriver</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>htmlunit-driver</artifactId>
+            <version>${htmlunit.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.codeborne</groupId>
+            <artifactId>phantomjsdriver</artifactId>
             <version>${phantomjs.version}</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-remote-driver</artifactId>
-              </exclusion>
-            </exclusions>
           </dependency>
           <dependency>
             <groupId>com.beust</groupId>
@@ -282,12 +288,65 @@
       </dependencyManagement>
       <dependencies>
         <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-server-standalone</artifactId>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.github.detro</groupId>
-          <artifactId>ghostdriver</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-server</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-chrome-driver</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-edge-driver</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-firefox-driver</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-ie-driver</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-opera-driver</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-java</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-safari-driver</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>htmlunit-driver</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>net.sourceforge.htmlunit</groupId>
+              <artifactId>htmlunit</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>htmlunit-driver</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.codeborne</groupId>
+          <artifactId>phantomjsdriver</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>*</groupId>
+              <artifactId>*</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
       <build>

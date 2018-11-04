@@ -499,4 +499,12 @@ public abstract class AbstractSeleniumConfig extends
     public String getSettingsPath() {
         return SETTINGS_FILE;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getBrowserName() {
+        return getString(SeleniumSettings.BROWSER_NAME.key());
+    }
 }

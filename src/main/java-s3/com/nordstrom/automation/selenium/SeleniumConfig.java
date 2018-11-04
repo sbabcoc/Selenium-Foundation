@@ -47,7 +47,16 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * &lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.grid.selenium.GridLauncherV3", "org.openqa.selenium.phantomjs.PhantomJSDriver"};
+                    "org.openqa.grid.selenium.GridLauncherV3",
+                    "org.openqa.selenium.BuildInfo",
+                    "com.google.common.collect.ImmutableMap",
+                    "com.beust.jcommander.JCommander",
+                    "org.openqa.selenium.json.Json",
+                    "org.seleniumhq.jetty9.util.thread.ThreadPool",
+                    "javax.servlet.Servlet",
+                    "okhttp3.ConnectionPool",
+                    "okio.BufferedSource"
+                    };
     
     static {
         try {

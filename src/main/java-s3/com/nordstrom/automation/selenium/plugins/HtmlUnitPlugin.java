@@ -10,25 +10,27 @@ public class HtmlUnitPlugin implements DriverPlugin {
      * <pre>&lt;dependency&gt;
      *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *   &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
-     *   &lt;version&gt;2.21&lt;/version&gt;
+     *   &lt;version&gt;2.30.0&lt;/version&gt;
      * &lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.htmlunit.HtmlUnitDriver",
-                    "com.gargoylesoftware.htmlunit.Version",
-                    "org.apache.commons.collections.ListUtils", "org.apache.xalan.Version",
-                    "org.apache.xml.serializer.Version", "org.apache.commons.lang3.CharSet",
-                    "org.apache.http.client.HttpClient", "org.apache.http.entity.mime.MIME",
-                    "org.apache.commons.codec.Encoder",
-                    "net.sourceforge.htmlunit.corejs.javascript.Icode",
-                    "net.sourceforge.htmlunit.cyberneko.LostText",
+                    "org.openqa.selenium.htmlunit.HtmlUnitDriver", "org.openqa.selenium.By",
+                    "org.openqa.selenium.support.FindBy", "com.gargoylesoftware.htmlunit.Version",
+                    "org.apache.xalan.Version", "org.apache.xml.serializer.Version",
+                    "org.apache.commons.lang3.CharSet", "org.apache.commons.text.WordUtils",
+                    "org.apache.http.client.HttpClient", "org.apache.http.HttpHost",
+                    "org.apache.http.entity.mime.MIME", "org.apache.commons.codec.Encoder",
                     "org.apache.xerces.parsers.XMLParser", "org.apache.xmlcommons.Version",
-                    "com.steadystate.css.parser.Token", "org.w3c.css.sac.Parser",
                     "org.apache.commons.io.IOUtils", "org.apache.commons.logging.Log",
                     "org.eclipse.jetty.websocket.client.WebSocketClient",
                     "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint",
                     "org.eclipse.jetty.websocket.common.Parser",
-                    "org.eclipse.jetty.websocket.api.Session"};
+                    "org.eclipse.jetty.websocket.api.Session",
+                    "net.sourceforge.htmlunit.corejs.javascript.Token",
+                    "net.sourceforge.htmlunit.cyberneko.filters.Identity",
+                    "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.parser.CSSParser",
+                    "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
+                    "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser"};
     
     private static final String BROWSER_NAME = "htmlunit";
 

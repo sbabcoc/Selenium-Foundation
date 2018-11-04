@@ -393,12 +393,4 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return getString(SeleniumSettings.BROWSER_NAME.key());
-    }
 }

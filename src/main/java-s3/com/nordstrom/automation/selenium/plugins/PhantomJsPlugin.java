@@ -9,14 +9,20 @@ public class PhantomJsPlugin implements DriverPlugin {
      * 
      * <pre>&lt;dependency&gt;
      *   &lt;groupId&gt;com.codeborne&lt;/groupId&gt;
-     *   &lt;artifactId&gt;phantomjsdriver&lt;/artifactId&gt;
-     *   &lt;version&gt;1.3.0&lt;/version&gt;
+         &lt;artifactId&gt;phantomjsdriver&lt;/artifactId&gt;
+     *   &lt;version&gt;1.4.4.0&lt;/version&gt;
+     *   &lt;exclusions&gt;
+     *     &lt;exclusion&gt;
+     *       &lt;groupId&gt;*&lt;/groupId&gt;
+     *       &lt;artifactId&gt;*&lt;/artifactId&gt;
+     *     &lt;/exclusion&gt;
+     *   &lt;/exclusions&gt;
      * &lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.phantomjs.PhantomJSDriver",
-                    "org.apache.commons.exec.Executor", "com.sun.jna.platform.win32.Kernel32",
-                    "com.sun.jna.win32.StdCallLibrary"};
+                    "org.apache.commons.exec.Executor",
+                    "net.bytebuddy.matcher.ElementMatcher"};
     
     private static final String BROWSER_NAME = "phantomjs";
 
