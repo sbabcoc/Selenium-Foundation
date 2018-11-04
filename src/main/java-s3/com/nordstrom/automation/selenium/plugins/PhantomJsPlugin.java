@@ -9,7 +9,7 @@ public class PhantomJsPlugin implements DriverPlugin {
      * 
      * <pre>&lt;dependency&gt;
      *   &lt;groupId&gt;com.codeborne&lt;/groupId&gt;
-         &lt;artifactId&gt;phantomjsdriver&lt;/artifactId&gt;
+     *   &lt;artifactId&gt;phantomjsdriver&lt;/artifactId&gt;
      *   &lt;version&gt;1.4.4.0&lt;/version&gt;
      *   &lt;exclusions&gt;
      *     &lt;exclusion&gt;

@@ -1,9 +1,18 @@
 dependencies {
   selenium3Compile configurations.compile
-  selenium3Compile 'com.google.guava:guava:23.6-jre'
-  selenium3Compile 'org.seleniumhq.selenium:selenium-server-standalone:3.14.0'
-  selenium3Compile('com.github.detro:ghostdriver:2.1.0') {
-    exclude group: 'org.seleniumhq.selenium', module: 'selenium-remote-driver'
+  selenium3Compile('com.google.guava:guava:25.0-jre') { force = true } 
+  selenium3Compile('com.beust:jcommander:1.72') { force = true }
+  selenium3Compile 'commons-io:commons-io:2.6'
+  selenium3Compile('org.seleniumhq.selenium:selenium-server:3.14.0') {
+    exclude module: 'selenium-chrome-driver'
+    exclude module: 'selenium-edge-driver'
+    exclude module: 'selenium-firefox-driver'
+    exclude module: 'selenium-ie-driver'
+    exclude module: 'selenium-opera-driver'
+    exclude module: 'selenium-java'
+    exclude module: 'selenium-safari-driver'
+    exclude module: 'htmlunit-driver'
+    exclude group: 'net.sourceforge.htmlunit', module: 'htmlunit'
   }
-  selenium3Compile 'com.beust:jcommander:1.72'
+  selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.30.0'
 }
