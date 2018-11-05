@@ -325,7 +325,7 @@ In **Selenium Foundation**, component containers are _enhanced_ - additional fac
 ```java
 
     System.out.println(pageObj.getName());
-    // => com.nordstrom.automation.selenium.model.ExamplePage$ByteBuddy$SPrBnLqt@2c7b1a01
+    // => com.nordstrom.automation.selenium.model.EnhancedExamplePage
 
 ```
 
