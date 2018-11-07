@@ -47,6 +47,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * &lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
+<<<<<<< HEAD
                     "org.openqa.grid.selenium.GridLauncherV3",
                     "org.openqa.selenium.BuildInfo",
                     "com.google.common.collect.ImmutableMap",
@@ -57,6 +58,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     "okhttp3.ConnectionPool",
                     "okio.BufferedSource"
                     };
+=======
+                    "org.openqa.grid.selenium.GridLauncherV3", "org.openqa.selenium.htmlunit.HtmlUnitDriver"};
+>>>>>>> master
     
     static {
         try {
