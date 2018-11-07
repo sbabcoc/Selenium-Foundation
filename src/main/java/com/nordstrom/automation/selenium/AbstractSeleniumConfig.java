@@ -501,10 +501,12 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
-     * {@inheritDoc}
+     * Get the name by which this browser is known to Selenium Grid.
+     * 
+     * @return Selenium Grid browser identifier
      */
-    @Override
     public String getBrowserName() {
-        return getString(SeleniumSettings.BROWSER_NAME.key());
+        Capabilities capabilities = getBrowserCaps();
+        return capabilities.getBrowserName();
     }
 }

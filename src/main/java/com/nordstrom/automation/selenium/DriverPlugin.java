@@ -1,5 +1,9 @@
 package com.nordstrom.automation.selenium;
 
+import java.util.List;
+
+import org.openqa.selenium.Capabilities;
+
 public interface DriverPlugin {
 
     /**
@@ -9,10 +13,35 @@ public interface DriverPlugin {
      */
     public String[] getDependencyContexts();
     
-    /**
-     * Get the name by which this browser is known to Selenium Grid.
-     * 
-     * @return Selenium Grid browser identifier
-     */
-    public String getBrowserName();
+    public List<Capabilities> getCapabilitiesList();
+    
+    public default boolean doLaunchStandAlone() {
+        return false;
+    }
+    
+    public GridServer launchNode();
+    
+    public static class GridServer {
+        private String name;
+        private int port;
+        private Process process;
+        
+        GridServer(String name, int port, Process process) {
+            this.name = name;
+            this.port = port;
+            this.process = process;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public Process getProcess() {
+            return process;
+        }
+    }
 }
