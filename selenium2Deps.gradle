@@ -1,15 +1,6 @@
-configurations.all {
-  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-    if (details.requested.group == 'com.google.guava' && details.requested.name == 'guava' && details.requested.version != '21.0') {
-      details.useVersion '21.0'
-      details.because 'required to avoid java.lang.IllegalAccessError'
-    }
-  }
-}
-
 dependencies {
   selenium2Compile configurations.compile
-  selenium2Compile group: 'com.google.guava', name: 'guava', version: '21.0'
+  selenium2Compile('com.google.guava:guava:21.0') { force = true } 
   selenium2Compile group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '2.53.0'
   selenium2Compile group: 'org.seleniumhq.selenium', name: 'htmlunit-driver-standalone', version:'2.21'
 }

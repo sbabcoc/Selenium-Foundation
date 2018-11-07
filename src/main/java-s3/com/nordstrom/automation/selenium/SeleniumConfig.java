@@ -24,7 +24,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String JSON_TAIL = "] }";
     
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.grid.selenium.GridLauncherV3", "org.openqa.selenium.phantomjs.PhantomJSDriver"};
+                    "org.openqa.grid.selenium.GridLauncherV3", "org.openqa.selenium.htmlunit.HtmlUnitDriver"};
     
     static {
         try {

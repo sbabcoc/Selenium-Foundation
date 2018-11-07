@@ -1,8 +1,8 @@
 dependencies {
   selenium3Compile configurations.compile
-  selenium3Compile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
+  selenium3Compile group: 'com.google.guava', name: 'guava', version: '25.0-jre'
   selenium3Compile group: 'org.seleniumhq.selenium', name: 'selenium-server-standalone', version:'3.14.0'
-  selenium3Compile('com.github.detro:ghostdriver:2.1.0') {
+  selenium3Compile('com.codeborne:phantomjsdriver:1.4.4') {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-remote-driver'
   }
   selenium3Compile group: 'com.beust', name: 'jcommander', version: '1.72'
