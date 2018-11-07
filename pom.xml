@@ -220,8 +220,8 @@
       </activation>
       <properties>
         <selenium.version>3.14.0</selenium.version>
-        <guava.version>23.6-jre</guava.version>
-        <phantomjs.version>2.1.0</phantomjs.version>
+        <guava.version>25.0-jre</guava.version>
+        <phantomjs.version>1.4.4</phantomjs.version>
         <jcommander.version>1.72</jcommander.version>
       </properties>
       <dependencyManagement>
@@ -237,8 +237,8 @@
             <version>${selenium.version}</version>
           </dependency>
           <dependency>
-            <groupId>com.github.detro</groupId>
-            <artifactId>ghostdriver</artifactId>
+            <groupId>com.codeborne</groupId>
+            <artifactId>phantomjsdriver</artifactId>
             <version>${phantomjs.version}</version>
             <exclusions>
               <exclusion>
@@ -260,8 +260,8 @@
           <artifactId>selenium-server-standalone</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.github.detro</groupId>
-          <artifactId>ghostdriver</artifactId>
+          <groupId>com.codeborne</groupId>
+          <artifactId>phantomjsdriver</artifactId>
         </dependency>
       </dependencies>
       <build>
