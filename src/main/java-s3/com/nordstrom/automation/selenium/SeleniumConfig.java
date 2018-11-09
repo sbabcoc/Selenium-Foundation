@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
@@ -10,6 +11,8 @@ import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
+
+import com.nordstrom.automation.selenium.core.GridProcess;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -47,7 +50,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * &lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-<<<<<<< HEAD
                     "org.openqa.grid.selenium.GridLauncherV3",
                     "org.openqa.selenium.BuildInfo",
                     "com.google.common.collect.ImmutableMap",
@@ -58,9 +60,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     "okhttp3.ConnectionPool",
                     "okio.BufferedSource"
                     };
-=======
-                    "org.openqa.grid.selenium.GridLauncherV3", "org.openqa.selenium.htmlunit.HtmlUnitDriver"};
->>>>>>> master
     
     static {
         try {
@@ -289,5 +288,17 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
+    }
+
+    @Override
+    public List<Capabilities> getCapabilitiesList() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public GridProcess.GridServer launchGridNode() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

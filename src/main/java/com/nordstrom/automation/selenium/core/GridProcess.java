@@ -30,8 +30,32 @@ import com.nordstrom.common.file.PathUtils;
  * Java process.  
  */
 @SuppressWarnings("squid:S1774")
-final class GridProcess {
+public final class GridProcess {
     
+    public static class GridServer {
+        private String name;
+        private int port;
+        private Process process;
+        
+        GridServer(String name, int port, Process process) {
+            this.name = name;
+            this.port = port;
+            this.process = process;
+        }
+    
+        public String getName() {
+            return name;
+        }
+    
+        public int getPort() {
+            return port;
+        }
+    
+        public Process getProcess() {
+            return process;
+        }
+    }
+
     private static final String OPT_ROLE = "-role";
     private static final String LOGS_PATH = "logs";
     
@@ -53,7 +77,7 @@ final class GridProcess {
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help<a>
      */
-    static Process start(final String launcherClassName, final String[] dependencyContexts, final String[] args) {
+    public static GridServer start(final String launcherClassName, final String[] dependencyContexts, final String[] args) {
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
@@ -82,7 +106,7 @@ final class GridProcess {
         builder.redirectOutput(outputPath.toFile());
         
         try {
-            return builder.start();
+            Process process = builder.start();
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
@@ -94,7 +118,7 @@ final class GridProcess {
      * @param dependencyContexts array of dependency contexts
      * @return classpath array
      */
-    private static String getClasspath(final String[] dependencyContexts) {
+    public static String getClasspath(final String[] dependencyContexts) {
         Set<String> pathList = new HashSet<>();
         for (String contextClassName : dependencyContexts) {
             pathList.add(findJarPathFor(contextClassName));
