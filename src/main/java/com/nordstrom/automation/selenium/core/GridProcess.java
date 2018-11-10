@@ -1,7 +1,9 @@
 package com.nordstrom.automation.selenium.core;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -78,6 +80,7 @@ public final class GridProcess {
      *      Getting Command-Line Help<a>
      */
     public static GridServer start(final String launcherClassName, final String[] dependencyContexts, final String[] args) {
+        
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
         String gridRole = args[optIndex + 1];
@@ -106,10 +109,18 @@ public final class GridProcess {
         builder.redirectOutput(outputPath.toFile());
         
         try {
-            Process process = builder.start();
+            Process p = builder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String line = "";
+            StringBuilder sb = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
+        return null;
     }
     
     /**

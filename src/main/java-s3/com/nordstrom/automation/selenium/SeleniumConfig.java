@@ -3,7 +3,6 @@ package com.nordstrom.automation.selenium;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
@@ -291,7 +290,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     }
 
     @Override
-    public List<Capabilities> getCapabilitiesList() {
+    public Map<String, Capabilities> getCapabilitiesMap() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -1,11 +1,10 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.Capabilities;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
-import com.nordstrom.automation.selenium.core.GridProcess;
 
 public class PhantomJsPlugin implements DriverPlugin {
     
@@ -29,8 +28,6 @@ public class PhantomJsPlugin implements DriverPlugin {
                     "org.apache.commons.exec.Executor",
                     "net.bytebuddy.matcher.ElementMatcher"};
     
-    private static final String BROWSER_NAME = "phantomjs";
-
     /**
      * {@inheritDoc}
      */
@@ -39,19 +36,10 @@ public class PhantomJsPlugin implements DriverPlugin {
         return DEPENDENCY_CONTEXTS;
     }
 
-    public String getBrowserName() {
-        return BROWSER_NAME;
-    }
-
     @Override
-    public List<Capabilities> getCapabilitiesList() {
+    public Map<String, Capabilities> getCapabilitiesMap() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    public GridProcess.GridServer launchGridNode() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

@@ -1,9 +1,10 @@
 package com.nordstrom.automation.selenium;
 
-import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.Capabilities;
 import com.nordstrom.automation.selenium.core.GridProcess;
+import com.nordstrom.automation.selenium.core.GridProcess.GridServer;
 
 public interface DriverPlugin {
 
@@ -14,10 +15,9 @@ public interface DriverPlugin {
      */
     public String[] getDependencyContexts();
     
-    public List<Capabilities> getCapabilitiesList();
+    public Map<String, Capabilities> getCapabilitiesMap();
     
-    public default GridProcess.GridServer launchGridNode() {
-        Process process = GridProcess.start(null, null, null);
-        return null;
+    public default GridServer launchGridNode() {
+        return GridProcess.start(null, null, null);
     }
 }

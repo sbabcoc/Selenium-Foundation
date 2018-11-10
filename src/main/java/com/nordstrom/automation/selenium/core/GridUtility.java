@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.DriverPlugin;
+import com.nordstrom.automation.selenium.core.GridProcess.GridServer;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.exceptions.InvalidGridHostException;
@@ -105,7 +106,7 @@ public final class GridUtility {
             if (serverParms.processRole == GridRole.NODE) {
                 String browserName = config.getBrowserName();
                 for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
-                    if (browserName.equals(driverPlugin.getBrowserName())) {
+                    if (driverPlugin.getCapabilitiesMap().containsKey(browserName)) {
                         String[] driverContexts = driverPlugin.getDependencyContexts();
                         dependencyContexts = Stream
                                         .concat(Stream.of(dependencyContexts), Stream.of(driverContexts))
@@ -115,9 +116,9 @@ public final class GridUtility {
                 }
             }
             
-            Process serverProcess = GridProcess.start(launcherClassName, dependencyContexts, serverParms.processArgs);
+            GridServer serverProcess = GridProcess.start(launcherClassName, dependencyContexts, serverParms.processArgs);
             new UrlChecker().waitUntilAvailable(WaitType.HOST.getInterval(), TimeUnit.SECONDS, serverParms.statusUrl);
-            setProcess(serverParms.processRole, serverProcess);
+            setProcess(serverParms.processRole, serverProcess.getProcess());
         }
     }
     
