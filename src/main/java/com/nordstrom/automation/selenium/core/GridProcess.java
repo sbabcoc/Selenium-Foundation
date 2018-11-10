@@ -1,9 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -34,15 +32,19 @@ import com.nordstrom.common.file.PathUtils;
 @SuppressWarnings("squid:S1774")
 public final class GridProcess {
     
+    private static final String hub_foo = "Nodes should register to http://10.18.33.177:4444/grid/register/";   
+    
     public static class GridServer {
         private String name;
         private int port;
         private Process process;
+        private Path outputPath;
         
-        GridServer(String name, int port, Process process) {
+        GridServer(String name, int port, Process process, Path outputPath) {
             this.name = name;
             this.port = port;
             this.process = process;
+            this.outputPath = outputPath;
         }
     
         public String getName() {
@@ -55,6 +57,10 @@ public final class GridProcess {
     
         public Process getProcess() {
             return process;
+        }
+
+        public Path getOutputPath() {
+            return outputPath;
         }
     }
 
@@ -80,6 +86,7 @@ public final class GridProcess {
      *      Getting Command-Line Help<a>
      */
     public static GridServer start(final String launcherClassName, final String[] dependencyContexts, final String[] args) {
+        
         
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
         int optIndex = argsList.indexOf(OPT_ROLE);
@@ -109,14 +116,7 @@ public final class GridProcess {
         builder.redirectOutput(outputPath.toFile());
         
         try {
-            Process p = builder.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            String line = "";
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
+            Process process = builder.start();
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
