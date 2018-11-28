@@ -393,4 +393,11 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
     }
+    
+    @Override
+    public List<? extends Capabilities> createCapabilitiesList(String jsonStr) {
+        RegistrationRequest config = RegistrationRequest.getNewInstance(JSON_HEAD + jsonStr + JSON_TAIL);
+        return config.getCapabilities();
+    }
+
 }

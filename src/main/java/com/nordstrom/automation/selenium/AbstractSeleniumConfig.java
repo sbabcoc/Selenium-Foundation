@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -10,7 +9,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -18,44 +16,32 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Objects;
-
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
 import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.client.utils.URIBuilder;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
-import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 
 /**
  * This class declares settings and methods related to WebDriver and Grid configuration for Selenium 2 and Selenium 3.
  */
 public abstract class AbstractSeleniumConfig extends
-                SettingsCore<AbstractSeleniumConfig.SeleniumSettings> implements DriverPlugin {
+                SettingsCore<AbstractSeleniumConfig.SeleniumSettings> {
 
+    private static final String GRID_ENDPOINT = "/wd/hub";
+    private static final String GRID_REGISTER = "/grid/register";
     private static final String SETTINGS_FILE = "settings.properties";
-    private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
-    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSeleniumConfig.class);
-    
-    static {
-        try {
-            Class.forName("com.nordstrom.automation.selenium.SeleniumConfig");
-        } catch (ClassNotFoundException e) {
-            UncheckedThrow.throwUnchecked(e);
-        }
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
     /**
      * This enumeration declares the settings that enable you to control the parameters used by
@@ -84,14 +70,6 @@ public abstract class AbstractSeleniumConfig extends
         HUB_PORT("selenuim.hub.port", null),
         /** name: <b>selenium.node.config</b> <br> default: {@code null} */
         NODE_CONFIG("selenium.node.config", null),
-        /** name: <b>selenium.node.host</b> <br> default: {@code null} */
-        NODE_HOST("selenium.node.host", null),
-        /** name: <b>selenium.node.port</b> <br> default: {@code null} */
-        NODE_PORT("selenium.node.port", null),
-        /** name: <b>selenium.browser.name</b> <br> default: {@code null} */
-        BROWSER_NAME("selenium.browser.name", null),
-        /** name: <b>selenium.browser.caps</b> <br> default: {@link SeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
-        BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
         /** name: <b>selenium.timeout.pageload</b> <br> default: <b>30</b> */
         PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),
         /** name: <b>selenium.timeout.implied</b> <br> default: <b>15</b> */
@@ -196,10 +174,10 @@ public abstract class AbstractSeleniumConfig extends
         /**
          * Get the timeout interval for this wait type.<br>
          * 
-         * @param config {@link AbstractSeleniumConfig} object to interrogate
+         * @param config {@link SeleniumConfig} object to interrogate
          * @return wait type timeout interval
          */
-        public long getInterval(final AbstractSeleniumConfig config) {
+        public long getInterval(final SeleniumConfig config) {
             if (timeoutInterval == null) {
                 Objects.requireNonNull(config, "[config] must be non-null");
                 timeoutInterval = config.getLong(timeoutSetting.key());
@@ -219,14 +197,13 @@ public abstract class AbstractSeleniumConfig extends
         
     }
 
-    protected static AbstractSeleniumConfig SELENIUM_CONFIG;
+    protected static SeleniumConfig seleniumConfig;
     
     private URI targetUri;
     private String nodeConfigPath;
-    protected String[] nodeArgs;
     private String hubConfigPath;
-    protected String[] hubArgs;
-    protected Capabilities browserCaps;
+//    protected String[] hubArgs;
+//    protected Capabilities browserCaps;
     
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
@@ -237,9 +214,9 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @return Selenium configuration object
      */
-    public static AbstractSeleniumConfig getConfig() {
-        if (SELENIUM_CONFIG != null) {
-            return SELENIUM_CONFIG;
+    public static SeleniumConfig getConfig() {
+        if (seleniumConfig != null) {
+            return seleniumConfig;
         }
         throw new IllegalStateException("SELENIUM_CONFIG must be populated by subclass static initializer");
     }
@@ -268,32 +245,32 @@ public abstract class AbstractSeleniumConfig extends
     /**
      * Get authority for Selenium Grid hub server.
      * 
-     * @return Selenium Grid hub server authority
+     * @return Selenium Grid hub server authority; {@code null} if hub port is undefined
      */
     public HttpHost getHubAuthority() {
-        return new HttpHost(getHubHost(), getHubPort());
+        if (getHubPort() != null) {
+            return new HttpHost(getHubHost(), getHubPort());
+        }
+        return null;
     }
     
     /**
-     * Get the arguments needed to launch a local Selenium Grid hub.
-     * 
-     * @return array of hub launch arguments
+     * FIXME
+     * @return
      */
-    public abstract String[] getHubArgs();
+    public URI getGridEndpoint() {
+        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
+        return URI.create(host.toURI() + GRID_ENDPOINT);
+    }
     
     /**
-     * Get name for Selenium Grid node server.
-     * 
-     * @return Selenium Grid node server name
+     * FIXME
+     * @return
      */
-    public abstract String getNodeHost();
-    
-    /**
-     * Get port for Selenium Grid node server.
-     * 
-     * @return Selenium Grid node server port
-     */
-    public abstract Integer getNodePort();
+    public URI getGridRegister() {
+        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
+        return URI.create(host.toURI() + GRID_REGISTER);
+    }
     
     /**
      * Get shutdown request string for Selenium Grid node server.
@@ -301,22 +278,6 @@ public abstract class AbstractSeleniumConfig extends
      * @return Selenium Grid node server shutdown request string
      */
     public abstract String getNodeShutdownRequest();
-    
-    /**
-     * Get authority for Selenium Grid node server.
-     * 
-     * @return Selenium Grid node server authority
-     */
-    public HttpHost getNodeAuthority() {
-        return new HttpHost(getNodeHost(), getNodePort());
-    }
-    
-    /**
-     * Get the arguments needed to launch a local Selenium Grid node.
-     * 
-     * @return array of node launch arguments
-     */
-    public abstract String[] getNodeArgs();
     
     /**
      * Get the configured target URI as specified by its component parts.
@@ -371,20 +332,13 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @return Selenium Grid hub configuration path
      */
-    protected String getHubConfigPath() {
+    public String getHubConfigPath() {
         if (hubConfigPath == null) {
             hubConfigPath = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
             LOGGER.debug("hubConfigPath = {}", hubConfigPath);
         }
         return hubConfigPath;
     }
-    
-    /**
-     * Convert the configured browser specification from JSON to {@link Capabilities} object.
-     * 
-     * @return {@link Capabilities} object for the configured browser specification
-     */
-    public abstract Capabilities getBrowserCaps();
     
     /**
      * Get Internet protocol (IP) address for the machine we're running on.
@@ -403,35 +357,6 @@ public abstract class AbstractSeleniumConfig extends
             LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
             return "localhost";
         }
-    }
-
-    /**
-     * Get browser capabilities JSON for the specified name.
-     * 
-     * @param nameStr browser name
-     * @return browser capabilities JSON
-     */
-    protected String getJsonForName(final String nameStr) {
-        String jsonStr = null;
-        
-        if (nameStr != null) {
-            InputStream inputStream = 
-                    Thread.currentThread().getContextClassLoader().getResourceAsStream(nameStr + "Caps.json");
-            
-            if (inputStream != null) {
-                try {
-                    jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                } catch (IOException eaten) { //NOSONAR
-                    LOGGER.warn("Unable to get browser configuration file contents: {}", eaten.getMessage());
-                }
-            }
-            
-            if (jsonStr == null) {
-                jsonStr = String.format(CAPS_PATTERN, nameStr);
-            }
-        }
-        
-        return jsonStr;
     }
 
     /**
@@ -493,20 +418,19 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
+     * Get fully-qualified names of context classes for Selenium Grid dependencies.
+     * 
+     * @return context class names for Selenium Grid dependencies
+     */ 
+    public abstract String[] getDependencyContexts();
+    
+    public abstract Path createNodeConfig(String jsonStr, String hubEndpoint) throws IOException;
+    
+    /**
      * {@inheritDoc}
      */
     @Override
     public String getSettingsPath() {
         return SETTINGS_FILE;
-    }
-    
-    /**
-     * Get the name by which this browser is known to Selenium Grid.
-     * 
-     * @return Selenium Grid browser identifier
-     */
-    public String getBrowserName() {
-        Capabilities capabilities = getBrowserCaps();
-        return capabilities.getBrowserName();
     }
 }

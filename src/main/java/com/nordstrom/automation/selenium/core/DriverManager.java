@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
+import java.time.Clock;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -12,7 +13,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Sleeper;
-import org.openqa.selenium.support.ui.SystemClock;
 import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
@@ -154,8 +154,9 @@ public final class DriverManager {
      * </ul>
      */
     public static void onFinish() {
-        GridUtility.stopGridNode(true);
-        GridUtility.stopGridHub(true);
+        //FIXME
+//        GridUtility.stopGridNode(true);
+//        GridUtility.stopGridHub(true);
     }
     
     /**
@@ -290,7 +291,7 @@ public final class DriverManager {
          * @param timeOutInSeconds 'wait' timeout in seconds
          */
         public DriverSessionWait(final TestBase context, final long timeOutInSeconds) {
-            super(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER);
+            super(context, Clock.systemDefaultZone(), Sleeper.SYSTEM_SLEEPER);
             withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
         }
     }

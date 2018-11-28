@@ -1,9 +1,5 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import java.util.Map;
-
-import org.openqa.selenium.Capabilities;
-
 import com.nordstrom.automation.selenium.DriverPlugin;
 
 public class HtmlUnitPlugin implements DriverPlugin {
@@ -36,8 +32,9 @@ public class HtmlUnitPlugin implements DriverPlugin {
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
                     "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser"};
     
-    private static final String BROWSER_NAME = "htmlunit";
-
+    private static final String CAPABILITIES =
+                    "{'browserName':'htmlunit', 'maxInstances':5, 'seleniumProtocol':'WebDriver', 'javascriptEnabled':true}";
+    
     /**
      * {@inheritDoc}
      */
@@ -47,9 +44,8 @@ public class HtmlUnitPlugin implements DriverPlugin {
     }
 
     @Override
-    public Map<String, Capabilities> getCapabilitiesMap() {
-        // TODO Auto-generated method stub
-        return null;
+    public String getCapabilities() {
+        return CAPABILITIES;
     }
 
 }

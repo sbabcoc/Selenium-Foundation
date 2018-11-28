@@ -18,7 +18,7 @@ public class GridProcessTest {
     public void testPrivateConstructor() throws Throwable {
         
         Constructor<?>[] ctors;
-        ctors = GridProcess.class.getDeclaredConstructors();
+        ctors = LocalGrid.class.getDeclaredConstructors();
         assertEquals(ctors.length, 1, "GridProcess must have exactly one constructor");
         assertEquals(ctors[0].getModifiers() & Modifier.PRIVATE, Modifier.PRIVATE,
                         "GridProcess constructor must be private");

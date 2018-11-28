@@ -1,17 +1,23 @@
 package com.nordstrom.automation.selenium;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
-import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
 
-import com.nordstrom.automation.selenium.core.GridProcess;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -24,6 +30,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "] }";
+    private static final String NODE_CONFIG = "nodeConfig-s3.json";
     
     /**
      * <b>org.openqa.grid.selenium.GridLauncherV3</b>
@@ -62,13 +69,12 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     
     static {
         try {
-            SELENIUM_CONFIG = new SeleniumConfig();
+            seleniumConfig = new SeleniumConfig();
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
         }
     }
     
-    private GridNodeConfiguration nodeConfig;
     private GridHubConfiguration hubConfig;
     
     /**
@@ -87,62 +93,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * @return Selenium configuration object
      */
     public static SeleniumConfig getConfig() {
-        return (SeleniumConfig) SELENIUM_CONFIG;
-    }
-    
-    /**
-     * Get the Selenium Grid node configuration.
-     * 
-     * @return Selenium Grid node configuration
-     */
-    public GridNodeConfiguration getNodeConfig() {
-        if (nodeConfig == null) {
-            nodeConfig = GridNodeConfiguration.loadFromJSON(getNodeConfigPath());
-            nodeConfig = resolveNodeSettings(nodeConfig);
-        }
-        return nodeConfig;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String[] getNodeArgs() {
-        if (nodeArgs == null) {
-            String configPath = getNodeConfigPath();
-            GridNodeConfiguration config = getNodeConfig();
-            nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host",
-                    config.host, "-port", config.port.toString(), "-hub", config.hub,
-                    "-servlet", "org.openqa.grid.web.servlet.LifecycleServlet"};
-        }
-        return Arrays.copyOf(nodeArgs, nodeArgs.length);
-    }
-
-    /**
-     * Resolve Selenium Grid node settings for host, port, and hub.
-     * 
-     * @param nodeConfig node configuration with unresolved settings
-     * @return node configuration with resolved settings
-     */
-    private GridNodeConfiguration resolveNodeSettings(final GridNodeConfiguration nodeConfig) {
-        // get configured (or default) Grid node host
-        String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
-        // if host specified
-        if (nodeHost != null) {
-            // store specified host
-            nodeConfig.host = nodeHost;
-        // otherwise, if host unspecified
-        } else if (nodeConfig.host == null) {
-            // use 'localhost'
-            nodeConfig.host = getLocalHost();
-        }
-        
-        // set configured (or default) Grid node port
-        nodeConfig.port = getInteger(SeleniumSettings.NODE_PORT.key(), null);
-        // set Grid hub registration URL
-        nodeConfig.hub = "http://" + getHubConfig().host + ":" + getHubConfig().port + "/grid/register/";
-        
-        return nodeConfig;
+        return seleniumConfig;
     }
     
     /**
@@ -161,16 +112,16 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String[] getHubArgs() {
-        if (hubArgs == null) {
-            String configPath = getHubConfigPath();
-            GridHubConfiguration config = getHubConfig();
-            hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
-                    "-host", config.host, "-port", config.port.toString()};
-        }
-        return Arrays.copyOf(hubArgs, hubArgs.length);
-    }
+//    @Override
+//    public String[] getHubArgs() {
+//        if (hubArgs == null) {
+//            String configPath = getHubConfigPath();
+//            GridHubConfiguration config = getHubConfig();
+//            hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
+//                    "-host", config.host, "-port", config.port.toString()};
+//        }
+//        return Arrays.copyOf(hubArgs, hubArgs.length);
+//    }
     
     /**
      * Resolve Selenium Grid hub settings for host and port.
@@ -206,30 +157,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
-    public Capabilities getBrowserCaps() {
-        if (browserCaps == null) {
-            String jsonStr = getJsonForName(getString(SeleniumSettings.BROWSER_NAME.key()));
-            
-            if (jsonStr == null) {
-                jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
-            }
-            
-            JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + jsonStr + JSON_TAIL));
-            GridNodeConfiguration config = GridNodeConfiguration.loadFromJSON(input);
-            browserCaps = config.capabilities.get(0);
-        }
-        return browserCaps;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = super.getDefaults();
         defaults.put(SeleniumSettings.HUB_PORT.key(), "4445");
-        defaults.put(SeleniumSettings.NODE_PORT.key(), "5556");
-        defaults.put(SeleniumSettings.NODE_CONFIG.key(), "nodeConfig-s3.json");
+        defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
         return defaults;
     }
     
@@ -253,22 +184,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
-    public String getNodeHost() {
-        return getConfig().getNodeConfig().host;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getNodePort() {
-        return getConfig().getNodeConfig().port;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getNodeShutdownRequest() {
         return "/extra/LifecycleServlet?action=shutdown";
     }
@@ -281,23 +196,27 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return "org.openqa.grid.selenium.GridLauncherV3";
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
     }
 
     @Override
-    public Map<String, Capabilities> getCapabilitiesMap() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public GridProcess.GridServer launchGridNode() {
-        // TODO Auto-generated method stub
-        return null;
+    public Path createNodeConfig(String capabilities, String hubEndpoint) throws IOException {
+        String nodeConfigPath = getNodeConfigPath();
+        String[] configPathBits = nodeConfigPath.split("\\.");
+        String hashCode = String.format("%08X", capabilities.hashCode());
+        Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
+        if (filePath.toFile().createNewFile()) {
+            JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
+            List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
+            GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
+            nodeConfig.capabilities = capabilitiesList;
+            nodeConfig.hub = hubEndpoint;
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+                out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        return filePath;
     }
 }
