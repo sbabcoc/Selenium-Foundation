@@ -23,7 +23,7 @@ public interface DriverPlugin {
      */
     public default GridServer start(String launcherClassName, String[] dependencyContexts, Path nodeConfigPath) {
         String[] combinedContexts = combineDependencyContexts(dependencyContexts);
-        return LocalGrid.start(launcherClassName, combinedContexts, GridRole.NODE, nodeConfigPath);
+        return LocalGrid.start(launcherClassName, combinedContexts, GridRole.NODE, Integer.valueOf(-1), nodeConfigPath);
     }
     
     /**

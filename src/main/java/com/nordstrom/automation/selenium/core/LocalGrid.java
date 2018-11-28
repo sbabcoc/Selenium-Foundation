@@ -54,6 +54,7 @@ public final class LocalGrid {
     private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
     
     private static final String OPT_ROLE = "-role";
+    private static final String OPT_PORT = "-port";
     private static final String LOGS_PATH = "logs";
     
     private static final String HUB_READY = "up and running";
@@ -66,7 +67,6 @@ public final class LocalGrid {
      * Private constructor to prevent direct instantiation from outside.
      */
     private LocalGrid() {
-        throw new AssertionError("LocalGrid must be instantiated through its 'launch' static factory method");
     }
     
     public GridServer getHubServer() {
@@ -83,7 +83,8 @@ public final class LocalGrid {
         String launcherClassName = config.getLauncherClassName();
         String[] dependencyContexts = config.getDependencyContexts();
         long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key());
-        GridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB, hubConfigPath);
+        Integer hubPort = config.getHubPort();
+        GridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB, hubPort, hubConfigPath);
         String hubEndpoint = waitUntilReady(hubServer, hostTimeout);
         
         // two flavors of nodes: standalone (e.g. - appium) or hosted (e.g. - chrome)
@@ -144,13 +145,14 @@ public final class LocalGrid {
      */
     private static String waitUntilReady(GridServer server, long maxWait) throws IOException, InterruptedException {
         StringBuilder builder = new StringBuilder();
-        long maxTime = System.currentTimeMillis() + maxWait;
+        long maxTime = System.currentTimeMillis() + (maxWait * 1000);
         try (InputStream inputStream = Files.newInputStream(server.outputPath)) {
             while (appendAndCheckFor(inputStream, server.readyMessage, builder) && ((maxWait == -1) || (System.currentTimeMillis() <= maxTime))) {
                 Thread.sleep(100);
             }
         }
         String output = builder.toString();
+        System.out.println("output: " + output);
         int endIndex = output.indexOf(GRID_REGISTER) + GRID_REGISTER.length();
         int beginIndex = output.lastIndexOf(' ', endIndex) + 1;
         return output.substring(beginIndex, endIndex);
@@ -204,11 +206,14 @@ public final class LocalGrid {
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help<a>
      */
-    public static GridServer start(final String launcherClassName, final String[] dependencyContexts, final GridRole role, final Path configPath) {
+    public static GridServer start(final String launcherClassName,
+                    final String[] dependencyContexts, final GridRole role, final Integer port, final Path configPath) {
         String gridRole = role.toString();
         List<String> argsList = new ArrayList<>();
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
+        argsList.add(OPT_PORT);
+        argsList.add(port.toString());
         argsList.add("-" + gridRole + "Config");
         argsList.add(configPath.toString());
         

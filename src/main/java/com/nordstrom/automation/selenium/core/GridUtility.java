@@ -31,8 +31,10 @@ public final class GridUtility {
     
     private static LocalGrid localGrid;
     
-    private static final String HUB_STATUS = "/grid/api/hub/";
     private static final String NODE_STATUS = "/wd/hub/status";
+    private static final String HUB_CONFIG = "/grid/api/hub/";
+    private static final String NODE_CONFIG = "/grid/api/proxy";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
     
     /**
@@ -74,7 +76,7 @@ public final class GridUtility {
      * @return 'true' if configured hub is active; otherwise 'false'
      */
     public static boolean isHubActive(HttpHost host) {
-        return isHostActive(host, HUB_STATUS);
+        return isHostActive(host, HUB_CONFIG);
     }
 
     /**
@@ -118,14 +120,23 @@ public final class GridUtility {
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver() {
-        
         SeleniumConfig config = AbstractSeleniumConfig.getConfig();
-        GridServerParms hubParms = GridServerParms.getHubParms(config);
-        if (isHubActive()) {
-            return new RemoteWebDriver(hubParms.endpointUrl, config.getBrowserCaps());
-        } else {
-            throw new IllegalStateException("No Selenium Grid instance was found at " + hubParms.endpointUrl);
+        
+        try {
+            LocalGrid.launch(config, Paths.get(config.getHubConfigPath()));
+        } catch (IOException | InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        return null;
+//        
+//        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+//        GridServerParms hubParms = GridServerParms.getHubParms(config);
+//        if (isHubActive()) {
+//            return new RemoteWebDriver(hubParms.endpointUrl, config.getCurrentCapabilities());
+//        } else {
+//            throw new IllegalStateException("No Selenium Grid instance was found at " + hubParms.endpointUrl);
+//        }
     }
     
     /**
@@ -135,7 +146,7 @@ public final class GridUtility {
      */
     public String getStatusPath(GridRole role) {
         if (role == GridRole.HUB) {
-            return HUB_STATUS;
+            return HUB_CONFIG;
         } else if (role == GridRole.NODE) {
             return NODE_STATUS;
         }

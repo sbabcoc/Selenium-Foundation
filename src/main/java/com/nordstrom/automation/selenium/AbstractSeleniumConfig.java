@@ -24,6 +24,7 @@ import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.http.HttpHost;
 import org.apache.http.client.utils.URIBuilder;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -339,6 +340,17 @@ public abstract class AbstractSeleniumConfig extends
         }
         return hubConfigPath;
     }
+    
+    /** 
+     * Convert the configured browser specification from JSON to {@link Capabilities} object.   
+     *  
+     * @return {@link Capabilities} object for the configured browser specification 
+     */ 
+//    public abstract Capabilities getCurrentCapabilities();
+    
+//    public abstract Capabilities getCapabilitiesForName(String browserName);
+    
+//    public abstract Capabilities getCapabilitiesForJson(String capabilities);
     
     /**
      * Get Internet protocol (IP) address for the machine we're running on.

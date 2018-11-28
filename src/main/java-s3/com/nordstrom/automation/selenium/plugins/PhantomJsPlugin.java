@@ -1,9 +1,5 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import java.util.Map;
-
-import org.openqa.selenium.Capabilities;
-
 import com.nordstrom.automation.selenium.DriverPlugin;
 
 public class PhantomJsPlugin implements DriverPlugin {
@@ -28,6 +24,9 @@ public class PhantomJsPlugin implements DriverPlugin {
                     "org.apache.commons.exec.Executor",
                     "net.bytebuddy.matcher.ElementMatcher"};
     
+    private static final String CAPABILITIES =
+                    "{\"browserName\": \"phantomjs\", \"maxInstances\": 5, \"seleniumProtocol\": \"WebDriver\"}";
+    
     /**
      * {@inheritDoc}
      */
@@ -36,10 +35,12 @@ public class PhantomJsPlugin implements DriverPlugin {
         return DEPENDENCY_CONTEXTS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Map<String, Capabilities> getCapabilitiesMap() {
-        // TODO Auto-generated method stub
-        return null;
+    public String getCapabilities() {
+        return CAPABILITIES;
     }
 
 }

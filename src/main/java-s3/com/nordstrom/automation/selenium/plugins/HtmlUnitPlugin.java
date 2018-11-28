@@ -33,7 +33,7 @@ public class HtmlUnitPlugin implements DriverPlugin {
                     "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser"};
     
     private static final String CAPABILITIES =
-                    "{'browserName':'htmlunit', 'maxInstances':5, 'seleniumProtocol':'WebDriver', 'javascriptEnabled':true}";
+                    "{\"browserName\":\"htmlunit\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\", \"javascriptEnabled\":true}";
     
     /**
      * {@inheritDoc}
@@ -43,6 +43,9 @@ public class HtmlUnitPlugin implements DriverPlugin {
         return DEPENDENCY_CONTEXTS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCapabilities() {
         return CAPABILITIES;
