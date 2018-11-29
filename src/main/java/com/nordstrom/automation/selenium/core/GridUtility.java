@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -14,10 +18,14 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.openqa.grid.common.GridRole;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.net.UrlChecker.TimeoutException;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
@@ -34,6 +42,7 @@ public final class GridUtility {
     private static final String NODE_STATUS = "/wd/hub/status";
     private static final String HUB_CONFIG = "/grid/api/hub/";
     private static final String NODE_CONFIG = "/grid/api/proxy";
+    private static final String GRID_CONSOLE = "/grid/console";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
     
@@ -59,7 +68,7 @@ public final class GridUtility {
             try {
                 localGrid = LocalGrid.launch(config, Paths.get(config.getHubConfigPath()));
                 isActive = true;
-            } catch (GridServerLaunchFailedException | IOException e) {
+            } catch (GridServerLaunchFailedException | IOException | TimeoutException e) {
                 LOGGER.warn("Unable to launch Selenium Grid server", e);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -124,7 +133,7 @@ public final class GridUtility {
         
         try {
             LocalGrid.launch(config, Paths.get(config.getHubConfigPath()));
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException | TimeoutException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -153,6 +162,32 @@ public final class GridUtility {
         throw new IllegalArgumentException("Specified [role] is unsupported: " + role);
     }
     
+    /**
+     * 
+     * @param hubEndpoint
+     * @return
+     * @throws IOException
+     */
+    public static List<String> getGridProxies(String hubEndpoint) throws IOException {
+        URI uri = URI.create(hubEndpoint);
+        String url = uri.getScheme() + "://" + uri.getAuthority() + GRID_CONSOLE;
+        Document doc = Jsoup.connect(url).get();
+        Elements proxyIds = doc.select("p.proxyid");
+        List<String> nodeList = new ArrayList<>();
+        for (Element proxyId : proxyIds) {
+            String text = proxyId.text();
+            int beginIndex = text.indexOf("http");
+            int endIndex = text.indexOf(',');
+            nodeList.add(text.substring(beginIndex, endIndex));
+        }
+        return nodeList;
+    }
+    
+    public static List<Capabilities> getNodeCapabilities(String nodeEndpoint) {
+        Connection doc = Jsoup.connect(nodeEndpoint);
+        return null;
+    }
+
     /**
      * Determine if the specified server is the local host.
      * 

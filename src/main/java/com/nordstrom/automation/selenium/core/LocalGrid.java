@@ -19,10 +19,11 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.http.HttpHost;
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.net.UrlChecker;
-import org.openqa.selenium.net.UrlChecker.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,11 +79,11 @@ public final class LocalGrid {
     }
     
     public static LocalGrid launch(SeleniumConfig config, final Path hubConfigPath)
-                    throws IOException, InterruptedException {
+                    throws IOException, InterruptedException, TimeoutException {
         
         String launcherClassName = config.getLauncherClassName();
         String[] dependencyContexts = config.getDependencyContexts();
-        long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key());
+        long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
         Integer hubPort = config.getHubPort();
         GridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB, hubPort, hubConfigPath);
         String hubEndpoint = waitUntilReady(hubServer, hostTimeout);
@@ -123,6 +124,8 @@ public final class LocalGrid {
         LocalGrid localGrid = new LocalGrid();
         localGrid.hubServer = hubServer;
         localGrid.nodeServers = nodeServers;
+        
+        GridUtility.getGridProxies(hubEndpoint);
 
         return localGrid;
     }
@@ -135,27 +138,39 @@ public final class LocalGrid {
      */
     
     /**
-     * Wait for the specified prompt to be received from the remote host.
+     * Wait for the specified Grid server to indicate that it's ready.
      * 
-     * @param server prompt to wait for
-     * @param maxWait maximum interval in milliseconds to wait for the specified prompt; -1 to wait indefinitely
+     * @param server {@link GridServer} object to wait for.
+     * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
      * @return all of the input that was received while waiting for the prompt
      * @throws InterruptedException if this thread was interrupted
      * @throws IOException if an I/O error occurs
+     * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
      */
-    private static String waitUntilReady(GridServer server, long maxWait) throws IOException, InterruptedException {
+    private static String waitUntilReady(GridServer server, long maxWait) throws IOException, InterruptedException, TimeoutException {
+        boolean didTimeout = false;
         StringBuilder builder = new StringBuilder();
-        long maxTime = System.currentTimeMillis() + (maxWait * 1000);
+        long maxTime = System.currentTimeMillis() + maxWait;
         try (InputStream inputStream = Files.newInputStream(server.outputPath)) {
-            while (appendAndCheckFor(inputStream, server.readyMessage, builder) && ((maxWait == -1) || (System.currentTimeMillis() <= maxTime))) {
+            while (appendAndCheckFor(inputStream, server.readyMessage, builder)) {
+                if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
+                    didTimeout = true;
+                    break;
+                }
                 Thread.sleep(100);
             }
         }
+        
         String output = builder.toString();
         System.out.println("output: " + output);
-        int endIndex = output.indexOf(GRID_REGISTER) + GRID_REGISTER.length();
-        int beginIndex = output.lastIndexOf(' ', endIndex) + 1;
-        return output.substring(beginIndex, endIndex);
+        
+        if (!didTimeout) {
+            int endIndex = output.indexOf(GRID_REGISTER) + GRID_REGISTER.length();
+            int beginIndex = output.lastIndexOf(' ', endIndex) + 1;
+            return output.substring(beginIndex, endIndex);
+        }
+        
+        throw new TimeoutException("Timed of waiting for Grid server to be ready");
     }
     
     /**
@@ -200,8 +215,9 @@ public final class LocalGrid {
      * 
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
-     * @param args Selenium server command line arguments (check {@code See Also} below)
-     * @return Java {@link Process} object for managing the server process
+     * @param role role of Grid server being started
+     * @param port port that Grid server should use; -1 to specify auto-configuration
+     * @return {@link GridServer} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help<a>
@@ -395,7 +411,7 @@ public final class LocalGrid {
                     URL hostUrl = URI.create(serverHost.toURI()).toURL();
                     GridUtility.getHttpResponse(serverHost, shutdownRequest);
                     new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, hostUrl);
-                } catch (IOException | TimeoutException e) {
+                } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
                     throw UncheckedThrow.throwUnchecked(e);
                 }
             }
