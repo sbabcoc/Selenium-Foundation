@@ -93,13 +93,13 @@ public class SeleniumConfigTest {
 //        assertTrue(path.endsWith("nodeConfig-s3.json"));
 //    }
     
-    @Test
-    public void testHubConfig() {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-        GridHubConfiguration hubConfig = config.getHubConfig();
-        assertNotNull(hubConfig);
-        assertEquals(hubConfig.role, "hub");
-    }
+//    @Test
+//    public void testHubConfig() {
+//        SeleniumConfig config = SeleniumConfig.getConfig();
+//        GridHubConfiguration hubConfig = config.getHubConfig();
+//        assertNotNull(hubConfig);
+//        assertEquals(hubConfig.role, "hub");
+//    }
     
 //    @Test
 //    public void testHubArgs() throws NoSuchFieldException, IllegalAccessException {

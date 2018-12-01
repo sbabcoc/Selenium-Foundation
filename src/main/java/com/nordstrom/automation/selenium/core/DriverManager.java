@@ -262,8 +262,7 @@ public final class DriverManager {
                 if (instance instanceof DriverProvider) {
                     return ((DriverProvider) instance).provideDriver(instance, method);
                 } else {
-                    SeleniumConfig config = AbstractSeleniumConfig.getConfig();
-                    return GridUtility.getDriver(config.getGridHub(), config.getCurrentCapabilities());
+                    return GridUtility.getDriver();
                 }
             }
             

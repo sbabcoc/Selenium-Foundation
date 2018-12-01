@@ -5,16 +5,19 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.jsoup.Jsoup;
@@ -30,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
@@ -122,6 +126,16 @@ public final class GridUtility {
         return client.execute(host, basicHttpEntityEnclosingRequest);
     }
     
+    public static WebDriver getDriver() {
+        if (isHubActive()) {
+            SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+            URL gridHub = config.getGridHub();
+            Capabilities capabilities = config.getCurrentCapabilities();
+            return getDriver(gridHub, capabilities);
+        }
+        throw new IllegalStateException("Unable to launch local Selenium Grid instance");
+    }
+    
     /**
      * Get the Selenium driver for the specified test class instance.
      * 
@@ -129,10 +143,15 @@ public final class GridUtility {
      * @throws MalformedURLException 
      */
     public static WebDriver getDriver(URL gridHub, Capabilities desiredCapabilities) {
-        if (isHubActive(HttpHost.create(gridHub.toString()))) {
-            return new RemoteWebDriver(gridHub, desiredCapabilities);
-        } else {
-            throw new IllegalStateException("No Selenium Grid instance was found at " + gridHub);
+        Objects.requireNonNull(gridHub, "[gridHub] must be non-null");
+        try {
+            if (isHubActive(URIUtils.extractHost(gridHub.toURI()))) {
+                return new RemoteWebDriver(gridHub, desiredCapabilities);
+            } else {
+                throw new IllegalStateException("No Selenium Grid instance was found at " + gridHub);
+            }
+        } catch (URISyntaxException e) {
+            throw UncheckedThrow.throwUnchecked(e);
         }
     }
     

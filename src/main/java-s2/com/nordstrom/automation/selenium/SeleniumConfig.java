@@ -226,7 +226,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     }
     
     @Override
-    public Path createNodeConfig(String capabilities, URL hubEndpoint) throws IOException {
+    public Path createNodeConfig(String capabilities, URL gridHub) throws IOException {
         String nodeConfigPath = getNodeConfigPath().toString();
         String[] configPathBits = nodeConfigPath.split("\\.");
         String hashCode = String.format("%08X", capabilities.hashCode());
@@ -237,7 +237,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             RegistrationRequest nodeConfig = new RegistrationRequest();
             nodeConfig.loadFromJSON(nodeConfigPath);
             nodeConfig.setCapabilities(capabilitiesList);
-            nodeConfig.getConfiguration().put(HUB, hubEndpoint.toString());
+            nodeConfig.getConfiguration().put(HUB, gridHub.toString());
 
             // hack for RegistrationRequest bug
             nodeConfig.setRole(GridRole.NODE);

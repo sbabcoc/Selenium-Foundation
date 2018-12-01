@@ -188,8 +188,8 @@ public final class LocalGrid {
             int endIndex = output.indexOf(GRID_REGISTER) + GRID_REGISTER.length();
             int beginIndex = output.lastIndexOf(' ', endIndex) + 1;
             URI gridHub = URI.create(output.substring(beginIndex, endIndex));
-            URI localhost = URI.create(getLocalHost());
-            return new URL(localhost.getScheme(), localhost.getHost(), gridHub.getPort(), GRID_ENDPOINT);
+            // replace 'localhost' IP address from server with VPN-compatible address
+            return new URL("http", getLocalHost(), gridHub.getPort(), GRID_ENDPOINT);
         }
         
         throw new TimeoutException("Timed of waiting for Grid server to be ready");

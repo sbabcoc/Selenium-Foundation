@@ -21,6 +21,7 @@ import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.http.HttpHost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URIUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
@@ -255,7 +256,11 @@ public abstract class AbstractSeleniumConfig extends
     public HttpHost getHubHost() {
         URL hub = getGridHub();
         if (hub != null) {
-            return HttpHost.create(hub.toString());
+            try {
+                return URIUtils.extractHost(gridHub.toURI());
+            } catch (URISyntaxException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
         }
         return null;
     }

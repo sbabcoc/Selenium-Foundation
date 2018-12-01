@@ -5,15 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
@@ -127,8 +127,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     }
 
     @Override
-    public Path createNodeConfig(String capabilities, String hubEndpoint) throws IOException {
-        String nodeConfigPath = getNodeConfigPath();
+    public Path createNodeConfig(String capabilities, URL gridHub) throws IOException {
+        String nodeConfigPath = getNodeConfigPath().toString();
         String[] configPathBits = nodeConfigPath.split("\\.");
         String hashCode = String.format("%08X", capabilities.hashCode());
         Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
@@ -137,11 +137,18 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
             GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
             nodeConfig.capabilities = capabilitiesList;
-            nodeConfig.hub = hubEndpoint;
+            nodeConfig.hub = gridHub.toString();
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
                 out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
             }
         }
         return filePath;
     }
+    
+    @Override
+    public Capabilities getCapabilitiesForJson(String capabilities) {
+        JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
+        return GridNodeConfiguration.loadFromJSON(input).capabilities.get(0);
+    }
+    
 }
