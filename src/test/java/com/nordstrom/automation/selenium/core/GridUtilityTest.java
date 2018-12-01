@@ -1,18 +1,11 @@
 package com.nordstrom.automation.selenium.core;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.net.UnknownHostException;
-
-import org.openqa.selenium.net.UrlChecker.TimeoutException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
