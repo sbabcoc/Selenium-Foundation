@@ -231,6 +231,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         String[] configPathBits = nodeConfigPath.split("\\.");
         String hashCode = String.format("%08X", capabilities.hashCode());
         Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
+        if (filePath.toFile().exists()) {
+            filePath.toFile().delete();
+        }
         if (filePath.toFile().createNewFile()) {
             String input = JSON_HEAD + capabilities + JSON_TAIL;
             List<DesiredCapabilities> capabilitiesList = RegistrationRequest.getNewInstance(input).getCapabilities();

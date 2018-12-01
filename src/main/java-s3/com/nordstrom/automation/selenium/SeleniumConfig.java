@@ -132,6 +132,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         String[] configPathBits = nodeConfigPath.split("\\.");
         String hashCode = String.format("%08X", capabilities.hashCode());
         Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
+        if (filePath.toFile().exists()) {
+            filePath.toFile().delete();
+        }
         if (filePath.toFile().createNewFile()) {
             JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
             List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
