@@ -75,8 +75,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         }
     }
     
-    private GridHubConfiguration hubConfig;
-    
     /**
      * Instantiate a <b>Selenium Foundation</b> configuration object.
      * 
@@ -97,63 +95,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     }
     
     /**
-     * Get the Selenium Grid hub configuration.
-     * 
-     * @return Selenium Grid hub configuration
-     */
-    public GridHubConfiguration getHubConfig() {
-        if (hubConfig == null) {
-            hubConfig = GridHubConfiguration.loadFromJSON(getHubConfigPath());
-            hubConfig = resolveHubSettings(hubConfig);
-        }
-        return hubConfig;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-//    @Override
-//    public String[] getHubArgs() {
-//        if (hubArgs == null) {
-//            String configPath = getHubConfigPath();
-//            GridHubConfiguration config = getHubConfig();
-//            hubArgs = new String[] {"-role", "hub", "-hubConfig", configPath, 
-//                    "-host", config.host, "-port", config.port.toString()};
-//        }
-//        return Arrays.copyOf(hubArgs, hubArgs.length);
-//    }
-    
-    /**
-     * Resolve Selenium Grid hub settings for host and port.
-     * 
-     * @param hubConfig node configuration with unresolved settings
-     * @return hub configuration with resolved settings
-     */
-    private GridHubConfiguration resolveHubSettings(final GridHubConfiguration hubConfig) {
-        // get configured (or default) Grid hub host
-        String hubHost = getString(SeleniumSettings.HUB_HOST.key());
-        // if host specified
-        if (hubHost != null) {
-            // store specified host
-            hubConfig.host = hubHost;
-        // otherwise, if host unspecified
-        } else if (hubConfig.host == null) {
-            // use 'localhost'
-            hubConfig.host = getLocalHost();
-        }
-        
-        // get configured (or default) Grid hub port
-        Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), null);
-        // if port specified
-        if (hubPort != null) {
-            // store specified port
-            hubConfig.port = hubPort;
-        }
-        
-        return hubConfig;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -162,22 +103,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         defaults.put(SeleniumSettings.HUB_PORT.key(), "4445");
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
         return defaults;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getHubHost() {
-        return getConfig().getHubConfig().host;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getHubPort() {
-        return getConfig().getHubConfig().port;
     }
     
     /**

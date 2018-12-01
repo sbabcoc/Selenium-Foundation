@@ -2,13 +2,10 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -31,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
+import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 
 /**
@@ -39,9 +37,9 @@ import com.nordstrom.common.file.PathUtils;
 public abstract class AbstractSeleniumConfig extends
                 SettingsCore<AbstractSeleniumConfig.SeleniumSettings> {
 
-    private static final String GRID_ENDPOINT = "/wd/hub";
-    private static final String GRID_REGISTER = "/grid/register";
     private static final String SETTINGS_FILE = "settings.properties";
+    private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
+    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
     /**
@@ -65,12 +63,19 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_PATH("selenium.target.path", "/"),
         /** name: <b>selenium.hub.config</b> <br> default: <b>hubConfig.json</b> */
         HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
-        /** name: <b>selenium.hub.host</b> <br> default: {@code null} */
+        /**
+         * This is URL for the Selenium Grid endpoint: [scheme:][//authority]/wd/hub
+         * <p>
+         * name: <b>selenium.hub.host</b> <br> default: {@code null} */
         HUB_HOST("selenium.hub.host", null),
         /** name: <b>selenium.hub.port</b> <br> default: {@code null} */
         HUB_PORT("selenuim.hub.port", null),
         /** name: <b>selenium.node.config</b> <br> default: {@code null} */
         NODE_CONFIG("selenium.node.config", null),
+        /** name: <b>selenium.browser.name</b> <br> default: {@code null} */
+        BROWSER_NAME("selenium.browser.name", null),
+        /** name: <b>selenium.browser.caps</b> <br> default: {@link SeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
+        BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
         /** name: <b>selenium.timeout.pageload</b> <br> default: <b>30</b> */
         PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),
         /** name: <b>selenium.timeout.implied</b> <br> default: <b>15</b> */
@@ -201,10 +206,9 @@ public abstract class AbstractSeleniumConfig extends
     protected static SeleniumConfig seleniumConfig;
     
     private URI targetUri;
-    private String nodeConfigPath;
-    private String hubConfigPath;
-//    protected String[] hubArgs;
-//    protected Capabilities browserCaps;
+    private Path nodeConfigPath;
+    private Path hubConfigPath;
+    private URL gridHub;
     
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
@@ -230,48 +234,68 @@ public abstract class AbstractSeleniumConfig extends
     public abstract String getLauncherClassName();
     
     /**
-     * Get name for Selenium Grid hub server.
+     * Get a host object for the Selenium Grid hub server.
      * 
-     * @return Selenium Grid hub server name
+     * @return {@link HttpHost} object fore the Selenium Grid hub server 
      */
-    public abstract String getHubHost();
+    public URL getGridHub() {
+        if (gridHub == null) {
+            String hostStr = getString(SeleniumSettings.HUB_HOST.key());
+            if (hostStr != null) {
+                try {
+                    gridHub = new URL(hostStr);
+                } catch (MalformedURLException e) {
+                    throw UncheckedThrow.throwUnchecked(e);
+                }
+            }
+        }
+        return gridHub;
+    }
+    
+    public HttpHost getHubHost() {
+        URL hub = getGridHub();
+        if (hub != null) {
+            return HttpHost.create(hub.toString());
+        }
+        return null;
+    }
     
     /**
      * Get port for Selenium Grid hub server.
      * 
      * @return Selenium Grid hub server port
      */
-    public abstract Integer getHubPort();
+//    public abstract Integer getHubPort();
     
     /**
      * Get authority for Selenium Grid hub server.
      * 
      * @return Selenium Grid hub server authority; {@code null} if hub port is undefined
      */
-    public HttpHost getHubAuthority() {
-        if (getHubPort() != null) {
-            return new HttpHost(getHubHost(), getHubPort());
-        }
-        return null;
-    }
+//    public HttpHost getHubAuthority() {
+//        if (getHubPort() != null) {
+//            return new HttpHost(getHubHost(), getHubPort());
+//        }
+//        return null;
+//    }
     
     /**
      * FIXME
      * @return
      */
-    public URI getGridEndpoint() {
-        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
-        return URI.create(host.toURI() + GRID_ENDPOINT);
-    }
+//    public URI getGridEndpoint() {
+//        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
+//        return URI.create(host.toURI() + GRID_ENDPOINT);
+//    }
     
     /**
      * FIXME
      * @return
      */
-    public URI getGridRegister() {
-        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
-        return URI.create(host.toURI() + GRID_REGISTER);
-    }
+//    public URI getGridRegister() {
+//        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
+//        return URI.create(host.toURI() + GRID_REGISTER);
+//    }
     
     /**
      * Get shutdown request string for Selenium Grid node server.
@@ -320,10 +344,11 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @return Selenium Grid node configuration path
      */
-    protected String getNodeConfigPath() {
+    protected Path getNodeConfigPath() {
         if (nodeConfigPath == null) {
-            nodeConfigPath = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
-            LOGGER.debug("nodeConfigPath = {}", nodeConfigPath);
+            String nodeConfig = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
+            LOGGER.debug("nodeConfig = {}", nodeConfig);
+            nodeConfigPath = Paths.get(nodeConfig);
         }
         return nodeConfigPath;
     }
@@ -333,10 +358,11 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @return Selenium Grid hub configuration path
      */
-    public String getHubConfigPath() {
+    public Path getHubConfigPath() {
         if (hubConfigPath == null) {
-            hubConfigPath = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
-            LOGGER.debug("hubConfigPath = {}", hubConfigPath);
+            String hubConfig = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
+            LOGGER.debug("hubConfig = {}", hubConfig);
+            hubConfigPath = Paths.get(hubConfig);
         }
         return hubConfigPath;
     }
@@ -346,31 +372,24 @@ public abstract class AbstractSeleniumConfig extends
      *  
      * @return {@link Capabilities} object for the configured browser specification 
      */ 
-//    public abstract Capabilities getCurrentCapabilities();
-    
-//    public abstract Capabilities getCapabilitiesForName(String browserName);
-    
-//    public abstract Capabilities getCapabilitiesForJson(String capabilities);
-    
-    /**
-     * Get Internet protocol (IP) address for the machine we're running on.
-     * 
-     * @return IP address for the machine we're running on (a.k.a. - 'localhost')
-     */
-    protected String getLocalHost() {
-        String host = getString(SeleniumSettings.GOOGLE_DNS_SOCKET_HOST.key());
-        int port = getInt(SeleniumSettings.GOOGLE_DNS_SOCKET_PORT.key());
-        
-        try (final DatagramSocket socket = new DatagramSocket()) {
-            // use Google Public DNS to discover preferred local IP
-            socket.connect(InetAddress.getByName(host), port);
-            return socket.getLocalAddress().getHostAddress();
-        } catch (SocketException | UnknownHostException eaten) { //NOSONAR
-            LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
-            return "localhost";
+    public Capabilities getCurrentCapabilities() {
+        String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
+        if (browserName != null) {
+            return getCapabilitiesForName(browserName);
         }
+        String capabilities = getString(SeleniumSettings.BROWSER_CAPS.key());
+        if (capabilities != null) {
+            return getCapabilitiesForJson(capabilities);
+        }
+        throw new IllegalStateException("Neither browser name nor capabilities are specified");
     }
-
+    
+    public Capabilities getCapabilitiesForName(String browserName) {
+        return getCapabilitiesForJson(String.format(CAPS_PATTERN, browserName));
+    }
+    
+    public abstract Capabilities getCapabilitiesForJson(String capabilities);
+    
     /**
      * Get the path to the specified configuration file.
      * 
@@ -436,7 +455,7 @@ public abstract class AbstractSeleniumConfig extends
      */ 
     public abstract String[] getDependencyContexts();
     
-    public abstract Path createNodeConfig(String jsonStr, String hubEndpoint) throws IOException;
+    public abstract Path createNodeConfig(String jsonStr, URL hubEndpoint) throws IOException;
     
     /**
      * {@inheritDoc}

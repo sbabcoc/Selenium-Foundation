@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
-import java.time.Clock;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -12,10 +11,10 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Sleeper;
 import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
@@ -120,8 +119,8 @@ public final class DriverManager {
                 }
             }
             
-            // if driver acquired and initial page specified
-            if ((optDriver.isPresent()) && (initialPage != null)) {
+            // if initial page spec'd
+            if (initialPage != null) {
                 Page page = Page.openInitialPage(initialPage, optDriver.get(), config.getTargetUri());
                 instance.setInitialPage(instance.prepInitialPage(page));
             }
@@ -263,7 +262,8 @@ public final class DriverManager {
                 if (instance instanceof DriverProvider) {
                     return ((DriverProvider) instance).provideDriver(instance, method);
                 } else {
-                    return GridUtility.getDriver();
+                    SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+                    return GridUtility.getDriver(config.getGridHub(), config.getCurrentCapabilities());
                 }
             }
             
@@ -291,7 +291,7 @@ public final class DriverManager {
          * @param timeOutInSeconds 'wait' timeout in seconds
          */
         public DriverSessionWait(final TestBase context, final long timeOutInSeconds) {
-            super(context, Clock.systemDefaultZone(), Sleeper.SYSTEM_SLEEPER);
+            super(context);
             withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
         }
     }

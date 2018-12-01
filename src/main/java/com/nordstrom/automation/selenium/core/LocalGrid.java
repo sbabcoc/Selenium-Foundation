@@ -5,9 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -60,6 +65,7 @@ public final class LocalGrid {
     
     private static final String HUB_READY = "up and running";
     private static final String NODE_READY = "ready to use";
+    private static final String GRID_ENDPOINT = "/wd/hub";
     private static final String GRID_REGISTER = "/grid/register";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalGrid.class);
@@ -70,23 +76,44 @@ public final class LocalGrid {
     private LocalGrid() {
     }
     
+    /**
+     * Get grid server object for the active hub.
+     * 
+     * @return {@link GridServer} object that represents the active hub server
+     */
     public GridServer getHubServer() {
         return hubServer;
     }
     
+    /**
+     * Get the list of grid server objects for the attached nodes.
+     * 
+     * @return list of {@link GridServer} objects that represent the attached node servers
+     */
     public List<GridServer> getNodeServers() {
         return nodeServers;
     }
     
+    /**
+     * 
+     * @param config
+     * @param hubConfigPath
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws TimeoutException
+     */
     public static LocalGrid launch(SeleniumConfig config, final Path hubConfigPath)
                     throws IOException, InterruptedException, TimeoutException {
         
         String launcherClassName = config.getLauncherClassName();
         String[] dependencyContexts = config.getDependencyContexts();
         long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
-        Integer hubPort = config.getHubPort();
+        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
         GridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB, hubPort, hubConfigPath);
-        String hubEndpoint = waitUntilReady(hubServer, hostTimeout);
+        URL gridHub = waitUntilReady(hubServer, hostTimeout);
+        
+        System.setProperty(SeleniumSettings.HUB_HOST.key(), gridHub.toString());
         
         // two flavors of nodes: standalone (e.g. - appium) or hosted (e.g. - chrome)
         // => bury the distinction by providing a 'start()' method that returns a GridServer object
@@ -115,7 +142,7 @@ public final class LocalGrid {
         List<GridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
             String capabilities = driverPlugin.getCapabilities();
-            Path nodeConfigPath = config.createNodeConfig(capabilities, hubEndpoint);
+            Path nodeConfigPath = config.createNodeConfig(capabilities, gridHub);
             GridServer nodeServer = driverPlugin.start(launcherClassName, dependencyContexts, nodeConfigPath);
             waitUntilReady(nodeServer, hostTimeout);
             nodeServers.add(nodeServer);
@@ -125,17 +152,10 @@ public final class LocalGrid {
         localGrid.hubServer = hubServer;
         localGrid.nodeServers = nodeServers;
         
-        GridUtility.getGridProxies(hubEndpoint);
+        GridUtility.getGridProxies(gridHub);
 
         return localGrid;
     }
-    
-    /*
-     * Hub process emits the string "Nodes should register to http://10.18.33.177:4444/grid/register/"
-     * Hub process emits the String "Selenium Grid hub is up and running"
-     * Node process emits the string "Registering the node to the hub: http://10.18.33.177:4445/grid/register"
-     * Node process emits the string "The node is registered to the hub and ready to use"
-     */
     
     /**
      * Wait for the specified Grid server to indicate that it's ready.
@@ -147,7 +167,7 @@ public final class LocalGrid {
      * @throws IOException if an I/O error occurs
      * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
      */
-    private static String waitUntilReady(GridServer server, long maxWait) throws IOException, InterruptedException, TimeoutException {
+    private static URL waitUntilReady(GridServer server, long maxWait) throws IOException, InterruptedException, TimeoutException {
         boolean didTimeout = false;
         StringBuilder builder = new StringBuilder();
         long maxTime = System.currentTimeMillis() + maxWait;
@@ -167,7 +187,9 @@ public final class LocalGrid {
         if (!didTimeout) {
             int endIndex = output.indexOf(GRID_REGISTER) + GRID_REGISTER.length();
             int beginIndex = output.lastIndexOf(' ', endIndex) + 1;
-            return output.substring(beginIndex, endIndex);
+            URI gridHub = URI.create(output.substring(beginIndex, endIndex));
+            URI localhost = URI.create(getLocalHost());
+            return new URL(localhost.getScheme(), localhost.getHost(), gridHub.getPort(), GRID_ENDPOINT);
         }
         
         throw new TimeoutException("Timed of waiting for Grid server to be ready");
@@ -224,12 +246,14 @@ public final class LocalGrid {
      */
     public static GridServer start(final String launcherClassName,
                     final String[] dependencyContexts, final GridRole role, final Integer port, final Path configPath) {
-        String gridRole = role.toString();
+        String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
-        argsList.add(OPT_PORT);
-        argsList.add(port.toString());
+        if (port.intValue() != -1) {
+            argsList.add(OPT_PORT);
+            argsList.add(port.toString());
+        }
         argsList.add("-" + gridRole + "Config");
         argsList.add(configPath.toString());
         
@@ -344,9 +368,6 @@ public final class LocalGrid {
         private HttpHost serverHost;
         private String statusRequest;
         private String shutdownRequest;
-        private URL endpointUrl;
-        private URL statusUrl;
-        
         
         GridServer(String role, Process process, Path outputPath) {
             this.isHub = ("hub".equals(role));
@@ -379,15 +400,6 @@ public final class LocalGrid {
             this.readyMessage = readyMessage;
         }
         
-        /*
-            try {
-                parms.endpointUrl = URI.create(parms.serverHost.toURI() + GRID_ENDPOINT).toURL();
-                parms.statusUrl = URI.create(parms.serverHost.toURI() + parms.statusRequest).toURL();
-            } catch (MalformedURLException e) {
-                throw new InvalidGridHostException("node", parms.serverHost, e);
-            }
-         */
-        
         public boolean stopGridServer(final boolean localOnly) {
             return stopGridServer(serverHost, statusRequest, shutdownRequest, localOnly);
         }
@@ -417,6 +429,26 @@ public final class LocalGrid {
             }
             
             return true;
+        }
+    }
+
+    /**
+     * Get Internet protocol (IP) address for the machine we're running on.
+     * 
+     * @return IP address for the machine we're running on (a.k.a. - 'localhost')
+     */
+    public static String getLocalHost() {
+        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+        String host = config.getString(SeleniumSettings.GOOGLE_DNS_SOCKET_HOST.key());
+        int port = config.getInt(SeleniumSettings.GOOGLE_DNS_SOCKET_PORT.key());
+        
+        try (final DatagramSocket socket = new DatagramSocket()) {
+            // use Google Public DNS to discover preferred local IP
+            socket.connect(InetAddress.getByName(host), port);
+            return socket.getLocalAddress().getHostAddress();
+        } catch (SocketException | UnknownHostException eaten) { //NOSONAR
+            LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
+            return "localhost";
         }
     }
 

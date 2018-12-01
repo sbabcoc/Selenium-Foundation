@@ -30,8 +30,9 @@ public class HtmlUnitPlugin implements DriverPlugin {
                     "org.eclipse.jetty.websocket.common.Parser",
                     "org.eclipse.jetty.websocket.api.Session"};
     
-    private static final String BROWSER_NAME = "htmlunit";
-
+    private static final String CAPABILITIES =
+                    "{\"browserName\":\"htmlunit\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\", \"javascriptEnabled\":true}";
+    
     /**
      * {@inheritDoc}
      */
@@ -40,8 +41,12 @@ public class HtmlUnitPlugin implements DriverPlugin {
         return DEPENDENCY_CONTEXTS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String getBrowserName() {
-        return BROWSER_NAME;
+    public String getCapabilities() {
+        return CAPABILITIES;
     }
+
 }

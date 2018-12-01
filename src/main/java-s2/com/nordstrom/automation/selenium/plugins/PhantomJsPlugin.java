@@ -18,8 +18,9 @@ public class PhantomJsPlugin implements DriverPlugin {
                     "org.apache.commons.exec.Executor", "com.sun.jna.platform.win32.Kernel32",
                     "com.sun.jna.win32.StdCallLibrary"};
     
-    private static final String BROWSER_NAME = "phantomjs";
-
+    private static final String CAPABILITIES =
+                    "{\"browserName\": \"phantomjs\", \"maxInstances\": 5, \"seleniumProtocol\": \"WebDriver\"}";
+    
     /**
      * {@inheritDoc}
      */
@@ -28,8 +29,12 @@ public class PhantomJsPlugin implements DriverPlugin {
         return DEPENDENCY_CONTEXTS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String getBrowserName() {
-        return BROWSER_NAME;
+    public String getCapabilities() {
+        return CAPABILITIES;
     }
+
 }
