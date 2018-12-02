@@ -13,7 +13,7 @@ import com.nordstrom.automation.selenium.annotations.NoDriver;
 public class GridProcessTest {
 
     @NoDriver
-    @Test(expectedExceptions = {AssertionError.class},
+    @Test(enabled = false, expectedExceptions = {AssertionError.class},
             expectedExceptionsMessageRegExp = "GridProcess is a static utility class that cannot be instantiated")
     public void testPrivateConstructor() throws Throwable {
         

@@ -177,6 +177,11 @@
             <version>${selenium.version}</version>
           </dependency>
           <dependency>
+            <groupId>net.sourceforge.htmlunit</groupId>
+            <artifactId>htmlunit</artifactId>
+            <version>${htmlunit.version}</version>
+          </dependency>
+          <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>htmlunit-driver</artifactId>
             <version>${htmlunit.version}</version>
@@ -201,6 +206,10 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-support</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>net.sourceforge.htmlunit</groupId>
+          <artifactId>htmlunit</artifactId>
         </dependency>
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
