@@ -1,6 +1,5 @@
 package com.nordstrom.automation.selenium.core;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -182,7 +180,7 @@ public final class LocalGrid {
         }
         
         String output = builder.toString();
-        System.out.println("output: " + output);
+        LOGGER.info("output: {}", output);
         
         if (!didTimeout) {
             int endIndex = output.indexOf(GRID_REGISTER) + GRID_REGISTER.length();
@@ -205,7 +203,7 @@ public final class LocalGrid {
      * @throws IOException if an I/O error occurs
      */
     private static boolean appendAndCheckFor(InputStream inputStream, String readyMessage, StringBuilder builder) throws InterruptedException, IOException {
-        String recv = readAvailable(inputStream);
+        String recv = GridUtility.readAvailable(inputStream);
         if ( ! recv.isEmpty()) {
             builder.append(recv);
             int readyMsgIndex = builder.indexOf(readyMessage);
@@ -213,23 +211,6 @@ public final class LocalGrid {
             return ((readyMsgIndex == -1) || (registerIndex == -1));
         }
         return true;
-    }
-    
-    /**
-     * Read available input from the specified input stream.
-     * 
-     * @param inputStream input stream
-     * @return available input
-     * @throws IOException if an I/O error occurs
-     */
-    private static String readAvailable(InputStream inputStream) throws IOException {
-        int length;
-        byte[] buffer = new byte[1024];
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        while ((length = inputStream.read(buffer)) != -1) {
-            result.write(buffer, 0, length);
-        }
-        return result.toString(StandardCharsets.UTF_8.name());
     }
     
     /**

@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.core;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -8,6 +10,7 @@ import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -170,6 +173,23 @@ public final class GridUtility {
     }
     
     /**
+     * Read available input from the specified input stream.
+     * 
+     * @param inputStream input stream
+     * @return available input
+     * @throws IOException if an I/O error occurs
+     */
+    public static String readAvailable(InputStream inputStream) throws IOException {
+        int length;
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        while ((length = inputStream.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString(StandardCharsets.UTF_8.name());
+    }
+
+    /**
      * 
      * @param gridHub
      * @return
@@ -185,13 +205,17 @@ public final class GridUtility {
             int beginIndex = text.indexOf("http");
             int endIndex = text.indexOf(',');
             nodeList.add(text.substring(beginIndex, endIndex));
+            getNodeCapabilities(gridHub, text.substring(beginIndex, endIndex));
         }
         return nodeList;
     }
     
     public static List<Capabilities> getNodeCapabilities(URL gridHub, String nodeEndpoint) throws IOException {
+        String json;
         String url = gridHub.getProtocol() + "://" + gridHub.getAuthority() + NODE_CONFIG + "?id=" + nodeEndpoint;
-        Document doc = Jsoup.connect(url).get();
+        try (InputStream is = new URL(url).openStream()) {
+            json = readAvailable(is);
+        }
         return null;
     }
 
