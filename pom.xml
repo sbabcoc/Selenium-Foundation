@@ -51,6 +51,7 @@
     <sonar.language>java</sonar.language>
     <jacoco.version>0.7.9</jacoco.version>
     <mockito.version>1.10.19</mockito.version>
+    <jsoup.version>1.10.2</jsoup.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
     <dependency-plugin.version>3.1.1</dependency-plugin.version>
     <clean-plugin.version>3.1.0</clean-plugin.version>
@@ -96,6 +97,11 @@
         <version>${logback-testng.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>${jsoup.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
         <version>${mockito.version}</version>
@@ -130,7 +136,6 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.10.2</version>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
