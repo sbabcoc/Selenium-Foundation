@@ -49,7 +49,7 @@ import com.nordstrom.common.file.PathUtils;
  * Java process.  
  */
 @SuppressWarnings("squid:S1774")
-public final class LocalGrid {
+public final class SeleniumGrid {
     
     private GridServer hubServer;
     private List<GridServer> nodeServers = new ArrayList<>();
@@ -66,12 +66,12 @@ public final class LocalGrid {
     private static final String GRID_ENDPOINT = "/wd/hub";
     private static final String GRID_REGISTER = "/grid/register";
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalGrid.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
     /**
      * Private constructor to prevent direct instantiation from outside.
      */
-    private LocalGrid() {
+    private SeleniumGrid() {
     }
     
     /**
@@ -101,7 +101,7 @@ public final class LocalGrid {
      * @throws InterruptedException
      * @throws TimeoutException
      */
-    public static LocalGrid launch(SeleniumConfig config, final Path hubConfigPath)
+    public static SeleniumGrid launch(SeleniumConfig config, final Path hubConfigPath)
                     throws IOException, InterruptedException, TimeoutException {
         
         String launcherClassName = config.getLauncherClassName();
@@ -146,7 +146,7 @@ public final class LocalGrid {
             nodeServers.add(nodeServer);
         }
         
-        LocalGrid localGrid = new LocalGrid();
+        SeleniumGrid localGrid = new SeleniumGrid();
         localGrid.hubServer = hubServer;
         localGrid.nodeServers = nodeServers;
         

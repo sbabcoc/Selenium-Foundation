@@ -43,7 +43,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  */
 public final class GridUtility {
     
-    private static LocalGrid localGrid;
+    private static SeleniumGrid localGrid;
     
     private static final String NODE_STATUS = "/wd/hub/status";
     private static final String HUB_CONFIG = "/grid/api/hub/";
@@ -72,7 +72,7 @@ public final class GridUtility {
         
         if (!isActive && ((hubHost == null) || isLocalHost(hubHost))) {
             try {
-                localGrid = LocalGrid.launch(config, config.getHubConfigPath());
+                localGrid = SeleniumGrid.launch(config, config.getHubConfigPath());
                 isActive = true;
             } catch (GridServerLaunchFailedException | IOException | TimeoutException e) {
                 LOGGER.warn("Unable to launch Selenium Grid server", e);
