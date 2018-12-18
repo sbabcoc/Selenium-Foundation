@@ -65,24 +65,24 @@ public final class GridUtility {
      * 
      * @return 'true' if configured hub is active; otherwise 'false'
      */
-    public static boolean isHubActive() {
-        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
-        HttpHost hubHost = config.getHubHost();
-        boolean isActive = isHubActive(hubHost);
-        
-        if (!isActive && ((hubHost == null) || isLocalHost(hubHost))) {
-            try {
-                localGrid = SeleniumGrid.launch(config, config.getHubConfigPath());
-                isActive = true;
-            } catch (GridServerLaunchFailedException | IOException | TimeoutException e) {
-                LOGGER.warn("Unable to launch Selenium Grid server", e);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        
-        return isActive;
-    }
+//    public static boolean isHubActive() {
+//        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+//        HttpHost hubHost = config.getHubHost();
+//        boolean isActive = isHubActive(hubHost);
+//        
+//        if (!isActive && ((hubHost == null) || isLocalHost(hubHost))) {
+//            try {
+//                localGrid = LocalSeleniumGrid.launch(config, config.getHubConfigPath());
+//                isActive = true;
+//            } catch (GridServerLaunchFailedException | IOException | TimeoutException e) {
+//                LOGGER.warn("Unable to launch Selenium Grid server", e);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }
+//        
+//        return isActive;
+//    }
     
     /**
      * Determine if the configured Selenium Grid hub is active.
@@ -129,9 +129,28 @@ public final class GridUtility {
         return client.execute(host, basicHttpEntityEnclosingRequest);
     }
     
+    /**
+     * 
+     * @return
+     */
     public static WebDriver getDriver() {
-        if (isHubActive()) {
-            SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+        
+        HttpHost hubHost = config.getHubHost();
+        boolean isActive = isHubActive(hubHost);
+        
+        if (!isActive && ((hubHost == null) || isLocalHost(hubHost))) {
+            try {
+                localGrid = LocalSeleniumGrid.launch(config, config.getHubConfigPath());
+                isActive = true;
+            } catch (GridServerLaunchFailedException | IOException | TimeoutException e) {
+                LOGGER.warn("Unable to launch Selenium Grid server", e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        
+        if (isActive) {
             URL gridHub = config.getGridHub();
             Capabilities capabilities = config.getCurrentCapabilities();
             return getDriver(gridHub, capabilities);

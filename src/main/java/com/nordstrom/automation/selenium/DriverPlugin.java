@@ -5,7 +5,8 @@ import java.util.stream.Stream;
 
 import org.openqa.grid.common.GridRole;
 
-import com.nordstrom.automation.selenium.core.SeleniumGrid;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 
 public interface DriverPlugin {
@@ -21,9 +22,9 @@ public interface DriverPlugin {
      * @param nodeConfigPath
      * @return
      */
-    public default GridServer start(String launcherClassName, String[] dependencyContexts, Path nodeConfigPath) {
+    public default LocalGridServer start(String launcherClassName, String[] dependencyContexts, Path nodeConfigPath) {
         String[] combinedContexts = combineDependencyContexts(dependencyContexts);
-        return SeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE, Integer.valueOf(-1), nodeConfigPath);
+        return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE, Integer.valueOf(-1), nodeConfigPath);
     }
     
     /**

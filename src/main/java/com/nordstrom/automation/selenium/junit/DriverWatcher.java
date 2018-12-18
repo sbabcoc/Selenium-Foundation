@@ -33,7 +33,7 @@ public class DriverWatcher implements MethodWatcher {
      * {@inheritDoc}
      */
     @Override
-    public void beforeInvocation(final Object obj, final FrameworkMethod method, final Object... params) {
+    public void beforeInvocation(final Object runner, final Object obj, final FrameworkMethod method, final Object... params) {
         DriverManager.beforeInvocation(obj, method.getMethod());
     }
     
@@ -41,7 +41,7 @@ public class DriverWatcher implements MethodWatcher {
      * {@inheritDoc}
      */
     @Override
-    public void afterInvocation(final Object obj, final FrameworkMethod method, final Throwable thrown) {
+    public void afterInvocation(final Object runner, final Object obj, final FrameworkMethod method, final Throwable thrown) {
         DriverManager.afterInvocation(obj, method.getMethod());
     }
     
