@@ -266,7 +266,7 @@ repositories {
 dependencies {
   compile 'com.nordstrom.tools:java-utils:1.7.3'
   compile 'com.nordstrom.tools:settings:2.2.2'
-  compile 'com.nordstrom.tools:testng-foundation:1.10.3'
+  compile 'com.nordstrom.tools:testng-foundation:1.10.4'
   compile 'com.nordstrom.tools:junit-foundation:9.0.3'
   compile 'ch.qos.logback:logback-classic:1.2.2'
   compile 'com.github.sbabcoc:logback-testng:1.0.1'
