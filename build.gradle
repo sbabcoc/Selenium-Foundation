@@ -263,14 +263,6 @@ repositories {
   maven { url "${projectDir}/repo" }
 }
 
-configurations {
-  junitAgent
-}
-
-test.doFirst {
-  jvmArgs "-javaagent:${configurations.junitAgent.files.iterator().next()}"
-}
-
 dependencies {
   compile 'com.nordstrom.tools:java-utils:1.7.3'
   compile 'com.nordstrom.tools:settings:2.2.2'
@@ -278,11 +270,16 @@ dependencies {
   compile 'com.nordstrom.tools:junit-foundation:9.0.3'
   compile 'ch.qos.logback:logback-classic:1.2.2'
   compile 'com.github.sbabcoc:logback-testng:1.0.1'
-  
-  junitAgent 'com.nordstrom.tools:junit-foundation:9.0.3'
+  compile 'org.jsoup:jsoup:1.10.2'
   
   apply from: "${profile}Deps.gradle"
   
   testCompile configurations["${profile}Compile"]
   testCompile 'org.mockito:mockito-all:1.10.19'
+}
+ext {
+    junitFoundation = configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.name == 'junit-foundation' }
+}
+test.doFirst {
+    jvmArgs "-javaagent:${junitFoundation.file}"
 }
