@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.openqa.grid.common.GridRole;
+import org.openqa.grid.web.servlet.LifecycleServlet;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
@@ -50,6 +51,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     protected List<LocalGridServer> nodeServers = new ArrayList<>();
 
     private static final String OPT_ROLE = "-role";
+    private static final String OPT_SERVLETS = "-servlets";
     private static final String OPT_PORT = "-port";
     private static final String LOGS_PATH = "logs";
     
@@ -75,13 +77,17 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
     
     /**
+     * Launch local Selenium Grid instance.
+     * <p>
+     * <b>NOTE</b>: This method stores the hub host URL in the {@link SeleniumSettings#HUB_HOST HUB_HOST} property for
+     * subsequent retrieval.
      * 
-     * @param config
-     * @param hubConfigPath
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws TimeoutException
+     * @param config {@link SeleniumConfig} object
+     * @param hubConfigPath Selenium Grid hub configuration path
+     * @return {@link SeleniumGrid} object for local Grid
+     * @throws IOException if an I/O error occurs
+     * @throws InterruptedException if this thread was interrupted
+     * @throws TimeoutException if host timeout interval exceeded
      */
     public static SeleniumGrid launch(SeleniumConfig config, final Path hubConfigPath)
                     throws IOException, InterruptedException, TimeoutException {
@@ -93,6 +99,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         LocalGridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB, hubPort, hubConfigPath);
         URL gridHub = waitUntilReady(hubServer, hostTimeout);
         
+        // store hub host URL in system property for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), gridHub.toString());
         
         // two flavors of nodes: standalone (e.g. - appium) or hosted (e.g. - chrome)
@@ -132,7 +139,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         localGrid.hubServer = hubServer;
         localGrid.nodeServers = nodeServers;
         
-        GridUtility.getGridProxies(gridHub);
+        // TODO - Remove this method test code
+        GridUtility.getGridProxies(config, gridHub);
     
         return localGrid;
     }
@@ -213,6 +221,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         List<String> argsList = new ArrayList<>();
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
+        if (role == GridRole.NODE) {
+            argsList.add(OPT_SERVLETS);
+            argsList.add(LifecycleServlet.class.getName());
+        }
         if (port.intValue() != -1) {
             argsList.add(OPT_PORT);
             argsList.add(port.toString());
@@ -244,7 +256,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         builder.redirectOutput(outputPath.toFile());
         
         try {
-            return new LocalGridServer(gridRole, builder.start(), outputPath);
+            return new LocalGridServer(role, builder.start(), outputPath);
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
@@ -345,7 +357,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     
     public static class LocalGridServer extends GridServer {
 
-        private boolean isHub;          // unneeded with hub-specific server class
         private Process process;        // LOCAL
         Path outputPath;                // LOCAL
         String readyMessage;            // LOCAL
@@ -353,8 +364,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         private static final String HUB_READY = "up and running";
         private static final String NODE_READY = "ready to use";
         
-        LocalGridServer(String role, Process process, Path outputPath) {
-            this.isHub = ("hub".equals(role));
+        LocalGridServer(GridRole role, Process process, Path outputPath) {
+            super(role);
             this.process = process;
             this.outputPath = outputPath;
             if (isHub) {

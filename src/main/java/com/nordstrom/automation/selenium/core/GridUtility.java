@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URISyntaxException;
@@ -27,7 +26,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -35,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -44,11 +43,6 @@ import com.nordstrom.common.base.UncheckedThrow;
 public final class GridUtility {
     
     private static SeleniumGrid localGrid;
-    
-    private static final String NODE_STATUS = "/wd/hub/status";
-    private static final String HUB_CONFIG = "/grid/api/hub/";
-    private static final String NODE_CONFIG = "/grid/api/proxy";
-    private static final String GRID_CONSOLE = "/grid/console";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
     
@@ -91,7 +85,7 @@ public final class GridUtility {
      * @return 'true' if configured hub is active; otherwise 'false'
      */
     public static boolean isHubActive(HttpHost hubHost) {
-        return isHostActive(hubHost, HUB_CONFIG);
+        return isHostActive(hubHost, GridServer.HUB_CONFIG);
     }
 
     /**
@@ -130,8 +124,11 @@ public final class GridUtility {
     }
     
     /**
+     * Get a driver with "current" capabilities from the active Selenium Grid.
+     * <p>
+     * <b>NOTE</b>: This method acquires Grid URL and desired driver capabilities from the active configuration.
      * 
-     * @return
+     * @return driver object (may be 'null')
      */
     public static WebDriver getDriver() {
         SeleniumConfig config = AbstractSeleniumConfig.getConfig();
@@ -159,10 +156,11 @@ public final class GridUtility {
     }
     
     /**
-     * Get the Selenium driver for the specified test class instance.
+     * Get a driver with desired capabilities from specified Selenium Grid hub.
      * 
+     * @param gridHub Grid hub from which to obtain the driver
+     * @param desiredCapabilities desired capabilities for the driver
      * @return driver object (may be 'null')
-     * @throws MalformedURLException 
      */
     public static WebDriver getDriver(URL gridHub, Capabilities desiredCapabilities) {
         Objects.requireNonNull(gridHub, "[gridHub] must be non-null");
@@ -175,20 +173,6 @@ public final class GridUtility {
         } catch (URISyntaxException e) {
             throw UncheckedThrow.throwUnchecked(e);
         }
-    }
-    
-    /**
-     * FIXME
-     * @param role
-     * @return
-     */
-    public String getStatusPath(GridRole role) {
-        if (role == GridRole.HUB) {
-            return HUB_CONFIG;
-        } else if (role == GridRole.NODE) {
-            return NODE_STATUS;
-        }
-        throw new IllegalArgumentException("Specified [role] is unsupported: " + role);
     }
     
     /**
@@ -210,12 +194,13 @@ public final class GridUtility {
 
     /**
      * 
+     * @param config TODO
      * @param gridHub
      * @return
      * @throws IOException
      */
-    public static List<String> getGridProxies(URL gridHub) throws IOException {
-        String url = gridHub.getProtocol() + "://" + gridHub.getAuthority() + GRID_CONSOLE;
+    public static List<String> getGridProxies(SeleniumConfig config, URL gridHub) throws IOException {
+        String url = gridHub.getProtocol() + "://" + gridHub.getAuthority() + GridServer.GRID_CONSOLE;
         Document doc = Jsoup.connect(url).get();
         Elements proxyIds = doc.select("p.proxyid");
         List<String> nodeList = new ArrayList<>();
@@ -224,18 +209,26 @@ public final class GridUtility {
             int beginIndex = text.indexOf("http");
             int endIndex = text.indexOf(',');
             nodeList.add(text.substring(beginIndex, endIndex));
-            getNodeCapabilities(gridHub, text.substring(beginIndex, endIndex));
+            getNodeCapabilities(config, gridHub, text.substring(beginIndex, endIndex));
         }
         return nodeList;
     }
     
-    public static List<Capabilities> getNodeCapabilities(URL gridHub, String nodeEndpoint) throws IOException {
+    /**
+     * 
+     * @param config TODO
+     * @param gridHub
+     * @param nodeEndpoint
+     * @return
+     * @throws IOException
+     */
+    public static Capabilities getNodeCapabilities(SeleniumConfig config, URL gridHub, String nodeEndpoint) throws IOException {
         String json;
-        String url = gridHub.getProtocol() + "://" + gridHub.getAuthority() + NODE_CONFIG + "?id=" + nodeEndpoint;
+        String url = gridHub.getProtocol() + "://" + gridHub.getAuthority() + GridServer.NODE_CONFIG + "?id=" + nodeEndpoint;
         try (InputStream is = new URL(url).openStream()) {
             json = readAvailable(is);
         }
-        return null;
+        return config.getCapabilitiesForJson(json);
     }
 
     /**

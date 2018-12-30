@@ -259,7 +259,7 @@ public final class DriverManager {
             public WebDriver apply(final TestBase instance) {
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
-                    return ((DriverProvider) instance).provideDriver(instance, method);
+                    return ((DriverProvider) instance).provideDriver(method);
                 } else {
                     return GridUtility.getDriver();
                 }

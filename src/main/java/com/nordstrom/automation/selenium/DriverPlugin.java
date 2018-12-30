@@ -7,7 +7,6 @@ import org.openqa.grid.common.GridRole;
 
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
-import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 
 public interface DriverPlugin {
     

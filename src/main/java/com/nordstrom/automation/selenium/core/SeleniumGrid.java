@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
+import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.net.UrlChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +29,39 @@ public class SeleniumGrid {
      * Add knowledge of node properties and behaviors. Add shutdown methods.
      */
     public static class GridServer {
+        protected boolean isHub;
         private HttpHost serverHost;    // COMMON
         private String statusRequest;   // COMMON (can be assembled on request)
         private String shutdownRequest; // COMMON (can be assembled on request)
         
-        private static final long SHUTDOWN_DELAY = 15;
+        public static final String GRID_CONSOLE = "/grid/console";
+        public static final String NODE_STATUS = "/wd/hub/status";
+        public static final String HUB_CONFIG = "/grid/api/hub/";
+        public static final String NODE_CONFIG = "/grid/api/proxy";
+        
         private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
+        private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
+        private static final long SHUTDOWN_DELAY = 15;
+        
+        public GridServer(GridRole role) {
+            if (role == GridRole.HUB) {
+                isHub = true;
+                statusRequest = HUB_CONFIG;
+                shutdownRequest = HUB_SHUTDOWN;
+            } else {
+                isHub = false;
+                statusRequest = NODE_STATUS;
+                shutdownRequest = NODE_SHUTDOWN;
+            }
+        }
+        
+        public HttpHost getHost() {
+            return serverHost;
+        }
+        
+        public void setHost(HttpHost host) {
+            this.serverHost = host;
+        }
         
         public boolean stopGridServer(final boolean localOnly) {
             return stopGridServer(serverHost, statusRequest, shutdownRequest, localOnly);
