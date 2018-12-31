@@ -5,13 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.http.HttpHost;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -36,24 +38,24 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <b>org.openqa.grid.selenium.GridLauncherV3</b>
      * 
      * <pre>&lt;dependency&gt;
-     *   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *   &lt;artifactId&gt;selenium-server-standalone&lt;/artifactId&gt;
-     *   &lt;version&gt;3.14.0&lt;/version&gt;
-     * &lt;/dependency&gt;</pre>
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-server-standalone&lt;/artifactId&gt;
+     *  &lt;version&gt;3.14.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
      * 
      * <b>org.openqa.selenium.phantomjs.PhantomJSDriver</b>
      * 
      * <pre>&lt;dependency&gt;
-     *   &lt;groupId&gt;com.github.detro&lt;/groupId&gt;
-     *   &lt;artifactId&gt;ghostdriver&lt;/artifactId&gt;
-     *   &lt;version&gt;2.1.0&lt;/version&gt;
-     *   &lt;exclusions&gt;
-     *     &lt;exclusion&gt;
-     *       &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *       &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
-     *     &lt;/exclusion&gt;
-     *   &lt;/exclusions&gt;
-     * &lt;/dependency&gt;</pre>
+     *  &lt;groupId&gt;com.github.detro&lt;/groupId&gt;
+     *  &lt;artifactId&gt;ghostdriver&lt;/artifactId&gt;
+     *  &lt;version&gt;2.1.0&lt;/version&gt;
+     *  &lt;exclusions&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *  &lt;/exclusions&gt;
+     *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.grid.selenium.GridLauncherV3",
@@ -121,26 +123,32 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return "org.openqa.grid.selenium.GridLauncherV3";
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Path createNodeConfig(String capabilities, URL gridHub) throws IOException {
+    public Path createNodeConfig(String capabilities, HttpHost hubHost) throws IOException {
         String nodeConfigPath = getNodeConfigPath().toString();
         String[] configPathBits = nodeConfigPath.split("\\.");
         String hashCode = String.format("%08X", capabilities.hashCode());
         Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
         if (filePath.toFile().exists()) {
-            filePath.toFile().delete();
+            Files.delete(filePath);
         }
         if (filePath.toFile().createNewFile()) {
             JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
             List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
             GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
             nodeConfig.capabilities = capabilitiesList;
-            nodeConfig.hub = gridHub.toString();
+            nodeConfig.hub = hubHost.toURI();
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
                 out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
             }
@@ -148,6 +156,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return filePath;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Capabilities getCapabilitiesForJson(String capabilities) {
         JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));

@@ -10,8 +10,16 @@ import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 
 public interface DriverPlugin {
     
+    /**
+     * 
+     * @return
+     */
     String[] getDependencyContexts();
     
+    /**
+     * 
+     * @return
+     */
     String getCapabilities();
     
     /**

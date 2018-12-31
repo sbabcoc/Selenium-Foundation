@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -26,10 +25,8 @@ import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
-import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 
 /**
@@ -209,7 +206,7 @@ public abstract class AbstractSeleniumConfig extends
     private URI targetUri;
     private Path nodeConfigPath;
     private Path hubConfigPath;
-    private URL gridHub;
+    private HttpHost hubHost;
     
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
@@ -237,62 +234,17 @@ public abstract class AbstractSeleniumConfig extends
     /**
      * Get a host object for the Selenium Grid hub server.
      * 
-     * @return {@link HttpHost} object fore the Selenium Grid hub server 
+     * @return {@link HttpHost} object for the Selenium Grid hub server 
      */
-    public URL getGridHub() {
-        if (gridHub == null) {
+    public HttpHost getHubHost() {
+        if (hubHost == null) {
             String hostStr = getString(SeleniumSettings.HUB_HOST.key());
             if (hostStr != null) {
-                try {
-                    gridHub = new URL(hostStr);
-                } catch (MalformedURLException e) {
-                    throw UncheckedThrow.throwUnchecked(e);
-                }
+                hubHost = new HttpHost(hostStr);
             }
         }
-        return gridHub;
+        return hubHost;
     }
-    
-    public HttpHost getHubHost() {
-        return GridUtility.extractHost(getGridHub());
-    }
-    
-    /**
-     * Get port for Selenium Grid hub server.
-     * 
-     * @return Selenium Grid hub server port
-     */
-//    public abstract Integer getHubPort();
-    
-    /**
-     * Get authority for Selenium Grid hub server.
-     * 
-     * @return Selenium Grid hub server authority; {@code null} if hub port is undefined
-     */
-//    public HttpHost getHubAuthority() {
-//        if (getHubPort() != null) {
-//            return new HttpHost(getHubHost(), getHubPort());
-//        }
-//        return null;
-//    }
-    
-    /**
-     * FIXME
-     * @return
-     */
-//    public URI getGridEndpoint() {
-//        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
-//        return URI.create(host.toURI() + GRID_ENDPOINT);
-//    }
-    
-    /**
-     * FIXME
-     * @return
-     */
-//    public URI getGridRegister() {
-//        HttpHost host = Objects.requireNonNull(getHubAuthority(), "Hub authority is undefined");
-//        return URI.create(host.toURI() + GRID_REGISTER);
-//    }
     
     /**
      * Get shutdown request string for Selenium Grid node server.
@@ -452,7 +404,14 @@ public abstract class AbstractSeleniumConfig extends
      */ 
     public abstract String[] getDependencyContexts();
     
-    public abstract Path createNodeConfig(String jsonStr, URL hubEndpoint) throws IOException;
+    /**
+     * 
+     * @param jsonStr
+     * @param hubEndpoint
+     * @return
+     * @throws IOException
+     */
+    public abstract Path createNodeConfig(String jsonStr, HttpHost hubEndpoint) throws IOException;
     
     /**
      * {@inheritDoc}

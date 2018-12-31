@@ -29,7 +29,6 @@ import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
-import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -49,8 +48,9 @@ import com.nordstrom.common.file.PathUtils;
  */
 public class LocalSeleniumGrid extends SeleniumGrid {
 
-    protected GridServer hubServer;
-    protected List<LocalGridServer> nodeServers = new ArrayList<>();
+    public LocalSeleniumGrid(LocalGridServer hubServer, List<LocalGridServer> nodeServers) {
+        super(hubServer, nodeServers);
+    }
 
     private static final String OPT_ROLE = "-role";
     private static final String OPT_SERVLETS = "-servlets";
@@ -59,24 +59,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     
     private static final String GRID_ENDPOINT = "/wd/hub";
     private static final String GRID_REGISTER = "/grid/register";
-    
-    /**
-     * Get grid server object for the active hub.
-     * 
-     * @return {@link GridServer} object that represents the active hub server
-     */
-    public GridServer getHubServer() {
-        return hubServer;
-    }
-    
-    /**
-     * Get the list of grid server objects for the attached nodes.
-     * 
-     * @return list of {@link GridServer} objects that represent the attached node servers
-     */
-    public List<LocalGridServer> getNodeServers() {
-        return nodeServers;
-    }
     
     /**
      * Launch local Selenium Grid instance.
@@ -99,10 +81,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
         Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
         LocalGridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB, hubPort, hubConfigPath);
-        URL gridHub = waitUntilReady(hubServer, hostTimeout);
+        waitUntilReady(hubServer, hostTimeout);
         
         // store hub host URL in system property for subsequent retrieval
-        System.setProperty(SeleniumSettings.HUB_HOST.key(), gridHub.toString());
+        System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getHost().toURI());
         
         // two flavors of nodes: standalone (e.g. - appium) or hosted (e.g. - chrome)
         // => bury the distinction by providing a 'start()' method that returns a GridServer object
@@ -131,18 +113,16 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
             String capabilities = driverPlugin.getCapabilities();
-            Path nodeConfigPath = config.createNodeConfig(capabilities, gridHub);
+            Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getHost());
             LocalGridServer nodeServer = driverPlugin.start(launcherClassName, dependencyContexts, nodeConfigPath);
             waitUntilReady(nodeServer, hostTimeout);
             nodeServers.add(nodeServer);
         }
         
-        LocalSeleniumGrid localGrid = new LocalSeleniumGrid();
-        localGrid.hubServer = hubServer;
-        localGrid.nodeServers = nodeServers;
+        LocalSeleniumGrid localGrid = new LocalSeleniumGrid(hubServer, nodeServers);
         
         // TODO - Remove this method test code
-        GridUtility.getGridProxies(config, gridHub);
+        GridUtility.getGridProxies(config, hubServer.getHost());
     
         return localGrid;
     }
@@ -394,22 +374,43 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
         }
         
+        /**
+         * 
+         * @return
+         */
         public Process getProcess() {
             return process;
         }
-
+        
+        /**
+         * 
+         * @return
+         */
         public Path getOutputPath() {
             return outputPath;
         }
-
+        
+        /**
+         * 
+         * @return
+         */
         public String getReadyMessage() {
             return readyMessage;
         }
-
+        
+        /**
+         * 
+         * @param readyMessage
+         */
         public void setReadyMessage(String readyMessage) {
             this.readyMessage = readyMessage;
         }
         
+        /**
+         * 
+         * @param port
+         * @return
+         */
         private static HttpHost getServerHost(Integer port) {
             return new HttpHost(getLocalHost(), port.intValue());
         }

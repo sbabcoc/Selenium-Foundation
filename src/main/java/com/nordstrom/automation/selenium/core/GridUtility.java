@@ -4,9 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +20,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.utils.URIUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.jsoup.Jsoup;
@@ -52,31 +52,6 @@ public final class GridUtility {
     private GridUtility() {
         throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
     }
-    
-    /**
-     * Determine if the configured Selenium Grid hub is active.<br>
-     * <b>NOTE</b>: If configured for local execution, this method ensures that a local hub and node are active.
-     * 
-     * @return 'true' if configured hub is active; otherwise 'false'
-     */
-//    public static boolean isHubActive() {
-//        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
-//        HttpHost hubHost = config.getHubHost();
-//        boolean isActive = isHubActive(hubHost);
-//        
-//        if (!isActive && ((hubHost == null) || isLocalHost(hubHost))) {
-//            try {
-//                localGrid = LocalSeleniumGrid.launch(config, config.getHubConfigPath());
-//                isActive = true;
-//            } catch (GridServerLaunchFailedException | IOException | TimeoutException e) {
-//                LOGGER.warn("Unable to launch Selenium Grid server", e);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
-//        }
-//        
-//        return isActive;
-//    }
     
     /**
      * Determine if the configured Selenium Grid hub is active.
@@ -148,9 +123,9 @@ public final class GridUtility {
         }
         
         if (isActive) {
-            URL gridHub = config.getGridHub();
+            hubHost = config.getHubHost();
             Capabilities capabilities = config.getCurrentCapabilities();
-            return getDriver(gridHub, capabilities);
+            return getDriver(hubHost, capabilities);
         }
         
         throw new IllegalStateException("Unable to launch local Selenium Grid instance");
@@ -159,19 +134,20 @@ public final class GridUtility {
     /**
      * Get a driver with desired capabilities from specified Selenium Grid hub.
      * 
-     * @param gridHub Grid hub from which to obtain the driver
+     * @param hubHost Grid hub from which to obtain the driver
      * @param desiredCapabilities desired capabilities for the driver
      * @return driver object (may be 'null')
      */
-    public static WebDriver getDriver(URL gridHub, Capabilities desiredCapabilities) {
-        Objects.requireNonNull(gridHub, "[gridHub] must be non-null");
+    public static WebDriver getDriver(HttpHost hubHost, Capabilities desiredCapabilities) {
+        Objects.requireNonNull(hubHost, "[gridHub] must be non-null");
         try {
-            if (isHubActive(URIUtils.extractHost(gridHub.toURI()))) {
-                return new RemoteWebDriver(gridHub, desiredCapabilities);
+            if (isHubActive(hubHost)) {
+                URL remoteAddress = URI.create(hubHost.toURI()).toURL();
+                return new RemoteWebDriver(remoteAddress, desiredCapabilities);
             } else {
-                throw new IllegalStateException("No Selenium Grid instance was found at " + gridHub);
+                throw new IllegalStateException("No Selenium Grid instance was found at " + hubHost);
             }
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException e) {
             throw UncheckedThrow.throwUnchecked(e);
         }
     }
@@ -194,14 +170,15 @@ public final class GridUtility {
     }
 
     /**
+     * Get the list of node endpoints attached to the specified Selenium Grid hub.
      * 
-     * @param config TODO
-     * @param gridHub
-     * @return
-     * @throws IOException
+     * @param config {@link SeleniumConfig} object
+     * @param hubHost Grid hub host
+     * @return list of node endpoints
+     * @throws IOException if an I/O error occurs
      */
-    public static List<String> getGridProxies(SeleniumConfig config, URL gridHub) throws IOException {
-        String url = gridHub.getProtocol() + "://" + gridHub.getAuthority() + GridServer.GRID_CONSOLE;
+    public static List<String> getGridProxies(SeleniumConfig config, HttpHost hubHost) throws IOException {
+        String url = hubHost.toURI() + GridServer.GRID_CONSOLE;
         Document doc = Jsoup.connect(url).get();
         Elements proxyIds = doc.select("p.proxyid");
         List<String> nodeList = new ArrayList<>();
@@ -210,22 +187,23 @@ public final class GridUtility {
             int beginIndex = text.indexOf("http");
             int endIndex = text.indexOf(',');
             nodeList.add(text.substring(beginIndex, endIndex));
-            getNodeCapabilities(config, gridHub, text.substring(beginIndex, endIndex));
+            getNodeCapabilities(config, hubHost, text.substring(beginIndex, endIndex));
         }
         return nodeList;
     }
     
     /**
+     * Get capabilities of the indicated node of the specified Selenium Grid hub.
      * 
-     * @param config TODO
-     * @param gridHub
-     * @param nodeEndpoint
-     * @return
-     * @throws IOException
+     * @param config {@link SeleniumConfig} object
+     * @param hubHost Grid hub host
+     * @param nodeEndpoint node endpoint
+     * @return {@link Capabilities} object for the specified node
+     * @throws IOException if an I/O error occurs
      */
-    public static Capabilities getNodeCapabilities(SeleniumConfig config, URL gridHub, String nodeEndpoint) throws IOException {
+    public static Capabilities getNodeCapabilities(SeleniumConfig config, HttpHost hubHost, String nodeEndpoint) throws IOException {
         String json;
-        String url = gridHub.getProtocol() + "://" + gridHub.getAuthority() + GridServer.NODE_CONFIG + "?id=" + nodeEndpoint;
+        String url = hubHost.toURI() + GridServer.NODE_CONFIG + "?id=" + nodeEndpoint;
         try (InputStream is = new URL(url).openStream()) {
             json = readAvailable(is);
         }
@@ -267,21 +245,5 @@ public final class GridUtility {
             LOGGER.warn("Attempt to associate IP address with adapter triggered I/O exception: {}", e.getMessage());
             return false;
         }
-    }
-    
-    /**
-     * 
-     * @param url
-     * @return
-     */
-    public static HttpHost extractHost(URL url) {
-        if (url != null) {
-            try {
-                return URIUtils.extractHost(url.toURI());
-            } catch (URISyntaxException e) {
-                throw UncheckedThrow.throwUnchecked(e);
-            }
-        }
-        return null;
     }
 }

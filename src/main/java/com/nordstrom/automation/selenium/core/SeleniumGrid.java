@@ -3,6 +3,9 @@ package com.nordstrom.automation.selenium.core;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
@@ -16,18 +19,34 @@ import com.nordstrom.common.base.UncheckedThrow;
 @SuppressWarnings("squid:S1774")
 public class SeleniumGrid {
     
+    protected GridServer hubServer;
+    protected List<? extends GridServer> nodeServers = new ArrayList<>();
+
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
-    /**
-     * Private constructor to prevent direct instantiation from outside.
-     */
-    protected SeleniumGrid() {
+    public <T extends GridServer> SeleniumGrid(T hubServer, List<T> nodeServers) {
+        this.hubServer = Objects.requireNonNull(hubServer);
+        this.nodeServers = Objects.requireNonNull(nodeServers);
     }
     
     /**
-     * TODO - Factor out common server properties and behaviors to support remote Grid.
-     * Add knowledge of node properties and behaviors. Add shutdown methods.
+     * Get grid server object for the active hub.
+     * 
+     * @return {@link GridServer} object that represents the active hub server
      */
+    public GridServer getHubServer() {
+        return hubServer;
+    }
+    
+    /**
+     * Get the list of grid server objects for the attached nodes.
+     * 
+     * @return list of {@link GridServer} objects that represent the attached node servers
+     */
+    public List<? extends GridServer> getNodeServers() {
+        return nodeServers;
+    }
+    
     public static class GridServer {
         private boolean isHub;
         private HttpHost serverHost;
@@ -56,14 +75,30 @@ public class SeleniumGrid {
             }
         }
         
+        /**
+         * Determine if this Grid server is a hub host.
+         * 
+         * @return {@code true} if this server is a hub; otherwise {@code false}
+         */
         public boolean isHub() {
             return isHub;
         }
         
+        /**
+         * Get the HTTP host for this server.
+         * 
+         * @return {@link HttpHost} object for this server
+         */
         public HttpHost getHost() {
             return serverHost;
         }
         
+        /**
+         * Stop this Selenium Grid server.
+         * 
+         * @param localOnly {@code true} to target only local Grid server
+         * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
+         */
         public boolean stopGridServer(final boolean localOnly) {
             return stopGridServer(serverHost, statusRequest, shutdownRequest, localOnly);
         }
@@ -72,8 +107,8 @@ public class SeleniumGrid {
          * Stop the specified Selenium Grid server.
          * 
          * @param serverParms Selenium Grid server parameters
-         * @param localOnly 'true' to target only local Grid server
-         * @return 'false' if [localOnly] and server is remote; otherwise 'true'
+         * @param localOnly {@code true} to target only local Grid server
+         * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
          */
         public static boolean stopGridServer(final HttpHost serverHost, final String statusRequest,
                         final String shutdownRequest, final boolean localOnly) {
