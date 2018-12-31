@@ -29,10 +29,10 @@ public class SeleniumGrid {
      * Add knowledge of node properties and behaviors. Add shutdown methods.
      */
     public static class GridServer {
-        protected boolean isHub;
-        private HttpHost serverHost;    // COMMON
-        private String statusRequest;   // COMMON (can be assembled on request)
-        private String shutdownRequest; // COMMON (can be assembled on request)
+        private boolean isHub;
+        private HttpHost serverHost;
+        private String statusRequest;
+        private String shutdownRequest;
         
         public static final String GRID_CONSOLE = "/grid/console";
         public static final String NODE_STATUS = "/wd/hub/status";
@@ -43,7 +43,8 @@ public class SeleniumGrid {
         private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
         private static final long SHUTDOWN_DELAY = 15;
         
-        public GridServer(GridRole role) {
+        public GridServer(HttpHost host, GridRole role) {
+            this.serverHost = host;
             if (role == GridRole.HUB) {
                 isHub = true;
                 statusRequest = HUB_CONFIG;
@@ -55,12 +56,12 @@ public class SeleniumGrid {
             }
         }
         
-        public HttpHost getHost() {
-            return serverHost;
+        public boolean isHub() {
+            return isHub;
         }
         
-        public void setHost(HttpHost host) {
-            this.serverHost = host;
+        public HttpHost getHost() {
+            return serverHost;
         }
         
         public boolean stopGridServer(final boolean localOnly) {

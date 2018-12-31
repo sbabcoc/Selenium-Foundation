@@ -152,6 +152,7 @@ public final class GridUtility {
             Capabilities capabilities = config.getCurrentCapabilities();
             return getDriver(gridHub, capabilities);
         }
+        
         throw new IllegalStateException("Unable to launch local Selenium Grid instance");
     }
     
@@ -266,5 +267,21 @@ public final class GridUtility {
             LOGGER.warn("Attempt to associate IP address with adapter triggered I/O exception: {}", e.getMessage());
             return false;
         }
+    }
+    
+    /**
+     * 
+     * @param url
+     * @return
+     */
+    public static HttpHost extractHost(URL url) {
+        if (url != null) {
+            try {
+                return URIUtils.extractHost(url.toURI());
+            } catch (URISyntaxException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
+        }
+        return null;
     }
 }

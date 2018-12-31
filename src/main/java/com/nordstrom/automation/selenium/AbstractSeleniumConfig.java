@@ -21,12 +21,12 @@ import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.http.HttpHost;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.client.utils.URIUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -254,15 +254,7 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     public HttpHost getHubHost() {
-        URL hub = getGridHub();
-        if (hub != null) {
-            try {
-                return URIUtils.extractHost(gridHub.toURI());
-            } catch (URISyntaxException e) {
-                throw UncheckedThrow.throwUnchecked(e);
-            }
-        }
-        return null;
+        return GridUtility.extractHost(getGridHub());
     }
     
     /**

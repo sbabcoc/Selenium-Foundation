@@ -8,10 +8,10 @@ public class PhantomJsPlugin implements DriverPlugin {
      * <b>org.openqa.selenium.phantomjs.PhantomJSDriver</b>
      * 
      * <pre>&lt;dependency&gt;
-     *   &lt;groupId&gt;com.codeborne&lt;/groupId&gt;
-     *   &lt;artifactId&gt;phantomjsdriver&lt;/artifactId&gt;
-     *   &lt;version&gt;1.3.0&lt;/version&gt;
-     * &lt;/dependency&gt;</pre>
+     *  &lt;groupId&gt;com.codeborne&lt;/groupId&gt;
+     *  &lt;artifactId&gt;phantomjsdriver&lt;/artifactId&gt;
+     *  &lt;version&gt;1.3.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.phantomjs.PhantomJSDriver",

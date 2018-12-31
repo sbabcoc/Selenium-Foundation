@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -232,7 +233,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         String hashCode = String.format("%08X", capabilities.hashCode());
         Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
         if (filePath.toFile().exists()) {
-            filePath.toFile().delete();
+            Files.delete(filePath);
         }
         if (filePath.toFile().createNewFile()) {
             String input = JSON_HEAD + capabilities + JSON_TAIL;

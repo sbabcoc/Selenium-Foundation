@@ -22,8 +22,10 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.http.HttpHost;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.web.servlet.LifecycleServlet;
+import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
@@ -150,7 +152,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * 
      * @param server {@link LocalGridServer} object to wait for.
      * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
-     * @return all of the input that was received while waiting for the prompt
+     * @return URL for the Grid hub (even if waiting for a node server)
      * @throws InterruptedException if this thread was interrupted
      * @throws IOException if an I/O error occurs
      * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
@@ -219,22 +221,39 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                     final String[] dependencyContexts, final GridRole role, final Integer port, final Path configPath) {
         String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
+        
+        // specify server role
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
+        
+        // if starting a Grid node
         if (role == GridRole.NODE) {
+            // add lifecycle servlet
             argsList.add(OPT_SERVLETS);
             argsList.add(LifecycleServlet.class.getName());
         }
-        if (port.intValue() != -1) {
-            argsList.add(OPT_PORT);
-            argsList.add(port.toString());
+        
+        Integer portNum = port;
+        if (portNum.intValue() == -1) {
+            portNum = Integer.valueOf(PortProber.findFreePort());
         }
+        
+        // specify server port
+        argsList.add(OPT_PORT);
+        argsList.add(portNum.toString());
+        
+        // specify server configuration file
         argsList.add("-" + gridRole + "Config");
         argsList.add(configPath.toString());
         
+        // specify Grid launcher class name
         argsList.add(0, launcherClassName);
+        
+        // specify Java class path
         argsList.add(0, getClasspath(dependencyContexts));
         argsList.add(0, "-cp");
+        
+        // specify Java command
         argsList.add(0, System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         
         ProcessBuilder builder = new ProcessBuilder(argsList);
@@ -256,7 +275,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         builder.redirectOutput(outputPath.toFile());
         
         try {
-            return new LocalGridServer(role, builder.start(), outputPath);
+            return new LocalGridServer(portNum, role, builder.start(), outputPath);
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
@@ -357,28 +376,24 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     
     public static class LocalGridServer extends GridServer {
 
-        private Process process;        // LOCAL
-        Path outputPath;                // LOCAL
-        String readyMessage;            // LOCAL
+        private Process process;
+        Path outputPath;
+        String readyMessage;
         
         private static final String HUB_READY = "up and running";
         private static final String NODE_READY = "ready to use";
         
-        LocalGridServer(GridRole role, Process process, Path outputPath) {
-            super(role);
+        LocalGridServer(Integer port, GridRole role, Process process, Path outputPath) {
+            super(getServerHost(port), role);
             this.process = process;
             this.outputPath = outputPath;
-            if (isHub) {
+            if (isHub()) {
                 readyMessage = HUB_READY;
             } else {
                 readyMessage = NODE_READY;
             }
         }
         
-        public boolean isHub() {
-            return isHub;
-        }
-    
         public Process getProcess() {
             return process;
         }
@@ -393,6 +408,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
 
         public void setReadyMessage(String readyMessage) {
             this.readyMessage = readyMessage;
+        }
+        
+        private static HttpHost getServerHost(Integer port) {
+            return new HttpHost(getLocalHost(), port.intValue());
         }
         
     }
