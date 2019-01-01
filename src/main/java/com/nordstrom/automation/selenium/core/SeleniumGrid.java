@@ -20,11 +20,19 @@ import com.nordstrom.common.base.UncheckedThrow;
 public class SeleniumGrid {
     
     protected GridServer hubServer;
-    protected List<? extends GridServer> nodeServers = new ArrayList<>();
+    protected List<GridServer> nodeServers = new ArrayList<>();
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
-    public <T extends GridServer> SeleniumGrid(T hubServer, List<T> nodeServers) {
+    public SeleniumGrid(HttpHost hubHost) throws IOException {
+        hubServer = new GridServer(hubHost, GridRole.HUB);
+        for (String nodeEndpoint : GridUtility.getGridProxies(hubHost)) {
+            HttpHost nodeHost = new HttpHost(nodeEndpoint);
+            nodeServers.add(new GridServer(nodeHost, GridRole.NODE));
+        }
+    }
+    
+    public SeleniumGrid(GridServer hubServer, List<GridServer> nodeServers) {
         this.hubServer = Objects.requireNonNull(hubServer);
         this.nodeServers = Objects.requireNonNull(nodeServers);
     }
@@ -43,7 +51,7 @@ public class SeleniumGrid {
      * 
      * @return list of {@link GridServer} objects that represent the attached node servers
      */
-    public List<? extends GridServer> getNodeServers() {
+    public List<? super GridServer> getNodeServers() {
         return nodeServers;
     }
     
@@ -54,6 +62,7 @@ public class SeleniumGrid {
         private String shutdownRequest;
         
         public static final String GRID_CONSOLE = "/grid/console";
+        public static final String HUB_BASE = "/wd/hub";
         public static final String NODE_STATUS = "/wd/hub/status";
         public static final String HUB_CONFIG = "/grid/api/hub/";
         public static final String NODE_CONFIG = "/grid/api/proxy";

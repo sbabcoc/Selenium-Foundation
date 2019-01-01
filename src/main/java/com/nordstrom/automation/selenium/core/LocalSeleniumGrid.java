@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -49,7 +50,7 @@ import com.nordstrom.common.file.PathUtils;
 public class LocalSeleniumGrid extends SeleniumGrid {
 
     public LocalSeleniumGrid(LocalGridServer hubServer, List<LocalGridServer> nodeServers) {
-        super(hubServer, nodeServers);
+        super(hubServer, Arrays.asList(nodeServers.toArray(new GridServer[0])));
     }
 
     private static final String OPT_ROLE = "-role";
@@ -119,12 +120,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             nodeServers.add(nodeServer);
         }
         
-        LocalSeleniumGrid localGrid = new LocalSeleniumGrid(hubServer, nodeServers);
-        
-        // TODO - Remove this method test code
-        GridUtility.getGridProxies(config, hubServer.getHost());
-    
-        return localGrid;
+        return new LocalSeleniumGrid(hubServer, nodeServers);
     }
 
     /**

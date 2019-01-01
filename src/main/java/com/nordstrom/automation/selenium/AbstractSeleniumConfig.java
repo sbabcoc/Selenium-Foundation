@@ -240,7 +240,8 @@ public abstract class AbstractSeleniumConfig extends
         if (hubHost == null) {
             String hostStr = getString(SeleniumSettings.HUB_HOST.key());
             if (hostStr != null) {
-                hubHost = new HttpHost(hostStr);
+                URI uri = URI.create(hostStr);
+                hubHost = new HttpHost(uri.getHost(), uri.getPort());
             }
         }
         return hubHost;

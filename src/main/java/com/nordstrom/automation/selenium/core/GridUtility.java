@@ -32,6 +32,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -42,7 +43,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  */
 public final class GridUtility {
     
-    private static SeleniumGrid localGrid;
+    private static SeleniumGrid seleniumGrid;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
     
@@ -109,11 +110,20 @@ public final class GridUtility {
         SeleniumConfig config = AbstractSeleniumConfig.getConfig();
         
         HttpHost hubHost = config.getHubHost();
+        
+        if (hubHost == null) {
+            String localHost = LocalSeleniumGrid.getLocalHost();
+            int hubPort = config.getInt(SeleniumSettings.HUB_PORT.key());
+            hubHost = new HttpHost(localHost, hubPort);
+        }
+        
         boolean isActive = isHubActive(hubHost);
         
-        if (!isActive && ((hubHost == null) || isLocalHost(hubHost))) {
+        if (isActive) {
+            
+        } else if (isLocalHost(hubHost)) {
             try {
-                localGrid = LocalSeleniumGrid.launch(config, config.getHubConfigPath());
+                seleniumGrid = LocalSeleniumGrid.launch(config, config.getHubConfigPath());
                 isActive = true;
             } catch (GridServerLaunchFailedException | IOException | TimeoutException e) {
                 LOGGER.warn("Unable to launch Selenium Grid server", e);
@@ -142,7 +152,7 @@ public final class GridUtility {
         Objects.requireNonNull(hubHost, "[gridHub] must be non-null");
         try {
             if (isHubActive(hubHost)) {
-                URL remoteAddress = URI.create(hubHost.toURI()).toURL();
+                URL remoteAddress = URI.create(hubHost.toURI() + GridServer.HUB_BASE).toURL();
                 return new RemoteWebDriver(remoteAddress, desiredCapabilities);
             } else {
                 throw new IllegalStateException("No Selenium Grid instance was found at " + hubHost);
@@ -171,13 +181,12 @@ public final class GridUtility {
 
     /**
      * Get the list of node endpoints attached to the specified Selenium Grid hub.
-     * 
-     * @param config {@link SeleniumConfig} object
      * @param hubHost Grid hub host
+     * 
      * @return list of node endpoints
      * @throws IOException if an I/O error occurs
      */
-    public static List<String> getGridProxies(SeleniumConfig config, HttpHost hubHost) throws IOException {
+    public static List<String> getGridProxies(HttpHost hubHost) throws IOException {
         String url = hubHost.toURI() + GridServer.GRID_CONSOLE;
         Document doc = Jsoup.connect(url).get();
         Elements proxyIds = doc.select("p.proxyid");
@@ -187,7 +196,6 @@ public final class GridUtility {
             int beginIndex = text.indexOf("http");
             int endIndex = text.indexOf(',');
             nodeList.add(text.substring(beginIndex, endIndex));
-            getNodeCapabilities(config, hubHost, text.substring(beginIndex, endIndex));
         }
         return nodeList;
     }
