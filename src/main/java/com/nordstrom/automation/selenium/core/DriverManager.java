@@ -150,7 +150,11 @@ public final class DriverManager {
     public static void onFinish() {
         SeleniumConfig config = SeleniumConfig.getConfig();
         if (config.getBoolean(SeleniumSettings.SHUTDOWN_GRID.key())) {
-            config.shutdownGrid(true);
+            try {
+                config.shutdownGrid(true);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
     

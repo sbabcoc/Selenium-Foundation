@@ -87,22 +87,23 @@ public class SeleniumGrid {
      * 
      * @param localOnly {@code true} to target only local Grid servers
      * @return {@code true} if local Grid shutdown; otherwise {@code false}
+     * @throws InterruptedException if this thread was interrupted
      */
     @SuppressWarnings("squid:S2864")
-    public boolean shutdown(final boolean localOnly) {
+    public boolean shutdown(final boolean localOnly) throws InterruptedException {
         boolean result = true;
         Iterator<Entry<String, GridServer>> iterator = nodeServers.entrySet().iterator();
         
         while (iterator.hasNext()) {
             Entry<String, GridServer> serverEntry = iterator.next();
-            if (serverEntry.getValue().stopGridServer(localOnly)) {
+            if (serverEntry.getValue().shutdown(localOnly)) {
                 iterator.remove();
             } else {
                 result = false;
             }
         }
         
-        if (hubServer.stopGridServer(localOnly)) {
+        if (hubServer.shutdown(localOnly)) {
             hubServer = null;
         } else {
             result = false;
@@ -180,9 +181,10 @@ public class SeleniumGrid {
          * 
          * @param localOnly {@code true} to target only local Grid server
          * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
+         * @throws InterruptedException if this thread was interrupted
          */
-        public boolean stopGridServer(final boolean localOnly) {
-            return stopGridServer(serverUrl, statusRequest, shutdownRequest, localOnly);
+        public boolean shutdown(final boolean localOnly) throws InterruptedException {
+            return shutdown(serverUrl, statusRequest, shutdownRequest, localOnly);
         }
 
         /**
@@ -193,9 +195,10 @@ public class SeleniumGrid {
          * @param shutdownRequest Selenium server shutdown request
          * @param localOnly {@code true} to target only local Grid server
          * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
+         * @throws InterruptedException if this thread was interrupted
          */
-        public static boolean stopGridServer(final URL serverUrl, final String statusRequest,
-                        final String shutdownRequest, final boolean localOnly) {
+        public static boolean shutdown(final URL serverUrl, final String statusRequest,
+                        final String shutdownRequest, final boolean localOnly) throws InterruptedException {
             
             if (localOnly && !GridUtility.isLocalHost(serverUrl)) {
                 return false;
@@ -205,6 +208,7 @@ public class SeleniumGrid {
                 try {
                     GridUtility.getHttpResponse(serverUrl, shutdownRequest);
                     new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
+                    Thread.sleep(1000);
                 } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
                     throw UncheckedThrow.throwUnchecked(e);
                 }
