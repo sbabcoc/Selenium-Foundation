@@ -1,40 +1,63 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import org.apache.http.HttpHost;
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.net.UrlChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.common.base.UncheckedThrow;
 
 @SuppressWarnings("squid:S1774")
 public class SeleniumGrid {
     
-    protected GridServer hubServer;
-    protected List<GridServer> nodeServers = new ArrayList<>();
+    private GridServer hubServer;
+    private List<GridServer> nodeServers = new ArrayList<>();
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
-    public SeleniumGrid(HttpHost hubHost) throws IOException {
-        hubServer = new GridServer(hubHost, GridRole.HUB);
-        for (String nodeEndpoint : GridUtility.getGridProxies(hubHost)) {
-            HttpHost nodeHost = new HttpHost(nodeEndpoint);
-            nodeServers.add(new GridServer(nodeHost, GridRole.NODE));
+    public SeleniumGrid(URL hubUrl) throws IOException {
+        hubServer = new GridServer(hubUrl, GridRole.HUB);
+        for (String nodeEndpoint : GridUtility.getGridProxies(hubUrl)) {
+            URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
+            nodeServers.add(new GridServer(nodeUrl, GridRole.NODE));
         }
     }
     
     public SeleniumGrid(GridServer hubServer, List<GridServer> nodeServers) {
         this.hubServer = Objects.requireNonNull(hubServer);
         this.nodeServers = Objects.requireNonNull(nodeServers);
+    }
+    
+    /**
+     * 
+     * @param config TODO
+     * @param hubUrl
+     * @return
+     * @throws IOException
+     * @throws TimeoutException 
+     * @throws InterruptedException 
+     */
+    public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException, InterruptedException, TimeoutException {
+        if (GridUtility.isHubActive(hubUrl)) {
+            return new SeleniumGrid(hubUrl);
+        } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
+            if (hubUrl != null) {
+                // ensure that hub port is available as a discrete setting
+                System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
+            }
+            return LocalSeleniumGrid.launch(config, config.getHubConfigPath());
+        }
+        throw new IllegalStateException("Specified remote hub url '" + hubUrl + "' isn't active");
     }
     
     /**
@@ -51,15 +74,13 @@ public class SeleniumGrid {
      * 
      * @return list of {@link GridServer} objects that represent the attached node servers
      */
-    public List<? super GridServer> getNodeServers() {
+    public List<GridServer> getNodeServers() {
         return nodeServers;
     }
     
     public static class GridServer {
-        private boolean isHub;
-        private HttpHost serverHost;
-        private String statusRequest;
-        private String shutdownRequest;
+        private GridRole role;
+        private URL serverUrl;
         
         public static final String GRID_CONSOLE = "/grid/console";
         public static final String HUB_BASE = "/wd/hub";
@@ -67,21 +88,11 @@ public class SeleniumGrid {
         public static final String HUB_CONFIG = "/grid/api/hub/";
         public static final String NODE_CONFIG = "/grid/api/proxy";
         
-        private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
-        private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
         private static final long SHUTDOWN_DELAY = 15;
         
-        public GridServer(HttpHost host, GridRole role) {
-            this.serverHost = host;
-            if (role == GridRole.HUB) {
-                isHub = true;
-                statusRequest = HUB_CONFIG;
-                shutdownRequest = HUB_SHUTDOWN;
-            } else {
-                isHub = false;
-                statusRequest = NODE_STATUS;
-                shutdownRequest = NODE_SHUTDOWN;
-            }
+        public GridServer(URL url, GridRole role) {
+            this.role = role;
+            this.serverUrl = url;
         }
         
         /**
@@ -90,47 +101,37 @@ public class SeleniumGrid {
          * @return {@code true} if this server is a hub; otherwise {@code false}
          */
         public boolean isHub() {
-            return isHub;
+            return (role == GridRole.HUB);
         }
         
         /**
-         * Get the HTTP host for this server.
+         * Get the URL for this server.
          * 
-         * @return {@link HttpHost} object for this server
+         * @return {@link URL} object for this server
          */
-        public HttpHost getHost() {
-            return serverHost;
-        }
-        
-        /**
-         * Stop this Selenium Grid server.
-         * 
-         * @param localOnly {@code true} to target only local Grid server
-         * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
-         */
-        public boolean stopGridServer(final boolean localOnly) {
-            return stopGridServer(serverHost, statusRequest, shutdownRequest, localOnly);
+        public URL getUrl() {
+            return serverUrl;
         }
         
         /**
          * Stop the specified Selenium Grid server.
          * 
+         * @param serverUrl Selenium server URL
          * @param serverParms Selenium Grid server parameters
          * @param localOnly {@code true} to target only local Grid server
          * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
          */
-        public static boolean stopGridServer(final HttpHost serverHost, final String statusRequest,
+        public static boolean stopGridServer(final URL serverUrl, final String statusRequest,
                         final String shutdownRequest, final boolean localOnly) {
             
-            if (localOnly && !GridUtility.isLocalHost(serverHost)) {
+            if (localOnly && !GridUtility.isLocalHost(serverUrl)) {
                 return false;
             }
             
-            if (GridUtility.isHostActive(serverHost, statusRequest)) {
+            if (GridUtility.isHostActive(serverUrl, statusRequest)) {
                 try {
-                    URL hostUrl = URI.create(serverHost.toURI()).toURL();
-                    GridUtility.getHttpResponse(serverHost, shutdownRequest);
-                    new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, hostUrl);
+                    GridUtility.getHttpResponse(serverUrl, shutdownRequest);
+                    new UrlChecker().waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
                 } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
                     throw UncheckedThrow.throwUnchecked(e);
                 }

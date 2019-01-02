@@ -18,6 +18,7 @@ import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -32,7 +33,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
+    private static final String GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncher";
+    private static final String HUB_PORT = "4444";
     private static final String NODE_CONFIG = "nodeConfig-s2.json";
+    private static final String NODE_SHUTDOWN = "/selenium-server/driver/?cmd=shutDownSeleniumServer";
     
     /**
      * <b>com.google.common.util.concurrent.SimpleTimeLimiter</b>
@@ -162,7 +166,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     "org.apache.commons.logging.LogFactory",
                     "org.openqa.selenium.support.events.WebDriverEventListener",
                     "org.openqa.selenium.WebDriverException",
-                    "org.openqa.grid.selenium.GridLauncher", "com.beust.jcommander.JCommander",
+                    GRID_LAUNCHER, "com.beust.jcommander.JCommander",
                     "javax.servlet.http.HttpServlet", "mx4j.remote.HeartBeat",
                     "net.jcip.annotations.ThreadSafe", "org.bouncycastle.crypto.BlockCipher",
                     "org.bouncycastle.openssl.PEMKeyPair", "org.seleniumhq.jetty9.util.Jetty",
@@ -197,25 +201,11 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = super.getDefaults();
-        defaults.put(SeleniumSettings.HUB_PORT.key(), "4444");
+        defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), GRID_LAUNCHER);
+        defaults.put(SeleniumSettings.HUB_PORT.key(), HUB_PORT);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
+        defaults.put(SeleniumSettings.NODE_SHUTDOWN.key(), NODE_SHUTDOWN);
         return defaults;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNodeShutdownRequest() {
-        return "/selenium-server/driver/?cmd=shutDownSeleniumServer";
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getLauncherClassName() {
-        return "org.openqa.grid.selenium.GridLauncher";
     }
     
     /**

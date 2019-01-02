@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -12,21 +13,26 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
 import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
-import org.apache.http.HttpHost;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.core.SeleniumGrid;
+import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
+import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 
 /**
@@ -59,6 +65,8 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_PORT("selenium.target.port", null),
         /** name: <b>selenium.target.path</b> <br> default: <b>/</b> */
         TARGET_PATH("selenium.target.path", "/"),
+        /** name: <b>selenium.grid.launcher</b> <br> default: {@code null} */
+        GRID_LAUNCHER("selenium.grid.launcher", null),
         /** name: <b>selenium.hub.config</b> <br> default: <b>hubConfig.json</b> */
         HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
         /**
@@ -68,8 +76,12 @@ public abstract class AbstractSeleniumConfig extends
         HUB_HOST("selenium.hub.host", null),
         /** name: <b>selenium.hub.port</b> <br> default: {@code null} */
         HUB_PORT("selenuim.hub.port", null),
+        /** name: <b>selenium.hub.shutdown</b> <br> default: <b>/lifecycle-manager?action=shutdown</b> */
+        HUB_SHUTDOWN("selenium.hub.shutdown", "/lifecycle-manager?action=shutdown"),
         /** name: <b>selenium.node.config</b> <br> default: {@code null} */
         NODE_CONFIG("selenium.node.config", null),
+        /** name: <b>selenium.node.shutdown</b> <br> default: {@code null} */
+        NODE_SHUTDOWN("selenium.node.shutdown", null),
         /** name: <b>selenium.browser.name</b> <br> default: {@code null} */
         BROWSER_NAME("selenium.browser.name", null),
         /** name: <b>selenium.browser.caps</b> <br> default: {@link SeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
@@ -206,7 +218,8 @@ public abstract class AbstractSeleniumConfig extends
     private URI targetUri;
     private Path nodeConfigPath;
     private Path hubConfigPath;
-    private HttpHost hubHost;
+    private URL hubUrl;
+    private SeleniumGrid seleniumGrid;
     
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
@@ -225,34 +238,45 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
-     * Get fully-qualified name of {@code GridLauncher} class.
      * 
-     * @return {@code GridLauncher} class name
+     * @return
      */
-    public abstract String getLauncherClassName();
-    
-    /**
-     * Get a host object for the Selenium Grid hub server.
-     * 
-     * @return {@link HttpHost} object for the Selenium Grid hub server 
-     */
-    public HttpHost getHubHost() {
-        if (hubHost == null) {
+    public URL getHubUrl() {
+        if (hubUrl == null) {
             String hostStr = getString(SeleniumSettings.HUB_HOST.key());
+            if (hostStr == null) {
+                Integer portNum = getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
+                if (portNum.intValue() != -1) {
+                    hostStr = "http://" + GridUtility.getLocalHost() + ":" + portNum.toString() + GridServer.HUB_BASE;
+                }
+            }
             if (hostStr != null) {
-                URI uri = URI.create(hostStr);
-                hubHost = new HttpHost(uri.getHost(), uri.getPort());
+                try {
+                    hubUrl = new URL(hostStr);
+                } catch (MalformedURLException e) {
+                    throw UncheckedThrow.throwUnchecked(e);
+                }
             }
         }
-        return hubHost;
+        return hubUrl;
     }
     
     /**
-     * Get shutdown request string for Selenium Grid node server.
      * 
-     * @return Selenium Grid node server shutdown request string
+     * @return
      */
-    public abstract String getNodeShutdownRequest();
+    public SeleniumGrid getSeleniumGrid() {
+        if (seleniumGrid == null) {
+            try {
+                seleniumGrid = SeleniumGrid.create(getConfig(), getHubUrl());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (IOException | TimeoutException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
+        }
+        return seleniumGrid;
+    }
     
     /**
      * Get the configured target URI as specified by its component parts.
@@ -408,11 +432,11 @@ public abstract class AbstractSeleniumConfig extends
     /**
      * 
      * @param jsonStr
-     * @param hubEndpoint
+     * @param hubUrl
      * @return
      * @throws IOException
      */
-    public abstract Path createNodeConfig(String jsonStr, HttpHost hubEndpoint) throws IOException;
+    public abstract Path createNodeConfig(String jsonStr, URL hubUrl) throws IOException;
     
     /**
      * {@inheritDoc}

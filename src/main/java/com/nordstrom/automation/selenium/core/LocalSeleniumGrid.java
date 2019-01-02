@@ -4,13 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,12 +20,9 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.http.HttpHost;
 import org.openqa.grid.common.GridRole;
-import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.net.PortProber;
 
-import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -54,7 +48,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
 
     private static final String OPT_ROLE = "-role";
-    private static final String OPT_SERVLETS = "-servlets";
     private static final String OPT_PORT = "-port";
     private static final String LOGS_PATH = "logs";
     
@@ -77,7 +70,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     public static SeleniumGrid launch(SeleniumConfig config, final Path hubConfigPath)
                     throws IOException, InterruptedException, TimeoutException {
         
-        String launcherClassName = config.getLauncherClassName();
+        String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
         String[] dependencyContexts = config.getDependencyContexts();
         long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
         Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
@@ -85,7 +78,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         waitUntilReady(hubServer, hostTimeout);
         
         // store hub host URL in system property for subsequent retrieval
-        System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getHost().toURI());
+        System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
         
         // two flavors of nodes: standalone (e.g. - appium) or hosted (e.g. - chrome)
         // => bury the distinction by providing a 'start()' method that returns a GridServer object
@@ -114,7 +107,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
             String capabilities = driverPlugin.getCapabilities();
-            Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getHost());
+            Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
             LocalGridServer nodeServer = driverPlugin.start(launcherClassName, dependencyContexts, nodeConfigPath);
             waitUntilReady(nodeServer, hostTimeout);
             nodeServers.add(nodeServer);
@@ -155,7 +148,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             int beginIndex = output.lastIndexOf(' ', endIndex) + 1;
             URI gridHub = URI.create(output.substring(beginIndex, endIndex));
             // replace 'localhost' IP address from server with VPN-compatible address
-            return new URL("http", getLocalHost(), gridHub.getPort(), GRID_ENDPOINT);
+            return new URL("http", GridUtility.getLocalHost(), gridHub.getPort(), GRID_ENDPOINT);
         }
         
         throw new TimeoutException("Timed of waiting for Grid server to be ready");
@@ -194,20 +187,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      *      Getting Command-Line Help<a>
      */
     public static LocalGridServer start(final String launcherClassName,
-                    final String[] dependencyContexts, final GridRole role, final Integer port, final Path configPath) {
+                    final String[] dependencyContexts, final GridRole role, final Integer port,
+                    final Path configPath) {
         String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
         
         // specify server role
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
-        
-        // if starting a Grid node
-        if (role == GridRole.NODE) {
-            // add lifecycle servlet
-            argsList.add(OPT_SERVLETS);
-            argsList.add(LifecycleServlet.class.getName());
-        }
         
         Integer portNum = port;
         if (portNum.intValue() == -1) {
@@ -330,26 +317,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                 "You appear to have loaded this class from a local jar file, but I can't make sense of the URL!");
     }
 
-    /**
-     * Get Internet protocol (IP) address for the machine we're running on.
-     * 
-     * @return IP address for the machine we're running on (a.k.a. - 'localhost')
-     */
-    public static String getLocalHost() {
-        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
-        String host = config.getString(SeleniumSettings.GOOGLE_DNS_SOCKET_HOST.key());
-        int port = config.getInt(SeleniumSettings.GOOGLE_DNS_SOCKET_PORT.key());
-        
-        try (final DatagramSocket socket = new DatagramSocket()) {
-            // use Google Public DNS to discover preferred local IP
-            socket.connect(InetAddress.getByName(host), port);
-            return socket.getLocalAddress().getHostAddress();
-        } catch (SocketException | UnknownHostException eaten) { //NOSONAR
-            SeleniumGrid.LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
-            return "localhost";
-        }
-    }
-    
     public static class LocalGridServer extends GridServer {
 
         private Process process;
@@ -360,7 +327,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         private static final String NODE_READY = "ready to use";
         
         LocalGridServer(Integer port, GridRole role, Process process, Path outputPath) {
-            super(getServerHost(port), role);
+            super(getServerUrl(port), role);
             this.process = process;
             this.outputPath = outputPath;
             if (isHub()) {
@@ -407,10 +374,12 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param port
          * @return
          */
-        private static HttpHost getServerHost(Integer port) {
-            return new HttpHost(getLocalHost(), port.intValue());
+        public static URL getServerUrl(Integer port) {
+            try {
+                return new URL("http://" + GridUtility.getLocalHost() + ":" + port.toString() + GridServer.HUB_BASE);
+            } catch (MalformedURLException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
         }
-        
     }
-    
 }
