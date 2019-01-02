@@ -115,7 +115,7 @@ public final class GridUtility {
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver(URL remoteAddress, Capabilities desiredCapabilities) {
-        Objects.requireNonNull(remoteAddress, "[gridHub] must be non-null");
+        Objects.requireNonNull(remoteAddress, "[remoteAddress] must be non-null");
         if (isHubActive(remoteAddress)) {
             return new RemoteWebDriver(remoteAddress, desiredCapabilities);
         } else {
