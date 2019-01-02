@@ -180,6 +180,12 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         }
     }
     
+    /**
+     * Instantiate a <b>Selenium Foundation</b> configuration object.
+     * 
+     * @throws ConfigurationException If a failure is encountered while initializing this configuration object.
+     * @throws IOException If a failure is encountered while reading from a configuration input stream.
+     */
     public SeleniumConfig() throws ConfigurationException, IOException {
         super();
     }
