@@ -124,7 +124,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
-    public Path createNodeConfig(String capabilities, URL hubHost) throws IOException {
+    public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
         String nodeConfigPath = getNodeConfigPath().toString();
         String[] configPathBits = nodeConfigPath.split("\\.");
         String hashCode = String.format("%08X", capabilities.hashCode());
@@ -137,7 +137,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
             GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
             nodeConfig.capabilities = capabilitiesList;
-            nodeConfig.hub = hubHost.toString();
+            nodeConfig.hub = hubUrl.toString();
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
                 out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
             }

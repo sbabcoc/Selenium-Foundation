@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,13 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.http.HttpHost;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -220,7 +219,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
-    public Path createNodeConfig(String capabilities, HttpHost hubHost) throws IOException {
+    public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
         String nodeConfigPath = getNodeConfigPath().toString();
         String[] configPathBits = nodeConfigPath.split("\\.");
         String hashCode = String.format("%08X", capabilities.hashCode());
@@ -234,7 +233,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             RegistrationRequest nodeConfig = new RegistrationRequest();
             nodeConfig.loadFromJSON(nodeConfigPath);
             nodeConfig.setCapabilities(capabilitiesList);
-            nodeConfig.getConfiguration().put(HUB, hubHost.toURI());
+            nodeConfig.getConfiguration().put(HUB, hubUrl.toString());
 
             // hack for RegistrationRequest bug
             nodeConfig.setRole(GridRole.NODE);
@@ -254,5 +253,4 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         String input = JSON_HEAD + capabilities + JSON_TAIL;
         return RegistrationRequest.getNewInstance(input).getCapabilities().get(0);
     }
-    
 }
