@@ -1,11 +1,19 @@
 package com.nordstrom.automation.selenium.core;
 
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.concurrent.TimeoutException;
+
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
@@ -15,23 +23,21 @@ import com.nordstrom.automation.selenium.support.TestNgBase;
 @LinkedListeners({DriverListener.class, ExecutionFlowController.class})
 public class GridUtilityTest extends TestNgBase {
     
-//    @BeforeClass
-//    public void stopLocalGrid() throws UnknownHostException, TimeoutException {
-//        if (!GridUtility.stopGridNode(true)) {
-//            throw new IllegalStateException("Configured for non-local node host");
-//        }
-//        if (!GridUtility.stopGridHub(true)) {
-//            throw new IllegalStateException("Configured for non-local hub host");
-//        }
-//    }
+    @BeforeClass
+    public void stopLocalGrid() throws InterruptedException {
+        if (!SeleniumConfig.getConfig().shutdownGrid(true)) {
+            throw new IllegalStateException("Configured for non-local hub host");
+        }
+    }
     
-//    @Test
-//    @NoDriver
-//    public void testIsActive() {
-//        AbstractSeleniumConfig config = AbstractSeleniumConfig.getConfig();
-//        assertFalse(GridUtility.isHubActive(config), "Configured local hub should initially be inactive");
-//        assertTrue(GridUtility.isHubActive(), "Configured local hub should have been activated");
-//    }
+    @Test
+    @NoDriver
+    public void testIsActive() throws IOException, InterruptedException, TimeoutException {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        assertFalse(GridUtility.isHubActive(config.getHubUrl()), "Configured local hub should initially be inactive");
+        SeleniumGrid.create(config, config.getHubUrl());
+        assertTrue(GridUtility.isHubActive(config.getHubUrl()), "Configured local hub should have been activated");
+    }
     
     @NoDriver
     @Test(expectedExceptions = {AssertionError.class},
@@ -52,5 +58,4 @@ public class GridUtilityTest extends TestNgBase {
             throw e.getCause();
         }
     }
-    
 }

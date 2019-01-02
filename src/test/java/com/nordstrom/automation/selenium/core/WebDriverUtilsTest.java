@@ -85,25 +85,25 @@ public class WebDriverUtilsTest extends TestNgBase {
         }
     }
     
-//    @Test
-//    public void testBrowserName() {
-//        WebDriver driver = getDriver();
-//        ExamplePage page = getPage();
-//        WebElement element = page.findElement(By.tagName("html"));
-//        SeleniumConfig config = SeleniumConfig.getConfig();
-//        String browserName = config.getCurrentCapabilities().getBrowserName();
-//        
-//        assertEquals(WebDriverUtils.getBrowserName((SearchContext) driver), browserName);
-//        assertEquals(WebDriverUtils.getBrowserName(page), browserName);
-//        assertEquals(WebDriverUtils.getBrowserName(element), browserName);
-//        
-//        try {
-//            WebDriverUtils.getBrowserName(mock(WebDriver.class));
-//            fail("No exception was thrown");
-//        } catch (UnsupportedOperationException e) {
-//            assertEquals(e.getMessage(), "The specified context is unable to describe its capabilities");
-//        }
-//    }
+    @Test
+    public void testBrowserName() {
+        WebDriver driver = getDriver();
+        ExamplePage page = getPage();
+        WebElement element = page.findElement(By.tagName("html"));
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        String browserName = config.getCurrentCapabilities().getBrowserName();
+        
+        assertEquals(WebDriverUtils.getBrowserName((SearchContext) driver), browserName);
+        assertEquals(WebDriverUtils.getBrowserName(page), browserName);
+        assertEquals(WebDriverUtils.getBrowserName(element), browserName);
+        
+        try {
+            WebDriverUtils.getBrowserName(mock(WebDriver.class));
+            fail("No exception was thrown");
+        } catch (UnsupportedOperationException e) {
+            assertEquals(e.getMessage(), "The specified context is unable to describe its capabilities");
+        }
+    }
     
     @Test
     public void testFilterHidden() {

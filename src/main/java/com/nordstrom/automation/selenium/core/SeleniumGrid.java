@@ -78,17 +78,16 @@ public class SeleniumGrid {
             }
             return LocalSeleniumGrid.launch(config, config.getHubConfigPath());
         }
-        throw new IllegalStateException("Specified remote hub url '" + hubUrl + "' isn't active");
+        throw new IllegalStateException("Specified remote hub URL '" + hubUrl + "' isn't active");
     }
     
     /**
      * Shutdown the Selenium Grid represented by this object.
      * 
      * @param localOnly {@code true} to target only local Grid servers
-     * @return {@code true} if local Grid shutdown; otherwise {@code false}
+     * @return {@code false} if non-local Grid server encountered; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
-    @SuppressWarnings("squid:S2864")
     public boolean shutdown(final boolean localOnly) throws InterruptedException {
         boolean result = true;
         Iterator<Entry<String, GridServer>> iterator = nodeServers.entrySet().iterator();

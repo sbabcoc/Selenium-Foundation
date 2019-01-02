@@ -290,13 +290,19 @@ public abstract class AbstractSeleniumConfig extends
      * Shutdown the active Selenium Grid.
      * 
      * @param localOnly {@code true} to target only local Grid servers
+     * @return {@code false} if non-local Grid server encountered; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
-    public void shutdownGrid(final boolean localOnly) throws InterruptedException {
+    public boolean shutdownGrid(final boolean localOnly) throws InterruptedException {
+        boolean result = true;
         synchronized(SeleniumGrid.class) {
-            if ((seleniumGrid != null) && seleniumGrid.shutdown(localOnly)) {
-                seleniumGrid = null;
+            if (seleniumGrid != null) {
+                result = seleniumGrid.shutdown(localOnly);
+                if (result) {
+                    seleniumGrid = null;
+                }
             }
+            return result;
         }
     }
     
