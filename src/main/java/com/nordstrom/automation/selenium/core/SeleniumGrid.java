@@ -49,11 +49,10 @@ public class SeleniumGrid {
      */
     public SeleniumGrid(GridServer hubServer, GridServer... nodeServers) {
         this.hubServer = Objects.requireNonNull(hubServer);
-        GridServer[] servers = Objects.requireNonNull(nodeServers);
-        if (servers.length == 0) {
+        if (Objects.requireNonNull(nodeServers).length == 0) {
             throw new IllegalArgumentException("[nodeServers] must be non-empty");
         }
-        for (GridServer nodeServer : servers) {
+        for (GridServer nodeServer : nodeServers) {
             String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
             this.nodeServers.put(nodeEndpoint, nodeServer);
         }
