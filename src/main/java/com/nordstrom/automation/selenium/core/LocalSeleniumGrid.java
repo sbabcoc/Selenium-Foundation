@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -52,7 +51,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_SERVLETS = "-servlets";
     private static final String LOGS_PATH = "logs";
     
-    private static final String GRID_ENDPOINT = "/wd/hub";
     private static final String GRID_REGISTER = "/grid/register";
     
     /**
@@ -122,37 +120,21 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * 
      * @param server {@link LocalGridServer} object to wait for.
      * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
-     * @return URL for the Grid hub (even if waiting for a node server)
      * @throws InterruptedException if this thread was interrupted
      * @throws IOException if an I/O error occurs
      * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
      */
-    protected static URL waitUntilReady(LocalGridServer server, long maxWait) throws IOException, InterruptedException, TimeoutException {
-        boolean didTimeout = false;
+    protected static void waitUntilReady(LocalGridServer server, long maxWait) throws IOException, InterruptedException, TimeoutException {
         StringBuilder builder = new StringBuilder();
         long maxTime = System.currentTimeMillis() + maxWait;
         try (InputStream inputStream = Files.newInputStream(server.outputPath)) {
             while (appendAndCheckFor(inputStream, server.readyMessage, builder)) {
                 if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
-                    didTimeout = true;
-                    break;
+                    throw new TimeoutException("Timed of waiting for Grid server to be ready");
                 }
                 Thread.sleep(100);
             }
         }
-        
-        String output = builder.toString();
-        System.out.println("output: " + output);
-        
-        if (!didTimeout) {
-            int endIndex = output.indexOf(GRID_REGISTER) + GRID_REGISTER.length();
-            int beginIndex = output.lastIndexOf(' ', endIndex) + 1;
-            URI gridHub = URI.create(output.substring(beginIndex, endIndex));
-            // replace 'localhost' IP address from server with VPN-compatible address
-            return new URL("http", GridUtility.getLocalHost(), gridHub.getPort(), GRID_ENDPOINT);
-        }
-        
-        throw new TimeoutException("Timed of waiting for Grid server to be ready");
     }
 
     /**
@@ -162,10 +144,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param readyMessage prompt to check for
      * @param builder {@link StringBuilder} object to which input is appended
      * @return {@code false} is prompt is found or channel is closed; otherwise {@code true}
-     * @throws InterruptedException if this thread was interrupted
      * @throws IOException if an I/O error occurs
      */
-    protected static boolean appendAndCheckFor(InputStream inputStream, String readyMessage, StringBuilder builder) throws InterruptedException, IOException {
+    protected static boolean appendAndCheckFor(InputStream inputStream, String readyMessage, StringBuilder builder) throws IOException {
         String recv = GridUtility.readAvailable(inputStream);
         if ( ! recv.isEmpty()) {
             builder.append(recv);
