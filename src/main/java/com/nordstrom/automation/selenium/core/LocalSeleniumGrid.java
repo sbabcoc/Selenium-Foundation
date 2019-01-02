@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -21,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.openqa.grid.common.GridRole;
+import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
@@ -35,7 +35,7 @@ import com.nordstrom.common.file.PathUtils;
  * the role of the server (either {@code hub} or {@code node}), and they get a {@link Process} object for managing
  * the server lifetime as a result.
  * <p>
- * The output of the process is redirected to a file named <ins>grid-<i>&lt;role&gt;</i>.log</ins> in the test context
+ * The output of the process is redirected to a file named <u>grid-<i>&lt;role&gt;</i>.log</u> in the test context
  * output directory. Process error output is redirected, so this log file will contain both standard output and errors.
  * <p>
  * <b>NOTE</b>: If no test context is specified, the log file will be stored in the "current" directory of the parent
@@ -43,12 +43,13 @@ import com.nordstrom.common.file.PathUtils;
  */
 public class LocalSeleniumGrid extends SeleniumGrid {
 
-    public LocalSeleniumGrid(LocalGridServer hubServer, List<LocalGridServer> nodeServers) {
-        super(hubServer, Arrays.asList(nodeServers.toArray(new GridServer[0])));
+    public LocalSeleniumGrid(LocalGridServer hubServer, LocalGridServer... nodeServers) {
+        super(hubServer, nodeServers);
     }
-
+    
     private static final String OPT_ROLE = "-role";
     private static final String OPT_PORT = "-port";
+    private static final String OPT_SERVLETS = "-servlets";
     private static final String LOGS_PATH = "logs";
     
     private static final String GRID_ENDPOINT = "/wd/hub";
@@ -113,7 +114,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             nodeServers.add(nodeServer);
         }
         
-        return new LocalSeleniumGrid(hubServer, nodeServers);
+        return new LocalSeleniumGrid(hubServer, nodeServers.toArray(new LocalGridServer[nodeServers.size()]));
     }
 
     /**
@@ -157,9 +158,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     /**
      * Append available channel input to the supplied string builder and check for the specified prompt.
      * 
+     * @param inputStream {@link InputStream} from which input is read
      * @param readyMessage prompt to check for
-     * @param builder {@link StringBuilder} object
-     * @return 'false' is prompt is found or channel is closed; otherwise 'true'
+     * @param builder {@link StringBuilder} object to which input is appended
+     * @return {@code false} is prompt is found or channel is closed; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      * @throws IOException if an I/O error occurs
      */
@@ -181,10 +183,11 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
      * @param role role of Grid server being started
      * @param port port that Grid server should use; -1 to specify auto-configuration
+     * @param configPath {@link Path} to server configuration file
      * @return {@link LocalGridServer} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
-     *      Getting Command-Line Help<a>
+     *      Getting Command-Line Help</a>
      */
     public static LocalGridServer start(final String launcherClassName,
                     final String[] dependencyContexts, final GridRole role, final Integer port,
@@ -196,8 +199,17 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
         
+        // if starting a Grid node
+        if (role == GridRole.NODE) {
+            // add lifecycle servlet
+            argsList.add(OPT_SERVLETS);
+            argsList.add(LifecycleServlet.class.getName());
+        }
+        
         Integer portNum = port;
+        // if port auto-select spec'd
         if (portNum.intValue() == -1) {
+            // acquire available port
             portNum = Integer.valueOf(PortProber.findFreePort());
         }
         
@@ -338,41 +350,39 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         }
         
         /**
+         * Get process for this local Grid server.
          * 
-         * @return
+         * @return {@link Process} object
          */
         public Process getProcess() {
             return process;
         }
         
         /**
+         * Get the output path for the process of this local Grid server.
          * 
-         * @return
+         * @return {@link Path} for process output
          */
         public Path getOutputPath() {
             return outputPath;
         }
         
         /**
+         * Get "ready" message for this local Grid server.
          * 
-         * @return
+         * @return server "ready" message
          */
         public String getReadyMessage() {
             return readyMessage;
         }
         
         /**
+         * Get {@code localhost} URL for Selenium Grid server at the specified port.
+         * <p>
+         * <b>NOTE</b>: The assembled URL will include the Grid web service base path.
          * 
-         * @param readyMessage
-         */
-        public void setReadyMessage(String readyMessage) {
-            this.readyMessage = readyMessage;
-        }
-        
-        /**
-         * 
-         * @param port
-         * @return
+         * @param port desired server port
+         * @return {@link URL} for local Grid server at the specified port
          */
         public static URL getServerUrl(Integer port) {
             try {

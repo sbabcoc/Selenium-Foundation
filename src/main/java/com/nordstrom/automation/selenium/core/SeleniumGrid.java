@@ -2,8 +2,10 @@ package com.nordstrom.automation.selenium.core;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -21,31 +23,51 @@ import com.nordstrom.common.base.UncheckedThrow;
 public class SeleniumGrid {
     
     private GridServer hubServer;
-    private List<GridServer> nodeServers = new ArrayList<>();
+    private Map<String, GridServer> nodeServers = new HashMap<>();
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
+    /**
+     * Constructor for Selenium Grid from hub URL
+     * 
+     * @param hubUrl {@link URL} for grid hub host
+     * @throws IOException if unable to acquire Grid details
+     */
     public SeleniumGrid(URL hubUrl) throws IOException {
         hubServer = new GridServer(hubUrl, GridRole.HUB);
         for (String nodeEndpoint : GridUtility.getGridProxies(hubUrl)) {
             URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
-            nodeServers.add(new GridServer(nodeUrl, GridRole.NODE));
+            nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
         }
     }
     
-    public SeleniumGrid(GridServer hubServer, List<GridServer> nodeServers) {
+    /**
+     * Constructor for Selenium Grid from server objects.
+     * 
+     * @param hubServer {@link GridServer} object for hub host
+     * @param nodeServers array of {@link GridServer} objects for node hosts
+     */
+    public SeleniumGrid(GridServer hubServer, GridServer... nodeServers) {
         this.hubServer = Objects.requireNonNull(hubServer);
-        this.nodeServers = Objects.requireNonNull(nodeServers);
+        GridServer[] servers = Objects.requireNonNull(nodeServers);
+        if (servers.length == 0) {
+            throw new IllegalArgumentException("[nodeServers] must be non-empty");
+        }
+        for (GridServer nodeServer : servers) {
+            String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
+            this.nodeServers.put(nodeEndpoint, nodeServer);
+        }
     }
     
     /**
+     * Create an object that represents the Selenium Grid with the specified hub endpoint.
      * 
-     * @param config TODO
-     * @param hubUrl
-     * @return
-     * @throws IOException
-     * @throws TimeoutException 
-     * @throws InterruptedException 
+     * @param config {@link SeleniumConfig} object
+     * @param hubUrl {@link URL} of hub host
+     * @return {@link SeleniumGrid} object for the specified hub endpoint
+     * @throws IOException if an I/O error occurs
+     * @throws InterruptedException if this thread was interrupted
+     * @throws TimeoutException if host timeout interval exceeded
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException, InterruptedException, TimeoutException {
         if (GridUtility.isHubActive(hubUrl)) {
@@ -61,6 +83,35 @@ public class SeleniumGrid {
     }
     
     /**
+     * Shutdown the Selenium Grid represented by this object.
+     * 
+     * @param localOnly {@code true} to target only local Grid servers
+     * @return {@code true} if local Grid shutdown; otherwise {@code false}
+     */
+    @SuppressWarnings("squid:S2864")
+    public boolean shutdown(final boolean localOnly) {
+        boolean result = true;
+        Iterator<Entry<String, GridServer>> iterator = nodeServers.entrySet().iterator();
+        
+        while (iterator.hasNext()) {
+            Entry<String, GridServer> serverEntry = iterator.next();
+            if (serverEntry.getValue().stopGridServer(localOnly)) {
+                iterator.remove();
+            } else {
+                result = false;
+            }
+        }
+        
+        if (hubServer.stopGridServer(localOnly)) {
+            hubServer = null;
+        } else {
+            result = false;
+        }
+        
+        return result;
+     }
+    
+    /**
      * Get grid server object for the active hub.
      * 
      * @return {@link GridServer} object that represents the active hub server
@@ -70,17 +121,19 @@ public class SeleniumGrid {
     }
     
     /**
-     * Get the list of grid server objects for the attached nodes.
+     * Get the map of grid server objects for the attached nodes.
      * 
-     * @return list of {@link GridServer} objects that represent the attached node servers
+     * @return map of {@link GridServer} objects that represent the attached node servers
      */
-    public List<GridServer> getNodeServers() {
+    public Map<String, GridServer> getNodeServers() {
         return nodeServers;
     }
     
     public static class GridServer {
         private GridRole role;
         private URL serverUrl;
+        private String statusRequest;
+        private String shutdownRequest;
         
         public static final String GRID_CONSOLE = "/grid/console";
         public static final String HUB_BASE = "/wd/hub";
@@ -88,11 +141,20 @@ public class SeleniumGrid {
         public static final String HUB_CONFIG = "/grid/api/hub/";
         public static final String NODE_CONFIG = "/grid/api/proxy";
         
+        private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
+        private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
         private static final long SHUTDOWN_DELAY = 15;
         
         public GridServer(URL url, GridRole role) {
             this.role = role;
             this.serverUrl = url;
+            if (isHub()) {
+                statusRequest = HUB_CONFIG;
+                shutdownRequest = HUB_SHUTDOWN;
+            } else {
+                statusRequest = NODE_STATUS;
+                shutdownRequest = NODE_SHUTDOWN;
+            }
         }
         
         /**
@@ -114,10 +176,21 @@ public class SeleniumGrid {
         }
         
         /**
+         * Stop the Selenium Grid server represented by this object.
+         * 
+         * @param localOnly {@code true} to target only local Grid server
+         * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
+         */
+        public boolean stopGridServer(final boolean localOnly) {
+            return stopGridServer(serverUrl, statusRequest, shutdownRequest, localOnly);
+        }
+
+        /**
          * Stop the specified Selenium Grid server.
          * 
          * @param serverUrl Selenium server URL
-         * @param serverParms Selenium Grid server parameters
+         * @param statusRequest Selenium server status request
+         * @param shutdownRequest Selenium server shutdown request
          * @param localOnly {@code true} to target only local Grid server
          * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
          */
@@ -140,5 +213,4 @@ public class SeleniumGrid {
             return true;
         }
     }
-
 }

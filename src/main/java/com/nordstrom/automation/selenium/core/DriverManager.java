@@ -145,16 +145,13 @@ public final class DriverManager {
     }
 
     /**
-     * Perform post-suite processing:
-     * <ul>
-     *     <li>If a Selenium Grid node process was spawned, shut it down.</li>
-     *     <li>If a Selenium Grid hub process was spawned, shut it down.</li>
-     * </ul>
+     * Perform post-suite processing, shutting down the local Selenium Grid.
      */
     public static void onFinish() {
-        //FIXME
-//        GridUtility.stopGridNode(true);
-//        GridUtility.stopGridHub(true);
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        if (config.getBoolean(SeleniumSettings.SHUTDOWN_GRID.key())) {
+            config.shutdownGrid(true);
+        }
     }
     
     /**

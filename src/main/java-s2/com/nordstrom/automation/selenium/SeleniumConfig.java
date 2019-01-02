@@ -35,7 +35,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncher";
     private static final String HUB_PORT = "4444";
     private static final String NODE_CONFIG = "nodeConfig-s2.json";
-    private static final String NODE_SHUTDOWN = "/selenium-server/driver/?cmd=shutDownSeleniumServer";
     
     /**
      * <b>com.google.common.util.concurrent.SimpleTimeLimiter</b>
@@ -203,7 +202,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), GRID_LAUNCHER);
         defaults.put(SeleniumSettings.HUB_PORT.key(), HUB_PORT);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
-        defaults.put(SeleniumSettings.NODE_SHUTDOWN.key(), NODE_SHUTDOWN);
         return defaults;
     }
     

@@ -217,9 +217,10 @@ public final class GridUtility {
     }
 
     /**
+     * Extract HTTP host object from the specified URL.
      * 
-     * @param url
-     * @return
+     * @param url {@link URL} from which to extract HTTP host
+     * @return {@link HttpHost} object
      */
     public static HttpHost extractHost(URL url) {
         if (url != null) {

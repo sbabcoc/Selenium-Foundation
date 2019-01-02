@@ -35,7 +35,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncherV3";
     private static final String HUB_PORT = "4445";
     private static final String NODE_CONFIG = "nodeConfig-s3.json";
-    private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
     
     /**
      * <b>org.openqa.grid.selenium.GridLauncherV3</b>
@@ -108,7 +107,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), GRID_LAUNCHER);
         defaults.put(SeleniumSettings.HUB_PORT.key(), HUB_PORT);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
-        defaults.put(SeleniumSettings.NODE_SHUTDOWN.key(), NODE_SHUTDOWN);
         return defaults;
     }
     
