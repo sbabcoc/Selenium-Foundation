@@ -35,7 +35,7 @@ public class GridUtilityTest extends TestNgBase {
     public void testIsActive() throws IOException, InterruptedException, TimeoutException {
         SeleniumConfig config = SeleniumConfig.getConfig();
         assertFalse(GridUtility.isHubActive(config.getHubUrl()), "Configured local hub should initially be inactive");
-        SeleniumGrid.create(config, config.getHubUrl());
+        config.getSeleniumGrid();
         assertTrue(GridUtility.isHubActive(config.getHubUrl()), "Configured local hub should have been activated");
     }
     

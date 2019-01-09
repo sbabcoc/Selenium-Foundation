@@ -19,7 +19,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
-
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -147,9 +146,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
-    public Capabilities getCapabilitiesForJson(String capabilities) {
+    public Capabilities[] getCapabilitiesForJson(String capabilities) {
         JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
-        return GridNodeConfiguration.loadFromJSON(input).capabilities.get(0);
+        return GridNodeConfiguration.loadFromJSON(input).capabilities.stream().toArray(Capabilities[]::new);
     }
     
 }

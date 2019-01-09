@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
+import java.util.Map;
+
+import com.nordstrom.automation.selenium.interfaces.DriverPlugin;
 
 public class PhantomJsPlugin implements DriverPlugin {
     
@@ -18,9 +20,6 @@ public class PhantomJsPlugin implements DriverPlugin {
                     "org.apache.commons.exec.Executor", "com.sun.jna.platform.win32.Kernel32",
                     "com.sun.jna.win32.StdCallLibrary"};
     
-    private static final String CAPABILITIES =
-                    "{\"browserName\": \"phantomjs\", \"maxInstances\": 5, \"seleniumProtocol\": \"WebDriver\"}";
-    
     /**
      * {@inheritDoc}
      */
@@ -34,7 +33,15 @@ public class PhantomJsPlugin implements DriverPlugin {
      */
     @Override
     public String getCapabilities() {
-        return CAPABILITIES;
+        return PhantomJsCaps.getCapabilities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getPersonalities() {
+        return PhantomJsCaps.getPersonalities();
     }
 
 }

@@ -377,32 +377,32 @@ public abstract class AbstractSeleniumConfig extends
     public Capabilities getCurrentCapabilities() {
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
         if (browserName != null) {
-            return getCapabilitiesForName(browserName);
+            return getSeleniumGrid().getPersonality(getConfig(), browserName);
         }
         String capabilities = getString(SeleniumSettings.BROWSER_CAPS.key());
         if (capabilities != null) {
-            return getCapabilitiesForJson(capabilities);
+            return getCapabilitiesForJson(capabilities)[0];
         }
         throw new IllegalStateException("Neither browser name nor capabilities are specified");
     }
     
     /**
-     * Generate a browser capabilities object for the specified name.
+     * Generate a list of browser capabilities objects for the specified name.
      * 
      * @param browserName browser name
-     * @return {@link Capabilities} object
+     * @return list of {@link Capabilities} objects
      */
-    public Capabilities getCapabilitiesForName(final String browserName) {
+    public Capabilities[] getCapabilitiesForName(final String browserName) {
         return getCapabilitiesForJson(String.format(CAPS_PATTERN, browserName));
     }
     
     /**
-     * Convert the specified JSON string into a browser capabilities object.
+     * Convert the specified JSON string into a list of browser capabilities objects.
      * 
      * @param capabilities browser capabilities as JSON string
-     * @return {@link Capabilities} object
+     * @return list of {@link Capabilities} objects
      */
-    public abstract Capabilities getCapabilitiesForJson(final String capabilities);
+    public abstract Capabilities[] getCapabilitiesForJson(final String capabilities);
     
     /**
      * Get the path to the specified configuration file.

@@ -4,25 +4,19 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.interfaces.DriverPlugin;
 
-public class PhantomJsPlugin implements DriverPlugin {
+public class ChromePlugin implements DriverPlugin {
     
     /**
-     * <b>org.openqa.selenium.phantomjs.PhantomJSDriver</b>
+     * <b>org.openqa.selenium.chrome.ChromeDriver</b>
      * 
      * <pre>&lt;dependency&gt;
-     *  &lt;groupId&gt;com.codeborne&lt;/groupId&gt;
-     *  &lt;artifactId&gt;phantomjsdriver&lt;/artifactId&gt;
-     *  &lt;version&gt;1.4.4&lt;/version&gt;
-     *  &lt;exclusions&gt;
-     *    &lt;exclusion&gt;
-     *      &lt;groupId&gt;*&lt;/groupId&gt;
-     *      &lt;artifactId&gt;*&lt;/artifactId&gt;
-     *    &lt;/exclusion&gt;
-     *  &lt;/exclusions&gt;
+     *    &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *    &lt;artifactId&gt;selenium-chrome-driver&lt;/artifactId&gt;
+     *    &lt;version&gt;3.14.0&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.phantomjs.PhantomJSDriver",
+                    "org.openqa.selenium.chrome.ChromeDriver",
                     "org.apache.commons.exec.Executor",
                     "net.bytebuddy.matcher.ElementMatcher"};
     
@@ -39,7 +33,7 @@ public class PhantomJsPlugin implements DriverPlugin {
      */
     @Override
     public String getCapabilities() {
-        return PhantomJsCaps.getCapabilities();
+        return ChromeCaps.getCapabilities();
     }
 
     /**
@@ -47,7 +41,7 @@ public class PhantomJsPlugin implements DriverPlugin {
      */
     @Override
     public Map<String, String> getPersonalities() {
-        return PhantomJsCaps.getPersonalities();
+        return ChromeCaps.getPersonalities();
     }
 
 }

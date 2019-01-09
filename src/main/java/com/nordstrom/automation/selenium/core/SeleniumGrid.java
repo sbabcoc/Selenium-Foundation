@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.openqa.grid.common.GridRole;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.net.UrlChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +129,16 @@ public class SeleniumGrid {
         return nodeServers;
     }
     
+    /**
+     * 
+     * @param config
+     * @param personality
+     * @return
+     */
+    public Capabilities getPersonality(SeleniumConfig config, String personality) {
+        return config.getCapabilitiesForName(personality)[0];
+    }
+
     public static class GridServer {
         private GridRole role;
         private URL serverUrl;

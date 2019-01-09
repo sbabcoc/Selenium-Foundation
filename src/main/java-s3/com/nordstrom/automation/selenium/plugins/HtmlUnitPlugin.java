@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
+import java.util.Map;
+
+import com.nordstrom.automation.selenium.interfaces.DriverPlugin;
 
 public class HtmlUnitPlugin implements DriverPlugin {
     
@@ -32,9 +34,6 @@ public class HtmlUnitPlugin implements DriverPlugin {
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
                     "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser"};
     
-    private static final String CAPABILITIES =
-                    "{\"browserName\":\"htmlunit\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\", \"javascriptEnabled\":true}";
-    
     /**
      * {@inheritDoc}
      */
@@ -48,7 +47,15 @@ public class HtmlUnitPlugin implements DriverPlugin {
      */
     @Override
     public String getCapabilities() {
-        return CAPABILITIES;
+        return HtmlUnitCaps.getCapabilities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getPersonalities() {
+        return HtmlUnitCaps.getPersonalities();
     }
 
 }

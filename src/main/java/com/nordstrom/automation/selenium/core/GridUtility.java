@@ -167,10 +167,10 @@ public final class GridUtility {
      * @param config {@link SeleniumConfig} object
      * @param hubHost Grid hub host
      * @param nodeEndpoint node endpoint
-     * @return {@link Capabilities} object for the specified node
+     * @return list of {@link Capabilities} objects for the specified node
      * @throws IOException if an I/O error occurs
      */
-    public static Capabilities getNodeCapabilities(SeleniumConfig config, HttpHost hubHost, String nodeEndpoint) throws IOException {
+    public static Capabilities[] getNodeCapabilities(SeleniumConfig config, HttpHost hubHost, String nodeEndpoint) throws IOException {
         String json;
         String url = hubHost.toURI() + GridServer.NODE_CONFIG + "?id=" + nodeEndpoint;
         try (InputStream is = new URL(url).openStream()) {

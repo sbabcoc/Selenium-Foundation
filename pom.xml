@@ -39,7 +39,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>1.7.3</java-utils.version>
+    <java-utils.version>1.8.0</java-utils.version>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
@@ -221,6 +221,11 @@
           <artifactId>htmlunit-driver</artifactId>
           <scope>test</scope>
         </dependency>
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-chrome-driver</artifactId>
+    <version>2.53.0</version>
+</dependency>
       </dependencies>
       <build>
         <directory>target-s2</directory>
@@ -352,6 +357,11 @@
           <artifactId>htmlunit-driver</artifactId>
           <scope>test</scope>
         </dependency>
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-chrome-driver</artifactId>
+    <version>3.14.0</version>
+</dependency>
       </dependencies>
       <build>
         <directory>target-s3</directory>

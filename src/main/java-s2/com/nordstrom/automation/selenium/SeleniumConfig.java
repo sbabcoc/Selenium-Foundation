@@ -253,8 +253,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
-    public Capabilities getCapabilitiesForJson(String capabilities) {
+    public Capabilities[] getCapabilitiesForJson(String capabilities) {
         String input = JSON_HEAD + capabilities + JSON_TAIL;
-        return RegistrationRequest.getNewInstance(input).getCapabilities().get(0);
+        return RegistrationRequest.getNewInstance(input).getCapabilities().stream().toArray(Capabilities[]::new);
     }
 }
