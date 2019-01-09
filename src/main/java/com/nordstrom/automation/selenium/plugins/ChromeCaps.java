@@ -13,7 +13,10 @@ public class ChromeCaps {
     private static final String CAPABILITIES =
                     "{\"browserName\":\"chrome\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
     
-    public static final String CHROME =
+    public static final String BROWSER_NAME = "chrome";
+    public static final String OPTIONS_KEY = "goog:chromeOptions";
+    
+    public static final String BASELINE =
                     "{\"browserName\":\"chrome\"," +
                      "\"goog:chromeOptions\":{" +
                          "\"args\":[\"--disable-infobars\"]," +
@@ -31,7 +34,7 @@ public class ChromeCaps {
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put("chrome", CHROME);
+        personalities.put(BROWSER_NAME, BASELINE);
         personalities.put("chrome.headless", HEADLESS);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }

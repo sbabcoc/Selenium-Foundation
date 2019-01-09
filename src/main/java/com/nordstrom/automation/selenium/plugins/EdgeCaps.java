@@ -4,17 +4,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HtmlUnitCaps {
+public class EdgeCaps {
     
-    private HtmlUnitCaps() {
-        throw new AssertionError("HtmlUnitCaps is a static constants class that cannot be instantiated");
+    private EdgeCaps() {
+        throw new AssertionError("EdgeCaps is a static constants class that cannot be instantiated");
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"htmlunit\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\", \"javascriptEnabled\":true}";
+                    "{\"browserName\":\"edge\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
     
-    public static final String BROWSER_NAME = "htmlunit";
-    public static final String BASELINE = "{\"browserName\":\"htmlunit\"}";
+    public static final String BROWSER_NAME = "edge";
+    public static final String OPTIONS_KEY = "edgeOptions";
+    public static final String BASELINE = "{\"browserName\":\"edge\"}";
     
     private static final Map<String, String> PERSONALITIES;
     

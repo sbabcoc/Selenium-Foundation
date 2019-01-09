@@ -4,17 +4,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HtmlUnitCaps {
+public class SafariCaps {
     
-    private HtmlUnitCaps() {
-        throw new AssertionError("HtmlUnitCaps is a static constants class that cannot be instantiated");
+    private SafariCaps() {
+        throw new AssertionError("SafariCaps is a static constants class that cannot be instantiated");
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"htmlunit\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\", \"javascriptEnabled\":true}";
+                    "{\"browserName\":\"safari\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
     
-    public static final String BROWSER_NAME = "htmlunit";
-    public static final String BASELINE = "{\"browserName\":\"htmlunit\"}";
+    public static final String BROWSER_NAME = "safari";
+    public static final String OPTIONS_KEY = "safari.options";
+    public static final String BASELINE = "{\"browserName\":\"safari\"}";
     
     private static final Map<String, String> PERSONALITIES;
     

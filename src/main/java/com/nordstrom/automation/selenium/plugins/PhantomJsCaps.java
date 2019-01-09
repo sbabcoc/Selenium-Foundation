@@ -13,13 +13,14 @@ public class PhantomJsCaps {
     private static final String CAPABILITIES =
                     "{\"browserName\": \"phantomjs\", \"maxInstances\": 5, \"seleniumProtocol\": \"WebDriver\"}";
     
+    public static final String BROWSER_NAME = "phantomjs";
     public static final String PHANTOMJS = "{\"browserName\":\"phantomjs\"}";
     
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put("phantomjs", PHANTOMJS);
+        personalities.put(BROWSER_NAME, PHANTOMJS);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
