@@ -30,8 +30,8 @@ public class SeleniumGrid {
     
     /**
      * Constructor for Selenium Grid from hub URL
-     * 
      * @param hubUrl {@link URL} for grid hub host
+     * 
      * @throws IOException if unable to acquire Grid details
      */
     public SeleniumGrid(URL hubUrl) throws IOException {
@@ -71,6 +71,7 @@ public class SeleniumGrid {
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException, InterruptedException, TimeoutException {
         if (GridUtility.isHubActive(hubUrl)) {
+            // TODO Differentiate local/remote hub, creating the corresponding type of Grid object.
             return new SeleniumGrid(hubUrl);
         } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
             if (hubUrl != null) {

@@ -59,10 +59,23 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         this.personalities = personalities;
     }
     
-    /**
+    /* 
+     * TODO Add constructor to re-constitute local Grid from active hub.
      * 
-     * @param config
-     * @param personality
+     * => Get capabilities of active node:  
+     *    Capabilities[] nodeCaps = GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint);
+     *    
+     * => Match capabilities with configured browser plug-in:
+     *    for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+     *        // determine if node browser name(s) == plug-in browser name(s)
+     *    }
+     */
+    
+    /**
+     * Get capabilities object for the specified browser personality.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param personality 
      * @return
      */
     @Override
