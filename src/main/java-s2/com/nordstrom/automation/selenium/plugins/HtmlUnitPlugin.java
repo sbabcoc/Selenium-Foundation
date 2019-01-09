@@ -2,7 +2,7 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
 
-import com.nordstrom.automation.selenium.interfaces.DriverPlugin;
+import com.nordstrom.automation.selenium.DriverPlugin;
 
 public class HtmlUnitPlugin implements DriverPlugin {
     

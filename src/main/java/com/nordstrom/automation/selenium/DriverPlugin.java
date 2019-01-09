@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.interfaces;
+package com.nordstrom.automation.selenium;
 
 import java.io.IOException;
 import java.nio.file.Path;
