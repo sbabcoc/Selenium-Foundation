@@ -18,6 +18,7 @@ import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.google.gson.Gson;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -256,5 +257,12 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     public Capabilities[] getCapabilitiesForJson(String capabilities) {
         String input = JSON_HEAD + capabilities + JSON_TAIL;
         return RegistrationRequest.getNewInstance(input).getCapabilities().stream().toArray(Capabilities[]::new);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toJson(Capabilities capabilities) {
+        return new Gson().toJsonTree(capabilities.asMap()).toString();
     }
 }

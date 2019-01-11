@@ -19,6 +19,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
+
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -151,4 +152,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return GridNodeConfiguration.loadFromJSON(input).capabilities.stream().toArray(Capabilities[]::new);
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    public String toJson(Capabilities capabilities) {
+        return new Json().toJson(capabilities);
+    }
 }

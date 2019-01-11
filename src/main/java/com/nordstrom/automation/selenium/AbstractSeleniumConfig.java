@@ -101,7 +101,9 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>google.dns.socket.host</b> <br> default: <b>8.8.8.8</b> */
         GOOGLE_DNS_SOCKET_HOST("google.dns.socket.host", "8.8.8.8"),    //NOSONAR
         /** name: <b>google.dns.socket.port</b> <br> default: <b>10002</b> */
-        GOOGLE_DNS_SOCKET_PORT("google.dns.socket.port", "10002");
+        GOOGLE_DNS_SOCKET_PORT("google.dns.socket.port", "10002"),
+        /** name: <b>selenium.opera.binary</b> <br> default: {@code null} */
+        OPERA_BINARY("selenium.opera.binary", null);
         
         private String propertyName;
         private String defaultValue;
@@ -403,6 +405,14 @@ public abstract class AbstractSeleniumConfig extends
      * @return list of {@link Capabilities} objects
      */
     public abstract Capabilities[] getCapabilitiesForJson(final String capabilities);
+    
+    /**
+     * Convert the specified browser capabilities object to a JSON string.
+     * 
+     * @param capabilities {@link Capabilities} object
+     * @return specified capabilities as a JSON string
+     */
+    public abstract String toJson(final Capabilities capabilities);
     
     /**
      * Get the path to the specified configuration file.

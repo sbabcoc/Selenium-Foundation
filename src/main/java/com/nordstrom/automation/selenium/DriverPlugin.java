@@ -24,9 +24,10 @@ public interface DriverPlugin {
     /**
      * Get driver capabilities as JSON string.
      * 
+     * @param config {@link SeleniumConfig} object
      * @return JSON driver capabilities
      */
-    String getCapabilities();
+    String getCapabilities(SeleniumConfig config);
     
     /**
      * Get driver "personalities" provided by this plug-in.
@@ -49,7 +50,7 @@ public interface DriverPlugin {
                     String[] dependencyContexts, GridServer hubServer) throws IOException {
 
         String[] combinedContexts = combineDependencyContexts(dependencyContexts);
-        Path nodeConfigPath = config.createNodeConfig(getCapabilities(), hubServer.getUrl());
+        Path nodeConfigPath = config.createNodeConfig(getCapabilities(config), hubServer.getUrl());
         return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
                         Integer.valueOf(-1), nodeConfigPath);
     }

@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.plugins;
 import java.util.Map;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
+import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class OperaPlugin implements DriverPlugin {
     
@@ -16,7 +17,8 @@ public class OperaPlugin implements DriverPlugin {
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.opera.OperaDriver"};
+                    "org.openqa.selenium.opera.OperaDriver",
+                    "org.apache.commons.exec.Executor"};
     
     /**
      * {@inheritDoc}
@@ -30,8 +32,8 @@ public class OperaPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getCapabilities() {
-        return OperaCaps.getCapabilities();
+    public String getCapabilities(SeleniumConfig config) {
+        return OperaCaps.getCapabilities(config);
     }
 
     /**

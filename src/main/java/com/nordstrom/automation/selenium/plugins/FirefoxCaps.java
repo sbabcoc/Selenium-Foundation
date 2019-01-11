@@ -15,13 +15,20 @@ public class FirefoxCaps {
     
     public static final String BROWSER_NAME = "firefox";
     public static final String OPTIONS_KEY = "moz:firefoxOptions";
-    public static final String BASELINE = "{\"browserName\":\"firefox\", \"marionette\":false}";
+    public static final String BASELINE = "{\"browserName\":\"firefox\"}";
+    
+    public static final String HEADLESS =
+                    "{\"browserName\":\"firefox\"," +
+                     "\"moz:firefoxOptions\":{" +
+                         "\"args\":[\"-headless\"]" +
+                    "}}";
     
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
         personalities.put(BROWSER_NAME, BASELINE);
+        personalities.put("firefox.headless", HEADLESS);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

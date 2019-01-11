@@ -11,11 +11,11 @@ public class EdgeCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"edge\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"MicrosoftEdge\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
     
-    public static final String BROWSER_NAME = "edge";
+    public static final String BROWSER_NAME = "MicrosoftEdge";
     public static final String OPTIONS_KEY = "edgeOptions";
-    public static final String BASELINE = "{\"browserName\":\"edge\"}";
+    public static final String BASELINE = "{\"browserName\":\"MicrosoftEdge\"}";
     
     private static final Map<String, String> PERSONALITIES;
     

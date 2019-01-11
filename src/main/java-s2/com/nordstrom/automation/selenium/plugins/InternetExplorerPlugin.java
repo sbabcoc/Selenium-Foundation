@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.plugins;
 import java.util.Map;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
+import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class InternetExplorerPlugin implements DriverPlugin {
     
@@ -36,7 +37,7 @@ public class InternetExplorerPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getCapabilities() {
+    public String getCapabilities(SeleniumConfig config) {
         return InternetExplorerCaps.getCapabilities();
     }
 
