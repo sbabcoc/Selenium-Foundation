@@ -15,7 +15,7 @@ public class FirefoxCaps {
     
     public static final String BROWSER_NAME = "firefox";
     public static final String OPTIONS_KEY = "moz:firefoxOptions";
-    public static final String BASELINE = "{\"browserName\":\"firefox\"}";
+    public static final String BASELINE = "{\"browserName\":\"firefox\", \"marionette\":false}";
     
     private static final Map<String, String> PERSONALITIES;
     

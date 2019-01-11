@@ -10,7 +10,7 @@ A popular strategy to reduce duplication and accelerate development of automated
 
 ### Design Pattern References
 
-* [Getting started (including complete examples) from Kim Schiller](https://www.pluralsight.com/guides/software-engineering-best-practices/getting-started-with-page-object-pattern-for-your-selenium-tests)
+* [Getting started (including complete examples) from Kim Schiller](https://www.pluralsight.com/guides/getting-started-with-page-object-pattern-for-your-selenium-tests)
 * [Pattern overview from Martin Fowler](https://martinfowler.com/bliki/PageObject.html)
 * [Pattern overview from SeleniumHQ](https://github.com/SeleniumHQ/selenium/wiki/PageObjects)
 * [In-depth pattern description from Guru99](https://www.guru99.com/page-object-model-pom-page-factory-in-selenium-ultimate-guide.html)
@@ -46,8 +46,8 @@ To eliminate unnecessary boilerplate code, **Selenium Foundation** performs m
 *   Prior to invoking methods of page objects and page components (see below), the driver is automatically targeted at the associated window or frame.
 *   Facilities are provided to automatically synchronize with the page load completion at transitions (more later).
 *   At the end of each test, the browser session is closed automatically.
-*   (FUTURE) If a test fails, a screenshot and page source are automatically saved for diagnostic purposes.
-*   (FUTURE) If a test fails with a retriable exception (any subclass of WebDriverException) and automatic retry is enabled, the test is executed again.
+*   If a test fails, a screenshot and page source are automatically saved for diagnostic purposes.
+*   If a test fails with a retriable exception (any subclass of WebDriverException) and automatic retry is enabled, the test is executed again.
 
 ## Building Page Objects with Selenium Foundation
 

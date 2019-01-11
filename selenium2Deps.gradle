@@ -2,9 +2,9 @@ dependencies {
   selenium2Compile configurations.compile
   selenium2Compile('com.google.guava:guava:21.0') { force = true }
   selenium2Compile 'commons-io:commons-io:2.4'
-  selenium2Compile('org.seleniumhq.selenium:selenium-server:2.53.0') {
+  selenium2Compile('org.seleniumhq.selenium:selenium-server:2.53.1') {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
   }
-  selenium2Compile 'org.seleniumhq.selenium:selenium-support:2.53.0'
+  selenium2Compile 'org.seleniumhq.selenium:selenium-support:2.53.1'
   selenium2Compile 'org.seleniumhq.selenium:htmlunit-driver:2.21'
 }

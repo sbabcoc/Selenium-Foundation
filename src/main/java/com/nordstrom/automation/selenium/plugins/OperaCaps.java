@@ -11,11 +11,11 @@ public class OperaCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"opera\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"operablink\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
     
-    public static final String BROWSER_NAME = "opera";
+    public static final String BROWSER_NAME = "operablink";
     public static final String OPTIONS_KEY = "operaOptions";
-    public static final String BASELINE = "{\"browserName\":\"opera\"}";
+    public static final String BASELINE = "{\"browserName\":\"operablink\"}";
     
     private static final Map<String, String> PERSONALITIES;
     

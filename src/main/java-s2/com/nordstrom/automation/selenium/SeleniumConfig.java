@@ -58,7 +58,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;selenium-api&lt;/artifactId&gt;
-     *  &lt;version&gt;2.53.0&lt;/version&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>org.openqa.grid.selenium.GridLauncher</b>
@@ -66,7 +66,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;selenium-server&lt;/artifactId&gt;
-     *  &lt;version&gt;2.53.0&lt;/version&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>com.beust.jcommander.JCommander</b> (for selenium-server)
@@ -154,7 +154,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.53.0&lt;/version&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {

@@ -31,7 +31,7 @@ public class OperaPlugin implements DriverPlugin {
      */
     @Override
     public String getCapabilities() {
-        return SafariCaps.getCapabilities();
+        return OperaCaps.getCapabilities();
     }
 
     /**
@@ -39,7 +39,7 @@ public class OperaPlugin implements DriverPlugin {
      */
     @Override
     public Map<String, String> getPersonalities() {
-        return SafariCaps.getPersonalities();
+        return OperaCaps.getPersonalities();
     }
 
 }

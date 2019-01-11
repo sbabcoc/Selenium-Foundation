@@ -4,21 +4,23 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
 
-public class FirefoxPlugin implements DriverPlugin {
+public class SafariPlugin implements DriverPlugin {
     
     /**
-     * <b>org.openqa.selenium.firefox.FirefoxDriver</b>
+     * <b>org.openqa.selenium.safari.SafariDriver</b>
      * 
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *  &lt;artifactId&gt;selenium-firefox-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;3.14.0&lt;/version&gt;
+     *  &lt;artifactId&gt;selenium-safari-driver&lt;/artifactId&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.firefox.FirefoxDriver",
+                    "org.openqa.selenium.safari.SafariDriver",
                     "org.apache.commons.exec.Executor",
-                    "net.bytebuddy.matcher.ElementMatcher"};
+                    "org.openqa.selenium.os.Kernel32",
+                    "com.sun.jna.platform.win32.Kernel32",
+                    "com.sun.jna.win32.StdCallLibrary"};
     
     /**
      * {@inheritDoc}
@@ -33,7 +35,7 @@ public class FirefoxPlugin implements DriverPlugin {
      */
     @Override
     public String getCapabilities() {
-        return FirefoxCaps.getCapabilities();
+        return SafariCaps.getCapabilities();
     }
 
     /**
@@ -41,7 +43,7 @@ public class FirefoxPlugin implements DriverPlugin {
      */
     @Override
     public Map<String, String> getPersonalities() {
-        return FirefoxCaps.getPersonalities();
+        return SafariCaps.getPersonalities();
     }
 
 }
