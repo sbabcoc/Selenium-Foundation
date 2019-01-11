@@ -32,26 +32,6 @@ public class OperaCaps {
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
-    @SuppressWarnings("unchecked")
-    public static String getCapabilities(SeleniumConfig config) {
-        String binaryPath = config.getString(SeleniumSettings.OPERA_BINARY.key());
-        Objects.requireNonNull(binaryPath, "Path to Opera binary must be specified in setting ["
-                        + SeleniumSettings.OPERA_BINARY.key() + "]");
-        
-        Capabilities capabilities = config.getCapabilitiesForJson(CAPABILITIES)[0];
-        DesiredCapabilities desired = new DesiredCapabilities().merge(capabilities);
-        Map<String, Object> operaOptions = (Map<String, Object>) desired.getCapability(OPTIONS_KEY);
-        
-        if (operaOptions == null) {
-            operaOptions = new HashMap<>();
-        }
-        
-        operaOptions.put(BINARY_KEY, binaryPath);
-        desired.setCapability(OPTIONS_KEY, operaOptions);
-        
-        return config.toJson(desired);
-    }
-    
     public static String getCapabilities() {
         return CAPABILITIES;
     }

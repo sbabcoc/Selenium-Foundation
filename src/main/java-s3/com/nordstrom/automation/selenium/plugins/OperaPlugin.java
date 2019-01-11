@@ -33,7 +33,7 @@ public class OperaPlugin implements DriverPlugin {
      */
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        return OperaCaps.getCapabilities(config);
+        return OperaCaps.getCapabilities();
     }
 
     /**
