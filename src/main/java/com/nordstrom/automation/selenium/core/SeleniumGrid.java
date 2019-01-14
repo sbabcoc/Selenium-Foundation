@@ -131,10 +131,11 @@ public class SeleniumGrid {
     }
     
     /**
+     * Get capabilities object for the specified browser personality.
      * 
-     * @param config
-     * @param personality
-     * @return
+     * @param config {@link SeleniumConfig} object
+     * @param personality browser personality to retrieve
+     * @return {@link Capabilities} object for the specified personality
      */
     public Capabilities getPersonality(SeleniumConfig config, String personality) {
         return config.getCapabilitiesForName(personality)[0];

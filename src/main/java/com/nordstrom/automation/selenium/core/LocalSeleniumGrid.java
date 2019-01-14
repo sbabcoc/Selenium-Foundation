@@ -72,11 +72,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      */
     
     /**
-     * Get capabilities object for the specified browser personality.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param personality 
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public Capabilities getPersonality(SeleniumConfig config, String personality) {

@@ -18,7 +18,8 @@ public class OperaPlugin implements DriverPlugin {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.opera.OperaDriver",
-                    "org.apache.commons.exec.Executor"};
+                    "org.apache.commons.exec.Executor",
+                    "net.bytebuddy.matcher.ElementMatcher"};
     
     /**
      * {@inheritDoc}
@@ -33,7 +34,7 @@ public class OperaPlugin implements DriverPlugin {
      */
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        return OperaCaps.getCapabilities();
+        return OperaCaps.getCapabilities(config);
     }
 
     /**

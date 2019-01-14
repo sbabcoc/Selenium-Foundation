@@ -53,7 +53,7 @@ public final class GridUtility {
     /**
      * Determine if the configured Selenium Grid hub is active.
      * 
-     * @param hubUrl URL to be checked
+     * @param hubUrl {@link URL} to be checked
      * @return 'true' if configured hub is active; otherwise 'false'
      */
     public static boolean isHubActive(URL hubUrl) {
@@ -63,7 +63,7 @@ public final class GridUtility {
     /**
      * Determine if the specified Selenium Grid host (hub or node) is active.
      * 
-     * @param hostUrl URL to be checked
+     * @param hostUrl {@link URL} to be checked
      * @param request request path (may include parameters)
      * @return 'true' if specified host is active; otherwise 'false'
      */
@@ -80,7 +80,7 @@ public final class GridUtility {
     /**
      * Send the specified GET request to the indicated host.
      * 
-     * @param hostUrl target HTTP host connection
+     * @param hostUrl {@link URL} of target host
      * @param request request path (may include parameters)
      * @return host response for the specified GET request
      * @throws IOException The request triggered an I/O exception
@@ -143,7 +143,7 @@ public final class GridUtility {
     /**
      * Get the list of node endpoints attached to the specified Selenium Grid hub.
      * 
-     * @param hubUrl ULR of Grid hub
+     * @param hubUrl {@link URL} of Grid hub
      * @return list of node endpoints
      * @throws IOException if an I/O error occurs
      */
@@ -165,7 +165,7 @@ public final class GridUtility {
      * Get capabilities of the indicated node of the specified Selenium Grid hub.
      * 
      * @param config {@link SeleniumConfig} object
-     * @param hubHost Grid hub host
+     * @param hubUrl {@link URL} of Grid hub
      * @param nodeEndpoint node endpoint
      * @return list of {@link Capabilities} objects for the specified node
      * @throws IOException if an I/O error occurs
@@ -182,7 +182,7 @@ public final class GridUtility {
     /**
      * Determine if the specified server is the local host.
      * 
-     * @param host URL to be checked
+     * @param host {@link URL} to be checked
      * @return 'true' if server is local host; otherwise 'false'
      */
     public static boolean isLocalHost(URL host) {
