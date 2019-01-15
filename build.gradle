@@ -264,13 +264,13 @@ repositories {
 }
 
 dependencies {
-  compile 'com.nordstrom.tools:java-utils:1.7.3'
-  compile 'com.nordstrom.tools:settings:2.2.2'
+  compile 'com.nordstrom.tools:java-utils:1.8.0'
+  compile 'com.nordstrom.tools:settings:2.2.4'
   compile 'com.nordstrom.tools:testng-foundation:1.10.4'
-  compile 'com.nordstrom.tools:junit-foundation:9.0.3'
-  compile 'ch.qos.logback:logback-classic:1.2.2'
+  compile 'com.nordstrom.tools:junit-foundation:9.0.4'
+  compile 'ch.qos.logback:logback-classic:1.2.3'
   compile 'com.github.sbabcoc:logback-testng:1.0.1'
-  compile 'org.jsoup:jsoup:1.10.2'
+  compile 'org.jsoup:jsoup:1.11.3'
   
   apply from: "${profile}Deps.gradle"
   

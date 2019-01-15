@@ -3,7 +3,7 @@ dependencies {
   selenium3Compile('com.google.guava:guava:25.0-jre') { force = true } 
   selenium3Compile('com.beust:jcommander:1.72') { force = true }
   selenium3Compile 'commons-io:commons-io:2.6'
-  selenium3Compile('org.seleniumhq.selenium:selenium-server:3.14.0') {
+  selenium3Compile('org.seleniumhq.selenium:selenium-server:3.141.59') {
     exclude module: 'selenium-chrome-driver'
     exclude module: 'selenium-edge-driver'
     exclude module: 'selenium-firefox-driver'
@@ -14,5 +14,5 @@ dependencies {
     exclude module: 'htmlunit-driver'
     exclude group: 'net.sourceforge.htmlunit', module: 'htmlunit'
   }
-  selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.30.0'
+  selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.33.3'
 }

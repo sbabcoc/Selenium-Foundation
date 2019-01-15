@@ -45,7 +45,7 @@
     <javadoc-plugin.version>3.0.1</javadoc-plugin.version>
     <settings.version>2.2.4</settings.version>
     <testng-foundation.version>1.10.4</testng-foundation.version>
-    <junit-foundation.version>9.0.3</junit-foundation.version>
+    <junit-foundation.version>9.0.4</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
     <logback-testng.version>1.0.1</logback-testng.version>
     <sonar.language>java</sonar.language>
@@ -267,7 +267,8 @@
       <properties>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>25.0-jre</guava.version>
-        <htmlunit.version>2.33.3</htmlunit.version>
+        <htmlunit.version>2.3
+        3.3</htmlunit.version>
         <jcommander.version>1.72</jcommander.version>
         <commons-io.version>2.6</commons-io.version>
       </properties>
