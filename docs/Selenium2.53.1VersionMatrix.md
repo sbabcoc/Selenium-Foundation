@@ -14,7 +14,7 @@
 </dependency>
 ``` 
 
-## Edge (`edge`)
+## Edge (`MicrosoftEdge`)
 
 | Application | Driver |
 |---|---|
