@@ -30,7 +30,7 @@ public class HtmlUnitPlugin implements DriverPlugin {
                     "org.eclipse.jetty.websocket.common.Parser",
                     "org.eclipse.jetty.websocket.api.Session",
                     "net.sourceforge.htmlunit.corejs.javascript.Token",
-                    "net.sourceforge.htmlunit.cyberneko.filters.Identity",
+                    "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
                     "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.parser.CSSParser",
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
                     "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser"};

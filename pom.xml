@@ -42,16 +42,16 @@
     <java-utils.version>1.8.0</java-utils.version>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
-    <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
-    <settings.version>2.2.2</settings.version>
+    <javadoc-plugin.version>3.0.1</javadoc-plugin.version>
+    <settings.version>2.2.4</settings.version>
     <testng-foundation.version>1.10.4</testng-foundation.version>
     <junit-foundation.version>9.0.3</junit-foundation.version>
-    <logback.version>1.2.2</logback.version>
+    <logback.version>1.2.3</logback.version>
     <logback-testng.version>1.0.1</logback-testng.version>
     <sonar.language>java</sonar.language>
-    <jacoco.version>0.7.9</jacoco.version>
+    <jacoco.version>0.8.2</jacoco.version>
     <mockito.version>1.10.19</mockito.version>
-    <jsoup.version>1.10.2</jsoup.version>
+    <jsoup.version>1.11.3</jsoup.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
     <dependency-plugin.version>3.1.1</dependency-plugin.version>
     <clean-plugin.version>3.1.0</clean-plugin.version>
@@ -265,9 +265,9 @@
         </property>
       </activation>
       <properties>
-        <selenium.version>3.14.0</selenium.version>
+        <selenium.version>3.141.59</selenium.version>
         <guava.version>25.0-jre</guava.version>
-        <htmlunit.version>2.30.0</htmlunit.version>
+        <htmlunit.version>2.33.3</htmlunit.version>
         <jcommander.version>1.72</jcommander.version>
         <commons-io.version>2.6</commons-io.version>
       </properties>
@@ -350,7 +350,6 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>htmlunit-driver</artifactId>
-          <scope>test</scope>
         </dependency>
       </dependencies>
       <build>
