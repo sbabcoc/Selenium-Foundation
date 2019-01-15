@@ -41,23 +41,111 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * 
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *  &lt;artifactId&gt;selenium-server-standalone&lt;/artifactId&gt;
-     *  &lt;version&gt;3.14.0&lt;/version&gt;
-     *&lt;/dependency&gt;</pre>
-     * 
-     * <b>org.openqa.selenium.phantomjs.PhantomJSDriver</b>
-     * 
-     * <pre>&lt;dependency&gt;
-     *  &lt;groupId&gt;com.github.detro&lt;/groupId&gt;
-     *  &lt;artifactId&gt;ghostdriver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.1.0&lt;/version&gt;
+     *  &lt;artifactId&gt;selenium-server&lt;/artifactId&gt;
+     *  &lt;version&gt;3.141.59&lt;/version&gt;
      *  &lt;exclusions&gt;
      *    &lt;exclusion&gt;
      *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *      &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
+     *      &lt;artifactId&gt;selenium-chrome-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-edge-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-firefox-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-ie-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-opera-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-safari-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;net.sourceforge.htmlunit&lt;/groupId&gt;
+     *      &lt;artifactId&gt;htmlunit&lt;/artifactId&gt;
      *    &lt;/exclusion&gt;
      *  &lt;/exclusions&gt;
      *&lt;/dependency&gt;</pre>
+     *
+     * <b>org.openqa.selenium.BuildInfo</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-api&lt;/artifactId&gt;
+     *  &lt;version&gt;3.141.59&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>com.google.common.collect.ImmutableMap</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
+     *  &lt;artifactId&gt;guava&lt;/artifactId&gt;
+     *  &lt;version&gt;25.0-jre&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>com.beust.jcommander.JCommander</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;com.beust&lt;/groupId&gt;
+     *  &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
+     *  &lt;version&gt;1.72&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>org.openqa.selenium.json.Json</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
+     *  &lt;version&gt;3.141.59&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>org.seleniumhq.jetty9.util.thread.ThreadPool</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;jetty-repacked&lt;/artifactId&gt;
+     *  &lt;version&gt;9.4.12v20180830&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>javax.servlet.Servlet</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+     *  &lt;artifactId&gt;javax-servlet-api&lt;/artifactId&gt;
+     *  &lt;version&gt;3.1.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>okhttp3.ConnectionPool</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;com.squareup.okhttp3&lt;/groupId&gt;
+     *  &lt;artifactId&gt;okhttp3&lt;/artifactId&gt;
+     *  &lt;version&gt;3.11.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>okio.BufferedSource</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;com.squareup.okio&lt;/groupId&gt;
+     *  &lt;artifactId&gt;okio&lt;/artifactId&gt;
+     *  &lt;version&gt;1.14.0&lt;/version&gt;
+     *&lt;/dependency&gt;
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     GRID_LAUNCHER,

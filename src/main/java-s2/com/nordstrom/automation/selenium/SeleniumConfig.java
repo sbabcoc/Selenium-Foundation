@@ -46,13 +46,37 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;version&gt;21.0&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
-     * <b>org.openqa.selenium.htmlunit.HtmlUnitDriver</b>
+     * <b>org.apache.http.conn.HttpClientConnectionManager</b>
      * 
      * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;
+     *  &lt;artifactId&gt;httpclient&lt;/artifactId&gt;
+     *  &lt;version&gt;4.5.1&lt;/version&gt;
+     *&lt;/dependency&gt;
+     * 
+     * <b>org.apache.http.config.RegistryBuilder</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;
+     *  &lt;artifactId&gt;httpcore&lt;/artifactId&gt;
+     *  &lt;version&gt;4.4.3&lt;/version&gt;
+     *&lt;/dependency&gt;
+     * 
+     * <b>org.apache.commons.logging.LogFactory</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;commons-logging&lt;/groupId&gt;
+     *  &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
+     *  &lt;version&gt;1.2&lt;/version&gt;
+     * 
+     * <b>org.openqa.selenium.support.events.WebDriverEventListener</b>
+     * 
+     *&lt;/dependency&gt;
+     * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *  &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.21&lt;/version&gt;
-     *&lt;/dependency&gt;</pre>
+     *  &lt;artifactId&gt;selenium-support&lt;/artifactId&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
+     *&lt;/dependency&gt;
      * 
      * <b>org.openqa.selenium.WebDriverException</b>
      * 
@@ -68,6 +92,12 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;selenium-server&lt;/artifactId&gt;
      *  &lt;version&gt;2.53.1&lt;/version&gt;
+     *  &lt;exclusions&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *  &lt;/exclusions&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>com.beust.jcommander.JCommander</b> (for selenium-server)
