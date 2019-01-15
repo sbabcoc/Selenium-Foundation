@@ -52,7 +52,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;
      *  &lt;artifactId&gt;httpclient&lt;/artifactId&gt;
      *  &lt;version&gt;4.5.1&lt;/version&gt;
-     *&lt;/dependency&gt;
+     *&lt;/dependency&gt;</pre>
      * 
      * <b>org.apache.http.config.RegistryBuilder</b>
      * 
@@ -60,7 +60,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;
      *  &lt;artifactId&gt;httpcore&lt;/artifactId&gt;
      *  &lt;version&gt;4.4.3&lt;/version&gt;
-     *&lt;/dependency&gt;
+     *&lt;/dependency&gt;</pre>
      * 
      * <b>org.apache.commons.logging.LogFactory</b>
      * 
@@ -68,15 +68,15 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;groupId&gt;commons-logging&lt;/groupId&gt;
      *  &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
      *  &lt;version&gt;1.2&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
      * 
      * <b>org.openqa.selenium.support.events.WebDriverEventListener</b>
      * 
-     *&lt;/dependency&gt;
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;selenium-support&lt;/artifactId&gt;
      *  &lt;version&gt;2.53.1&lt;/version&gt;
-     *&lt;/dependency&gt;
+     *&lt;/dependency&gt;</pre>
      * 
      * <b>org.openqa.selenium.WebDriverException</b>
      * 
