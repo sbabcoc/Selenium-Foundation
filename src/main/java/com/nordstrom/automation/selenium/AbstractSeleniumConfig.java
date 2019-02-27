@@ -43,6 +43,7 @@ public abstract class AbstractSeleniumConfig extends
 
     private static final String SETTINGS_FILE = "settings.properties";
     private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
+    /** value: <b>{"browserName": "htmlunit"}</b> */
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
@@ -86,7 +87,7 @@ public abstract class AbstractSeleniumConfig extends
         NODE_SHUTDOWN("selenium.node.shutdown", "/extra/LifecycleServlet?action=shutdown"),
         /** name: <b>selenium.browser.name</b> <br> default: {@code null} */
         BROWSER_NAME("selenium.browser.name", null),
-        /** name: <b>selenium.browser.caps</b> <br> default: {@link SeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
+        /** name: <b>selenium.browser.caps</b> <br> default: {@link AbstractSeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
         BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
         /** name: <b>selenium.timeout.pageload</b> <br> default: <b>30</b> */
         PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),

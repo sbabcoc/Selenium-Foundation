@@ -48,6 +48,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private Map<String, String> personalities;
     
     private static final String OPT_ROLE = "-role";
+    private static final String OPT_HOST = "-host";
     private static final String OPT_PORT = "-port";
     private static final String OPT_SERVLETS = "-servlets";
     private static final String LOGS_PATH = "logs";
@@ -225,6 +226,12 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             argsList.add(LifecycleServlet.class.getName());
         }
         
+        String hostUrl = GridUtility.getLocalHost();
+        
+        // specify server host
+        argsList.add(OPT_HOST);
+        argsList.add(hostUrl);
+        
         Integer portNum = port;
         // if port auto-select spec'd
         if (portNum.intValue() == -1) {
@@ -269,7 +276,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         builder.redirectOutput(outputPath.toFile());
         
         try {
-            return new LocalGridServer(portNum, role, builder.start(), outputPath);
+            return new LocalGridServer(hostUrl, portNum, role, builder.start(), outputPath);
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
@@ -357,8 +364,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         private static final String HUB_READY = "up and running";
         private static final String NODE_READY = "ready to use";
         
-        LocalGridServer(Integer port, GridRole role, Process process, Path outputPath) {
-            super(getServerUrl(port), role);
+        LocalGridServer(String host, Integer port, GridRole role, Process process, Path outputPath) {
+            super(getServerUrl(host, port), role);
             this.process = process;
             this.outputPath = outputPath;
             if (isHub()) {
@@ -403,9 +410,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param port desired server port
          * @return {@link URL} for local Grid server at the specified port
          */
-        public static URL getServerUrl(Integer port) {
+        public static URL getServerUrl(String host, Integer port) {
             try {
-                return new URL("http://" + GridUtility.getLocalHost() + ":" + port.toString() + GridServer.HUB_BASE);
+                return new URL("http://" + host + ":" + port.toString() + GridServer.HUB_BASE);
             } catch (MalformedURLException e) {
                 throw UncheckedThrow.throwUnchecked(e);
             }

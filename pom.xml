@@ -45,7 +45,7 @@
     <javadoc-plugin.version>3.0.1</javadoc-plugin.version>
     <settings.version>2.2.4</settings.version>
     <testng-foundation.version>1.10.4</testng-foundation.version>
-    <junit-foundation.version>9.0.4</junit-foundation.version>
+    <junit-foundation.version>9.1.1</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
     <logback-testng.version>1.0.1</logback-testng.version>
     <sonar.language>java</sonar.language>
