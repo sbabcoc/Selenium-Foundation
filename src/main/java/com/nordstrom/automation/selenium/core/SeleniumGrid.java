@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -20,35 +21,62 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.common.base.UncheckedThrow;
 
+/**
+ * <h1>The {@code SeleniumGrid} Object</h1>
+ * <p>
+ * The <b>{@code SeleniumGrid}</b> object provides an interface to 
+ * <a href='https://github.com/SeleniumHQ/selenium/wiki/Grid2'>Selenium Grid</a> collections - both local and remote.
+ * A standard grid object is available through the configuration, and independent instances can be created as needed.
+ * 
+ * <h2>Using the standard {@code SeleniumGrid} object</h2>
+ * <p>
+ * By default, <b>Selenium Foundation</b> acquires its browser sessions from an instance of the 
+ * <a href='https://seleniumhq.github.io/docs/grid.html'>Selenium Grid</a>. If no remote Grid instance is specified in
+ * your project's configuration, <b>Selenium Foundation</b> will launch and manage a local instance for you.
+ * <p>
+ * As stated in the main 
+ * <a href='https://github.com/Nordstrom/Selenium-Foundation/blob/master/README.md#grid-based-driver-creation'>README
+ * </a> file, <b>Selenium Foundation</b> acquires local browser sessions from a local Grid instance to avoid divergent
+ * behavior and special-case code to support both local and remote operation.
+ */
 @SuppressWarnings("squid:S1774")
 public class SeleniumGrid {
     
     private GridServer hubServer;
     private Map<String, GridServer> nodeServers = new HashMap<>();
-
+    protected Map<String, String> personalities = new HashMap<>();
+    
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
     /**
-     * Constructor for Selenium Grid from hub URL
-     * @param hubUrl {@link URL} for grid hub host
+     * Constructor for Selenium Grid from hub URL.
+     * <p>
+     * This is used to create an interface for an active grid - remote or local.
      * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubUrl {@link URL} for grid hub host
      * @throws IOException if unable to acquire Grid details
      */
-    public SeleniumGrid(URL hubUrl) throws IOException {
+    public SeleniumGrid(SeleniumConfig config, URL hubUrl) throws IOException {
         hubServer = new GridServer(hubUrl, GridRole.HUB);
         for (String nodeEndpoint : GridUtility.getGridProxies(hubUrl)) {
             URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
             nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
+            addPersonalities(config, hubServer.getUrl(), nodeEndpoint);
         }
     }
     
     /**
      * Constructor for Selenium Grid from server objects.
+     * <p>
+     * This is used to create an interface for a newly-created local Grid.
      * 
+     * @param config {@link SeleniumConfig} object
      * @param hubServer {@link GridServer} object for hub host
      * @param nodeServers array of {@link GridServer} objects for node hosts
+     * @throws IOException if unable to acquire Grid details
      */
-    public SeleniumGrid(GridServer hubServer, GridServer... nodeServers) {
+    public SeleniumGrid(SeleniumConfig config, GridServer hubServer, GridServer... nodeServers) throws IOException {
         this.hubServer = Objects.requireNonNull(hubServer);
         if (Objects.requireNonNull(nodeServers).length == 0) {
             throw new IllegalArgumentException("[nodeServers] must be non-empty");
@@ -56,11 +84,38 @@ public class SeleniumGrid {
         for (GridServer nodeServer : nodeServers) {
             String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
             this.nodeServers.put(nodeEndpoint, nodeServer);
+            addPersonalities(config, hubServer.getUrl(), nodeEndpoint);
+        }
+    }
+    
+    /**
+     * Add supported personalities of the specified Grid node.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubUrl {@link URL} of Grid hub
+     * @param nodeEndpoint node endpoint
+     * @throws IOException if an I/O error occurs
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void addPersonalities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
+        for (Capabilities capabilities : GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint)) {
+            Map<String, Object> req = (Map<String, Object>) capabilities.getCapability("request");
+            List<Map> capsList = (List<Map>) req.get("capabilities");
+            if (capsList == null) {
+                Map<String, Object> conf = (Map<String, Object>) req.get("configuration");
+                capsList = (List<Map>) conf.get("capabilities");
+            }
+            for (Map<String, Object> capsItem : capsList) {
+                personalities.put((String) capsItem.get("browserName"), config.toJson(capsItem));
+            }
         }
     }
     
     /**
      * Create an object that represents the Selenium Grid with the specified hub endpoint.
+     * <p>
+     * If the endpoint is {@code null} or specifies an inactive {@code localhost} URL, this method launches a local
+     * Grid instance and returns a {@link LocalSeleniumGrid} object.
      * 
      * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of hub host
@@ -71,8 +126,7 @@ public class SeleniumGrid {
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException, InterruptedException, TimeoutException {
         if (GridUtility.isHubActive(hubUrl)) {
-            // TODO Differentiate local/remote hub, creating the corresponding type of Grid object.
-            return new SeleniumGrid(hubUrl);
+            return new SeleniumGrid(config, hubUrl);
         } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
             if (hubUrl != null) {
                 // ensure that hub port is available as a discrete setting
@@ -138,7 +192,15 @@ public class SeleniumGrid {
      * @return {@link Capabilities} object for the specified personality
      */
     public Capabilities getPersonality(SeleniumConfig config, String personality) {
-        return config.getCapabilitiesForName(personality)[0];
+        String json = personalities.get(personality);
+        if ((json == null) || json.isEmpty()) {
+            String browserName = personality.split("\\.")[0];
+            LOGGER.warn("Specified personality '{}' not supported by local Grid; revert to browser name '{}'",
+                            personality, browserName);
+            return config.getCapabilitiesForName(browserName)[0];
+        } else {
+            return config.getCapabilitiesForJson(json)[0];
+        }
     }
 
     public static class GridServer {

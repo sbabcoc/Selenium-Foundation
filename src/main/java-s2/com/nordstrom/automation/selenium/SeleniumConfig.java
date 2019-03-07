@@ -240,7 +240,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     /**
      * {@inheritDoc}
      */
-    public String toJson(Capabilities capabilities) {
-        return new Gson().toJsonTree(capabilities.asMap()).toString();
+    @Override
+    public String toJson(Object obj) {
+        return new Gson().toJsonTree(obj).toString();
     }
 }

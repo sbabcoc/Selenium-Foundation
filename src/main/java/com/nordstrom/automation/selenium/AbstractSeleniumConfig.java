@@ -413,7 +413,17 @@ public abstract class AbstractSeleniumConfig extends
      * @param capabilities {@link Capabilities} object
      * @return specified capabilities as a JSON string
      */
-    public abstract String toJson(final Capabilities capabilities);
+    public String toJson(final Capabilities capabilities) {
+        return toJson(capabilities.asMap());
+    }
+    
+    /**
+     * Convert the specified object to a JSON string.
+     * 
+     * @param obj object to be converted
+     * @return specified object as a JSON string
+     */
+    public abstract String toJson(final Object obj);
     
     /**
      * Get the path to the specified configuration file.

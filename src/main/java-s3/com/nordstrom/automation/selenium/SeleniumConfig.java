@@ -243,7 +243,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     /**
      * {@inheritDoc}
      */
-    public String toJson(Capabilities capabilities) {
-        return new Json().toJson(capabilities);
+    @Override
+    public String toJson(Object obj) {
+        return new Json().toJson(obj);
     }
 }

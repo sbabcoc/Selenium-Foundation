@@ -12,17 +12,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.web.servlet.LifecycleServlet;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
@@ -45,8 +42,6 @@ import com.nordstrom.common.file.PathUtils;
  */
 public class LocalSeleniumGrid extends SeleniumGrid {
 
-    private Map<String, String> personalities;
-    
     private static final String OPT_ROLE = "-role";
     private static final String OPT_HOST = "-host";
     private static final String OPT_PORT = "-port";
@@ -55,39 +50,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     
     private static final String GRID_REGISTER = "/grid/register";
     
-    public LocalSeleniumGrid(Map<String, String> personalities, LocalGridServer hubServer, LocalGridServer... nodeServers) {
-        super(hubServer, nodeServers);
-        this.personalities = personalities;
+    public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
+        super(config, hubServer, nodeServers);
     }
     
-    /* 
-     * TODO Add constructor to re-constitute local Grid from active hub.
-     * 
-     * => Get capabilities of active node:  
-     *    Capabilities[] nodeCaps = GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint);
-     *    
-     * => Match capabilities with configured browser plug-in:
-     *    for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
-     *        // determine if node browser name(s) == plug-in browser name(s)
-     *    }
-     */
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Capabilities getPersonality(SeleniumConfig config, String personality) {
-        String json = personalities.get(personality);
-        if ((json == null) || json.isEmpty()) {
-            String browserName = personality.split("\\.")[0];
-            LOGGER.warn("Specified personality '{}' not supported by local Grid; revert to browser name '{}'",
-                            personality, browserName);
-            return super.getPersonality(config, browserName);
-        } else {
-            return config.getCapabilitiesForJson(json)[0];
-        }
-    }
-
     /**
      * Launch local Selenium Grid instance.
      * <p>
@@ -139,19 +105,13 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         //     Json.toJson(Object toConvert)
     
         List<LocalGridServer> nodeServers = new ArrayList<>();
-        Map<String, String> personalities = new HashMap<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
             LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer);
             waitUntilReady(nodeServer, hostTimeout);
             nodeServers.add(nodeServer);
-            
-            Map<String, String> nodeCaps = driverPlugin.getPersonalities();
-            if (nodeCaps != null) {
-                personalities.putAll(nodeCaps);
-            }
         }
         
-        return new LocalSeleniumGrid(personalities, hubServer, nodeServers.stream().toArray(LocalGridServer[]::new));
+        return new LocalSeleniumGrid(config, hubServer, nodeServers.stream().toArray(LocalGridServer[]::new));
     }
 
     /**
