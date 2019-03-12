@@ -59,7 +59,7 @@ As mentioned previously, you're able to override defaults in **`SeleniumConfig`*
 **`SeleniumConfig`** is more than a collection of settings; this class also provides generic interfaces to several core aspects of the WebDriver API that differ between Selenium 2 and Selenium 3:
 
 * Convert JSON string to **`Capabilities`** object: `getCapabilitiesForJson(String capabilities)`
-* Convert **`Capabilities`** object to JSON string: `toJson(Capabilities capabilities)`
+* Convert object to JSON string: `toJson(Object obj)`
 * Get context class names for Grid dependencies: `getDependencyContexts()`
 * Create Grid node configuration file from JSON: `createNodeConfig(String jsonStr, URL hubUrl)`
 
@@ -83,7 +83,33 @@ The static `getConfig()` method returns a **`SeleniumConfig`** object that provi
 * `getSeleniumGrid()` - Get an object that represents the active Selenium Grid.
 * `shutdownGrid(boolean localOnly)` - Shut down the active Selenium Grid.
 
-You can learn more about the **`SeleniumGrid`** [here](TheSeleniumGridObject.md).
+As indicated previously, the set of drivers supported by the local Grid instance managed by **Selenium Foundation** is configured with a ServiceLoader [provider configuration file](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/test/resources/META-INF/services/com.nordstrom.automation.selenium.DriverPlugin). Note that the file that link connects to isn't just a static sample file; it's the actual provider configuration file for the project unit tests.
+
+As of this writing, the unit tests are configured to use [HtmlUnit](http://htmlunit.sourceforge.net/). Described as "a GUI-less browser for Java programs", this browser is perfect for rendering the simple pages used to exercise the features of **Selenium Foundation**. In addition to this ServiceLoader configuration file, the Java project itself must declare the dependencies that are required by the corresponding driver. These dependencies are dependent on the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves.
+
+Here are the Maven dependencies for the **Selenium 2** version of **`HtmlUnitPlugin`**:
+
+```xml
+<dependency>
+  <groupId>net.sourceforge.htmlunit</groupId>
+  <artifactId>htmlunit</artifactId>
+  <version>2.21</version>
+</dependency>
+<dependency>
+  <groupId>org.seleniumhq.selenium</groupId>
+  <artifactId>htmlunit-driver</artifactId>
+  <version>2.21</version>
+</dependency>
+```
+
+Currently, plug-ins are provided for the following browsers:
+
+| Browser | Selenium 2 | Selenium 3 |
+| --- |:---:|:---:|
+| Google Chrome | [&rarr;]() | [*]() |
+| Firefox | [*]() | [*]() |
+| HtmlUnit | [*]() | [*]() |
+| PhantomJS | [*]() | [*]() |
 
 ### Browser Capabilities
 
