@@ -324,6 +324,15 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         private static final String HUB_READY = "up and running";
         private static final String NODE_READY = "ready to use";
         
+        /**
+         * Constructor for local Grid server object.
+         * 
+         * @param host IP address of local Grid server
+         * @param port port of local Grid server
+         * @param role {@link GridRole} of local Grid server
+         * @param process {@link Process} of local Grid server
+         * @param outputPath path of output from Grid server process 
+         */
         LocalGridServer(String host, Integer port, GridRole role, Process process, Path outputPath) {
             super(getServerUrl(host, port), role);
             this.process = process;
@@ -367,7 +376,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * <p>
          * <b>NOTE</b>: The assembled URL will include the Grid web service base path.
          * 
-         * @param port desired server port
+         * @param host IP address of local Grid server
+         * @param port port of local Grid server
          * @return {@link URL} for local Grid server at the specified port
          */
         public static URL getServerUrl(String host, Integer port) {
