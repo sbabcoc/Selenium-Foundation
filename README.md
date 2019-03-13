@@ -136,14 +136,9 @@ The **`@LinkedListeners`** annotation is processed by the **ListenerChain**, whi
 
 **Selenium Foundation** includes a context-specific extension of the [RetryManager](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/RetryManager.java) analyzer of [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation). This retry analyzer considers any test that fails due to a **WebDriverException** to be retriable. By default, this retry analyzer is disabled. To enable automatic retry of **WebDriverException** failures, specify a positive value for the **MAX_RETRY** setting of **TestNG Foundation**:
 
-<table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
-    <tr style="text-align: left; border: 1px solid black;">
-        <th><i>testng.properties</i></th>
-    </tr>
-    <tr>
-        <td>testng.max.retry=2</td>
-    </tr>
-</table>
+| _testng.properties_ |
+| --- |
+| testng.max.retry=2 |
 
 The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation) documentation for more details.
 
@@ -196,28 +191,11 @@ public void testMenuFeatures() {
 
 You'll probably find that the defaults assigned to most settings will suffice in most basic scenarios. However, it's likely that you'll need to override one or more of the following. The **Property Name** column indicates the name of the System property associated with the setting. To override a setting, you can either add a line for the setting to your _settings.properties_ file or define a System property. 
 
-<table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
-    <tr>
-        <th style="text-align: left; border: 1px solid black;">Constant</th>
-        <th style="text-align: left; border: 1px solid black;">Property Name</th>
-        <th style="text-align: center; border: 1px solid black;">Default</th>
-    </tr>
-    <tr>
-        <td style="text-align: left; border: 1px solid black;">BROWSER_NAME</td>
-        <td style="text-align: left; border: 1px solid black;">selenium.browser.name</td>
-        <td style="text-align: center; border: 1px solid black;">(none) *</td>
-    </tr>
-    <tr>
-        <td style="text-align: left; border: 1px solid black;">TARGET_HOST</td>
-        <td style="text-align: left; border: 1px solid black;">selenium.target.host</td>
-        <td style="text-align: center; border: 1px solid black;">localhost</td>
-    </tr>
-    <tr>
-        <td style="text-align: left; border: 1px solid black;">TARGET_PATH</td>
-        <td style="text-align: left; border: 1px solid black;">selenium.target.path</td>
-        <td style="text-align: center; border: 1px solid black;">/</td>
-    </tr>
-</table>
+| Constant | Property Name | Default |
+| --- | --- |:---:|
+| BROWSER_NAME | selenium.browser.name | (none) * |
+| TARGET_HOST | selenium.target.host | localhost |
+| TARGET_PATH | selenium.target.path | / |
 
 \* NOTE: By default, HtmlUnit is selected as the browser. For easier override, this is specified through **BROWSER_CAPS** instead of **BROWSER_NAME**. For details, see [Manipulate Settings with SeleniumConfig](docs/ManipulateSettingsWithSeleniumConfig.md). 
 
@@ -225,20 +203,12 @@ You'll probably find that the defaults assigned to most settings will suffice in
 
 **SeleniumConfig** searches a series of locations for a _settings.properties_ file. This file will typically be stored in your user "home" folder. Any settings declared in this file will override the defaults assigned in the **SeleniumSettings** enumeration. Settings that are declared as System properties will override both the defaults assigned by **SeleniumSettings** and settings declared in _settings.properties_. For example: 
 
-<table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
-    <tr style="text-align: left; border: 1px solid black;">
-        <th><i>settings.properties</i></th>
-    </tr>
-    <tr>
-        <td>selenium.target.host=my.server.com</td>
-    </tr>
-    <tr>
-        <td>selenium.browser.name=chrome</td>
-    </tr>
-</table>
+| _settings.properties_ |
+| --- |
+| selenium.target.host=my.server.com |
+| selenium.browser.name=chrome |
 
 This sample _settings.properties_ file overrides the values of **TARGET_HOST** and **BROWSER_NAME**. The latter can be overridden by System property declaration: 
-
 > `-Dselenium.browser.name=firefox`
 
 The hierarchy of evaluation produces the following results: 
@@ -301,14 +271,9 @@ com.nordstrom.automation.selenium.junit.RetryAnalyzer
 
 * Specify a positive value for the **MAX_RETRY** setting of **JUnit Foundation**:
 
-<table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
-    <tr style="text-align: left; border: 1px solid black;">
-        <th><i>junit.properties</i></th>
-    </tr>
-    <tr>
-        <td>junit.max.retry=2</td>
-    </tr>
-</table>
+| _junit.properties_ |
+| --- |
+| junit.max.retry=2 |
 
 In this example, these two configurations will enable **JUnit Foundation** to retry tests that fail with **WebDriverException** twice before counting them as failures. See the [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation) documentation for more details.
 
