@@ -1,32 +1,5 @@
 {
-  "capabilities":
-  [
-    {
-      "browserName": "firefox",
-      "maxInstances": 5,
-      "seleniumProtocol": "WebDriver"
-    },
-    {
-      "browserName": "chrome",
-      "maxInstances": 5,
-      "seleniumProtocol": "WebDriver"
-    },
-    {
-      "browserName": "internet explorer",
-      "maxInstances": 1,
-      "seleniumProtocol": "WebDriver"
-    },
-    {
-      "browserName": "phantomjs",
-      "maxInstances": 5,
-      "seleniumProtocol": "WebDriver"
-    },
-    {
-      "browserName": "htmlunit",
-      "maxInstances": 5,
-      "seleniumProtocol": "WebDriver"
-    }
-  ],
+  "capabilities": [ ],
   "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
   "maxSession": 5,
   "register": true,

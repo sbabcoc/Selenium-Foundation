@@ -1,14 +1,24 @@
 package com.nordstrom.automation.selenium;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.OutputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
-import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+import com.google.gson.Gson;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -19,35 +29,142 @@ import com.nordstrom.automation.settings.SettingsCore;
 @SuppressWarnings({"squid:S1200", "squid:S2972", "squid:MaximumInheritanceDepth"})
 public class SeleniumConfig extends AbstractSeleniumConfig {
     
-    private static final String HOST = "host";
-    private static final String PORT = "port";
     private static final String HUB = "hub";
     
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
+    private static final String GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncher";
+    private static final String HUB_PORT = "4444";
+    private static final String NODE_CONFIG = "nodeConfig-s2.json";
     
-    private static final String[] DEPENDENCY_CONTEXTS = {
+    /**
+     * <b>org.openqa.grid.selenium.GridLauncher</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-server&lt;/artifactId&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
+     *  &lt;exclusions&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *  &lt;/exclusions&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>com.google.common.util.concurrent.SimpleTimeLimiter</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
+     *  &lt;artifactId&gt;guava&lt;/artifactId&gt;
+     *  &lt;version&gt;21.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>com.google.gson.JsonIOException</b> (for selenium-remote-driver)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;com.google.code.gson&lt;/groupId&gt;
+     *  &lt;artifactId&gt;gson&lt;/artifactId&gt;
+     *  &lt;version&gt;2.3.1&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.selenium.remote.JsonToBeanConverter</b> (for selenium-support)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-remote-driver&lt;/artifactId&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.selenium.WebDriverException</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-api&lt;/artifactId&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.seleniumhq.jetty9.util.Jetty</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;jetty-repacked&lt;/artifactId&gt;
+     *  &lt;version&gt;9.2.13.v20150730&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.apache.http.conn.HttpClientConnectionManager</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;
+     *  &lt;artifactId&gt;httpclient&lt;/artifactId&gt;
+     *  &lt;version&gt;4.5.1&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.apache.http.config.RegistryBuilder</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;
+     *  &lt;artifactId&gt;httpcore&lt;/artifactId&gt;
+     *  &lt;version&gt;4.4.3&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.apache.commons.logging.LogFactory</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;commons-logging&lt;/groupId&gt;
+     *  &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
+     *  &lt;version&gt;1.2&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>javax.servlet.http.HttpServlet</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+     *  &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+     *  &lt;version&gt;3.1.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.jetty.util.MultiException</b> (for selenium-server)
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;jetty-rc-repacked&lt;/artifactId&gt;
+     *  &lt;version&gt;5&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>org.openqa.selenium.support.events.WebDriverEventListener</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-support&lt;/artifactId&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     */
+    private static final String[] DEPENDENCY_CONTEXTS = {GRID_LAUNCHER,
                     "com.google.common.util.concurrent.SimpleTimeLimiter",
-                    "org.openqa.selenium.htmlunit.HtmlUnitDriver",
-                    "org.openqa.grid.selenium.GridLauncher", "com.beust.jcommander.JCommander",
-                    "org.apache.commons.codec.Encoder", "javax.servlet.http.HttpServlet",
-                    "mx4j.remote.HeartBeat", "net.jcip.annotations.ThreadSafe",
-                    "org.bouncycastle.crypto.BlockCipher", "org.bouncycastle.openssl.PEMKeyPair",
-                    "org.seleniumhq.jetty9.util.Jetty", "org.openqa.jetty.util.MultiException",
-                    "org.yaml.snakeyaml.Yaml", "com.google.gson.JsonIOException",
-                    "org.openqa.selenium.remote.JsonToBeanConverter"};
+                    "com.google.gson.JsonIOException",
+                    "org.openqa.selenium.remote.JsonToBeanConverter",
+                    "org.openqa.selenium.WebDriverException", "org.seleniumhq.jetty9.util.Jetty",
+                    "org.apache.http.conn.HttpClientConnectionManager",
+                    "org.apache.http.config.RegistryBuilder",
+                    "org.apache.commons.logging.LogFactory", "javax.servlet.http.HttpServlet",
+                    "org.openqa.jetty.util.MultiException",
+                    "org.openqa.selenium.support.events.WebDriverEventListener"};
     
     static {
         try {
-            SELENIUM_CONFIG = new SeleniumConfig();
+            seleniumConfig = new SeleniumConfig();
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
         }
     }
     
-    private RegistrationRequest nodeConfig;
-    private GridHubConfiguration hubConfig;
-    
+    /**
+     * Instantiate a <b>Selenium Foundation</b> configuration object.
+     * 
+     * @throws ConfigurationException If a failure is encountered while initializing this configuration object.
+     * @throws IOException If a failure is encountered while reading from a configuration input stream.
+     */
     public SeleniumConfig() throws ConfigurationException, IOException {
         super();
     }
@@ -58,147 +175,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * @return Selenium configuration object
      */
     public static SeleniumConfig getConfig() {
-        return (SeleniumConfig) SELENIUM_CONFIG;
-    }
-    
-    /**
-     * Get the Selenium Grid node configuration.
-     * 
-     * @return Selenium Grid node configuration
-     */
-    public RegistrationRequest getNodeConfig() {
-        if (nodeConfig == null) {
-            nodeConfig = new RegistrationRequest();
-            nodeConfig.loadFromJSON(getNodeConfigPath());
-            nodeConfig = resolveNodeSettings(nodeConfig);
-            
-            // hack for RegistrationRequest bug
-            nodeConfig.setRole(GridRole.NODE);
-        }
-        return nodeConfig;
-    }
-    
-    /**
-     * Get the arguments needed to launch a local Selenium Grid node.
-     * 
-     * @return array of node launch arguments
-     */
-    @Override
-    public String[] getNodeArgs() {
-        if (nodeArgs == null) {
-            String configPath = getNodeConfigPath();
-            Map<String, Object> config = getNodeConfig().getConfiguration();
-            nodeArgs = new String[] {"-role", "node", "-nodeConfig", configPath, "-host", (String) config.get(HOST),
-                    "-port", config.get(PORT).toString(), "-hub", (String) config.get(HUB)};
-        }
-        return Arrays.copyOf(nodeArgs, nodeArgs.length);
-    }
-
-    /**
-     * Resolve Selenium Grid node settings for host, port, and hub.
-     * 
-     * @param nodeConfig node configuration with unresolved settings
-     * @return node configuration with resolved settings
-     */
-    private RegistrationRequest resolveNodeSettings(final RegistrationRequest nodeConfig) {
-        Map<String, Object> config = nodeConfig.getConfiguration();
-        
-        // get configured Grid node host
-        String nodeHost = getString(SeleniumSettings.NODE_HOST.key());
-        // if host specified
-        if (nodeHost != null) {
-            // store specified host
-            config.put(HOST, nodeHost);
-        // otherwise
-        } else {
-            // use 'localhost' if host is unspecified
-            config.computeIfAbsent(HOST, k -> getLocalHost());
-        }
-        
-        // set configured (or default) Grid node port
-        config.put(PORT, getInteger(SeleniumSettings.NODE_PORT.key(), null));
-        // set Grid hub registration URL
-        config.put(HUB, "http://" + getHubConfig().getHost() + ":" + getHubConfig().getPort() + "/grid/register/");
-        
-        return nodeConfig;
-    }
-    
-    /**
-     * Get the Selenium Grid hub configuration.
-     * 
-     * @return Selenium Grid hub configuration
-     */
-    public GridHubConfiguration getHubConfig() {
-        if (hubConfig == null) {
-            hubConfig = new GridHubConfiguration();
-            hubConfig.loadFromJSON(getHubConfigPath());
-            hubConfig = resolveHubSettings(hubConfig);
-        }
-        return hubConfig;
-    }
-    
-    /**
-     * Get the arguments needed to launch a local Selenium Grid hub.
-     * 
-     * @return array of hub launch arguments
-     */
-    public String[] getHubArgs() {
-        if (hubArgs == null) {
-            String configPath = getHubConfigPath();
-            GridHubConfiguration config = getHubConfig();
-            hubArgs = new String[] {"-role", HUB, "-hubConfig", configPath, 
-                    "-host", config.getHost(), "-port", Integer.toString(config.getPort())};
-        }
-        return Arrays.copyOf(hubArgs, hubArgs.length);
-    }
-    
-    /**
-     * Resolve Selenium Grid hub settings for host and port.
-     * 
-     * @param hubConfig node configuration with unresolved settings
-     * @return hub configuration with resolved settings
-     */
-    private GridHubConfiguration resolveHubSettings(final GridHubConfiguration hubConfig) {
-        // get configured (or default) Grid hub host
-        String hubHost = getString(SeleniumSettings.HUB_HOST.key());
-        // if host specified
-        if (hubHost != null) {
-            // store specified host
-            hubConfig.setHost(hubHost);
-        // otherwise, if host unspecified
-        } else if (hubConfig.getHost() == null) {
-            // use 'localhost'
-            hubConfig.setHost(getLocalHost());
-        }
-        
-        // get configured (or default) Grid hub port
-        Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), null);
-        // if port specified
-        if (hubPort != null) {
-            // store specified port
-            hubConfig.setPort(hubPort.intValue());
-        }
-        
-        return hubConfig;
-    }
-
-    /**
-     * Convert the configured browser specification from JSON to {@link Capabilities} object.
-     * 
-     * @return {@link Capabilities} object for the configured browser specification
-     */
-    public Capabilities getBrowserCaps() {
-        if (browserCaps == null) {
-            String jsonStr = getJsonForName(getString(SeleniumSettings.BROWSER_NAME.key()));
-            
-            if (jsonStr == null) {
-                jsonStr = getString(SeleniumSettings.BROWSER_CAPS.key());
-            }
-            
-            RegistrationRequest config = RegistrationRequest.getNewInstance(JSON_HEAD + jsonStr + JSON_TAIL);
-            browserCaps = config.getCapabilities().get(0);
-        }
-        return browserCaps;
+        return seleniumConfig;
     }
     
     /**
@@ -207,58 +184,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = super.getDefaults();
-        defaults.put(SeleniumSettings.HUB_PORT.key(), "4444");
-        defaults.put(SeleniumSettings.NODE_PORT.key(), "5555");
-        defaults.put(SeleniumSettings.NODE_CONFIG.key(), "nodeConfig-s2.json");
+        defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), GRID_LAUNCHER);
+        defaults.put(SeleniumSettings.HUB_PORT.key(), HUB_PORT);
+        defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
         return defaults;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getHubHost() {
-        return getConfig().getHubConfig().getHost();
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getHubPort() {
-        return getConfig().getHubConfig().getPort();
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNodeHost() {
-        return (String) getConfig().getNodeConfig().getConfiguration().get(HOST);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getNodePort() {
-        return (Integer) getConfig().getNodeConfig().getConfiguration().get(PORT);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNodeShutdownRequest() {
-        return "/selenium-server/driver/?cmd=shutDownSeleniumServer";
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getLauncherClassName() {
-        return "org.openqa.grid.selenium.GridLauncher";
     }
     
     /**
@@ -267,5 +196,52 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
+        String nodeConfigPath = getNodeConfigPath().toString();
+        String[] configPathBits = nodeConfigPath.split("\\.");
+        String hashCode = String.format("%08X", capabilities.hashCode());
+        Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
+        if (filePath.toFile().exists()) {
+            Files.delete(filePath);
+        }
+        if (filePath.toFile().createNewFile()) {
+            String input = JSON_HEAD + capabilities + JSON_TAIL;
+            List<DesiredCapabilities> capabilitiesList = RegistrationRequest.getNewInstance(input).getCapabilities();
+            RegistrationRequest nodeConfig = new RegistrationRequest();
+            nodeConfig.loadFromJSON(nodeConfigPath);
+            nodeConfig.setCapabilities(capabilitiesList);
+            nodeConfig.getConfiguration().put(HUB, hubUrl.toString());
+
+            // hack for RegistrationRequest bug
+            nodeConfig.setRole(GridRole.NODE);
+            
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+                out.write(nodeConfig.toJSON().getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        return filePath;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Capabilities[] getCapabilitiesForJson(String capabilities) {
+        String input = JSON_HEAD + capabilities + JSON_TAIL;
+        return RegistrationRequest.getNewInstance(input).getCapabilities().stream().toArray(Capabilities[]::new);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toJson(Object obj) {
+        return new Gson().toJsonTree(obj).toString();
     }
 }

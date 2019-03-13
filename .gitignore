@@ -7,7 +7,8 @@ target*
 *.iml
 .idea
 *.md.html
-logs
+logs/
+logs-*/
 .gradle/
 build/
 build-*/

@@ -91,7 +91,7 @@ public class WebDriverUtilsTest extends TestNgBase {
         ExamplePage page = getPage();
         WebElement element = page.findElement(By.tagName("html"));
         SeleniumConfig config = SeleniumConfig.getConfig();
-        String browserName = config.getBrowserCaps().getBrowserName();
+        String browserName = config.getCurrentCapabilities().getBrowserName();
         
         assertEquals(WebDriverUtils.getBrowserName((SearchContext) driver), browserName);
         assertEquals(WebDriverUtils.getBrowserName(page), browserName);

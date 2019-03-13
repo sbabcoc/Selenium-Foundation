@@ -11,8 +11,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Sleeper;
-import org.openqa.selenium.support.ui.SystemClock;
 import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
@@ -120,8 +118,8 @@ public final class DriverManager {
                 }
             }
             
-            // if driver acquired and initial page specified
-            if ((optDriver.isPresent()) && (initialPage != null)) {
+            // if initial page spec'd
+            if (initialPage != null) {
                 Page page = Page.openInitialPage(initialPage, optDriver.get(), config.getTargetUri());
                 instance.setInitialPage(instance.prepInitialPage(page));
             }
@@ -147,15 +145,17 @@ public final class DriverManager {
     }
 
     /**
-     * Perform post-suite processing:
-     * <ul>
-     *     <li>If a Selenium Grid node process was spawned, shut it down.</li>
-     *     <li>If a Selenium Grid hub process was spawned, shut it down.</li>
-     * </ul>
+     * Perform post-suite processing, shutting down the local Selenium Grid.
      */
     public static void onFinish() {
-        GridUtility.stopGridNode(true);
-        GridUtility.stopGridHub(true);
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        if (config.getBoolean(SeleniumSettings.SHUTDOWN_GRID.key())) {
+            try {
+                config.shutdownGrid(true);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
     
     /**
@@ -260,7 +260,7 @@ public final class DriverManager {
             public WebDriver apply(final TestBase instance) {
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
-                    return ((DriverProvider) instance).provideDriver(instance, method);
+                    return ((DriverProvider) instance).provideDriver(method);
                 } else {
                     return GridUtility.getDriver();
                 }
@@ -290,7 +290,7 @@ public final class DriverManager {
          * @param timeOutInSeconds 'wait' timeout in seconds
          */
         public DriverSessionWait(final TestBase context, final long timeOutInSeconds) {
-            super(context, new SystemClock(), Sleeper.SYSTEM_SLEEPER);
+            super(context);
             withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
         }
     }
