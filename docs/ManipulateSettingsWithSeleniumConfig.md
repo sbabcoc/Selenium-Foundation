@@ -106,10 +106,10 @@ Currently, plug-ins are provided for the following browsers:
 
 | Browser | Selenium 2 | Selenium 3 |
 | --- |:---:|:---:|
-| Chrome | [src](../src\main\java-s2\com\nordstrom\automation\selenium\plugins\ChromePlugin.java) | [src](../src\main\java-s3\com\nordstrom\automation\selenium\plugins\ChromePlugin.java) |
-| Firefox | [src](../src\main\java-s2\com\nordstrom\automation\selenium\plugins\FirefoxPlugin.java) | [src](../src\main\java-s3\com\nordstrom\automation\selenium\plugins\FirefoxPlugin.java) |
-| HtmlUnit | [src](../src\main\java-s2\com\nordstrom\automation\selenium\plugins\HtmlUnitPlugin.java) | [src](../src\main\java-s3\com\nordstrom\automation\selenium\plugins\HtmlUnitPlugin.java) |
-| PhantomJS | [src](../src\main\java-s2\com\nordstrom\automation\selenium\plugins\PhantomJsPlugin.java) | [src](../src\main\java-s3\com\nordstrom\automation\selenium\plugins\PhantomJsPlugin.java) |
+| Chrome | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
+| Firefox | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
+| HtmlUnit | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
+| PhantomJS | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
 
 Note that **Selenium Foundation** also includes plug-ins for _Edge_, _Internet Explorer_, _Opera_, and _Safari_ - but at the time of this writing, the drivers for these browsers don't appear to be functional. 
 
