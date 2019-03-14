@@ -123,12 +123,14 @@ The following is an outline of the elements that must be included in every TestN
 * The [@LinkedListeners](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/LinkedListeners.java) annotation:  
  To attach listeners to an active **ListenerChain**, mark your test class with the **`@LinkedListeners`** annotation. The [TestNgBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/support/TestNgBase.java) class is marked with a **`@LinkedListeners`** annotation that specifies three listeners that manage several core features of **Selenium Foundation**:
   * [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/ScreenshotCapture.java):  
-**ScreenshotCapture** is a TestNG listener that automatically captures screenshots in the event of test failures. Tests are also able to request on-demand screenshot capture through the `captureArtifact(ITestResult)` method.
+  **ScreenshotCapture** is a TestNG listener that automatically captures screenshots in the event of test failures. Tests are also able to request on-demand screenshot capture through the `captureArtifact(ITestResult)` method.
+  * [PageSourceCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/PageSourceCapture.java):  
+  **PageSourceCapture** is a TestNG listener that automatically captures page source in the event of test failures. Tests are also able to request on-demand page source capture through the `captureArtifact(ITestResult)` method.
   * [DriverListener](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/DriverListener.java):  
-**DriverListener** is a TestNG listener that manages driver sessions and local Selenium Grid servers.
+  **DriverListener** is a TestNG listener that manages driver sessions and local Selenium Grid servers.
   * [ExecutionFlowController](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/ExecutionFlowController.java):  
-**ExecutionFlowController** is a TestNG listener that propagates test context attributes:  
- [_before_ method] → [test method] → [_after_ method]
+  **ExecutionFlowController** is a TestNG listener that propagates test context attributes:  
+  [_before_ method] → [test method] → [_after_ method]
 
 The **`@LinkedListeners`** annotation is processed by the **ListenerChain**, which must be activated so that the other core listeners will be connected and functioning correctly. Although you can use the standard TestNG **`@Listeners`** annotation to activate **ListenerChain**, we recommend that you use the **ServiceLoader** mechanism for this purpose in your actual project. This is the technique employed by the test suite of the **Selenium Foundation** project. For details, see [Selenium Foundation Test Support](docs/SeleniumFoundationTestSupport.md).
 
@@ -239,14 +241,50 @@ There are several required elements that must be included in every JUnit 4 test 
 
 ### Outline of Required Elements
 
-The following is an outline of the elements that must be included in every JUnit 4 test that uses **Selenium Foundation**:
+The following is an outline of the elements that must be included in every JUnit 4 project that uses **Selenium Foundation**:
 
-* [HookInstallingRunner](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/HookInstallingRunner.java):  
-**HookInstallingRunner** is a JUnit 4 test runner that uses bytecode enhancement to install hooks on test and configuration methods to enable method pre-processing and post-processing. This closely resembles the **IInvokedMethodListener** feature of TestNG.
-* [@MethodWatchers](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatchers.java):  
-The **MethodWatchers** annotation is assigned to test classes and enables you to attach one or more method watcher class, which implement the **MethodWatcher** interface. To activate this feature, run with the **HookInstallingRunner**.
+* **JUnit Foundation** [event notifications](https://github.com/Nordstrom/JUnit-Foundation#how-to-enable-notifications):  
+The JUnit support provided by **Selenium Foundation** relies on event notifications published by **JUnit Foundation**. Notifications are enabled by a Java agent, which uses bytecode enhancement to install hooks on test and configuration methods.
+###### Maven configuration for Java agent:
+```xml
+    <plugins>
+      <!-- This provides the path to the Java agent -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>getClasspathFilenames</id>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.0</version>
+        <configuration>
+          <argLine>-javaagent:${com.nordstrom.tools:junit-foundation:jar}</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+```  
+###### Gradle configuration for Java agent:  
+```gradle
+ext {
+    junitFoundation = configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.name == 'junit-foundation' }
+}
+
+test.doFirst {
+    jvmArgs "-javaagent:${junitFoundation.file}"
+}
+```
+
 * [DriverWatcher](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
-**DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions and local Selenium Grid servers. It provides initial page support, and it also supplies a JUnit 4:
+**DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions. It provides initial page support, and it also supplies a JUnit 4 [TestWatcher](https://junit.org/junit4/javadoc/4.12/org/junit/rules/TestWatcher.html):
   * **`DriverWatcher.getTestWatcher()`**:  
   The test rule returned by this static method is responsible for closing the driver attached to the current test method.
 * [DriverListener](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverListener.java):  
@@ -255,6 +293,8 @@ The **MethodWatchers** annotation is assigned to test classes and enables you to
  Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies two watchers that manage core features of **Selenium Foundation**:
   * [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/ScreenshotCapture.java):  
   **ScreenshotCapture** is a JUnit 4 test watcher that automatically captures a screenshot in the event of test failure.
+  * [PageSourceCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/PageSourceCapture.java):  
+  **PageSourceCapture** is a JUnit 4 test watcher that automatically captures page source in the event of test failures.
   * [DriverWatcher](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
   As described previously, the test watcher returned by `DriverWatcher.getTestWatcher()` closes the driver attached to the current test method.
 
