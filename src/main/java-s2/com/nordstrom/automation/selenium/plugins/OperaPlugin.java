@@ -47,6 +47,14 @@ public class OperaPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
+    public String getBrowserName() {
+        return OperaCaps.BROWSER_NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, String> getPersonalities() {
         return OperaCaps.getPersonalities();
     }

@@ -41,6 +41,14 @@ public class PhantomJsPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
+    public String getBrowserName() {
+        return PhantomJsCaps.BROWSER_NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, String> getPersonalities() {
         return PhantomJsCaps.getPersonalities();
     }
