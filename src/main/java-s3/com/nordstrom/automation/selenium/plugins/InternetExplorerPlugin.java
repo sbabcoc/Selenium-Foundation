@@ -41,6 +41,14 @@ public class InternetExplorerPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
+    public String getBrowserName() {
+        return InternetExplorerCaps.BROWSER_NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, String> getPersonalities() {
         return InternetExplorerCaps.getPersonalities();
     }

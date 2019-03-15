@@ -43,6 +43,14 @@ public class SafariPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
+    public String getBrowserName() {
+        return SafariCaps.BROWSER_NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, String> getPersonalities() {
         return SafariCaps.getPersonalities();
     }

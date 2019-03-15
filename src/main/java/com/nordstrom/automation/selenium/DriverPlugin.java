@@ -30,6 +30,13 @@ public interface DriverPlugin {
     String getCapabilities(SeleniumConfig config);
     
     /**
+     * Get name of browser supported by this plug-in.
+     * 
+     * @return browser name
+     */
+    String getBrowserName();
+    
+    /**
      * Get driver "personalities" provided by this plug-in.
      * 
      * @return named collection of capabilities records

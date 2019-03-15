@@ -58,6 +58,14 @@ public class HtmlUnitPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
+    public String getBrowserName() {
+        return HtmlUnitCaps.BROWSER_NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, String> getPersonalities() {
         return HtmlUnitCaps.getPersonalities();
     }

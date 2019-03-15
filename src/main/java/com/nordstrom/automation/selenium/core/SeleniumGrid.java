@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -62,8 +64,9 @@ public class SeleniumGrid {
         for (String nodeEndpoint : GridUtility.getGridProxies(hubUrl)) {
             URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
             nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
-            addPersonalities(config, hubServer.getUrl(), nodeEndpoint);
+            addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
         }
+        addPluginPersonalities();
     }
     
     /**
@@ -84,8 +87,9 @@ public class SeleniumGrid {
         for (GridServer nodeServer : nodeServers) {
             String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
             this.nodeServers.put(nodeEndpoint, nodeServer);
-            addPersonalities(config, hubServer.getUrl(), nodeEndpoint);
+            addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
         }
+        addPluginPersonalities();
     }
     
     /**
@@ -97,7 +101,7 @@ public class SeleniumGrid {
      * @throws IOException if an I/O error occurs
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private void addPersonalities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
+    private void addNodePersonalities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
         for (Capabilities capabilities : GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint)) {
             Map<String, Object> req = (Map<String, Object>) capabilities.getCapability("request");
             List<Map> capsList = (List<Map>) req.get("capabilities");
@@ -107,6 +111,17 @@ public class SeleniumGrid {
             }
             for (Map<String, Object> capsItem : capsList) {
                 personalities.put((String) capsItem.get("browserName"), config.toJson(capsItem));
+            }
+        }
+    }
+    
+    /**
+     * Add supported personalities from configured driver plug-ins.
+     */
+    private void addPluginPersonalities() {
+        for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+            if (personalities.containsKey(driverPlugin.getBrowserName())) {
+                personalities.putAll(driverPlugin.getPersonalities());
             }
         }
     }
