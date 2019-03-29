@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
+import org.testng.Reporter;
 
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.utility.ScreenshotUtils;
@@ -26,6 +27,8 @@ public class ScreenshotArtifact implements ArtifactType {
      */
     @Override
     public boolean canGetArtifact(final ITestResult result) {
+        // ensure current test result is set
+        Reporter.setCurrentTestResult(result);
         Optional<WebDriver> optDriver = DriverManager.nabDriver(result.getInstance());
         return ScreenshotUtils.canGetArtifact(optDriver, LOGGER);
     }
@@ -35,6 +38,8 @@ public class ScreenshotArtifact implements ArtifactType {
      */
     @Override
     public byte[] getArtifact(final ITestResult result) {
+        // ensure current test result is set
+        Reporter.setCurrentTestResult(result);
         Optional<WebDriver> optDriver = DriverManager.nabDriver(result.getInstance());
         return ScreenshotUtils.getArtifact(optDriver, result.getThrowable(), LOGGER);
     }
