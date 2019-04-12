@@ -23,6 +23,7 @@ import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.google.common.collect.ObjectArrays;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -106,14 +107,45 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
-            LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer);
+            LocalGridServer nodeServer = start(config, launcherClassName, dependencyContexts, hubServer, driverPlugin);
             waitUntilReady(nodeServer, hostTimeout);
             nodeServers.add(nodeServer);
         }
         
-        return new LocalSeleniumGrid(config, hubServer, nodeServers.stream().toArray(LocalGridServer[]::new));
+        return new LocalSeleniumGrid(config, hubServer, nodeServers.toArray(new LocalGridServer[0]));
     }
 
+    /**
+     * Start local Selenium Grid node for this driver.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param launcherClassName fully-qualified class name for Grid launcher
+     * @param dependencyContexts common dependency contexts for all Grid nodes
+     * @param hubServer Grid hub server with which node should register
+     * @param driverPlugin driver plug-in from which to create the node
+     * @return {@link LocalGridServer} object for specified node
+     * @throws IOException if an I/O error occurs
+     */
+    public static LocalGridServer start(SeleniumConfig config, String launcherClassName,
+                    String[] dependencyContexts, GridServer hubServer, DriverPlugin driverPlugin) throws IOException {
+
+        String[] combinedContexts = combineDependencyContexts(dependencyContexts, driverPlugin);
+        Path nodeConfigPath = config.createNodeConfig(driverPlugin.getCapabilities(config), hubServer.getUrl());
+        return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
+                        Integer.valueOf(-1), nodeConfigPath);
+    }
+    
+    /**
+     * Combine driver dependency contexts with the specified core Selenium Grid contexts.
+     *
+     * @param dependencyContexts core Selenium Grid dependency contexts
+     * @param driverPlugin driver plug-in from which to acquire dependencies
+     * @return combined contexts for Selenium Grid dependencies
+     */
+    public static String[] combineDependencyContexts(String[] dependencyContexts, DriverPlugin driverPlugin) {
+        return ObjectArrays.concat(dependencyContexts, driverPlugin.getDependencyContexts(), String.class);
+    }
+    
     /**
      * Wait for the specified Grid server to indicate that it's ready.
      * 

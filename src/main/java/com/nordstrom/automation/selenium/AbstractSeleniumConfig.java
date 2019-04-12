@@ -467,7 +467,7 @@ public abstract class AbstractSeleniumConfig extends
         URI uri = url.toURI();
         if ("jar".equals(uri.getScheme())) {
             try {
-                FileSystems.newFileSystem(uri, Collections.emptyMap());
+                FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
             } catch (FileSystemAlreadyExistsException eaten) { //NOSONAR
                 LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
             } 

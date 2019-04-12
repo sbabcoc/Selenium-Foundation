@@ -39,15 +39,15 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>1.8.0</java-utils.version>
+    <java-utils.version>1.9.0</java-utils.version>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>3.0.1</javadoc-plugin.version>
-    <settings.version>2.2.4</settings.version>
-    <testng-foundation.version>1.10.4</testng-foundation.version>
-    <junit-foundation.version>9.1.1</junit-foundation.version>
+    <settings.version>2.3.0</settings.version>
+    <testng-foundation.version>1.13.0</testng-foundation.version>
+    <junit-foundation.version>9.4.0</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
-    <logback-testng.version>1.0.2</logback-testng.version>
+    <logback-testng.version>1.1.0</logback-testng.version>
     <sonar.language>java</sonar.language>
     <jacoco.version>0.8.2</jacoco.version>
     <mockito.version>1.10.19</mockito.version>

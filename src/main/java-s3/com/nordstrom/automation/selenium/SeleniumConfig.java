@@ -237,7 +237,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public Capabilities[] getCapabilitiesForJson(String capabilities) {
         JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
-        return GridNodeConfiguration.loadFromJSON(input).capabilities.stream().toArray(Capabilities[]::new);
+        return GridNodeConfiguration.loadFromJSON(input).capabilities.toArray(new Capabilities[0]);
     }
     
     /**

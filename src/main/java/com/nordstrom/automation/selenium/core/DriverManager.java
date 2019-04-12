@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -12,6 +11,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.FluentWait;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -181,7 +181,7 @@ public final class DriverManager {
         if (obj instanceof TestBase) {
             return ((TestBase) obj).nabDriver();
         } else {
-            return Optional.empty();
+            return Optional.absent();
         }
     }
     
@@ -208,7 +208,7 @@ public final class DriverManager {
             SessionId sessionId = ((RemoteWebDriver) driver).getSessionId();
             return Optional.of(sessionId);
         }
-        return Optional.empty();
+        return Optional.absent();
     }
 
     /**
@@ -236,7 +236,7 @@ public final class DriverManager {
             
             ((TestBase) obj).setInitialPage(null);
             ((TestBase) obj).setDriver(null);
-            optDriver = Optional.empty();
+            optDriver = Optional.absent();
             driver.quit();
         }
         

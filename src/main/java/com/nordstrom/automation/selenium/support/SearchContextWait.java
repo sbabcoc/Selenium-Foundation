@@ -79,4 +79,13 @@ public class SearchContextWait extends FluentWait<SearchContext> {
         }
         throw ex;
     }
+    
+    /**
+     * Get the search context for which this 'wait' proxy was created.
+     * 
+     * @return subject {@link SearchContext}
+     */
+    public SearchContext getContext() {
+        return context;
+    }
 }

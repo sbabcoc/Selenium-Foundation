@@ -1,7 +1,5 @@
 package com.nordstrom.automation.selenium.utility;
 
-import java.util.Optional;
-
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -9,6 +7,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
+
+import com.google.common.base.Optional;
 
 /**
  * This utility class contains low-level methods that support screenshot artifact capture.
@@ -26,7 +26,7 @@ public final class ScreenshotUtils {
      * Determine if the specified driver is capable of taking screenshots.
      * 
      * @param optDriver optional web driver object
-     * @param logger SLF4J logger object
+     * @param logger SLF4J logger object; may be 'null'
      * @return 'true' if driver can take screenshots; otherwise 'false
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
@@ -39,7 +39,9 @@ public final class ScreenshotUtils {
             } else if (driver instanceof TakesScreenshot) {
                 return true;
             }
-            logger.warn("This driver is not able to take screenshots."); //NOSONAR
+            if (logger != null) {
+                logger.warn("This driver is not able to take screenshots."); //NOSONAR
+            }
         }
         return false;
     }
@@ -49,7 +51,7 @@ public final class ScreenshotUtils {
      * 
      * @param optDriver optional web driver object
      * @param reason impetus for capture request; may be 'null'
-     * @param logger SLF4J logger object
+     * @param logger SLF4J logger object; may be 'null'
      * @return page source; if capture fails, an empty string is returned
      */
     public static byte[] getArtifact(
@@ -60,7 +62,9 @@ public final class ScreenshotUtils {
                 WebDriver driver = optDriver.get();
                 return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
             } catch (WebDriverException e) {
-                logger.warn("The driver is capable of taking a screenshot, but it failed.", e);
+                if (logger != null) {
+                    logger.warn("The driver is capable of taking a screenshot, but it failed.", e);
+                }
             }
         }
         return new byte[0];

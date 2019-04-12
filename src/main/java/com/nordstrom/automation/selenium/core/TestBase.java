@@ -1,9 +1,10 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
+
+import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.model.Page;
@@ -11,7 +12,7 @@ import com.nordstrom.automation.selenium.model.Page;
 /**
  * This interface defines the contract for Selenium Foundation test classes.
  */
-public interface TestBase {
+public abstract class TestBase {
 
     /**
      * Get the driver for the current test.
@@ -19,7 +20,7 @@ public interface TestBase {
      * @return driver for the current test
      * @throws DriverNotAvailableException No driver was found in the current test context
      */
-    default WebDriver getDriver() {
+    public WebDriver getDriver() {
         Optional<WebDriver> optDriver = nabDriver();
         if (optDriver.isPresent()) {
             return optDriver.get();
@@ -32,7 +33,7 @@ public interface TestBase {
      * 
      * @return 'true' if a driver is present; otherwise 'false'
      */
-    default boolean hasDriver() {
+    public boolean hasDriver() {
         return nabDriver().isPresent();
     }
     
@@ -43,14 +44,14 @@ public interface TestBase {
      * 
      * @return (optional) driver for the current test
      */
-    Optional<WebDriver> nabDriver();
+    public abstract Optional<WebDriver> nabDriver();
     
     /**
      * Set the driver for the current test.
      * 
      * @param driver driver for the current test; 'null' to discard driver
      */
-    void setDriver(WebDriver driver);
+    public abstract void setDriver(WebDriver driver);
     
     /**
      * Prepare the specified page object for use:
@@ -63,7 +64,7 @@ public interface TestBase {
      * @param pageObj page object to be prepared
      * @return prepared page object
      */
-    default Page prepInitialPage(Page pageObj) {
+    public Page prepInitialPage(Page pageObj) {
         if (pageObj.getWindowHandle() == null) {
             pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
         }
@@ -78,7 +79,7 @@ public interface TestBase {
      * @return initial page for the current test
      * @throws InitialPageNotSpecifiedException No initial page has been specified
      */
-    default Page getInitialPage() {
+    public Page getInitialPage() {
         Optional<Page> optInitialPage = nabInitialPage();
         if (optInitialPage.isPresent()) {
             return optInitialPage.get();
@@ -91,7 +92,7 @@ public interface TestBase {
      * 
      * @return 'true' if an initial page has been specified; otherwise 'false'
      */
-    default boolean hasInitialPage() {
+    public boolean hasInitialPage() {
         return nabInitialPage().isPresent();
     }
     
@@ -102,28 +103,28 @@ public interface TestBase {
      * 
      * @return (optional) initial page for the current test
      */
-    Optional<Page> nabInitialPage();
+    public abstract Optional<Page> nabInitialPage();
     
     /**
      * Set the initial page for the current test.
      * 
      * @param pageObj initial page for the current test
      */
-    void setInitialPage(Page pageObj);
+    public abstract void setInitialPage(Page pageObj);
     
     /**
      * Get test run output directory.
      * 
      * @return test run output directory
      */
-    String getOutputDirectory();
+    public abstract String getOutputDirectory();
     
     /**
      * Adjust test method timeout by adding the specified interval.
      * 
      * @param adjust timeout adjustment
      */
-    default void adjustTimeout(long adjust) {
+    public void adjustTimeout(long adjust) {
         // by default, do nothing
     }
     
@@ -134,11 +135,11 @@ public interface TestBase {
      * @param obj object to be wrapped (may be 'null')
      * @return (optional) wrapped object; empty if {@code obj} is 'null'
      */
-    static <T> Optional<T> optionalOf(T obj) {
+    public static <T> Optional<T> optionalOf(T obj) {
         if (obj != null) {
             return Optional.of(obj);
         } else {
-            return Optional.empty();
+            return Optional.absent();
         }
     }
     
@@ -148,7 +149,7 @@ public interface TestBase {
      * @param method method to be checked
      * @return 'true' if specified method has {@code Test} annotation; otherwise 'false'
      */
-    boolean isTest(Method method);
+    public abstract boolean isTest(Method method);
     
     /**
      * Determine if the specified method is a 'before method' configuration method.
@@ -156,7 +157,7 @@ public interface TestBase {
      * @param method method to be checked
      * @return 'true' if specified method has {@code Before} annotation; otherwise 'false'
      */
-    boolean isBeforeMethod(Method method);
+    public abstract boolean isBeforeMethod(Method method);
     
     /**
      * Determine if the specified method is an 'after method' configuration method.
@@ -164,7 +165,7 @@ public interface TestBase {
      * @param method method to be checked
      * @return 'true' if specified method has {@code After} annotation; otherwise 'false'
      */
-    boolean isAfterMethod(Method method);
+    public abstract boolean isAfterMethod(Method method);
     
     /**
      * Determine if the specified method is a 'before class' configuration method.
@@ -172,7 +173,7 @@ public interface TestBase {
      * @param method method to be checked
      * @return 'true' if specified method has {@code BeforeClass} annotation; otherwise 'false'
      */
-    boolean isBeforeClass(Method method);
+    public abstract boolean isBeforeClass(Method method);
     
     /**
      * Determine if the specified method is a 'after class' configuration method.
@@ -180,5 +181,5 @@ public interface TestBase {
      * @param method method to be checked
      * @return 'true' if specified method has {@code AfterClass} annotation; otherwise 'false'
      */
-    boolean isAfterClass(Method method);
+    public abstract boolean isAfterClass(Method method);
 }

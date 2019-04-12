@@ -91,8 +91,8 @@ sourceSets {
   }
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 clean {
   delete 'logs'
@@ -264,12 +264,12 @@ repositories {
 }
 
 dependencies {
-  compile 'com.nordstrom.tools:java-utils:1.8.0'
-  compile 'com.nordstrom.tools:settings:2.2.4'
-  compile 'com.nordstrom.tools:testng-foundation:1.10.4'
-  compile 'com.nordstrom.tools:junit-foundation:9.1.1'
+  compile 'com.nordstrom.tools:java-utils:1.9.0'
+  compile 'com.nordstrom.tools:settings:2.3.0'
+  compile 'com.nordstrom.tools:testng-foundation:1.13.0'
+  compile 'com.nordstrom.tools:junit-foundation:9.4.0'
   compile 'ch.qos.logback:logback-classic:1.2.3'
-  compile 'com.github.sbabcoc:logback-testng:1.0.2'
+  compile 'com.github.sbabcoc:logback-testng:1.1.0'
   compile 'org.jsoup:jsoup:1.11.3'
   
   apply from: "${profile}Deps.gradle"

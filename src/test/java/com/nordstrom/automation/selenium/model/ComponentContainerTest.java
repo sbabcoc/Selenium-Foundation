@@ -157,7 +157,7 @@ public class ComponentContainerTest {
      * @return mocked WebElement object
      */
     private static WebElement mockElement(String type, String value, boolean isCheckbox) {
-        WebElement element = mock(WebElement.class, withSettings().extraInterfaces(WrapsDriver.getType()));
+        WebElement element = mock(WebElement.class, withSettings().extraInterfaces(WrapsDriver.TYPE));
         when(element.getTagName()).thenReturn(type);
         if (isCheckbox) {
             when(element.getAttribute("type")).thenReturn("checkbox");
@@ -170,7 +170,7 @@ public class ComponentContainerTest {
         }
 
         WebDriver driver = mockDriver();
-        when(WrapsDriver.getWrappedDriver(element)).thenReturn(driver);
+        when(WrapsDriver.getWrappedDriver.apply(element)).thenReturn(driver);
         return element;
     }
 

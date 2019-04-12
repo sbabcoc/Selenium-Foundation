@@ -26,7 +26,7 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
  */
 public abstract class Enhanceable<T> {
     
-    private static final List<Class<?>> BYPASS = Arrays.asList(Enhanceable.class);
+    private static final List<Class<?>> BYPASS = Arrays.<Class<?>>asList(Enhanceable.class);
     private static final Map<Class<?>, Class<?>> proxyMap = new HashMap<>();
     
     /**
