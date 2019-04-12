@@ -91,9 +91,6 @@ sourceSets {
   }
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
 clean {
   delete 'logs'
   delete 'target'

@@ -1,3 +1,7 @@
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+
 dependencies {
   selenium2Compile configurations.compile
   selenium2Compile('com.google.guava:guava:21.0') { force = true }

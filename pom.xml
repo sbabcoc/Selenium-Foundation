@@ -35,8 +35,6 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
     <java-utils.version>1.9.0</java-utils.version>
@@ -154,6 +152,8 @@
         </property>
       </activation>
       <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
         <selenium.version>2.53.1</selenium.version>
         <guava.version>21.0</guava.version>
         <commons-io.version>2.4</commons-io.version>
@@ -265,6 +265,8 @@
         </property>
       </activation>
       <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>25.0-jre</guava.version>
         <htmlunit.version>2.33.3</htmlunit.version>
