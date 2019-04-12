@@ -42,7 +42,7 @@
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>3.0.1</javadoc-plugin.version>
     <settings.version>2.3.0</settings.version>
-    <testng-foundation.version>1.13.0</testng-foundation.version>
+    <testng-foundation.version>1.13.1</testng-foundation.version>
     <junit-foundation.version>9.4.0</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
     <logback-testng.version>1.1.0</logback-testng.version>
@@ -240,17 +240,6 @@
                   </sources>
                 </configuration>
               </execution>
-              <execution>
-                <id>add-test-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-s2</source>
-                  </sources>
-                </configuration>
-              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -369,17 +358,6 @@
                 <configuration>
                   <sources>
                     <source>src/main/java-s3</source>
-                  </sources>
-                </configuration>
-              </execution>
-              <execution>
-                <id>add-test-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-s3</source>
                   </sources>
                 </configuration>
               </execution>

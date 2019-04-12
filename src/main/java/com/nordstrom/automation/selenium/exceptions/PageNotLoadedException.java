@@ -15,7 +15,7 @@ import com.nordstrom.automation.selenium.support.Coordinator;
 /**
  * This exception is thrown by implementations of {@link DetectsLoadCompletion#isLoadComplete()} to indicate that 
  * loading of the page is not yet complete. The determination of page-load conditions is scenario-specific and may
- * include the use of {@link DetectsLoadCompletion#checkPageLoadCondition(Coordinator, String)}, which facilitates
+ * include the use of {@link ComponentContainer#checkPageLoadCondition(Coordinator, String)}, which facilitates
  * the use of predefined condition evaluation functions for page-load checking.<br>
  * <br>
  * The condition-polling mechanism employed by
