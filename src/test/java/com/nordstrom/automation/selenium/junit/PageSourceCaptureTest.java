@@ -4,10 +4,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.junit.Test;
 
+import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.common.file.PathUtils;

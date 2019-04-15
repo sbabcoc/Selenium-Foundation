@@ -1,13 +1,14 @@
 package com.nordstrom.automation.selenium.utility;
 
 import java.net.URI;
-import java.util.Optional;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
+
+import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 /**
@@ -29,7 +30,7 @@ public final class PageSourceUtils {
      * Determine if the specified driver is capable of producing page source.
      * 
      * @param optDriver optional web driver object
-     * @param logger SLF4J logger object
+     * @param logger SLF4J logger object; may be 'null'
      * @return 'true' if driver can produce page source; otherwise 'false
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
@@ -39,12 +40,16 @@ public final class PageSourceUtils {
                 Capabilities caps = ((HasCapabilities) driver).getCapabilities();
                 // if driver explicitly reports that it cannot produce page source
                 if (Boolean.FALSE.equals(caps.getCapability(TAKES_ELEMENT_SCREENSHOT))) {
-                    logger.warn("This driver is not capable of producing page source."); //NOSONAR
+                    if (logger != null) {
+                        logger.warn("This driver is not capable of producing page source."); //NOSONAR
+                    }
                 } else {
                     return true;
                 }
             } else {
-                logger.warn("Unable to determine if this driver can capture page source."); //NOSONAR
+                if (logger != null) {
+                    logger.warn("Unable to determine if this driver can capture page source."); //NOSONAR
+                }
             }
         }
         return false;
@@ -55,7 +60,7 @@ public final class PageSourceUtils {
      * 
      * @param optDriver optional web driver object
      * @param reason impetus for capture request; may be 'null'
-     * @param logger SLF4J logger object
+     * @param logger SLF4J logger object; may be 'null'
      * @return page source; if capture fails, an empty string is returned
      */
     public static String getArtifact(
@@ -70,7 +75,9 @@ public final class PageSourceUtils {
                 insertOriginalUrl(sourceBuilder, driver);
                 return sourceBuilder.toString();
             } catch (WebDriverException e) {
-                logger.warn("The driver is capable of producing page source, but failed.", e);
+                if (logger != null) {
+                    logger.warn("The driver is capable of producing page source, but failed.", e);
+                }
             }
         }
         return "";

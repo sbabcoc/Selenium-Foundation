@@ -1,6 +1,13 @@
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+tasks.withType(JavaCompile) {
+    options.bootstrapClasspath = files("${System.env.JDK7_HOME}/jre/lib/rt.jar")
+}
+
 dependencies {
   selenium2Compile configurations.compile
-  selenium2Compile('com.google.guava:guava:21.0') { force = true }
+  selenium2Compile('com.google.guava:guava:19.0') { force = true }
   selenium2Compile 'commons-io:commons-io:2.4'
   selenium2Compile('org.seleniumhq.selenium:selenium-server:2.53.1') {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'

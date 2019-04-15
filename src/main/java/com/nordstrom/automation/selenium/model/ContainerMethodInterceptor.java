@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,6 +15,7 @@ import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.PageLoadRendererTimeoutException;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
+import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.Coordinators;
 import com.nordstrom.common.base.ExceptionUnwrapper;
 
@@ -161,7 +163,7 @@ public enum ContainerMethodInterceptor {
                 
                 if (detectsCompletion) {
                     ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD)
-                            .until(DetectsLoadCompletion.pageLoadIsComplete());
+                            .until(pageLoadIsComplete());
                 } else if (reference != null) {
                     WaitType.PAGE_LOAD.getWait(driver).until(Coordinators.stalenessOf(reference));
                 }
@@ -230,6 +232,30 @@ public enum ContainerMethodInterceptor {
             }
         }
         return e;
+    }
+    
+    /**
+     * Returns a 'wait' proxy that determines if the page has finished loading.
+     * 
+     * @return 'true' if the page has finished loading; otherwise 'false'
+     */
+    public static Coordinator<Boolean> pageLoadIsComplete() {
+        return new Coordinator<Boolean>() {
+
+            @Override
+            public Boolean apply(final SearchContext context) {
+                if (context instanceof DetectsLoadCompletion) {
+                    return Boolean.valueOf(((DetectsLoadCompletion) context).isLoadComplete());
+                }
+                throw new IllegalArgumentException(String.format("Search context type '%s' doesn't implement the "
+                                + "DetectsLoadCompletion interface", context.getClass().getName()));
+            }
+            
+            @Override
+            public String toString() {
+                return "page to finish loading";
+            }
+        };
     }
     
 }

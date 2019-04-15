@@ -35,19 +35,18 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>1.8.0</java-utils.version>
+    <java-utils.version>1.9.1</java-utils.version>
+    <toolchains-plugin.version>1.1</toolchains-plugin.version>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <source-plugin.version>3.0.1</source-plugin.version>
     <javadoc-plugin.version>3.0.1</javadoc-plugin.version>
-    <settings.version>2.2.4</settings.version>
-    <testng-foundation.version>1.10.4</testng-foundation.version>
-    <junit-foundation.version>9.1.1</junit-foundation.version>
+    <settings.version>2.3.1</settings.version>
+    <testng-foundation.version>1.13.2</testng-foundation.version>
+    <junit-foundation.version>9.4.2</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
-    <logback-testng.version>1.0.2</logback-testng.version>
+    <logback-testng.version>1.1.1</logback-testng.version>
     <sonar.language>java</sonar.language>
     <jacoco.version>0.8.2</jacoco.version>
     <mockito.version>1.10.19</mockito.version>
@@ -154,8 +153,10 @@
         </property>
       </activation>
       <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
         <selenium.version>2.53.1</selenium.version>
-        <guava.version>21.0</guava.version>
+        <guava.version>19.0</guava.version>
         <commons-io.version>2.4</commons-io.version>
         <htmlunit.version>2.21</htmlunit.version>
       </properties>
@@ -240,18 +241,19 @@
                   </sources>
                 </configuration>
               </execution>
-              <execution>
-                <id>add-test-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-s2</source>
-                  </sources>
-                </configuration>
-              </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>1.7</version>
+                  <vendor>oracle</vendor>
+                </jdk>
+              </toolchains>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -265,6 +267,8 @@
         </property>
       </activation>
       <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>25.0-jre</guava.version>
         <htmlunit.version>2.33.3</htmlunit.version>
@@ -370,18 +374,19 @@
                   </sources>
                 </configuration>
               </execution>
-              <execution>
-                <id>add-test-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-s3</source>
-                  </sources>
-                </configuration>
-              </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>1.8</version>
+                  <vendor>oracle</vendor>
+                </jdk>
+              </toolchains>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -391,6 +396,11 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-toolchains-plugin</artifactId>
+          <version>${toolchains-plugin.version}</version>
+        </plugin>      
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
@@ -436,6 +446,19 @@
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-toolchains-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>toolchain</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <versionRange>[1.0.0,)</versionRange>
                     <goals>
@@ -453,6 +476,17 @@
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>toolchain</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>

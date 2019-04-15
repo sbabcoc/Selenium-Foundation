@@ -57,8 +57,8 @@ public final class WebDriverUtils {
     public static WebDriver getDriver(final SearchContext context) {
         if (context instanceof WebDriver) {
             return (WebDriver) context;
-        } else if (WrapsDriver.isAssignableFrom(context)) {
-            return WrapsDriver.getWrappedDriver(context);
+        } else if (WrapsDriver.isAssignableFrom.apply(context)) {
+            return WrapsDriver.getWrappedDriver.apply(context);
         } else {
             throw new UnsupportedOperationException("Unable to extract the driver from the specified context");
         }

@@ -16,7 +16,7 @@ import org.openqa.selenium.TimeoutException;
  * 
  * @param <T> The return type
  */
-public interface Coordinator<T> extends Function<SearchContext, T> {
+public abstract class Coordinator<T> implements Function<SearchContext, T> {
     
     /**
      * This method can be overridden by implementations of {@link Coordinator} to provide a context-specific
@@ -25,7 +25,7 @@ public interface Coordinator<T> extends Function<SearchContext, T> {
      * @param e The original {@link TimeoutException} object thrown by the framework "wait" implementation
      * @return an instance of a context-specific sub-class of {@link TimeoutException} 
      */
-    public default TimeoutException differentiateTimeout(TimeoutException e) {
+    public TimeoutException differentiateTimeout(TimeoutException e) {
         return e;
     }
 }

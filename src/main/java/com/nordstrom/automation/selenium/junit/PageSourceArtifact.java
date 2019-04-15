@@ -1,22 +1,20 @@
 package com.nordstrom.automation.selenium.junit;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
-
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.utility.PageSourceUtils;
+import com.google.common.base.Optional;
 import com.nordstrom.automation.junit.ArtifactType;
 
 /**
  * This class implements the artifact type for screenshot capture.
  */
-public class PageSourceArtifact implements ArtifactType {
+public class PageSourceArtifact extends ArtifactType {
     
-    private static final Path ARTIFACT_PATH = Paths.get("page-source");
+    private static final String ARTIFACT_PATH = "page-source";
     private static final String EXTENSION = "html";
     private static final Logger LOGGER = LoggerFactory.getLogger(PageSourceArtifact.class);
     
@@ -43,7 +41,7 @@ public class PageSourceArtifact implements ArtifactType {
      */
     @Override
     public Path getArtifactPath(final Object instance) {
-        return ArtifactType.super.getArtifactPath(instance).resolve(ARTIFACT_PATH);
+        return super.getArtifactPath(instance).resolve(ARTIFACT_PATH);
     }
     
     /**

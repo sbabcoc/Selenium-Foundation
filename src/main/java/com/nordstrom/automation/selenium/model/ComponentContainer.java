@@ -35,6 +35,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
+import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinator;
@@ -791,6 +792,31 @@ public abstract class ComponentContainer
         }
     }
 
+    /**
+     * Check the specified page-load condition to determine if this condition has been met.<br>
+     * NOTE - This method indicates failure to meet the condition by throwing {@link PageNotLoadedException}.
+     * 
+     * @param <T> coordinator type parameter
+     * @param condition expected page-load condition
+     * @param message the detail message for the {@link PageNotLoadedException} thrown if the condition isn't met
+     * @return result from the {@link Function#apply(Object) apply} method of the specified coordinator
+     */
+    public <T> T checkPageLoadCondition(final Coordinator<T> condition, final String message) {
+        T result = null;
+        Throwable cause = null;
+        try {
+            result = condition.apply(getContext());
+        } catch (RuntimeException t) {
+            cause = t;
+        }
+        if (cause != null) {
+            throw new PageNotLoadedException(message, cause);
+        } else if (result == null || result == Boolean.FALSE) {
+            throw new PageNotLoadedException(message);
+        }
+        return result;
+    }
+    
     /**
      * Get list of expected query parameters.
      * 

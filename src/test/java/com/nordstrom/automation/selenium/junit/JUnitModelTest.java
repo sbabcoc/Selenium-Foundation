@@ -1,7 +1,11 @@
 package com.nordstrom.automation.selenium.junit;
 
+import java.util.Map;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.model.ExamplePage;
