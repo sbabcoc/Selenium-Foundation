@@ -1,6 +1,10 @@
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+tasks.withType(JavaCompile) {
+    options.bootstrapClasspath = files("${System.env.JDK8_HOME}/jre/lib/rt.jar")
+}
+
 dependencies {
   selenium3Compile configurations.compile
   selenium3Compile('com.google.guava:guava:25.0-jre') { force = true } 

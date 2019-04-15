@@ -23,6 +23,7 @@ import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ObjectArrays;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -285,7 +286,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         for (String contextClassName : dependencyContexts) {
             pathList.add(findJarPathFor(contextClassName));
         }
-        return String.join(File.pathSeparator, pathList);
+        return Joiner.on(File.pathSeparator).join(pathList);
     }
 
     /**
@@ -339,7 +340,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                                 Charset.defaultCharset().name());
                 return new File(fileName).getAbsolutePath();
             } catch (UnsupportedEncodingException e) {
-                throw new InternalError("Default charset doesn't exist. Your VM is borked.", e);
+                throw (InternalError) new InternalError("Default charset doesn't exist. Your VM is borked.").initCause(e);
             }
         }
         
