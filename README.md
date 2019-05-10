@@ -290,7 +290,7 @@ test.doFirst {
 * [DriverListener](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverListener.java):  
 **DriverListener** implements the **JUnit Foundation** [ShutdownListener](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/ShutdownListener.java) interface to shut down the local Selenium Grid serves at the end of the run.
 * [RuleChain](http://junit.org/junit4/javadoc/latest/org/junit/rules/RuleChain.html):  
- Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies two watchers that manage core features of **Selenium Foundation**:
+ Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies three watchers that manage core features of **Selenium Foundation**:
   * [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/ScreenshotCapture.java):  
   **ScreenshotCapture** is a JUnit 4 test watcher that automatically captures a screenshot in the event of test failure.
   * [PageSourceCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/PageSourceCapture.java):  
