@@ -157,7 +157,7 @@ The **QuickStart** class demonstrates several important **Selenium Foundation** 
 * [ReporterAppender](https://github.com/sbabcoc/logback-testng/blob/master/src/main/java/com/github/sbabcoc/logback/testng/ReporterAppender.java):  
 **ReporterAppender** is a **Logback** appender for TestNG Reporter. The **Selenium Foundation** project ships with a _logback.xml_ file that attaches this appender. See the complete **logback-testng** information page [here](https://github.com/sbabcoc/logback-testng).
 * **`TestBase.optionalOf(Object)`**:  
-This static utility method wraps the specified object in an [Optional](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
+This static utility method wraps the specified object in an [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
 
 ## DRIVER ACQUISITION AND HAND-OFF
 
@@ -322,7 +322,7 @@ In this example, these two configurations will enable **JUnit Foundation** to re
 The **JUnitBase** class demonstrates several features of the **Selenium Foundation** API:
 
 * **`TestBase.optionalOf(Object)`**:  
-This static utility method wraps the specified object in an [Optional](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
+This static utility method wraps the specified object in an [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
 * **`RuleChainWalker.getAttachedRule(RuleChain, Class<T extends TestRule>)`**:  
 This static utility method gets reference to an instance of the specified test rule type on the supplied rule chain. In **JUnitBase**, this is use to acquire a reference to the **ScreenshotCapture** watcher for capturing on-demand screenshot artifacts.
 * **`ScreenshotCapture.getDescription()`**:  
