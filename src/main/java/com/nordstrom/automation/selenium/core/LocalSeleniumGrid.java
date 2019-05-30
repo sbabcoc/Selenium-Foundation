@@ -126,6 +126,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param dependencyContexts common dependency contexts for all Grid nodes
      * @param hubServer Grid hub server with which node should register
      * @param driverPlugin driver plug-in from which to create the node
+     * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+     * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
      * @return {@link LocalGridServer} object for specified node
      * @throws IOException if an I/O error occurs
      */
