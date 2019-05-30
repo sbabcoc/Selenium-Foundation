@@ -29,7 +29,6 @@ import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.base.UncheckedThrow;
-import com.nordstrom.common.file.PathUtils;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -48,8 +47,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_HOST = "-host";
     private static final String OPT_PORT = "-port";
     private static final String OPT_SERVLETS = "-servlets";
-    private static final String LOGS_PATH = "logs";
-    
     private static final String GRID_REGISTER = "/grid/register";
     
     public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
@@ -76,8 +73,12 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         String[] dependencyContexts = config.getDependencyContexts();
         long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
         Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
-        LocalGridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB, hubPort, hubConfigPath);
-        waitUntilReady(hubServer, hostTimeout);
+        String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
+        Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
+        Path outputPath = GridUtility.getOutputPath(config, GridRole.HUB);
+        LocalGridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB,
+                        hubPort, hubConfigPath, workingPath, outputPath);
+        waitUntilReady(hubServer, outputPath, hostTimeout);
         
         // store hub host URL in system property for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
@@ -108,8 +109,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
-            LocalGridServer nodeServer = start(config, launcherClassName, dependencyContexts, hubServer, driverPlugin);
-            waitUntilReady(nodeServer, hostTimeout);
+            outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
+            LocalGridServer nodeServer = start(config, launcherClassName, dependencyContexts, hubServer, driverPlugin, workingPath, outputPath);
+            waitUntilReady(nodeServer, outputPath, hostTimeout);
             nodeServers.add(nodeServer);
         }
         
@@ -128,12 +130,13 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @throws IOException if an I/O error occurs
      */
     public static LocalGridServer start(SeleniumConfig config, String launcherClassName,
-                    String[] dependencyContexts, GridServer hubServer, DriverPlugin driverPlugin) throws IOException {
+                    String[] dependencyContexts, GridServer hubServer, DriverPlugin driverPlugin,
+                    final Path workingPath, final Path outputPath) throws IOException {
 
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, driverPlugin);
         Path nodeConfigPath = config.createNodeConfig(driverPlugin.getCapabilities(config), hubServer.getUrl());
         return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
-                        Integer.valueOf(-1), nodeConfigPath);
+                        Integer.valueOf(-1), nodeConfigPath, workingPath, outputPath);
     }
     
     /**
@@ -151,18 +154,20 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * Wait for the specified Grid server to indicate that it's ready.
      * 
      * @param server {@link LocalGridServer} object to wait for.
+     * @param outputPath {@link Path} to output log file; {@code null} if not redirected
      * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
      * @throws InterruptedException if this thread was interrupted
      * @throws IOException if an I/O error occurs
      * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
      */
-    protected static void waitUntilReady(LocalGridServer server, long maxWait) throws IOException, InterruptedException, TimeoutException {
-        StringBuilder builder = new StringBuilder();
+    protected static void waitUntilReady(LocalGridServer server, Path outputPath, long maxWait)
+                    throws IOException, InterruptedException, TimeoutException {
         long maxTime = System.currentTimeMillis() + maxWait;
-        try (InputStream inputStream = Files.newInputStream(server.outputPath)) {
-            while (appendAndCheckFor(inputStream, server.readyMessage, builder)) {
+        try (InputStream inputStream = (outputPath != null) ? Files.newInputStream(outputPath)
+                        : server.process.getInputStream()) {
+            while (appendAndCheckFor(inputStream, server.readyMessage, server.builder)) {
                 if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
-                    throw new TimeoutException("Timed of waiting for Grid server to be ready");
+                    throw new TimeoutException("Timed out waiting for Grid server to be ready");
                 }
                 Thread.sleep(100);
             }
@@ -197,6 +202,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param role role of Grid server being started
      * @param port port that Grid server should use; -1 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file
+     * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+     * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
      * @return {@link LocalGridServer} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
@@ -204,7 +211,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      */
     public static LocalGridServer start(final String launcherClassName,
                     final String[] dependencyContexts, final GridRole role, final Integer port,
-                    final Path configPath) {
+                    final Path configPath, final Path workingPath, final Path outputPath) {
+        
         String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
         
@@ -251,25 +259,18 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         argsList.add(0, System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         
         ProcessBuilder builder = new ProcessBuilder(argsList);
+        builder.redirectErrorStream(true);
         
-        Path outputPath;
-        String outputDir = PathUtils.getBaseDir();
-        
-        try {
-            Path logsPath = Paths.get(outputDir, LOGS_PATH);
-            if (!logsPath.toFile().exists()) {
-                Files.createDirectories(logsPath);
-            }
-            outputPath = PathUtils.getNextPath(logsPath, "grid-" + gridRole, "log");
-        } catch (IOException e) {
-            throw new GridServerLaunchFailedException(gridRole, e);
+        if (workingPath != null) {
+            builder.directory(workingPath.toFile());
         }
         
-        builder.redirectErrorStream(true);
-        builder.redirectOutput(outputPath.toFile());
+        if (outputPath != null) {
+            builder.redirectOutput(outputPath.toFile());
+        }
         
         try {
-            return new LocalGridServer(hostUrl, portNum, role, builder.start(), outputPath);
+            return new LocalGridServer(hostUrl, portNum, role, builder.start());
         } catch (IOException e) {
             throw new GridServerLaunchFailedException(gridRole, e);
         }
@@ -351,7 +352,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     public static class LocalGridServer extends GridServer {
 
         private Process process;
-        Path outputPath;
+        private StringBuilder builder;
         String readyMessage;
         
         private static final String HUB_READY = "up and running";
@@ -364,12 +365,11 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param port port of local Grid server
          * @param role {@link GridRole} of local Grid server
          * @param process {@link Process} of local Grid server
-         * @param outputPath path of output from Grid server process 
          */
-        LocalGridServer(String host, Integer port, GridRole role, Process process, Path outputPath) {
+        LocalGridServer(String host, Integer port, GridRole role, Process process) {
             super(getServerUrl(host, port), role);
             this.process = process;
-            this.outputPath = outputPath;
+            this.builder = new StringBuilder();
             if (isHub()) {
                 readyMessage = HUB_READY;
             } else {
@@ -387,12 +387,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         }
         
         /**
-         * Get the output path for the process of this local Grid server.
+         * Get process output from the launch of this local Grid server.
+         * <p>
+         * <b>NOTE</b>: Process output collection ends upon encountering the "ready" message.
          * 
-         * @return {@link Path} for process output
+         * @return server output
          */
-        public Path getOutputPath() {
-            return outputPath;
+        public String getLaunchOutput() {
+            return builder.toString();
         }
         
         /**

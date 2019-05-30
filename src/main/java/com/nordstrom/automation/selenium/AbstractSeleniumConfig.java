@@ -103,8 +103,12 @@ public abstract class AbstractSeleniumConfig extends
         GOOGLE_DNS_SOCKET_HOST("google.dns.socket.host", "8.8.8.8"),    //NOSONAR
         /** name: <b>google.dns.socket.port</b> <br> default: <b>10002</b> */
         GOOGLE_DNS_SOCKET_PORT("google.dns.socket.port", "10002"),
-        /** name: <b>selenium.opera.binary</b> <br> default: {@code null} */
-        OPERA_BINARY("selenium.opera.binary", null);
+        /** name: <b>selenium.grid.working.dir</b> <br> default: {@code null} */
+        GRID_WORKING_DIR("selenium.grid.working.dir", null),
+        /** name: <b>selenium.grid.log.folder</b> <br> default: <b>logs</b> */
+        GRID_LOGS_FOLDER("selenium.grid.log.folder", "logs"),
+        /** name: <b>selenium.grid.no.redirect</b> <br> default: {@code false} */
+        GRID_NO_REDIRECT("selenium.grid.no.redirect", "false");
         
         private String propertyName;
         private String defaultValue;

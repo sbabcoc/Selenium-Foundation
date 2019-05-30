@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class OperaCaps {
@@ -20,6 +19,7 @@ public class OperaCaps {
     private static final String CAPABILITIES = "{\"browserName\":\"operablink\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "operablink";
+    public static final String OPERA_BINARY = "selenium.opera.binary";
     public static final String OPTIONS_KEY = "operaOptions";
     public static final String BINARY_KEY = "binary";
     
@@ -34,9 +34,8 @@ public class OperaCaps {
     }
     
     public static String getCapabilities(SeleniumConfig config) {
-        String binaryPath = config.getString(SeleniumSettings.OPERA_BINARY.key());
-        Objects.requireNonNull(binaryPath, "Path to Opera binary must be specified in setting ["
-                        + SeleniumSettings.OPERA_BINARY.key() + "]");
+        String binaryPath = config.getString(OPERA_BINARY);
+        Objects.requireNonNull(binaryPath, "Path to Opera binary must be specified in setting [" + OPERA_BINARY + "]");
         
         DesiredCapabilities caps = new DesiredCapabilities().merge(config.getCapabilitiesForJson(CAPABILITIES)[0]);
         Map<String, Object> options = (Map<String, Object>) caps.getCapability(OPTIONS_KEY);

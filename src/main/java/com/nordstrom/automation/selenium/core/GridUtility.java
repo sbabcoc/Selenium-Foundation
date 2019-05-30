@@ -11,6 +11,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +28,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -34,7 +38,9 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
+import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.base.UncheckedThrow;
+import com.nordstrom.common.file.PathUtils;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
@@ -134,7 +140,8 @@ public final class GridUtility {
         int length;
         byte[] buffer = new byte[1024];
         ByteArrayOutputStream result = new ByteArrayOutputStream();
-        while ((length = inputStream.read(buffer)) != -1) {
+        while (inputStream.available() > 0) {
+            length = inputStream.read(buffer);
             result.write(buffer, 0, length);
         }
         return result.toString(StandardCharsets.UTF_8.name());
@@ -251,5 +258,40 @@ public final class GridUtility {
             SeleniumGrid.LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
             return "localhost";
         }
+    }
+    
+    /**
+     * Get next configured output path for Grid server of specified role.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param role role of Grid server being started
+     * @return Grid server output path (may be {@code null})
+     */
+    public static Path getOutputPath(SeleniumConfig config, GridRole role) {
+        Path outputPath = null;
+        
+        if (!config.getBoolean(SeleniumSettings.GRID_NO_REDIRECT.key())) {
+            String gridRole = role.toString().toLowerCase();
+            String logsFolder = config.getString(SeleniumSettings.GRID_LOGS_FOLDER.key());
+            Path logsPath = Paths.get(logsFolder);
+            if (!logsPath.isAbsolute()) {
+                String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
+                if (workingDir == null || workingDir.isEmpty()) {
+                    workingDir = System.getProperty("user.dir");
+                }
+                logsPath = Paths.get(workingDir, logsFolder);
+            }
+            
+            try {
+                if (!logsPath.toFile().exists()) {
+                    Files.createDirectories(logsPath);
+                }
+                outputPath = PathUtils.getNextPath(logsPath, "grid-" + gridRole, "log");
+            } catch (IOException e) {
+                throw new GridServerLaunchFailedException(gridRole, e);
+            }
+        }
+        
+        return outputPath;
     }
 }
