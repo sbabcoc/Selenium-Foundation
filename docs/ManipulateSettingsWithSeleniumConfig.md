@@ -93,12 +93,12 @@ Here are the Maven dependencies for the **Selenium 2** version of **`HtmlUnitPlu
 <dependency>
   <groupId>net.sourceforge.htmlunit</groupId>
   <artifactId>htmlunit</artifactId>
-  <version>2.21</version>
+  <version>2.22</version>
 </dependency>
 <dependency>
   <groupId>org.seleniumhq.selenium</groupId>
   <artifactId>htmlunit-driver</artifactId>
-  <version>2.21</version>
+  <version>2.22</version>
 </dependency>
 ```
 
