@@ -83,6 +83,7 @@ public abstract class ComponentContainer
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
     private static final String ELEMENT_MESSAGE = "[element] must be non-null";
     private static final int PARAM_BIT_COUNT = 2;
+    private static final String LOOPBACK = "http://127.0.0.1/";
     
     private final Logger logger;
     
@@ -544,7 +545,7 @@ public abstract class ComponentContainer
      */
     public <T extends Page> T openPageAtPath(final Class<T> pageClass, final String path, final boolean newWindow) {
         URIBuilder builder = new URIBuilder(SeleniumConfig.getConfig().getTargetUri());
-        builder.setPath(URI.create(builder.getPath() + "/").resolve("./" + path).getPath());
+        builder.setPath(URI.create(LOOPBACK + builder.getPath() + "/").resolve("./" + path).getPath());
         return openPageAtUrl(pageClass, builder.toString(), newWindow);
     }
     
@@ -633,7 +634,7 @@ public abstract class ComponentContainer
                 if (pathUri.isAbsolute()) {
                     return pathUri.toString();
                 } else {
-                    builder.setPath(URI.create(builder.getPath() + "/").resolve("./" + path).getPath());
+                    builder.setPath(URI.create(LOOPBACK + builder.getPath() + "/").resolve("./" + path).getPath());
                 }
             }
             
