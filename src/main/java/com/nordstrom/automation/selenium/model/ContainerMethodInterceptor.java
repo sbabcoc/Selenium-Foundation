@@ -13,6 +13,7 @@ import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.PageLoadRendererTimeoutException;
+import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinator;
@@ -163,7 +164,8 @@ public enum ContainerMethodInterceptor {
                 
                 if (detectsCompletion) {
                     ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD)
-                            .until(pageLoadIsComplete());
+                                    .ignoring(PageNotLoadedException.class)
+                                    .until(pageLoadIsComplete());
                 } else if (reference != null) {
                     WaitType.PAGE_LOAD.getWait(driver).until(Coordinators.stalenessOf(reference));
                 }
