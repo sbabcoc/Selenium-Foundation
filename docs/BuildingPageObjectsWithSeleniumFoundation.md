@@ -117,7 +117,7 @@ public class SkuDescriptionSearchDialog extends Dialog {
      */
     public void resetSearch() {
         findElement(Using.RESET_BUTTON.locator).click();
-        getParentPage().getWait(WaitType.PAGE_LOAD).until(DetectsLoadCompletion.pageLoadIsComplete());
+        getParentPage().getWait(WaitType.PAGE_LOAD).until(ContainerMethodInterceptor.pageLoadIsComplete());
     }
 }
 ```
