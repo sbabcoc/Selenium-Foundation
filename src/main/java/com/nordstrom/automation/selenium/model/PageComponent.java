@@ -258,7 +258,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * @return search context as page component (throws an exception otherwise)
      * @throws UnsupportedOperationException The specified search context isn't a page component
      */
-    private static PageComponent verifyContext(final SearchContext context) {
+    protected static PageComponent verifyContext(final SearchContext context) {
         if (context instanceof PageComponent) {
             return (PageComponent) context;
         }
