@@ -173,7 +173,7 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
             try {
                 return ! element.getWrappedElement().isDisplayed();
             } catch (StaleElementReferenceException e) {
-                getLogger().debug("Container element no longer exists");
+                getLogger().warn("Container element no longer exists");
             }
         }
         return true;
