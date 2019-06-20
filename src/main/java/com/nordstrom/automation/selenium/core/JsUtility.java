@@ -68,7 +68,7 @@ public final class JsUtility {
     private static final String CLASS_NAME_KEY = "className";
     private static final String MESSAGE_KEY = "message";
     
-    private static final String READY_CHECK = "return (document.readyState == 'complete' && jQuery.active == 0);";
+    private static final String DOCUMENT_READY = getScriptResource("documentReady.js");
     
     /**
      * Private constructor to prevent instantiation.
@@ -159,7 +159,7 @@ public final class JsUtility {
              */
             @Override
             public Boolean apply(final SearchContext context) {
-                return (Boolean) WebDriverUtils.getExecutor(context).executeScript(READY_CHECK);
+                return (Boolean) WebDriverUtils.getExecutor(context).executeScript(DOCUMENT_READY);
             }
             
             /**
