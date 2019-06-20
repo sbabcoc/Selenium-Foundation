@@ -6,8 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.nordstrom.automation.selenium.exceptions.DocumentNotReadyTimeoutException;
+import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -64,6 +67,8 @@ public final class JsUtility {
     private static final String ERROR_MESSAGE_KEY = "errorMessage";
     private static final String CLASS_NAME_KEY = "className";
     private static final String MESSAGE_KEY = "message";
+    
+    private static final String READY_CHECK = "return (document.readyState == 'complete' && jQuery.active == 0);";
     
     /**
      * Private constructor to prevent instantiation.
@@ -139,6 +144,40 @@ public final class JsUtility {
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
     public static <T> T runAndReturn(final WebDriver driver, final String js, final Object... args) {
         return (T) WebDriverUtils.getExecutor(driver).executeScript(js, args);
+    }
+    
+    /**
+     * Returns a 'wait' proxy that determines if the current document is in 'ready' state.
+     * 
+     * @return 'true' if the document is in 'ready' state; otherwise 'false'
+     */
+    public static Coordinator<Boolean> documentIsReady() {
+        return new Coordinator<Boolean>() {
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Boolean apply(final SearchContext context) {
+                return (Boolean) WebDriverUtils.getExecutor(context).executeScript(READY_CHECK);
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString() {
+                return "document to be ready";
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new DocumentNotReadyTimeoutException(e.getMessage(), e.getCause());
+            }
+        };
     }
     
     /**
