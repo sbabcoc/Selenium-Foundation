@@ -1,0 +1,1 @@
+return ((typeof window.jQuery == 'undefined') || ((window.jQuery.active == 0) && ($(':animated').length == 0)) && (document.readyState == 'complete'));
