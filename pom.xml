@@ -222,11 +222,6 @@
           <artifactId>htmlunit-driver</artifactId>
           <scope>test</scope>
         </dependency>
-<dependency>
-  <groupId>com.codeborne</groupId>
-  <artifactId>phantomjsdriver</artifactId>
-  <version>1.3.0</version>
-</dependency>
       </dependencies>
       <build>
         <directory>target-s2</directory>
@@ -360,17 +355,6 @@
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>htmlunit-driver</artifactId>
         </dependency>
-<dependency>
-  <groupId>com.codeborne</groupId>
-  <artifactId>phantomjsdriver</artifactId>
-  <version>1.4.4</version>
-  <exclusions>
-    <exclusion>
-      <groupId>*</groupId>
-      <artifactId>*</artifactId>
-    </exclusion>
-  </exclusions>
-</dependency>
       </dependencies>
       <build>
         <directory>target-s3</directory>
