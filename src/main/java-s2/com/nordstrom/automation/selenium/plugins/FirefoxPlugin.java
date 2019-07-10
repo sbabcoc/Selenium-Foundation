@@ -21,9 +21,9 @@ public class FirefoxPlugin implements DriverPlugin {
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.firefox.FirefoxDriver",
                     "org.apache.commons.exec.Executor",
-                    "org.openqa.selenium.os.Kernel32",
-                    "com.sun.jna.platform.win32.Kernel32",
-                    "com.sun.jna.win32.StdCallLibrary"};
+                    "org.openqa.selenium.remote.RemoteWebDriver",
+                    "com.sun.jna.platform.RasterRangesUtils",
+                    "com.sun.jna.Library"};
     
     /**
      * {@inheritDoc}
