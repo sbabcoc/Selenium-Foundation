@@ -18,8 +18,8 @@ public class PhantomJsPlugin implements DriverPlugin {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.phantomjs.PhantomJSDriver",
-                    "org.apache.commons.exec.Executor", "com.sun.jna.platform.win32.Kernel32",
-                    "com.sun.jna.win32.StdCallLibrary"};
+                    "org.apache.commons.exec.Executor", "com.sun.jna.platform.RasterRangesUtils",
+                    "com.sun.jna.Library"};
     
     /**
      * {@inheritDoc}
