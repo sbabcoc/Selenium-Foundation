@@ -25,6 +25,8 @@ public class OperaCaps {
     
     public static final String BASELINE = "{\"browserName\":\"operablink\"}";
     
+    private static final String[] PROPERTY_NAMES = { "webdriver.opera.driver" };
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -33,6 +35,7 @@ public class OperaCaps {
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
+    @SuppressWarnings("unchecked")
     public static String getCapabilities(SeleniumConfig config) {
         String binaryPath = config.getString(OPERA_BINARY);
         Objects.requireNonNull(binaryPath, "Path to Opera binary must be specified in setting [" + OPERA_BINARY + "]");
@@ -50,6 +53,10 @@ public class OperaCaps {
 
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    public static String[] getPropertyNames() {
+        return PROPERTY_NAMES;
     }
 
 }

@@ -57,4 +57,12 @@ public class FirefoxPlugin implements DriverPlugin {
         return FirefoxCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return FirefoxCaps.getPropertyNames();
+    }
+
 }

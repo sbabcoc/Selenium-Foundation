@@ -53,4 +53,12 @@ public class InternetExplorerPlugin implements DriverPlugin {
         return InternetExplorerCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return InternetExplorerCaps.getPropertyNames();
+    }
+
 }

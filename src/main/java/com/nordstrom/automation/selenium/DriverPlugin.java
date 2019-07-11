@@ -33,4 +33,11 @@ public interface DriverPlugin {
      */
     Map<String, String> getPersonalities();
     
+    /**
+     * Get names of supported System properties.
+     * 
+     * @return System property names
+     */
+    String[] getPropertyNames();
+    
 }

@@ -17,6 +17,10 @@ public class SafariCaps {
     public static final String OPTIONS_KEY = "safari.options";
     public static final String BASELINE = "{\"browserName\":\"safari\"}";
     
+    private static final String[] PROPERTY_NAMES = {
+                    "webdriver.safari.driver",
+                    "webdriver.safari.noinstall"};
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -31,6 +35,10 @@ public class SafariCaps {
 
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    public static String[] getPropertyNames() {
+        return PROPERTY_NAMES;
     }
 
 }

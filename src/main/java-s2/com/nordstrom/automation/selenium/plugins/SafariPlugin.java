@@ -55,4 +55,12 @@ public class SafariPlugin implements DriverPlugin {
         return SafariCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return SafariCaps.getPropertyNames();
+    }
+
 }

@@ -59,4 +59,12 @@ public class PhantomJsPlugin implements DriverPlugin {
         return PhantomJsCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return PhantomJsCaps.getPropertyNames();
+    }
+
 }

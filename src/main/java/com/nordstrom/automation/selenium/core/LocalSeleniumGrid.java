@@ -18,6 +18,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.net.PortProber;
@@ -137,8 +138,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
 
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, driverPlugin);
         Path nodeConfigPath = config.createNodeConfig(driverPlugin.getCapabilities(config), hubServer.getUrl());
+        String[] propertyNames = driverPlugin.getPropertyNames();
         return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
-                        Integer.valueOf(-1), nodeConfigPath, workingPath, outputPath);
+                        Integer.valueOf(-1), nodeConfigPath, workingPath, outputPath, propertyNames);
     }
     
     /**
@@ -206,6 +208,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param configPath {@link Path} to server configuration file
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
+     * @param propertyNames optional array of property names to propagate to server process
      * @return {@link LocalGridServer} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
@@ -213,7 +216,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      */
     public static LocalGridServer start(final String launcherClassName,
                     final String[] dependencyContexts, final GridRole role, final Integer port,
-                    final Path configPath, final Path workingPath, final Path outputPath) {
+                    final Path configPath, final Path workingPath, final Path outputPath,
+                    final String... propertyNames) {
         
         String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
@@ -252,6 +256,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         // specify Grid launcher class name
         argsList.add(0, launcherClassName);
+        
+        // propagate Java System properties
+        for (String name : propertyNames) {
+            String value = System.getProperty(name);
+            if (value != null) {
+                argsList.add(0, "-D" + name + "=" + StringUtils.wrap(value, '"'));
+            }
+        }
         
         // specify Java class path
         argsList.add(0, getClasspath(dependencyContexts));

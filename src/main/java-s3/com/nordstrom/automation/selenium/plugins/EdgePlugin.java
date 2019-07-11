@@ -51,4 +51,12 @@ public class EdgePlugin implements DriverPlugin {
         return EdgeCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return EdgeCaps.getPropertyNames();
+    }
+
 }

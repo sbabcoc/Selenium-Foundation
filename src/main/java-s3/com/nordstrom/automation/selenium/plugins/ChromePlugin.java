@@ -53,4 +53,12 @@ public class ChromePlugin implements DriverPlugin {
         return ChromeCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return ChromeCaps.getPropertyNames();
+    }
+
 }
