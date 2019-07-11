@@ -59,4 +59,12 @@ public class OperaPlugin implements DriverPlugin {
         return OperaCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return OperaCaps.getPropertyNames();
+    }
+
 }

@@ -67,4 +67,12 @@ public class HtmlUnitPlugin implements DriverPlugin {
         return HtmlUnitCaps.getPersonalities();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getPropertyNames() {
+        return HtmlUnitCaps.getPropertyNames();
+    }
+
 }

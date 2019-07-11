@@ -16,6 +16,8 @@ public class HtmlUnitCaps {
     public static final String BROWSER_NAME = "htmlunit";
     public static final String BASELINE = "{\"browserName\":\"htmlunit\"}";
     
+    private static final String[] PROPERTY_NAMES = {  };
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -30,6 +32,10 @@ public class HtmlUnitCaps {
 
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    public static String[] getPropertyNames() {
+        return PROPERTY_NAMES;
     }
 
 }

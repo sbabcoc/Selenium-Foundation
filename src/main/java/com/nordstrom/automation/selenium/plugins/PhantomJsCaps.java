@@ -16,6 +16,12 @@ public class PhantomJsCaps {
     public static final String BROWSER_NAME = "phantomjs";
     public static final String PHANTOMJS = "{\"browserName\":\"phantomjs\"}";
     
+    private static final String[] PROPERTY_NAMES = {
+                    "phantomjs.binary.path",
+                    "phantomjs.ghostdriver.path",
+                    "phantomjs.cli.args",
+                    "phantomjs.ghostdriver.cli.args"};
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -30,6 +36,10 @@ public class PhantomJsCaps {
 
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+    
+    public static String[] getPropertyNames() {
+        return PROPERTY_NAMES;
     }
 
 }

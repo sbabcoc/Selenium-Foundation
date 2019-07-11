@@ -30,6 +30,8 @@ public class ChromeCaps {
                          "\"prefs\":{\"credentials_enable_service\":false}" +
                     "}}";
     
+    private static final String[] PROPERTY_NAMES = { "webdriver.chrome.driver" };
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -45,6 +47,10 @@ public class ChromeCaps {
 
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+    
+    public static String[] getPropertyNames() {
+        return PROPERTY_NAMES;
     }
 
 }

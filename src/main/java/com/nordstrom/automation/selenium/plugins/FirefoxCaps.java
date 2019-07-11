@@ -23,6 +23,8 @@ public class FirefoxCaps {
                          "\"args\":[\"-headless\"]" +
                     "}}";
     
+    private static final String[] PROPERTY_NAMES = { "webdriver.gecko.driver" };
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -35,9 +37,13 @@ public class FirefoxCaps {
     public static String getCapabilities() {
         return CAPABILITIES;
     }
-
+    
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    public static String[] getPropertyNames() {
+        return PROPERTY_NAMES;
     }
 
 }

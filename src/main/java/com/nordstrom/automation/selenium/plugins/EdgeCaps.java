@@ -17,6 +17,8 @@ public class EdgeCaps {
     public static final String OPTIONS_KEY = "edgeOptions";
     public static final String BASELINE = "{\"browserName\":\"MicrosoftEdge\"}";
     
+    private static final String[] PROPERTY_NAMES = { "webdriver.edge.driver" };
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -31,6 +33,10 @@ public class EdgeCaps {
 
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+    
+    public static String[] getPropertyNames() {
+        return PROPERTY_NAMES;
     }
 
 }
