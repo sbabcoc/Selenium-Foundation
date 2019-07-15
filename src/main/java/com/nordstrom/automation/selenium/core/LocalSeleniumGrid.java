@@ -18,7 +18,6 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.net.PortProber;
@@ -261,7 +260,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         for (String name : propertyNames) {
             String value = System.getProperty(name);
             if (value != null) {
-                argsList.add(0, "-D" + name + "=" + StringUtils.wrap(value, '"'));
+                argsList.add(0, "-D" + name + "=" + value);
             }
         }
         
