@@ -58,6 +58,9 @@ public class DriverWatcher implements MethodWatcher<FrameworkMethod> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<FrameworkMethod> supportedType() {
         return FrameworkMethod.class;
