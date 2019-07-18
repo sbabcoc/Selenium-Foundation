@@ -1,14 +1,17 @@
 package com.nordstrom.automation.selenium.junit;
 
+import org.junit.internal.runners.model.ReflectiveCallable;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.FrameworkMethod;
 
+import com.nordstrom.automation.junit.LifecycleHooks;
 import com.nordstrom.automation.junit.MethodWatcher;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.TestBase;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This JUnit watcher performs several basic functions related to driver session management:
@@ -27,22 +30,37 @@ import com.nordstrom.automation.selenium.core.TestBase;
  * 
  * @see GridUtility
  */
-public class DriverWatcher implements MethodWatcher {
+public class DriverWatcher implements MethodWatcher<FrameworkMethod> {
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void beforeInvocation(final Object runner, final Object obj, final FrameworkMethod method, final Object... params) {
-        DriverManager.beforeInvocation(obj, method.getMethod());
+    public void beforeInvocation(final Object runner, final FrameworkMethod method, final ReflectiveCallable callable) {
+        try {
+            Object obj = LifecycleHooks.getFieldValue(callable, "val$target");
+            DriverManager.beforeInvocation(obj, method.getMethod());
+        } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            UncheckedThrow.throwUnchecked(e);
+        }
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void afterInvocation(final Object runner, final Object obj, final FrameworkMethod method, final Throwable thrown) {
-        DriverManager.afterInvocation(obj, method.getMethod());
+    public void afterInvocation(final Object runner, final FrameworkMethod method, final ReflectiveCallable callable, final Throwable thrown) {
+        try {
+            Object obj = LifecycleHooks.getFieldValue(callable, "val$target");
+            DriverManager.afterInvocation(obj, method.getMethod());
+        } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            UncheckedThrow.throwUnchecked(e);
+        }
+    }
+
+    @Override
+    public Class<FrameworkMethod> supportedType() {
+        return FrameworkMethod.class;
     }
     
     /**
