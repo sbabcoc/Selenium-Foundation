@@ -4,8 +4,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-
 import javax.imageio.ImageIO;
 
 import org.openqa.selenium.HasCapabilities;
@@ -17,6 +15,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 
 import com.google.common.base.Optional;
+import com.google.common.io.BaseEncoding;
 
 /**
  * This utility class contains low-level methods that support screenshot artifact capture.
@@ -97,7 +96,7 @@ public final class ScreenshotUtils {
 
         try {
             ImageIO.write(image, "png", bos);
-            imageString = Base64.getEncoder().encodeToString(bos.toByteArray());
+            imageString = BaseEncoding.base64().encode(bos.toByteArray());
             bos.close();
             
             return OutputType.BYTES.convertFromBase64Png(imageString);
