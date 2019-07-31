@@ -1,5 +1,13 @@
 package com.nordstrom.automation.selenium.utility;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+
+import javax.imageio.ImageIO;
+
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -27,7 +35,7 @@ public final class ScreenshotUtils {
      * 
      * @param optDriver optional web driver object
      * @param logger SLF4J logger object; may be 'null'
-     * @return 'true' if driver can take screenshots; otherwise 'false
+     * @return 'true' if driver can take screenshots; otherwise 'false'
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
         if (optDriver.isPresent()) {
@@ -36,8 +44,9 @@ public final class ScreenshotUtils {
                 if (((HasCapabilities) driver).getCapabilities().is(CapabilityType.TAKES_SCREENSHOT)) {
                     return true;
                 }
-            } else if (driver instanceof TakesScreenshot) {
-                return true;
+            }
+            if (driver instanceof TakesScreenshot) {
+                return true; // for remote drivers, this may be bogus
             }
             if (logger != null) {
                 logger.warn("This driver is not able to take screenshots."); //NOSONAR
@@ -47,12 +56,12 @@ public final class ScreenshotUtils {
     }
     
     /**
-     * Produce page source from the specified driver.
+     * Produce a screenshot from the specified driver.
      * 
      * @param optDriver optional web driver object
      * @param reason impetus for capture request; may be 'null'
      * @param logger SLF4J logger object; may be 'null'
-     * @return page source; if capture fails, an empty string is returned
+     * @return screenshot artifact; if capture fails, an empty byte array is returned
      */
     public static byte[] getArtifact(
                     final Optional<WebDriver> optDriver, final Throwable reason, final Logger logger) { //NOSONAR
@@ -62,11 +71,38 @@ public final class ScreenshotUtils {
                 WebDriver driver = optDriver.get();
                 return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
             } catch (WebDriverException e) {
-                if (logger != null) {
+                if (e.getCause() instanceof ClassCastException) {
+                    return proxyArtifact();
+                } else if (logger != null) {
                     logger.warn("The driver is capable of taking a screenshot, but it failed.", e);
                 }
             }
         }
         return new byte[0];
+    }
+    
+    /**
+     * Produce a proxy screenshot artifact for incapable remote drivers.
+     * 
+     * @return proxy screenshot artifact
+     */
+    private static byte[] proxyArtifact(){ 
+        BufferedImage image = new BufferedImage(155, 45, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = image.getGraphics();
+        graphics.drawString("This remote driver is not", 10, 20);
+        graphics.drawString("able to take screenshots", 10, 35);
+        
+        String imageString = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        try {
+            ImageIO.write(image, "png", bos);
+            imageString = Base64.getEncoder().encodeToString(bos.toByteArray());
+            bos.close();
+            
+            return OutputType.BYTES.convertFromBase64Png(imageString);
+        } catch (IOException e) {
+            return new byte[0];
+        }
     }
 }
