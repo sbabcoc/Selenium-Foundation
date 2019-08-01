@@ -858,7 +858,7 @@ public abstract class ComponentContainer
                         
                     default:
                         throw new IllegalArgumentException("Format of PageUrl parameter '" + param
-                                        + "' does not conform to template [name] or [name]=[pattern]");
+                            + "' does not conform to template [name] or [name]=[pattern]");
                 }
             }
         } else if (expectUri != null) {
