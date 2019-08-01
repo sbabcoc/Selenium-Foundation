@@ -20,7 +20,7 @@ import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 
 public class ComponentContainerTest {
 
-    private static final URI targetUri = URI.create("http://target.com/basepath");
+    private static final URI targetUri = URI.create("http://target.com/basepath/");
     
     @Test
     public void updateTextInputSameValue() {
@@ -147,6 +147,13 @@ public class ComponentContainerTest {
         // verify file exists
         assertTrue(new File(uri).exists());
     }
+    
+    @Test
+    public void verifyLandingPage() {
+        PageUrlExample page = new PageUrlExample(mockDriver());
+        PageUrl pageUrl = PageUrlExample.class.getAnnotation(PageUrl.class);
+        ComponentContainer.verifyLandingPage(page, PageUrlExample.class, pageUrl, targetUri);
+    }
 
     /**
      * Create mocked {@link WebElement} object.
@@ -216,4 +223,17 @@ public class ComponentContainerTest {
     
     @PageUrl(scheme="file", value="ExamplePage.html")
     static class FilePage{ }
+    
+    @PageUrl(pattern="sub-path\\.do|main\\.do", value="main.do", params={"one=foo|oof", "two=bare?", "deadbeef"})
+    static class PageUrlExample extends Page
+    {
+        public PageUrlExample(WebDriver driver) {
+            super(driver);
+        }
+        
+        @Override
+        public String getCurrentUrl() {
+            return targetUri.toString() + "sub-path.do?deadbeef&two=bar&one=foo";
+        }
+    }
 }

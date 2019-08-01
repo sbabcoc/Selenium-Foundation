@@ -82,7 +82,8 @@ public abstract class ComponentContainer
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
     private static final String ELEMENT_MESSAGE = "[element] must be non-null";
-    private static final int PARAM_BIT_COUNT = 2;
+    private static final int PARAM_NAME_ONLY = 1;
+    private static final int NAME_WITH_VALUE = 2;
     private static final String LOOPBACK = "http://127.0.0.1/";
     
     private final Logger logger;
@@ -723,72 +724,85 @@ public abstract class ComponentContainer
         Class<?> pageClass = getContainerClass(pageObj);
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
         if (pageUrl != null) {
-            String actual;
-            String expect;
-            
-            URI actualUri = URI.create(pageObj.getCurrentUrl());
             URI targetUri = SeleniumConfig.getConfig().getTargetUri();
-            String expectUrl = getPageUrl(pageUrl, targetUri);
-            URI expectUri = (expectUrl != null) ? URI.create(expectUrl) : null;
-            if (expectUri != null) {
-                actual = actualUri.getScheme();
-                expect = expectUri.getScheme();
-                if ( ! StringUtils.equals(actual, expect)) {
-                    throw new LandingPageMismatchException(pageClass, "scheme", actual, expect);
-                }
+            verifyLandingPage(pageObj, pageClass, pageUrl, targetUri);
+        }
+    }
+
+    /**
+     * <b>INTERNAL</b>: Verify actual landing page against elements of the {@link PageUrl} annotation of the specified
+     * page object.
+     * 
+     * @param pageObj page object whose landing page is to be verified
+     * @param pageClass class of the specified page object
+     * @param pageUrl {@link PageUrl} annotation for the indicate page class
+     * @param targetUri configured target URI
+     */
+    protected static final void verifyLandingPage(final Page pageObj, Class<?> pageClass, PageUrl pageUrl, URI targetUri) {
+        String actual;
+        String expect;
+        
+        URI actualUri = URI.create(pageObj.getCurrentUrl());
+        String expectUrl = getPageUrl(pageUrl, targetUri);
+        URI expectUri = (expectUrl != null) ? URI.create(expectUrl) : null;
+        if (expectUri != null) {
+            actual = actualUri.getScheme();
+            expect = expectUri.getScheme();
+            if ( ! StringUtils.equals(actual, expect)) {
+                throw new LandingPageMismatchException(pageClass, "scheme", actual, expect);
+            }
+            
+            actual = actualUri.getHost();
+            expect = expectUri.getHost();
+            if ( ! StringUtils.equals(actual, expect)) {
+                throw new LandingPageMismatchException(pageClass, "host", actual, expect);
+            }
+            
+            actual = actualUri.getUserInfo();
+            expect = expectUri.getUserInfo();
+            if ( ! StringUtils.equals(actual, expect)) {
+                throw new LandingPageMismatchException(pageClass, "user info", actual, expect);
+            }
+            
+            actual = Integer.toString(actualUri.getPort());
+            expect = Integer.toString(expectUri.getPort());
+            if ( ! StringUtils.equals(actual, expect)) {
+                throw new LandingPageMismatchException(pageClass, "port", actual, expect);
+            }
+        }
+        
+        String pattern = pageUrl.pattern();
+        if (!PLACEHOLDER.equals(pattern)) {
+            actual = actualUri.getPath();
+            String target = targetUri.getPath();
+            if (StringUtils.isNotBlank(target)) {
+                int actualLen = actual.length();
+                int targetLen = target.length();
                 
-                actual = actualUri.getHost();
-                expect = expectUri.getHost();
-                if ( ! StringUtils.equals(actual, expect)) {
-                    throw new LandingPageMismatchException(pageClass, "host", actual, expect);
-                }
-                
-                actual = actualUri.getUserInfo();
-                expect = expectUri.getUserInfo();
-                if ( ! StringUtils.equals(actual, expect)) {
-                    throw new LandingPageMismatchException(pageClass, "user info", actual, expect);
-                }
-                
-                actual = Integer.toString(actualUri.getPort());
-                expect = Integer.toString(expectUri.getPort());
-                if ( ! StringUtils.equals(actual, expect)) {
-                    throw new LandingPageMismatchException(pageClass, "port", actual, expect);
+                if ((actualLen > targetLen) && (actual.startsWith(target))) {
+                    actual = actual.substring(targetLen);
+                } else {
+                    throw new LandingPageMismatchException(pageClass, "base path", actual, target);
                 }
             }
             
-            String pattern = pageUrl.pattern();
-            if (!PLACEHOLDER.equals(pattern)) {
-                actual = actualUri.getPath();
-                String target = targetUri.getPath();
-                if (StringUtils.isNotBlank(target)) {
-                    int actualLen = actual.length();
-                    int targetLen = target.length();
-                    
-                    if ((actualLen > targetLen) && (actual.startsWith(target)) && (actual.charAt(targetLen) == '/')) {
-                        actual = actual.substring(targetLen + 1);
-                    } else {
-                        throw new LandingPageMismatchException(pageClass, "base path", actual, target);
-                    }
-                }
-                
-                if ( ! actual.matches(pattern)) {
-                    throw new LandingPageMismatchException(pageClass, pageObj.getCurrentUrl());
-                }
-            } else if (expectUri != null) {
-                actual = actualUri.getPath();
-                expect = expectUri.getPath();
-                if ( ! StringUtils.equals(actual, expect)) {
-                    throw new LandingPageMismatchException(pageClass, "path", actual, expect);
-                }
+            if ( ! actual.matches(pattern)) {
+                throw new LandingPageMismatchException(pageClass, pageObj.getCurrentUrl());
             }
-            
-            List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
-            
-            for (NameValuePair expectPair : getExpectedParams(pageUrl, expectUri)) {
-                if (!hasExpectedParam(actualParams, expectPair)) {
-                    throw new LandingPageMismatchException(
-                                    pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
-                }
+        } else if (expectUri != null) {
+            actual = actualUri.getPath();
+            expect = expectUri.getPath();
+            if ( ! StringUtils.equals(actual, expect)) {
+                throw new LandingPageMismatchException(pageClass, "path", actual, expect);
+            }
+        }
+        
+        List<NameValuePair> actualParams = URLEncodedUtils.parse(actualUri, "UTF-8");
+        
+        for (NameValuePair expectPair : getExpectedParams(pageUrl, expectUri)) {
+            if (!hasExpectedParam(actualParams, expectPair)) {
+                throw new LandingPageMismatchException(
+                                pageClass, "query parameter", actualUri.getQuery(), expectPair.toString());
             }
         }
     }
@@ -830,14 +844,21 @@ public abstract class ComponentContainer
         String[] params = pageUrl.params();
         if (params.length > 0) {
             for (String param : params) {
+                String name = null;
+                String value = null;
                 String[] nameValueBits = param.split("=");
-                if (nameValueBits.length == PARAM_BIT_COUNT) {
-                    String name = nameValueBits[0].trim();
-                    String value = nameValueBits[1].trim();
-                    expectParams.add(new BasicNameValuePair(name, value));
-                } else {
-                    throw new IllegalArgumentException("Format of PageUrl parameter '" + param
-                            + "' does not conform to template [name]=[pattern]");
+                switch (nameValueBits.length) {
+                    case NAME_WITH_VALUE:
+                        value = nameValueBits[1].trim();
+                        
+                    case PARAM_NAME_ONLY:
+                        name = nameValueBits[0].trim();
+                        expectParams.add(new BasicNameValuePair(name, value));
+                        break;
+                        
+                    default:
+                        throw new IllegalArgumentException("Format of PageUrl parameter '" + param
+                            + "' does not conform to template [name] or [name]=[pattern]");
                 }
             }
         } else if (expectUri != null) {
@@ -857,9 +878,18 @@ public abstract class ComponentContainer
         Iterator<NameValuePair> iterator = actualParams.iterator();
         while (iterator.hasNext()) {
             NameValuePair actualPair = iterator.next();
-            if ((actualPair.getName().equals(expectPair.getName())) && 
-                (actualPair.getValue().matches(expectPair.getValue())))
-            {
+            if ( ! actualPair.getName().equals(expectPair.getName())) {
+                continue;
+            }
+            
+            String actualValue = actualPair.getValue();
+            String expectValue = expectPair.getValue();
+            
+            if ((actualValue == null) ^ (expectValue == null)) {
+                continue;
+            }
+            
+            if ((actualValue == null) || (actualValue.matches(expectValue))) {
                 iterator.remove();
                 return true;
             }
