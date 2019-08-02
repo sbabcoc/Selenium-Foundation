@@ -175,7 +175,7 @@ public class Page extends ComponentContainer {
         }
         
         driver.get(url);
-        return newContainer((Class<T>) initialPage.value(), ARG_TYPES_1, new Object[] {driver});
+        return newPage((Class<T>) initialPage.value(), driver);
     }
     
     /**
@@ -268,6 +268,18 @@ public class Page extends ComponentContainer {
         ((Page) enhanced).setWindowHandle(((Page) container).getWindowHandle());
         ((Page) enhanced).setSpawningPage(((Page) container).getSpawningPage());
         return enhanced;
+    }
+    
+    /**
+     * Instantiate a new page object of the specified type.
+     * 
+     * @param <T> page class
+     * @param pageType page class
+     * @param driver driver object
+     * @return new page object of the specified type
+     */
+    public static <T extends Page> T newPage(Class<T> pageType, WebDriver driver) {
+        return newContainer(pageType, ARG_TYPES_1, driver);
     }
     
     /**
