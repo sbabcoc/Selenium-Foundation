@@ -563,7 +563,7 @@ public abstract class ComponentContainer
         Objects.requireNonNull(pageClass, "[pageClass] must be non-null");
         Objects.requireNonNull(url, "[url] must be non-null");
         
-        T pageObj = newContainer(pageClass, new Class<?>[] {WebDriver.class}, new Object[] {driver});
+        T pageObj = Page.newPage(pageClass, driver);
         if (newWindow) {
             pageObj.setWindowState(WindowState.WILL_OPEN);
             WebDriverUtils.getExecutor(driver).executeScript("window.open('" + url + "','_blank');");
@@ -954,8 +954,8 @@ public abstract class ComponentContainer
      * @param arguments array of constructor argument values
      * @return new container of the specified type
      */
-    static <T extends ComponentContainer> T newContainer(
-                    final Class<T> containerType, final Class<?>[] argumentTypes, final Object[] arguments) {
+    public static <T extends ComponentContainer> T newContainer(
+                    final Class<T> containerType, final Class<?>[] argumentTypes, final Object... arguments) {
         try {
             Constructor<T> ctor = containerType.getConstructor(argumentTypes);
             return ctor.newInstance(arguments);
