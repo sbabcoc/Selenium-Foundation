@@ -17,15 +17,33 @@ public class TransitionErrorException extends IllegalStateException {
     private final String errorMessage;
     private static final long serialVersionUID = -2969607575378647073L;
 
+    /**
+     * Constructor for {@code transition error} exception.
+     * 
+     * @param container search context in which the error was detected
+     * @param errorMessage error message
+     */
     public TransitionErrorException(ComponentContainer container, String errorMessage) {
         super(buildMessage(container, errorMessage));
         this.errorMessage = errorMessage;
     }
     
+    /**
+     * Get message for this transition error.
+     * 
+     * @return transition error message
+     */
     public String getErrorMessage() {
         return errorMessage;
     }
 
+    /**
+     * Build the message for this transition error exception.
+     * 
+     * @param container search context in which the error was detected
+     * @param errorMessage error message
+     * @return transition error exception message
+     */
     private static String buildMessage(ComponentContainer container, String message) {
         StringBuilder builder = new StringBuilder("Transition error detected: ").append(message);
         builder.append("\nContainer: ").append(Enhanceable.getContainerClass(container).getName());
