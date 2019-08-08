@@ -44,8 +44,8 @@ public class TransitionErrorException extends IllegalStateException {
      * @param errorMessage error message
      * @return transition error exception message
      */
-    private static String buildMessage(ComponentContainer container, String message) {
-        StringBuilder builder = new StringBuilder("Transition error detected: ").append(message);
+    private static String buildMessage(ComponentContainer container, String errorMessage) {
+        StringBuilder builder = new StringBuilder("Transition error detected: ").append(errorMessage);
         builder.append("\nContainer: ").append(Enhanceable.getContainerClass(container).getName());
         WebDriver driver = container.getWrappedDriver();
         if (driver != null) {
