@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import org.openqa.selenium.By;
@@ -14,7 +15,9 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.PageLoadRendererTimeoutException;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
+import com.nordstrom.automation.selenium.exceptions.TransitionErrorException;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
+import com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.Coordinators;
@@ -65,6 +68,8 @@ public enum ContainerMethodInterceptor {
     };
     
     private static final ThreadLocal<ComponentContainer> TARGET = new InheritableThreadLocal<>();
+    private static final ServiceLoader<TransitionErrorDetector> errorDetectorLoader =
+                    ServiceLoader.load(TransitionErrorDetector.class);
     
     private static final String RENDERER_TIMEOUT_MESSAGE = "receiving message from renderer";
 
@@ -165,9 +170,9 @@ public enum ContainerMethodInterceptor {
                 if (detectsCompletion) {
                     ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD)
                                     .ignoring(PageNotLoadedException.class)
-                                    .until(pageLoadIsComplete());
+                                    .until(loadIsComplete());
                 } else if (reference != null) {
-                    WaitType.PAGE_LOAD.getWait(driver).until(Coordinators.stalenessOf(reference));
+                    WaitType.PAGE_LOAD.getWait(driver).until(loadIsComplete(reference));
                 }
             }
             
@@ -237,27 +242,69 @@ public enum ContainerMethodInterceptor {
     }
     
     /**
-     * Returns a 'wait' proxy that determines if the page has finished loading.
+     * Returns a 'wait' proxy that determines if the container has finished loading.
      * 
-     * @return 'true' if the page has finished loading; otherwise 'false'
+     * @return 'true' if the container has finished loading; otherwise 'false'
      */
-    public static Coordinator<Boolean> pageLoadIsComplete() {
+    public static Coordinator<Boolean> loadIsComplete() {
         return new Coordinator<Boolean>() {
 
             @Override
             public Boolean apply(final SearchContext context) {
-                if (context instanceof DetectsLoadCompletion) {
-                    return Boolean.valueOf(((DetectsLoadCompletion) context).isLoadComplete());
-                }
-                throw new IllegalArgumentException(String.format("Search context type '%s' doesn't implement the "
-                                + "DetectsLoadCompletion interface", context.getClass().getName()));
+                scanForErrors(context);
+                return Boolean.valueOf(((DetectsLoadCompletion) context).isLoadComplete());
             }
             
             @Override
             public String toString() {
-                return "page to finish loading";
+                return "container to finish loading";
             }
         };
+    }
+    
+    /**
+     * Returns a 'wait' proxy that determines if the container has finished loading.
+     * 
+     * @param element the element to wait for
+     * @return 'true' if the container has finished loading; otherwise 'false'
+     */
+    public static Coordinator<Boolean> loadIsComplete(final WebElement element) {
+        return new Coordinator<Boolean>() {
+            
+            private final Coordinator<Boolean> stalenessOfElement = Coordinators.stalenessOf(element);
+
+            @Override
+            public Boolean apply(final SearchContext context) {
+                scanForErrors(context);
+                return stalenessOfElement.apply(null);
+            }
+            
+            @Override
+            public String toString() {
+                return "container to finish loading";
+            }
+        };
+    }
+    
+    /**
+     * Notify registered {@link TransitionErrorDetector} service providers to perform a scan for errors.
+     * <p>
+     * <b>NOTE</b>: The error scan is only performed if the specified search context is a {@link ComponentContainer}.
+     * 
+     * @param context search context to scan for errors
+     */
+    private static void scanForErrors(SearchContext context) {
+        if (context instanceof ComponentContainer) {
+            synchronized(errorDetectorLoader) {
+                for (TransitionErrorDetector detector : errorDetectorLoader) {
+                    String message = detector.scanForErrors((ComponentContainer) context);
+                    if (message != null) {
+                        throw new TransitionErrorException((ComponentContainer) context, message);
+                    }
+                }
+            }
+        }
+        
     }
     
 }
