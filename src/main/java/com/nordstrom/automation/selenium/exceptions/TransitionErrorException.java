@@ -20,11 +20,11 @@ public class TransitionErrorException extends IllegalStateException {
     /**
      * Constructor for {@code transition error} exception.
      * 
-     * @param container search context in which the error was detected
+     * @param context container context in which the error was detected
      * @param errorMessage error message
      */
-    public TransitionErrorException(ComponentContainer container, String errorMessage) {
-        super(buildMessage(container, errorMessage));
+    public TransitionErrorException(ComponentContainer context, String errorMessage) {
+        super(buildMessage(context, errorMessage));
         this.errorMessage = errorMessage;
     }
     
@@ -40,14 +40,14 @@ public class TransitionErrorException extends IllegalStateException {
     /**
      * Build the message for this transition error exception.
      * 
-     * @param container search context in which the error was detected
+     * @param context container context in which the error was detected
      * @param errorMessage error message
      * @return transition error exception message
      */
-    private static String buildMessage(ComponentContainer container, String errorMessage) {
+    private static String buildMessage(ComponentContainer context, String errorMessage) {
         StringBuilder builder = new StringBuilder("Transition error detected: ").append(errorMessage);
-        builder.append("\nContainer: ").append(Enhanceable.getContainerClass(container).getName());
-        WebDriver driver = container.getWrappedDriver();
+        builder.append("\nContainer: ").append(Enhanceable.getContainerClass(context).getName());
+        WebDriver driver = context.getWrappedDriver();
         if (driver != null) {
             String pageUrl = driver.getCurrentUrl();
             if (pageUrl != null) {
