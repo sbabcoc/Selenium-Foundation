@@ -51,7 +51,7 @@ public abstract class TestBase {
      * 
      * @param driver driver for the current test; 'null' to discard driver
      */
-    public abstract <T extends WebDriver> void setDriver(T driver);
+    public abstract void setDriver(WebDriver driver);
     
     /**
      * Prepare the specified page object for use:
@@ -110,7 +110,7 @@ public abstract class TestBase {
      * 
      * @param pageObj initial page for the current test
      */
-    public abstract <T extends Page> void setInitialPage(T pageObj);
+    public abstract void setInitialPage(Page pageObj);
     
     /**
      * Get test run output directory.
