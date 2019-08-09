@@ -177,7 +177,7 @@ public final class DriverManager {
      * @param obj test class instance
      * @return (optional) driver from the specified test result
      */
-    public static Optional<WebDriver> nabDriver(final Object obj) {
+    public static <T extends WebDriver> Optional<T> nabDriver(final Object obj) {
         if (obj instanceof TestBase) {
             return ((TestBase) obj).nabDriver();
         } else {
@@ -217,8 +217,8 @@ public final class DriverManager {
      * @param obj test class instance
      * @return an empty {@link Optional} object
      */
-    public static Optional<WebDriver> closeDriver(final Object obj) {
-        Optional<WebDriver> optDriver = nabDriver(obj);
+    public static <T extends WebDriver> Optional<T> closeDriver(final Object obj) {
+        Optional<T> optDriver = nabDriver(obj);
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             

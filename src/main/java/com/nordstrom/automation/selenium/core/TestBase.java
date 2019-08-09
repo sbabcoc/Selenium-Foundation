@@ -20,8 +20,8 @@ public abstract class TestBase {
      * @return driver for the current test
      * @throws DriverNotAvailableException No driver was found in the current test context
      */
-    public WebDriver getDriver() {
-        Optional<WebDriver> optDriver = nabDriver();
+    public <T extends WebDriver> T getDriver() {
+        Optional<T> optDriver = nabDriver();
         if (optDriver.isPresent()) {
             return optDriver.get();
         }
@@ -44,7 +44,7 @@ public abstract class TestBase {
      * 
      * @return (optional) driver for the current test
      */
-    public abstract Optional<WebDriver> nabDriver();
+    public abstract <T extends WebDriver> Optional<T> nabDriver();
     
     /**
      * Set the driver for the current test.
@@ -64,7 +64,7 @@ public abstract class TestBase {
      * @param pageObj page object to be prepared
      * @return prepared page object
      */
-    public Page prepInitialPage(Page pageObj) {
+    public <T extends Page> T prepInitialPage(final T pageObj) {
         if (pageObj.getWindowHandle() == null) {
             pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
         }
@@ -79,8 +79,8 @@ public abstract class TestBase {
      * @return initial page for the current test
      * @throws InitialPageNotSpecifiedException No initial page has been specified
      */
-    public Page getInitialPage() {
-        Optional<Page> optInitialPage = nabInitialPage();
+    public <T extends Page> T getInitialPage() {
+        Optional<T> optInitialPage = nabInitialPage();
         if (optInitialPage.isPresent()) {
             return optInitialPage.get();
         }
@@ -103,7 +103,7 @@ public abstract class TestBase {
      * 
      * @return (optional) initial page for the current test
      */
-    public abstract Optional<Page> nabInitialPage();
+    public abstract <T extends Page> Optional<T> nabInitialPage();
     
     /**
      * Set the initial page for the current test.
