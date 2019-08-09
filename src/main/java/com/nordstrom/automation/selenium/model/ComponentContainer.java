@@ -685,6 +685,7 @@ public abstract class ComponentContainer
              */
             @Override
             public Boolean apply(final SearchContext context) {
+                ContainerMethodInterceptor.scanForErrors(context);
                 verifyLandingPage((Page) context);
                 return Boolean.TRUE;
             }
