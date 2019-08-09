@@ -172,7 +172,7 @@ public enum ContainerMethodInterceptor {
                                     .ignoring(PageNotLoadedException.class)
                                     .until(loadIsComplete());
                 } else if (reference != null) {
-                    WaitType.PAGE_LOAD.getWait(driver).until(loadIsComplete(reference));
+                    WaitType.PAGE_LOAD.getWait((ComponentContainer) result).until(loadIsComplete(reference));
                 }
             }
             
@@ -293,7 +293,7 @@ public enum ContainerMethodInterceptor {
      * 
      * @param context search context to scan for errors
      */
-    private static void scanForErrors(SearchContext context) {
+    static void scanForErrors(SearchContext context) {
         if (context instanceof ComponentContainer) {
             synchronized(errorDetectorLoader) {
                 for (TransitionErrorDetector detector : errorDetectorLoader) {
