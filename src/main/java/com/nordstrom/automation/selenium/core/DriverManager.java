@@ -174,6 +174,7 @@ public final class DriverManager {
     /**
      * If present, get the driver for the specified test class instance.
      * 
+     * @param <T> type of driver object
      * @param obj test class instance
      * @return (optional) driver from the specified test result
      */
@@ -214,6 +215,7 @@ public final class DriverManager {
     /**
      * Close the Selenium driver attached to the specified test class instance.
      * 
+     * @param <T> type of driver object
      * @param obj test class instance
      * @return an empty {@link Optional} object
      */
