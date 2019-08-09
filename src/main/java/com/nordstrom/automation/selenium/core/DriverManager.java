@@ -174,11 +174,10 @@ public final class DriverManager {
     /**
      * If present, get the driver for the specified test class instance.
      * 
-     * @param <T> type of driver object
      * @param obj test class instance
      * @return (optional) driver from the specified test result
      */
-    public static <T extends WebDriver> Optional<T> nabDriver(final Object obj) {
+    public static Optional<WebDriver> nabDriver(final Object obj) {
         if (obj instanceof TestBase) {
             return ((TestBase) obj).nabDriver();
         } else {
@@ -215,12 +214,11 @@ public final class DriverManager {
     /**
      * Close the Selenium driver attached to the specified test class instance.
      * 
-     * @param <T> type of driver object
      * @param obj test class instance
      * @return an empty {@link Optional} object
      */
-    public static <T extends WebDriver> Optional<T> closeDriver(final Object obj) {
-        Optional<T> optDriver = nabDriver(obj);
+    public static Optional<WebDriver> closeDriver(final Object obj) {
+        Optional<WebDriver> optDriver = nabDriver(obj);
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             

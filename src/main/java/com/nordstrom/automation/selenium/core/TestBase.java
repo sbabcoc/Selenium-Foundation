@@ -17,12 +17,11 @@ public abstract class TestBase {
     /**
      * Get the driver for the current test.
      * 
-     * @param <T> type of driver object
      * @return driver for the current test
      * @throws DriverNotAvailableException No driver was found in the current test context
      */
-    public <T extends WebDriver> T getDriver() {
-        Optional<T> optDriver = nabDriver();
+    public WebDriver getDriver() {
+        Optional<WebDriver> optDriver = nabDriver();
         if (optDriver.isPresent()) {
             return optDriver.get();
         }
@@ -43,10 +42,9 @@ public abstract class TestBase {
      * <b>NOTE</b>: It's uncommon that you'll need to access this {@link Optional} value directly. You'll typically
      * use the {@link #getDriver} and {@link #hasDriver} methods instead.
      * 
-     * @param <T> type of driver object
      * @return (optional) driver for the current test
      */
-    public abstract <T extends WebDriver> Optional<T> nabDriver();
+    public abstract Optional<WebDriver> nabDriver();
     
     /**
      * Set the driver for the current test.
@@ -63,11 +61,10 @@ public abstract class TestBase {
      *     <li>Return an enhanced instance of the page object.</li>
      * </ul>
      * 
-     * @param <T> type of page object
      * @param pageObj page object to be prepared
      * @return prepared page object
      */
-    public <T extends Page> T prepInitialPage(final T pageObj) {
+    public Page prepInitialPage(Page pageObj) {
         if (pageObj.getWindowHandle() == null) {
             pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
         }
@@ -79,12 +76,11 @@ public abstract class TestBase {
     /**
      * Get the initial page for the current test.
      * 
-     * @param <T> type of page object
      * @return initial page for the current test
      * @throws InitialPageNotSpecifiedException No initial page has been specified
      */
-    public <T extends Page> T getInitialPage() {
-        Optional<T> optInitialPage = nabInitialPage();
+    public Page getInitialPage() {
+        Optional<Page> optInitialPage = nabInitialPage();
         if (optInitialPage.isPresent()) {
             return optInitialPage.get();
         }
@@ -105,10 +101,9 @@ public abstract class TestBase {
      * <b>NOTE</b>: It's uncommon that you'll need to access this {@link Optional} value directly. You'll typically
      * use the {@link #getInitialPage} and {@link #hasInitialPage} methods instead.
      * 
-     * @param <T> type of page object
      * @return (optional) initial page for the current test
      */
-    public abstract <T extends Page> Optional<T> nabInitialPage();
+    public abstract Optional<Page> nabInitialPage();
     
     /**
      * Set the initial page for the current test.
