@@ -19,8 +19,7 @@ public class PhantomJsCaps {
     private static final String[] PROPERTY_NAMES = {
                     "phantomjs.binary.path",
                     "phantomjs.ghostdriver.path",
-                    "phantomjs.cli.args",
-                    "phantomjs.ghostdriver.cli.args"};
+                    "phantomjs.logfile.path"};
     
     private static final Map<String, String> PERSONALITIES;
     
