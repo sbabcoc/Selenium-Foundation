@@ -107,8 +107,13 @@ public final class PageSourceUtils {
         }
         
         URI uri = URI.create(driver.getCurrentUrl());
-        
         String path = uri.getPath();
+        
+        // if path missing
+        if (path == null) {
+            return sourceBuilder;
+        }
+        
         int endIndex = path.lastIndexOf('/') + 1;
         String root = path.substring(0, endIndex);
         
