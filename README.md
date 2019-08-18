@@ -110,7 +110,7 @@ To assist in root-cause analysis, **Selenium Foundation** automatically captures
 
 ## TESTNG REQUIRED ELEMENTS
 
-There are several required elements that must be included in every TestNG test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [TestNgBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/support/TestNgBase.java) class as a starter. This class includes all of the required elements outlined below, and adds the [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/ScreenshotCapture.java) listener.
+There are several required elements that must be included in every TestNG test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [TestNgBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/support/TestNgBase.java) class as a starter. This class includes all of the required elements outlined below, and adds the [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/ScreenshotCapture.java) and [PageSourceCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/PageSourceCapture.java) listeners.
 
 **TestNgBase** is an abstract class that implements the [TestBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/core/TestBase.java) interface, which provides a common abstraction for both TestNG and JUnit 4 tests.
 
@@ -231,7 +231,7 @@ Here are the official homes for several of the major drivers:
 
 # JUNIT 4 SUPPORT
 
-In addition to the TestNG support documented above, **Selenium Foundation** also includes support for **JUnit 4**. This support is built upon **JUnit Foundation**, which provides the framework for method interception (used for driver management), artifact capture (used to acquire screenshots), and automatic retry of failed tests.
+In addition to the TestNG support documented above, **Selenium Foundation** also includes support for **JUnit 4**. This support is built upon **JUnit Foundation**, which provides the framework for method interception (used for driver management), artifact capture (used to acquire screenshots and page source), and automatic retry of failed tests.
 
 ## JUnit 4 Required Elements
 
@@ -324,7 +324,7 @@ The **JUnitBase** class demonstrates several features of the **Selenium Foundati
 * **`TestBase.optionalOf(Object)`**:  
 This static utility method wraps the specified object in an [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
 * **`RuleChainWalker.getAttachedRule(RuleChain, Class<T extends TestRule>)`**:  
-This static utility method gets reference to an instance of the specified test rule type on the supplied rule chain. In **JUnitBase**, this is use to acquire a reference to the **ScreenshotCapture** watcher for capturing on-demand screenshot artifacts.
+This static utility method gets reference to an instance of the specified test rule type on the supplied rule chain. In **JUnitBase**, this is used to acquire a reference to the **ScreenshotCapture** watcher for capturing on-demand screenshot artifacts.
 * **`ScreenshotCapture.getDescription()`**:  
 This instance method of **ScreenshotCapture** enables test code to acquire the [Description](http://junit.org/junit4/javadoc/latest/org/junit/runner/Description.html) object for the current JUnit 4 test method. This object can be interrogated for many useful propeties of the test method, including method name, attached annotations, and containing class.
 
