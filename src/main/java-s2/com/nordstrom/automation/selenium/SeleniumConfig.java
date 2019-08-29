@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -204,12 +203,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
         String nodeConfigPath = getNodeConfigPath().toString();
-        String[] configPathBits = nodeConfigPath.split("\\.");
+        String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
         String hashCode = String.format("%08X", capabilities.hashCode());
-        Path filePath = Paths.get(configPathBits[0] + "-" + hashCode + "." + configPathBits[1]);
-        if (filePath.toFile().exists()) {
-            Files.delete(filePath);
-        }
+        Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         if (filePath.toFile().createNewFile()) {
             String input = JSON_HEAD + capabilities + JSON_TAIL;
             List<DesiredCapabilities> capabilitiesList = RegistrationRequest.getNewInstance(input).getCapabilities();

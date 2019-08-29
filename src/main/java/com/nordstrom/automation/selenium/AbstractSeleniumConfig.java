@@ -497,12 +497,12 @@ public abstract class AbstractSeleniumConfig extends
     /**
      * Create node configuration file from the specified JSON string, to be registered with the indicated hub.
      * 
-     * @param jsonStr node configuration as JSON string
+     * @param capabilities node configuration as JSON string
      * @param hubUrl URL of hub host with which to register
      * @return {@link Path} object for the created (or previously existing) configuration file
      * @throws IOException on failure to create configuration file
      */
-    public abstract Path createNodeConfig(String jsonStr, URL hubUrl) throws IOException;
+    public abstract Path createNodeConfig(String capabilities, URL hubUrl) throws IOException;
     
     /**
      * {@inheritDoc}
