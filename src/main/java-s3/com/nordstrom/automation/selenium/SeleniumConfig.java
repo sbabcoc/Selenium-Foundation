@@ -144,7 +144,15 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;groupId&gt;com.squareup.okio&lt;/groupId&gt;
      *  &lt;artifactId&gt;okio&lt;/artifactId&gt;
      *  &lt;version&gt;1.14.0&lt;/version&gt;
-     *&lt;/dependency&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>ch.qos.logback.classic.spi.ThrowableProxy</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;
+     *  &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;
+     *  &lt;version&gt;1.2.3&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     GRID_LAUNCHER,
@@ -155,7 +163,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     "org.seleniumhq.jetty9.util.thread.ThreadPool",
                     "javax.servlet.Servlet",
                     "okhttp3.ConnectionPool",
-                    "okio.BufferedSource"
+                    "okio.BufferedSource",
+                    "ch.qos.logback.classic.spi.ThrowableProxy"
                     };
     
     static {

@@ -138,17 +138,30 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;artifactId&gt;selenium-support&lt;/artifactId&gt;
      *  &lt;version&gt;2.53.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
+     * 
+     * <b>ch.qos.logback.classic.spi.ThrowableProxy</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;
+     *  &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;
+     *  &lt;version&gt;1.2.3&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
      */
-    private static final String[] DEPENDENCY_CONTEXTS = {GRID_LAUNCHER,
+    private static final String[] DEPENDENCY_CONTEXTS = {
+                    GRID_LAUNCHER,
                     "com.google.common.util.concurrent.SimpleTimeLimiter",
                     "com.google.gson.JsonIOException",
                     "org.openqa.selenium.remote.JsonToBeanConverter",
-                    "org.openqa.selenium.WebDriverException", "org.seleniumhq.jetty9.util.Jetty",
+                    "org.openqa.selenium.WebDriverException",
+                    "org.seleniumhq.jetty9.util.Jetty",
                     "org.apache.http.conn.HttpClientConnectionManager",
                     "org.apache.http.config.RegistryBuilder",
-                    "org.apache.commons.logging.LogFactory", "javax.servlet.http.HttpServlet",
+                    "org.apache.commons.logging.LogFactory",
+                    "javax.servlet.http.HttpServlet",
                     "org.openqa.jetty.util.MultiException",
-                    "org.openqa.selenium.support.events.WebDriverEventListener"};
+                    "org.openqa.selenium.support.events.WebDriverEventListener",
+                    "ch.qos.logback.classic.spi.ThrowableProxy"
+                    };
     
     static {
         try {
