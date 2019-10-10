@@ -260,7 +260,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         for (String name : propertyNames) {
             String value = System.getProperty(name);
             if (value != null) {
-                argsList.add(0, "-D" + name + "=\"" + value + "\"");
+                argsList.add(0, "-D" + name + "=" + value);
             }
         }
         

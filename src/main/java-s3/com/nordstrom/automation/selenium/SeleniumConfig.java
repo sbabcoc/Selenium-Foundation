@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
@@ -221,7 +222,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
         String nodeConfigPath = getNodeConfigPath().toString();
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        String hashCode = String.format("%08X", capabilities.hashCode());
+        String hashCode = String.format("%08X", Objects.hash(capabilities, hubUrl));
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         if (filePath.toFile().createNewFile()) {
             JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
