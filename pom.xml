@@ -37,20 +37,19 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>1.9.1</java-utils.version>
+    <java-utils.version>1.9.3</java-utils.version>
     <toolchains-plugin.version>1.1</toolchains-plugin.version>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
-    <source-plugin.version>3.0.1</source-plugin.version>
-    <javadoc-plugin.version>3.0.1</javadoc-plugin.version>
-    <settings.version>2.3.1</settings.version>
-    <testng-foundation.version>1.13.2</testng-foundation.version>
-    <junit-foundation.version>11.0.1</junit-foundation.version>
+    <source-plugin.version>3.2.0</source-plugin.version>
+    <javadoc-plugin.version>3.1.1</javadoc-plugin.version>
+    <settings.version>2.3.3</settings.version>
+    <testng-foundation.version>1.13.3</testng-foundation.version>
+    <junit-foundation.version>11.0.2</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
-    <logback-testng.version>1.1.1</logback-testng.version>
+    <logback-testng.version>1.2.0</logback-testng.version>
     <sonar.language>java</sonar.language>
-    <jacoco.version>0.8.2</jacoco.version>
-    <mockito.version>1.10.19</mockito.version>
-    <jsoup.version>1.11.3</jsoup.version>
+    <jacoco.version>0.8.5</jacoco.version>
+    <jsoup.version>1.12.1</jsoup.version>
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
     <dependency-plugin.version>3.1.1</dependency-plugin.version>
     <clean-plugin.version>3.1.0</clean-plugin.version>
@@ -100,11 +99,6 @@
         <artifactId>jsoup</artifactId>
         <version>${jsoup.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>${mockito.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -136,11 +130,6 @@
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   
   <profiles>
@@ -156,9 +145,10 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <selenium.version>2.53.1</selenium.version>
-        <guava.version>19.0</guava.version>
+        <guava.version>28.1-android</guava.version>
         <commons-io.version>2.4</commons-io.version>
         <htmlunit.version>2.21</htmlunit.version>
+        <mockito.version>2.25.0</mockito.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -192,6 +182,11 @@
             <artifactId>htmlunit-driver</artifactId>
             <version>${htmlunit.version}</version>
           </dependency>
+          <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
@@ -220,6 +215,11 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>htmlunit-driver</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -270,10 +270,11 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <selenium.version>3.141.59</selenium.version>
-        <guava.version>25.0-jre</guava.version>
+        <guava.version>28.1-jre</guava.version>
         <htmlunit.version>2.33.3</htmlunit.version>
-        <jcommander.version>1.72</jcommander.version>
+        <jcommander.version>1.78</jcommander.version>
         <commons-io.version>2.6</commons-io.version>
+        <mockito.version>3.1.0</mockito.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -301,6 +302,11 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>${jcommander.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -354,6 +360,11 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>htmlunit-driver</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+          <scope>test</scope>
         </dependency>
       </dependencies>
       <build>
