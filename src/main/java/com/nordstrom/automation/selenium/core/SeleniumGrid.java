@@ -319,7 +319,6 @@ public class SeleniumGrid {
             if (GridUtility.isHostActive(serverUrl, statusRequest)) {
                 try {
                     GridUtility.getHttpResponse(serverUrl, shutdownRequest);
-                    
                     waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
                     Thread.sleep(1000);
                 } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
