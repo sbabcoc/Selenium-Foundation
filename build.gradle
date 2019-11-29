@@ -1,8 +1,8 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-  id 'io.codearte.nexus-staging' version '0.11.0'
-  id 'net.researchgate.release' version '2.7.0'
+  id 'io.codearte.nexus-staging' version '0.21.1'
+  id 'net.researchgate.release' version '2.8.1'
 }
 
 apply plugin: 'java'
@@ -97,7 +97,7 @@ clean {
 }
 
 jacoco {
-  toolVersion = '0.7.9'
+  toolVersion = '0.8.5'
   reportsDir = file("${buildDir}/customJacocoReportDir")
 }
 
@@ -261,18 +261,17 @@ repositories {
 }
 
 dependencies {
-  compile 'com.nordstrom.tools:java-utils:1.9.1'
-  compile 'com.nordstrom.tools:settings:2.3.1'
-  compile 'com.nordstrom.tools:testng-foundation:1.13.2'
-  compile 'com.nordstrom.tools:junit-foundation:11.0.1'
+  compile 'com.nordstrom.tools:java-utils:1.9.3'
+  compile 'com.nordstrom.tools:settings:2.3.3'
+  compile 'com.nordstrom.tools:testng-foundation:1.13.3'
+  compile 'com.nordstrom.tools:junit-foundation:11.0.2'
   compile 'ch.qos.logback:logback-classic:1.2.3'
-  compile 'com.github.sbabcoc:logback-testng:1.1.1'
-  compile 'org.jsoup:jsoup:1.11.3'
+  compile 'com.github.sbabcoc:logback-testng:1.2.0'
+  compile 'org.jsoup:jsoup:1.12.1'
   
   apply from: "${profile}Deps.gradle"
   
   testCompile configurations["${profile}Compile"]
-  testCompile 'org.mockito:mockito-all:1.10.19'
 }
 ext {
     junitFoundation = configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.name == 'junit-foundation' }
