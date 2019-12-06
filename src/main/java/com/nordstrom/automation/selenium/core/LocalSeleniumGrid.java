@@ -325,17 +325,26 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         Set<String> agentList = new HashSet<>();
         Set<String> pathList = new HashSet<>();
         for (String contextClassName : dependencyContexts) {
+            // get JAR path for this dependency context
             String jarPath = findJarPathFor(contextClassName);
+            // if this context names the preMain class of a Java agent
             if (contextClassName.equals(getJarPremainClass(jarPath))) {
+                // collect agent path
                 agentList.add(jarPath);
+            // otherwise
             } else {
+                // collect class path
                 pathList.add(jarPath);
             }
         }
+        // assemble classpath string
         String classPath = Joiner.on(File.pathSeparator).join(pathList);
+        // if no agents were found
         if (agentList.isEmpty()) {
+            // classpath only
             return classPath;
         } else {
+            // classpath plus tab-delimited list of agent paths 
             return classPath + "\n" + Joiner.on("\t").join(agentList);
         }
     }
