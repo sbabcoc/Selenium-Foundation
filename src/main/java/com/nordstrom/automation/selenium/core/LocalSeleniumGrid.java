@@ -314,7 +314,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * string returned by this method will contain two records delimited by a {@code newline} character:
      * 
      * <ul>
-     *     <li>0 - assembled classlath string</li>
+     *     <li>0 - assembled classpath string</li>
      *     <li>1 - tab-delimited list of Java agent paths</li>
      * </ul>
      * 
