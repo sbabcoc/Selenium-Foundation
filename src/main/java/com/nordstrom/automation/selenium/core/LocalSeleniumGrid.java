@@ -310,7 +310,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     /**
      * Assemble a classpath string from the specified array of dependencies.
      * <p>
-     * <b>NOTE</b>: If any of the specified dependency contexts names the {@code preMain} class of a Java agent, the
+     * <b>NOTE</b>: If any of the specified dependency contexts names the {@code premain} class of a Java agent, the
      * string returned by this method will contain two records delimited by a {@code newline} character:
      * 
      * <ul>
@@ -327,7 +327,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         for (String contextClassName : dependencyContexts) {
             // get JAR path for this dependency context
             String jarPath = findJarPathFor(contextClassName);
-            // if this context names the preMain class of a Java agent
+            // if this context names the premain class of a Java agent
             if (contextClassName.equals(getJarPremainClass(jarPath))) {
                 // collect agent path
                 agentList.add(jarPath);
