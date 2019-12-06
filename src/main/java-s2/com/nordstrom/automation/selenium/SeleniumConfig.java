@@ -150,6 +150,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     GRID_LAUNCHER,
+                    "com.nordstrom.tools.GuavaAgent",           // guava-agent
+                    "net.bytebuddy.matcher.ElementMatcher",     // guava-agent
                     "com.google.common.util.concurrent.SimpleTimeLimiter",
                     "com.google.gson.JsonIOException",
                     "org.openqa.selenium.remote.JsonToBeanConverter",

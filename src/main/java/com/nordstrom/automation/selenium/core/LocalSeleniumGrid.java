@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.web.servlet.LifecycleServlet;
@@ -264,8 +267,23 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
         }
         
+        // get assembled classpath string
+        String classPath = getClasspath(dependencyContexts);
+        // split on Java agent list separator
+        String[] pathBits = classPath.split("\n");
+        // if agent(s) specified
+        if (pathBits.length > 1) {
+            // extract classpath
+            classPath = pathBits[0];
+            // for each specified agent...
+            for (String agentPath : pathBits[1].split("\t")) {
+                // ... specify a 'javaagent' argument
+                argsList.add(0, "-javaagent:" + agentPath);
+            }
+        }
+        
         // specify Java class path
-        argsList.add(0, getClasspath(dependencyContexts));
+        argsList.add(0, classPath);
         argsList.add(0, "-cp");
         
         // specify Java command
@@ -290,17 +308,45 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
 
     /**
-     * Assemble a classpath array from the specified array of dependencies.
+     * Assemble a classpath string from the specified array of dependencies.
+     * <p>
+     * <b>NOTE</b>: If any of the specified dependency contexts names the {@code premain} class of a Java agent, the
+     * string returned by this method will contain two records delimited by a {@code newline} character:
+     * 
+     * <ul>
+     *     <li>0 - assembled classpath string</li>
+     *     <li>1 - tab-delimited list of Java agent paths</li>
+     * </ul>
      * 
      * @param dependencyContexts array of dependency contexts
-     * @return classpath array
+     * @return assembled classpath string (see <b>NOTE</b>)
      */
     public static String getClasspath(final String[] dependencyContexts) {
+        Set<String> agentList = new HashSet<>();
         Set<String> pathList = new HashSet<>();
         for (String contextClassName : dependencyContexts) {
-            pathList.add(findJarPathFor(contextClassName));
+            // get JAR path for this dependency context
+            String jarPath = findJarPathFor(contextClassName);
+            // if this context names the premain class of a Java agent
+            if (contextClassName.equals(getJarPremainClass(jarPath))) {
+                // collect agent path
+                agentList.add(jarPath);
+            // otherwise
+            } else {
+                // collect class path
+                pathList.add(jarPath);
+            }
         }
-        return Joiner.on(File.pathSeparator).join(pathList);
+        // assemble classpath string
+        String classPath = Joiner.on(File.pathSeparator).join(pathList);
+        // if no agents were found
+        if (agentList.isEmpty()) {
+            // classpath only
+            return classPath;
+        } else {
+            // classpath plus tab-delimited list of agent paths 
+            return classPath + "\n" + Joiner.on("\t").join(agentList);
+        }
     }
 
     /**
@@ -362,6 +408,24 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                 "You appear to have loaded this class from a local jar file, but I can't make sense of the URL!");
     }
 
+    /**
+     * Extract the 'Premain-Class' attribute from the manifest of the indicated JAR file.
+     * 
+     * @param jarPath absolute path to the JAR file
+     * @return value of 'Premain-Class' attribute; {@code null} if unspecified
+     */
+    public static String  getJarPremainClass(String jarPath) {
+        try (JarInputStream jarStream = new JarInputStream(new FileInputStream(jarPath))) {
+            Manifest manifest = jarStream.getManifest();
+            if (manifest != null) {
+                return manifest.getMainAttributes().getValue("Premain-Class");
+            }
+        } catch (IOException e) {
+            // nothing to do here
+        }
+        return null;
+    }
+    
     public static class LocalGridServer extends GridServer {
 
         private Process process;

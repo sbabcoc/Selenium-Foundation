@@ -145,7 +145,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <selenium.version>2.53.1</selenium.version>
-        <guava.version>28.1-android</guava.version>
+        <guava-agent.version>28.1</guava-agent.version>
         <commons-io.version>2.4</commons-io.version>
         <htmlunit.version>2.21</htmlunit.version>
         <mockito.version>2.25.0</mockito.version>
@@ -153,9 +153,9 @@
       <dependencyManagement>
         <dependencies>
           <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
+            <groupId>com.nordstrom.tools</groupId>
+            <artifactId>guava-agent</artifactId>
+            <version>${guava-agent.version}</version>
           </dependency>
           <dependency>
             <groupId>commons-io</groupId>
@@ -190,6 +190,10 @@
         </dependencies>
       </dependencyManagement>
       <dependencies>
+        <dependency>
+          <groupId>com.nordstrom.tools</groupId>
+          <artifactId>guava-agent</artifactId>
+        </dependency>
         <dependency>
           <groupId>commons-io</groupId>
           <artifactId>commons-io</artifactId>
