@@ -267,11 +267,17 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
         }
         
+        // get assembled classpath string
         String classPath = getClasspath(dependencyContexts);
+        // split on Java agent list separator
         String[] pathBits = classPath.split("\n");
+        // if agent(s) specified
         if (pathBits.length > 1) {
+            // extract classpath
             classPath = pathBits[0];
+            // for each specified agent...
             for (String agentPath : pathBits[1].split("\t")) {
+                // ... specify a 'javaagent' argument
                 argsList.add(0, "-javaagent:" + agentPath);
             }
         }
@@ -302,10 +308,18 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
 
     /**
-     * Assemble a classpath array from the specified array of dependencies.
+     * Assemble a classpath string from the specified array of dependencies.
+     * <p>
+     * <b>NOTE</b>: If any of the specified dependency contexts names the {@code preMain} class of a Java agent, the
+     * string returned by this method will contain two records delimited by a {@code newline} character:
+     * 
+     * <ul>
+     *     <li>0 - assembled classlath string</li>
+     *     <li>1 - tab-delimited list of Java agent paths</li>
+     * </ul>
      * 
      * @param dependencyContexts array of dependency contexts
-     * @return classpath array
+     * @return assembled classpath string (see <b>NOTE</b>)
      */
     public static String getClasspath(final String[] dependencyContexts) {
         Set<String> agentList = new HashSet<>();
