@@ -215,6 +215,17 @@ public final class JsUtility {
     /**
      * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
      * 
+     * @param exception web driver exception to propagate
+     * @return nothing (this method always throws the specified exception)
+     * @deprecated at 17.3.0 
+     */
+    public static RuntimeException propagate(final WebDriverException exception) {
+        throw propagate(null, exception);
+    }
+    
+    /**
+     * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
+     * 
      * @param driver A handle to the currently running Selenium test window.
      * @param exception web driver exception to propagate
      * @return nothing (this method always throws the specified exception)
@@ -224,13 +235,19 @@ public final class JsUtility {
         Throwable thrown = exception;
         // if exception is a WebDriverException (not a sub-class)
         if (exception.getClass().equals(WebDriverException.class)) {
+            // extract serialized exception object from message
             thrown = extractException(exception, exception.getMessage());
             
+            // if driver spec'd and no serialized exception found
             if ((driver != null) && (thrown.equals(exception))) {
+                // get browser log entries
                 LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
 
+                // for each log entry
                 for (LogEntry logEntry : logEntries.filter(Level.WARNING)) {
+                    // extract serialized exception object from message
                     thrown = extractException(exception, logEntry.getMessage());
+                    // done if serialized exception found
                     if (!thrown.equals(exception)) break;
                 }
             }
@@ -239,17 +256,6 @@ public final class JsUtility {
         throw UncheckedThrow.throwUnchecked(thrown);
     }
 
-    /**
-     * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
-     * 
-     * @param exception web driver exception to propagate
-     * @return nothing (this method always throws the specified exception)
-     * @deprecated at 17.3.0 
-     */
-    public static RuntimeException propagate(final WebDriverException exception) {
-        throw propagate(null, exception);
-    }
-    
     /**
      * If present, extract JSON-formatted serialized exception object from the specified message.
      * <p>
@@ -262,14 +268,12 @@ public final class JsUtility {
      * @return deserialized exception; specified exception is none is found
      */
     private static Throwable extractException(final WebDriverException exception, String message) {
-        Throwable thrown;
         // only retain the first line
         message = message.split("\n")[0].trim();
         // extract JSON string from message
         message = extractJsonString(message);
         // deserialize encoded exception object if present
-        thrown = deserializeException(exception, message);
-        return thrown;
+        return deserializeException(exception, message);
     }
     
     /**
