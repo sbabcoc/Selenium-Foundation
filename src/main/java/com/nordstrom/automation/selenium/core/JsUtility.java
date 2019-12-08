@@ -244,7 +244,7 @@ public final class JsUtility {
      * 
      * @param exception web driver exception to propagate
      * @return nothing (this method always throws the specified exception)
-     * @deprecated at 17.3.0. The only driver that doesn't bury the original error is HtmlUnitDriver. 
+     * @deprecated at 17.3.0 
      */
     public static RuntimeException propagate(final WebDriverException exception) {
         throw propagate(null, exception);
