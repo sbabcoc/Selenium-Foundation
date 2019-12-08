@@ -14,7 +14,8 @@ public class PhantomJsCaps {
                     "{\"browserName\": \"phantomjs\", \"maxInstances\": 5, \"seleniumProtocol\": \"WebDriver\"}";
     
     public static final String BROWSER_NAME = "phantomjs";
-    public static final String PHANTOMJS = "{\"browserName\":\"phantomjs\"}";
+    public static final String BASELINE = "{\"browserName\":\"phantomjs\"}";
+    public static final String LOGGING = "{\"browserName\":\"phantomjs\", \"loggingPrefs\": {\"browser\": \"WARNING\"}}";
     
     private static final String[] PROPERTY_NAMES = {
                     "phantomjs.binary.path",
@@ -25,7 +26,8 @@ public class PhantomJsCaps {
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put(BROWSER_NAME, PHANTOMJS);
+        personalities.put(BROWSER_NAME, BASELINE);
+        personalities.put("phantomjs.logging", LOGGING);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
