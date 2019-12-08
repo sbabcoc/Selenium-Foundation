@@ -6,11 +6,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,21 +217,63 @@ public final class JsUtility {
      * 
      * @param exception web driver exception to propagate
      * @return nothing (this method always throws the specified exception)
+     * @deprecated at 17.3.0 
      */
     public static RuntimeException propagate(final WebDriverException exception) {
+        throw propagate(null, exception);
+    }
+    
+    /**
+     * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
+     * 
+     * @param driver A handle to the currently running Selenium test window.
+     * @param exception web driver exception to propagate
+     * @return nothing (this method always throws the specified exception)
+     * @since 17.4.0 
+     */
+    public static RuntimeException propagate(final WebDriver driver, final WebDriverException exception) {
         Throwable thrown = exception;
         // if exception is a WebDriverException (not a sub-class)
-        if (exception.getClass().equals(WebDriverException.class)) { 
-            String message = exception.getMessage();
-            // only retain the first line
-            message = message.split("\n")[0].trim();
-            // extract JSON string from message
-            message = extractJsonString(message);
-            // deserialize encoded exception object if present
-            thrown = deserializeException(exception, message);
+        if (exception.getClass().equals(WebDriverException.class)) {
+            // extract serialized exception object from message
+            thrown = extractException(exception, exception.getMessage());
+            
+            // if driver spec'd and no serialized exception found
+            if ((driver != null) && (thrown.equals(exception))) {
+                // get browser log entries
+                LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+
+                // for each log entry
+                for (LogEntry logEntry : logEntries.filter(Level.WARNING)) {
+                    // extract serialized exception object from message
+                    thrown = extractException(exception, logEntry.getMessage());
+                    // done if serialized exception found
+                    if (!thrown.equals(exception)) break;
+                }
+            }
         }
         // throw resolved exception as unchecked
         throw UncheckedThrow.throwUnchecked(thrown);
+    }
+
+    /**
+     * If present, extract JSON-formatted serialized exception object from the specified message.
+     * <p>
+     * <b>NOTE</b>: If the message contains a serialized exception object, the exception is deserialized with its cause
+     * set to the specified {@code WebDriverException}. If no serialized exception is found, the specified exception is
+     * returned instead.
+     * 
+     * @param exception web driver exception
+     * @param message message to scan for serialized exception object
+     * @return deserialized exception; specified exception is none is found
+     */
+    private static Throwable extractException(final WebDriverException exception, String message) {
+        // only retain the first line
+        message = message.split("\n")[0].trim();
+        // extract JSON string from message
+        message = extractJsonString(message);
+        // deserialize encoded exception object if present
+        return deserializeException(exception, message);
     }
     
     /**

@@ -89,7 +89,7 @@ public class JsUtilityTest extends TestNgBase {
             WebElement response = JsUtility.runAndReturn(driver, script, name);
             return response.getAttribute("content");
         } catch (WebDriverException e) {
-            throw JsUtility.propagate(e);
+            throw JsUtility.propagate(driver, e);
         }
     }
     
