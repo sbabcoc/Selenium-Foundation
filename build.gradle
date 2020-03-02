@@ -265,6 +265,7 @@ dependencies {
   compile 'com.nordstrom.tools:settings:2.3.3'
   compile 'com.nordstrom.tools:junit-foundation:11.0.2'
   compile 'ch.qos.logback:logback-classic:1.2.3'
+  compile 'com.github.sbabcoc:logback-testng:1.2.0'
   compile 'org.jsoup:jsoup:1.12.1'
   
   apply from: "${profile}Deps.gradle"

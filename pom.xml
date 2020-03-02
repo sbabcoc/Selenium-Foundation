@@ -45,6 +45,7 @@
     <settings.version>2.3.3</settings.version>
     <junit-foundation.version>11.0.2</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
+    <logback-testng.version>1.2.0</logback-testng.version>
     <sonar.language>java</sonar.language>
     <jacoco.version>0.8.5</jacoco.version>
     <jsoup.version>1.12.1</jsoup.version>
@@ -83,6 +84,11 @@
         <version>${logback.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.github.sbabcoc</groupId>
+        <artifactId>logback-testng</artifactId>
+        <version>${logback-testng.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>${jsoup.version}</version>
@@ -107,6 +113,10 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.sbabcoc</groupId>
+      <artifactId>logback-testng</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
     </dependency>
@@ -125,7 +135,6 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <testng-foundation.version>1.13.3</testng-foundation.version>
-        <logback-testng.version>1.2.0</logback-testng.version>
         <selenium.version>2.53.1</selenium.version>
         <guava-agent.version>28.1</guava-agent.version>
         <commons-io.version>2.4</commons-io.version>
@@ -138,11 +147,6 @@
             <groupId>com.nordstrom.tools</groupId>
             <artifactId>testng-foundation</artifactId>
             <version>${testng-foundation.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>com.github.sbabcoc</groupId>
-            <artifactId>logback-testng</artifactId>
-            <version>${logback-testng.version}</version>
           </dependency>
           <dependency>
             <groupId>com.nordstrom.tools</groupId>
@@ -185,10 +189,6 @@
         <dependency>
           <groupId>com.nordstrom.tools</groupId>
           <artifactId>testng-foundation</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.github.sbabcoc</groupId>
-          <artifactId>logback-testng</artifactId>
         </dependency>
         <dependency>
           <groupId>com.nordstrom.tools</groupId>
@@ -274,7 +274,6 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <testng-foundation.version>1.13.4-SNAPSHOT</testng-foundation.version>
-        <logback-testng.version>1.2.1-SNAPSHOT</logback-testng.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>28.1-jre</guava.version>
         <htmlunit.version>2.33.3</htmlunit.version>
@@ -288,11 +287,6 @@
             <groupId>com.nordstrom.tools</groupId>
             <artifactId>testng-foundation</artifactId>
             <version>${testng-foundation.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>com.github.sbabcoc</groupId>
-            <artifactId>logback-testng</artifactId>
-            <version>${logback-testng.version}</version>
           </dependency>
           <dependency>
             <groupId>com.google.guava</groupId>
@@ -330,10 +324,6 @@
         <dependency>
           <groupId>com.nordstrom.tools</groupId>
           <artifactId>testng-foundation</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.github.sbabcoc</groupId>
-          <artifactId>logback-testng</artifactId>
         </dependency>
         <dependency>
           <groupId>commons-io</groupId>
