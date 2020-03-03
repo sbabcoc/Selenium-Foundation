@@ -3,7 +3,6 @@ package com.nordstrom.automation.selenium.core;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -39,6 +38,7 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.automation.selenium.utility.NetIdentity;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 
@@ -48,6 +48,7 @@ import com.nordstrom.common.file.PathUtils;
 public final class GridUtility {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
+    private static final NetIdentity IDENTITY = new NetIdentity();
     
     /**
      * Private constructor to prevent instantiation.
@@ -246,18 +247,7 @@ public final class GridUtility {
      * @return IP address for the machine we're running on (a.k.a. - 'localhost')
      */
     public static String getLocalHost() {
-        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
-        String host = config.getString(SeleniumSettings.GOOGLE_DNS_SOCKET_HOST.key());
-        int port = config.getInt(SeleniumSettings.GOOGLE_DNS_SOCKET_PORT.key());
-        
-        try (final DatagramSocket socket = new DatagramSocket()) {
-            // use Google Public DNS to discover preferred local IP
-            socket.connect(InetAddress.getByName(host), port);
-            return socket.getLocalAddress().getHostAddress();
-        } catch (SocketException | UnknownHostException eaten) { //NOSONAR
-            SeleniumGrid.LOGGER.warn("Unable to get 'localhost' IP address: {}", eaten.getMessage());
-            return "localhost";
-        }
+        return IDENTITY.getHostAddress();
     }
     
     /**
