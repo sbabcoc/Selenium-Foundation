@@ -193,7 +193,7 @@ uploadArchives {
       beforeDeployment {
         MavenDeployment deployment -> signing.signPom(deployment)
         signArchives.filesToSign.each {
-            println it.name
+            signing.sign(it)
         }
       }
       
