@@ -177,6 +177,12 @@ test {
   testLogging.showStandardStreams = true
 }
 
+artifacts {
+  archives tasks["${profile}Jar"]
+  archives tasks["${profile}SourcesJar"]
+  archives tasks["${profile}JavadocJar"]
+}
+
 signing {
   sign configurations.archives
 }
@@ -186,8 +192,6 @@ uploadArchives {
     mavenDeployer {
       beforeDeployment {
         MavenDeployment deployment -> signing.signPom(deployment)
-        println "Invoke signArchives"
-        signArchives
       }
       
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
@@ -244,12 +248,6 @@ uploadArchives {
 nexusStaging {
   packageGroup = 'com.nordstrom'
   stagingProfileId = '76d943f622957'
-}
-
-artifacts {
-  archives tasks["${profile}Jar"]
-  archives tasks["${profile}SourcesJar"]
-  archives tasks["${profile}JavadocJar"]
 }
 
 repositories {
