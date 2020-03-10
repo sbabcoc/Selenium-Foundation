@@ -187,7 +187,7 @@ uploadArchives {
       beforeDeployment {
         MavenDeployment deployment -> signing.signPom(deployment)
         println "Invoke signArchives"
-        signArchives()
+        signArchives
       }
       
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
