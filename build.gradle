@@ -178,9 +178,7 @@ test {
 }
 
 signing {
-  sign tasks["${profile}Jar"]
-  sign tasks["${profile}SourcesJar"]
-  sign tasks["${profile}JavadocJar"]
+  sign configurations.archives
 }
 
 uploadArchives {
@@ -188,6 +186,19 @@ uploadArchives {
     mavenDeployer {
       beforeDeployment {
         MavenDeployment deployment -> signing.signPom(deployment)
+        
+        // sign the artifacts
+        project.tasks.signArchives.signatureFiles.each {
+          artifact(it) {
+            def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
+            if (matcher.find()) {
+              classifier = matcher.group(1)
+            } else {
+              classifier = null
+            }
+            extension = 'jar.asc'
+          }
+        }
       }
       
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
