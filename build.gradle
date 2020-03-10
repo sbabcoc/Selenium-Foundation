@@ -199,8 +199,7 @@ uploadArchives {
           println it.name
           def asc = project.artifacts.add('archives', it) {
             classifier = it.classifier
-            extension = it.extension
-            type = it.type
+            extension = 'jar.asc'
           }
           deployment.addArtifact(asc)
         }
