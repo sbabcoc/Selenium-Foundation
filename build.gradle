@@ -193,7 +193,7 @@ uploadArchives {
       beforeDeployment { MavenDeployment deployment ->
         signing.signPom(deployment)
         signArchives.signatureFiles.each {
-          def asc = project.artifacts.add('ascSignatures', it) {
+          def asc = project.artifacts.add('archives', it) {
             classifier = it.classifier
             extension = it.extension
             type = it.type
