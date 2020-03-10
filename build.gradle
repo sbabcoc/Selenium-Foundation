@@ -286,6 +286,3 @@ ext {
 test.doFirst {
     jvmArgs "-javaagent:${junitFoundation.file}"
 }
-uploadArchives.dependsOn {
-    [signArchives]
-}
