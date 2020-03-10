@@ -186,19 +186,8 @@ uploadArchives {
     mavenDeployer {
       beforeDeployment {
         MavenDeployment deployment -> signing.signPom(deployment)
-        tasks["signArchives"]
-//        // sign the artifacts
-//        project.tasks.signArchives.signatureFiles.each {
-//          artifact(it) {
-//            def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
-//            if (matcher.find()) {
-//              classifier = matcher.group(1)
-//            } else {
-//              classifier = null
-//            }
-//            extension = 'jar.asc'
-//          }
-//        }
+        println "Invoke signArchives"
+        signArchives()
       }
       
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
