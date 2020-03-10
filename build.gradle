@@ -190,10 +190,15 @@ signing {
 uploadArchives {
   repositories {
     mavenDeployer {
-      beforeDeployment {
-        MavenDeployment deployment -> signing.signPom(deployment)
-        signArchives.filesToSign.each {
-            signing.sign(it)
+      beforeDeployment { MavenDeployment deployment ->
+        signing.signPom(deployment)
+        signArchives.signatureFiles.each {
+          def asc = project.artifacts.add('ascSignatures', it) {
+            classifier = it.classifier
+            extension = it.extension
+            type = it.type
+          }
+          deployment.addArtifact(asc)
         }
       }
       
@@ -280,4 +285,7 @@ ext {
 }
 test.doFirst {
     jvmArgs "-javaagent:${junitFoundation.file}"
+}
+uploadArchives.dependsOn {
+    [signArchives]
 }
