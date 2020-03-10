@@ -196,6 +196,10 @@ uploadArchives {
           signing.sign(it)
         }
         signArchives.signatureFiles.each {
+          println it.name
+          println it.extension
+          println it.classifier
+          println it.type
           def asc = project.artifacts.add('archives', it) {
             classifier = it.classifier
             extension = it.extension
