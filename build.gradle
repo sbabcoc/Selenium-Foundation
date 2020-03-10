@@ -194,6 +194,7 @@ uploadArchives {
         MavenDeployment deployment -> signing.signPom(deployment)
         signArchives.filesToSign.each {
             println it.name
+        }
       }
       
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
