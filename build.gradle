@@ -192,17 +192,9 @@ uploadArchives {
     mavenDeployer {
       beforeDeployment { MavenDeployment deployment ->
         signing.signPom(deployment)
-        signArchives.filesToSign.each {
-          signing.sign(it)
-        }
-        signArchives.signatureFiles.each { ascFile ->
-          println ascFile.name
-          def ascItem = project.artifacts.add('archives', ascFile) {
-            def matcher = ascFile.name =~ /-(sources|javadoc)\.jar\.asc$/
-            classifier = (matcher.find()) ? matcher.group(1) : seleniumApi
-            extension = 'jar.asc'
-          }
-          deployment.addArtifact(ascItem)
+        signArchives.filesToSign.each { file ->
+          def signOp = signing.sign(it)
+          deployment.addArtifact(signOp.singleSignature)
         }
         deployment.artifacts.each {
           println it.toString()
