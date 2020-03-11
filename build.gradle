@@ -195,6 +195,9 @@ uploadArchives {
         signArchives.filesToSign.each {
           def signOp = signing.sign(it)
           def single = signOp.singleSignature
+          single.name = 'selenium-foundation'
+          single.classifier = it.classifier
+          
           println single.toString()
           println single.name
           println single.extension
