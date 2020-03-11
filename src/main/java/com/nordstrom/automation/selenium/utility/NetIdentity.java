@@ -23,17 +23,22 @@ public class NetIdentity {
 
     private String findInternalAddress(Enumeration<NetworkInterface> interfaces) throws UnknownHostException {
         while (interfaces.hasMoreElements()) {
-            NetworkInterface i = interfaces.nextElement();
+            NetworkInterface intrface = interfaces.nextElement();
             
-            if (i == null) continue;
-            Enumeration<InetAddress> addresses = i.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress address = addresses.nextElement();
-                String hostAddr = address.getHostAddress();
-
-                if (INTERNAL.matcher(hostAddr).find(0)) {
-                    return hostAddr;
+            try {
+                if ((intrface != null) && intrface.isUp()) {
+                    Enumeration<InetAddress> addresses = intrface.getInetAddresses();
+                    while (addresses.hasMoreElements()) {
+                        InetAddress address = addresses.nextElement();
+                        String hostAddr = address.getHostAddress();
+   
+                        if (INTERNAL.matcher(hostAddr).find(0)) {
+                            return hostAddr;
+                        }
+                    }
                 }
+            } catch (SocketException eaten) {
+                // nothing to do here
             }
         }
         
