@@ -200,7 +200,7 @@ uploadArchives {
           println single.extension
           println single.classifier
           println single.type
-          println
+          println ''
           deployment.addArtifact(single)
         }
         deployment.artifacts.each {
@@ -209,7 +209,7 @@ uploadArchives {
           println it.extension
           println it.classifier
           println it.type
-          println
+          println ''
         }
       }
       
