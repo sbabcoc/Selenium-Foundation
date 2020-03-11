@@ -195,8 +195,9 @@ uploadArchives {
         signArchives.filesToSign.each {
           def signOp = signing.sign(it)
           def single = signOp.singleSignature
+          def matcher = it.name =~ /-(sources|javadoc)\.jar$/
           single.name = 'selenium-foundation'
-          single.classifier = it.classifier
+          single.classifier = matcher.find() ? matcher.group(1) : null
           
           println single.toString()
           println single.name
