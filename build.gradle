@@ -194,10 +194,12 @@ uploadArchives {
         signing.signPom(deployment)
         signArchives.filesToSign.each {
           def signOp = signing.sign(it)
-          deployment.addArtifact(signOp.singleSignature)
-        }
-        deployment.artifacts.each {
-          println it.toString()
+          def single = signOp.singleSignature
+          println single.name
+          println single.extension
+          println single.classifier
+          println single.type
+          deployment.addArtifact(single)
         }
       }
       
