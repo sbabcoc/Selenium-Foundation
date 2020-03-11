@@ -195,17 +195,21 @@ uploadArchives {
         signArchives.filesToSign.each {
           def signOp = signing.sign(it)
           def single = signOp.singleSignature
+          println single.toString()
           println single.name
           println single.extension
           println single.classifier
           println single.type
+          println
           deployment.addArtifact(single)
         }
         deployment.artifacts.each {
+          println it.toString()
           println it.name
           println it.extension
           println it.classifier
           println it.type
+          println
         }
       }
       
