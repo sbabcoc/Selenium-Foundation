@@ -195,13 +195,14 @@ uploadArchives {
         signArchives.filesToSign.each {
           signing.sign(it)
         }
-        signArchives.signatureFiles.each {
-          println it.name
-          def asc = project.artifacts.add('archives', it) {
-            classifier = it.classifier
+        signArchives.signatureFiles.each { ascFile ->
+          println ascFile.name
+          def ascItem = project.artifacts.add('archives', ascFile) {
+            def matcher = ascFile.name =~ /-(sources|javadoc)\.jar\.asc$/
+            classifier = (matcher.find()) ? matcher.group(1) : null
             extension = 'jar.asc'
           }
-          deployment.addArtifact(asc)
+          deployment.addArtifact(ascItem)
         }
       }
       
