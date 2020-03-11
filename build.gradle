@@ -201,6 +201,12 @@ uploadArchives {
           println single.type
           deployment.addArtifact(single)
         }
+        deployment.artifacts.each {
+          println it.name
+          println it.extension
+          println it.classifier
+          println it.type
+        }
       }
       
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
