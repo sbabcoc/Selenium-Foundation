@@ -36,5 +36,15 @@ public final class DataUtils {
             return null;
         }
     }
+    
+    /**
+     * Transform the specified Java object into its JSON string representation.
+     * 
+     * @param object Java object to be transformed
+     * @return JSON representation of {@code object}
+     */
+    public static String toString(final Object object) {
+        return new Gson().toJson(object);
+    }
 
 }

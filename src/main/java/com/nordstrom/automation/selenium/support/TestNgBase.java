@@ -16,8 +16,12 @@ import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.listeners.PageSourceCapture;
+import com.nordstrom.automation.selenium.listeners.PlatformInterceptor.PlatformIdentity;
 import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.model.Page;
+import com.nordstrom.automation.selenium.platform.PlatformEnum;
+import com.nordstrom.automation.selenium.platform.PlatformTargetable;
+import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
@@ -171,6 +175,25 @@ public abstract class TestNgBase extends TestBase {
                 testResult.getMethod().setTimeOut(timeout + adjust);
             }
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PlatformEnum activatePlatform(WebDriver driver) {
+        if (this instanceof PlatformTargetable) {
+            ITestResult testResult = Reporter.getCurrentTestResult();
+            if (testResult != null) {
+                String description = testResult.getMethod().getDescription();
+                PlatformIdentity identity = DataUtils.fromString(description, PlatformIdentity.class);
+                if (identity != null) {
+                    ((PlatformTargetable<?>) this).activatePlatform(driver, identity.getPlatform());
+                    return identity.getPlatform();
+                }
+            }
+        }
+        return null;
     }
     
     /**
