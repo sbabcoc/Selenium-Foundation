@@ -37,8 +37,7 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
     }
 
     @Override
-    public void activatePlatform(WebDriver driver, P platform)
-                    throws PlatformActivationFailedException {
+    public void activatePlatform(WebDriver driver, P platform) throws PlatformActivationFailedException {
         // by default, do nothing
     }
     

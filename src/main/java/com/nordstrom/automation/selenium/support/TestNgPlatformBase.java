@@ -52,8 +52,7 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
     
     @Override
     @SuppressWarnings("serial")
-    public void activatePlatform(WebDriver driver, P platform)
-                    throws PlatformActivationFailedException {
+    public void activatePlatform(WebDriver driver, P platform) throws PlatformActivationFailedException {
         ITestResult testResult = Reporter.getCurrentTestResult();
         if (testResult != null) {
             String description = testResult.getMethod().getDescription();
