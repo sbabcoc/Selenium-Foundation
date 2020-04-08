@@ -38,11 +38,11 @@ public class PlatformInterceptor implements IMethodInterceptor {
 
         // iterate over method list
         for (IMethodInstance thisMethod : methods) {
-            PlatformEnum platformConstant = resolveTargetPlatform(thisMethod);
+            Object platformConstant = resolveTargetPlatform(thisMethod);
             
             // if this method supports the current target platform
-            if (TargetPlatformHandler.shouldRun(contextPlatform, platformConstant)) {
-                addMethodForPlatform(result, thisMethod, platformConstant);
+            if (TargetPlatformHandler.shouldRun(contextPlatform, (PlatformEnum) platformConstant)) {
+                addMethodForPlatform(result, thisMethod, (PlatformEnum) platformConstant);
             }
         }
 
@@ -150,8 +150,9 @@ public class PlatformInterceptor implements IMethodInterceptor {
             return description;
         }
         
+        @SuppressWarnings("unchecked")
         public P deserialize() {
-            return valueOf(classForName(className), constName);
+            return (P) valueOf(classForName(className), constName);
         }
         
         @SuppressWarnings("unchecked")

@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.utility;
 
+import java.lang.reflect.Type;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ public final class DataUtils {
      * @param type target object type
      * @return new instance of the specified type
      */
-    public static <T> T fromString(final String json, final Class<T> type) {
+    public static <T> T fromString(final String json, final Type type) {
         try {
             return new Gson().fromJson(json, type);
         } catch (JsonSyntaxException e) {
