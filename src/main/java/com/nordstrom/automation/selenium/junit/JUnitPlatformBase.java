@@ -9,7 +9,6 @@ import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedExce
 import com.nordstrom.automation.selenium.platform.PlatformEnum;
 import com.nordstrom.automation.selenium.platform.PlatformTargetable;
 import com.nordstrom.common.base.UncheckedThrow;
-import com.nordstrom.common.file.PathUtils;
 
 public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extends JUnitBase implements PlatformTargetable<P> {
     
@@ -27,7 +26,7 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
 
     @Override
     public String[] getSubPath() {
-        return PathUtils.append(getTargetPlatform().getName());
+        return new String[] { getTargetPlatform().getName() };
     }
 
     @Override

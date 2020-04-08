@@ -16,7 +16,6 @@ import com.nordstrom.automation.selenium.platform.PlatformEnum;
 import com.nordstrom.automation.selenium.platform.PlatformTargetable;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
-import com.nordstrom.common.file.PathUtils;
 
 @Listeners(PlatformInterceptor.class)
 public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> extends TestNgBase implements PlatformTargetable<P> {
@@ -37,7 +36,7 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
 
     @Override
     public String[] getSubPath() {
-        return PathUtils.append(getTargetPlatform().getName());
+        return new String[] { getTargetPlatform().getName() };
     }
 
     @Override
