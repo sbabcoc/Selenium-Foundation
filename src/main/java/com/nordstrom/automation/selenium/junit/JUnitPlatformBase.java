@@ -3,9 +3,6 @@ package com.nordstrom.automation.selenium.junit;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.openqa.selenium.WebDriver;
-
-import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedException;
 import com.nordstrom.automation.selenium.platform.PlatformEnum;
 import com.nordstrom.automation.selenium.platform.PlatformTargetable;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -36,12 +33,6 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
         return (P) targetPlatformRule.getPlatform();
     }
 
-    @Override
-    public void activatePlatform(WebDriver driver, P platform)
-                    throws PlatformActivationFailedException {
-        // by default, do nothing
-    }
-    
     @Override
     public P[] getValidPlatforms() {
         return (P[]) values();
