@@ -52,7 +52,7 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
     
     @Override
     @SuppressWarnings("serial")
-    public P activatePlatform(WebDriver driver, P platform)
+    public void activatePlatform(WebDriver driver, P platform)
                     throws PlatformActivationFailedException {
         ITestResult testResult = Reporter.getCurrentTestResult();
         if (testResult != null) {
@@ -62,7 +62,6 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
                 testResult.setAttribute(PLATFORM, identity.deserialize());
             }
         }
-        return getTargetPlatform();
     }
 
     @Override

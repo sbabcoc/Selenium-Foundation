@@ -183,18 +183,17 @@ public abstract class TestNgBase extends TestBase {
      */
     @Override
     @SuppressWarnings({"serial", "unchecked"})
-    public <P extends Enum<?> & PlatformEnum> P activatePlatform(WebDriver driver) {
+    public <P extends Enum<?> & PlatformEnum> void activatePlatform(WebDriver driver) {
         if (this instanceof PlatformTargetable) {
             ITestResult testResult = Reporter.getCurrentTestResult();
             if (testResult != null) {
                 String description = testResult.getMethod().getDescription();
                 PlatformIdentity<P> identity = DataUtils.fromString(description, new TypeToken<PlatformIdentity<P>>(){}.getType());
                 if (identity != null) {
-                    return ((PlatformTargetable<P>) this).activatePlatform(driver, identity.deserialize());
+                    ((PlatformTargetable<P>) this).activatePlatform(driver, identity.deserialize());
                 }
             }
         }
-        return null;
     }
     
     /**

@@ -86,14 +86,13 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <P extends Enum<?> & PlatformEnum> P activatePlatform(WebDriver driver) {
+    public <P extends Enum<?> & PlatformEnum> void activatePlatform(WebDriver driver) {
         if (this instanceof PlatformTargetable) {
             P platform = (P) targetPlatformRule.getPlatform();
             if (platform != null) {
-                return ((PlatformTargetable<P>) this).activatePlatform(driver, platform);
+                ((PlatformTargetable<P>) this).activatePlatform(driver, platform);
             }
         }
-        return null;
     }
     
     /**
