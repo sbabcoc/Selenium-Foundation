@@ -6,12 +6,12 @@ public enum ExamplePlatform implements PlatformEnum {
     
     private String name;
 
-    public static final String PLATFORM_ONE_ = "platform_one";
-    public static final String PLATFORM_TWO_ = "platform_two";
+    public static final String PLATFORM_ONE_NAME = "platform_one";
+    public static final String PLATFORM_TWO_NAME = "platform_two";
     
     static {
-        PLATFORM_ONE.name = PLATFORM_ONE_;
-        PLATFORM_TWO.name = PLATFORM_TWO_;
+        PLATFORM_ONE.name = PLATFORM_ONE_NAME;
+        PLATFORM_TWO.name = PLATFORM_TWO_NAME;
     }
     
     /**

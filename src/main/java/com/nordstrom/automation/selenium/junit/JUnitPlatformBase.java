@@ -14,13 +14,11 @@ import com.nordstrom.common.file.PathUtils;
 public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extends JUnitBase implements PlatformTargetable<P> {
     
     private final Class<P> platformClass;
-    private final Method fromString;
     private final Method values;
 
     public JUnitPlatformBase(Class<P> platformClass) {
         this.platformClass = platformClass;
         try {
-            fromString = platformClass.getMethod("fromString", String.class);
             values = platformClass.getMethod("values");
         } catch (NoSuchMethodException | SecurityException e) {
             throw UncheckedThrow.throwUnchecked(e);
@@ -51,7 +49,12 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
 
     @Override
     public P platformFromString(String name) {
-        return invoke(fromString, name);
+        for (P platform : values()) {
+            if (platform.getName().equals(name)) {
+                return platform;
+            }
+        }
+        return null;
     }
 
     @Override
