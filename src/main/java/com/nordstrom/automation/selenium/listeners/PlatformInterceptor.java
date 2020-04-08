@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.listeners;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -113,7 +114,9 @@ public class PlatformInterceptor implements IMethodInterceptor {
         return realMethod.getAnnotation(TargetPlatform.class);
     }
 
-    public static class PlatformIdentity<P extends Enum<?> & PlatformEnum> {
+    public static class PlatformIdentity<P extends Enum<?> & PlatformEnum> implements Serializable {
+        
+        private static final long serialVersionUID = 3048495330930703188L;
         
         private String constName;
         private String className;

@@ -23,6 +23,11 @@ public final class DataUtils {
     
     /**
      * Transform the specified JSON string into the specified type.
+     * <p>
+     * <b>NOTE</b>: For this method to work correctly, the specified type must conform to the
+     * <a href=https://stackoverflow.com/a/3295517>JavaBeans</a> specification. For a simple example, see the
+     * {@link com.nordstrom.automation.selenium.listeners.PlatformInterceptor.PlatformIdentity PlatformIdentity}
+     * class.
      * 
      * @param <T> desired object type
      * @param json JSON object string
@@ -40,6 +45,11 @@ public final class DataUtils {
 
     /**
      * Transform the specified Java object into its JSON string representation.
+     * <p>
+     * <b>NOTE</b>: For this method to work correctly, the specified object must conform to the
+     * <a href=https://stackoverflow.com/a/3295517>JavaBeans</a> specification. For a simple example, see the
+     * {@link com.nordstrom.automation.selenium.listeners.PlatformInterceptor.PlatformIdentity PlatformIdentity}
+     * class.
      * 
      * @param object Java object to be transformed
      * @return JSON representation of {@code object}
