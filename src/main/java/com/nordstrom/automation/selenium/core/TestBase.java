@@ -122,6 +122,7 @@ public abstract class TestBase {
      * by {@link PlatformTargetable}. This method provides a default implementation for test classes
      * that extend {@link TestBase} and implement <b>PlatformTargetable</b>.
      * 
+     * @param <P> target platform enumeration
      * @return scenario-specific path modifier
      * @see PathModifier#getSubPath()
      */
@@ -156,6 +157,7 @@ public abstract class TestBase {
     /**
      * Activate the resolved target platform.
      * 
+     * @param <P> target platform enumeration
      * @param driver WebDriver object
      */
     public abstract <P extends Enum<?> & PlatformEnum> void activatePlatform(WebDriver driver);

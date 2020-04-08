@@ -6,6 +6,7 @@ public class TargetPlatformHandler {
     /**
      * Resolve the target platform constant for the associated method.
      * 
+     * @param <P> target platform enumeration
      * @param testObject test class object
      * @param targetPlatform {@link TargetPlatform} annotation for the current method (may be 'null')
      * @return target platform constant; 'null' if test class object is not {@link PlatformTargetable}
