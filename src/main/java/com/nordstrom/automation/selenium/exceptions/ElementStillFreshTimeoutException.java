@@ -13,7 +13,7 @@ public class ElementStillFreshTimeoutException extends TimeoutException { //NOSO
     private static final long serialVersionUID = -3082528281757446744L;
 
     public ElementStillFreshTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

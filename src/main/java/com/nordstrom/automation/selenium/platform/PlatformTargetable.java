@@ -12,7 +12,7 @@ import com.nordstrom.common.file.PathUtils.PathModifier;
  * those test methods that support that platform.
  */
 public interface PlatformTargetable<P extends Enum<?> & PlatformEnum> extends PathModifier {
-	
+    
     /**
      * Get the target platform for this test class instance.
      * 

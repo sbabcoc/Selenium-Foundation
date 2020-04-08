@@ -13,7 +13,7 @@ public class ElementNotPresentTimeoutException extends TimeoutException { //NOSO
     private static final long serialVersionUID = 7039645286156391657L;
 
     public ElementNotPresentTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

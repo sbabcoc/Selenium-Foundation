@@ -15,7 +15,7 @@ public class ElementTextContentTimeoutException extends TimeoutException { //NOS
     private static final long serialVersionUID = -2893297898946904937L;
 
     public ElementTextContentTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

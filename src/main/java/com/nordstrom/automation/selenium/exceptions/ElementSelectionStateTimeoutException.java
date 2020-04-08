@@ -14,7 +14,7 @@ public class ElementSelectionStateTimeoutException extends TimeoutException { //
     private static final long serialVersionUID = 2150778933322672061L;
 
     public ElementSelectionStateTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

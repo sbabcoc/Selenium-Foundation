@@ -16,7 +16,7 @@ public class ElementAttributeTimeoutException extends TimeoutException { //NOSON
     private static final long serialVersionUID = 7422856432865870480L;
 
     public ElementAttributeTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }
