@@ -28,14 +28,4 @@ public enum ExamplePlatform implements PlatformEnum {
     public boolean matches(String contextPlatform) {
         return name.equals(contextPlatform);
     }
-    
-    public static ExamplePlatform fromString(String name) {
-        for (ExamplePlatform platform : values()) {
-            if (platform.name.equals(name)) {
-                return platform;
-            }
-        }
-        return null;
-    }
-
 }

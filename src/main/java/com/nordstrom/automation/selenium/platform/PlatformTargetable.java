@@ -24,10 +24,11 @@ public interface PlatformTargetable<P extends Enum<?> & PlatformEnum> extends Pa
      * Activate the specified target platform.
      * 
      * @param driver WebDriver object
-     * @param platformEnum platform to be activated
+     * @param platform platform to be activated
+     * @return target platform for this instance
      * @throws PlatformActivationFailedException if platform activation fails
      */
-    void activatePlatform(WebDriver driver, PlatformEnum platformEnum) throws PlatformActivationFailedException;
+    P activatePlatform(WebDriver driver, P platform) throws PlatformActivationFailedException;
     
     /**
      * Get the collection of valid platforms.

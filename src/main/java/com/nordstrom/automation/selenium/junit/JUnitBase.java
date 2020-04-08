@@ -29,7 +29,7 @@ import com.nordstrom.common.file.PathUtils;
 public abstract class JUnitBase extends TestBase implements ArtifactParams {
     
     @Rule
-    public TargetPlatformRule targetPlatformRule = new TargetPlatformRule(this);
+    public TargetPlatformRule<?> targetPlatformRule = new TargetPlatformRule<>(this);
 
     /** This method rule manages driver lifetimes and opens initial pages. */
     @Rule
@@ -85,12 +85,12 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      * {@inheritDoc}
      */
     @Override
-    public PlatformEnum activatePlatform(WebDriver driver) {
+    @SuppressWarnings("unchecked")
+    public <P extends Enum<?> & PlatformEnum> P activatePlatform(WebDriver driver) {
         if (this instanceof PlatformTargetable) {
-            PlatformEnum platform = targetPlatformRule.getPlatform();
+            P platform = (P) targetPlatformRule.getPlatform();
             if (platform != null) {
-                ((PlatformTargetable<?>) this).activatePlatform(driver, platform);
-                return platform;
+                return ((PlatformTargetable<P>) this).activatePlatform(driver, platform);
             }
         }
         return null;

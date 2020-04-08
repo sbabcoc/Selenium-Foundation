@@ -158,7 +158,7 @@ public abstract class TestBase {
      * 
      * @param driver WebDriver object
      */
-    public abstract PlatformEnum activatePlatform(WebDriver driver);
+    public abstract <P extends Enum<?> & PlatformEnum> P activatePlatform(WebDriver driver);
     
     /**
      * Wrap the specified object in an {@link Optional} object.

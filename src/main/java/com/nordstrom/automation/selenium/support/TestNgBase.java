@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.base.Optional;
+import com.google.common.reflect.TypeToken;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.listeners.PageSourceCapture;
@@ -70,14 +71,14 @@ public abstract class TestNgBase extends TestBase {
          * 
          * @param obj object to be stored; 'null' to discard value
          */
-        private void set(final Object obj) {
-            ITestResult result = Reporter.getCurrentTestResult();
-            if (obj != null) {
-                result.setAttribute(key, obj);
-            } else {
-                result.removeAttribute(key);
-            }
-        }
+//      private void set(final Object obj) {
+//          ITestResult result = Reporter.getCurrentTestResult();
+//          if (obj != null) {
+//              result.setAttribute(key, obj);
+//          } else {
+//              result.removeAttribute(key);
+//          }
+//      }
         
         /**
          * Store the specified object in the attributes collection, tracking reference propagation.
@@ -181,15 +182,15 @@ public abstract class TestNgBase extends TestBase {
      * {@inheritDoc}
      */
     @Override
-    public PlatformEnum activatePlatform(WebDriver driver) {
+    @SuppressWarnings({"serial", "unchecked"})
+    public <P extends Enum<?> & PlatformEnum> P activatePlatform(WebDriver driver) {
         if (this instanceof PlatformTargetable) {
             ITestResult testResult = Reporter.getCurrentTestResult();
             if (testResult != null) {
                 String description = testResult.getMethod().getDescription();
-                PlatformIdentity identity = DataUtils.fromString(description, PlatformIdentity.class);
+                PlatformIdentity<P> identity = DataUtils.fromString(description, new TypeToken<PlatformIdentity<P>>(){}.getType());
                 if (identity != null) {
-                    ((PlatformTargetable<?>) this).activatePlatform(driver, identity.getPlatform());
-                    return identity.getPlatform();
+                    return ((PlatformTargetable<P>) this).activatePlatform(driver, identity.deserialize());
                 }
             }
         }
