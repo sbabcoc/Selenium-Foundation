@@ -42,7 +42,7 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
     
     @Override
     public P[] getValidPlatforms() {
-        return (P[]) values();
+        return values();
     }
 
     @Override

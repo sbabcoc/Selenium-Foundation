@@ -64,7 +64,7 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
 
     @Override
     public P[] getValidPlatforms() {
-        return (P[]) values();
+        return values();
     }
 
     @Override
