@@ -16,12 +16,10 @@ public class TargetPlatformHandler {
         P platform = null;
         
         if (testObject instanceof PlatformTargetable) {
-            PlatformTargetable<P> targetable = (PlatformTargetable<P>) testObject;
-            
             if (targetPlatform == null) {
-                platform = targetable.getDefaultPlatform();
+                platform = ((PlatformTargetable<P>) testObject).getDefaultPlatform();
             } else {
-                platform = targetable.platformFromString(targetPlatform.value());
+                platform = ((PlatformTargetable<P>) testObject).platformFromString(targetPlatform.value());
             }
         }
         
