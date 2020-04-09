@@ -60,15 +60,6 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
         return platformClass;
     }
     
-    public P fromString(String name) {
-        for (P platform : values()) {
-            if (platform.getName().equals(name)) {
-                return platform;
-            }
-        }
-        return null;
-    }
-    
     private P[] values() {
         return invoke(values);
     }
