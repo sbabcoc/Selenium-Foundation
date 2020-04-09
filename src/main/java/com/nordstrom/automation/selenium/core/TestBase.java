@@ -8,9 +8,6 @@ import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.platform.PlatformEnum;
-import com.nordstrom.automation.selenium.platform.PlatformTargetable;
-import com.nordstrom.common.file.PathUtils.ReportsDirectory;
-import com.nordstrom.common.file.PathUtils.PathModifier;
 
 /**
  * This interface defines the contract for Selenium Foundation test classes.
@@ -114,29 +111,6 @@ public abstract class TestBase {
      * @param pageObj initial page for the current test
      */
     public abstract void setInitialPage(Page pageObj);
-    
-    /**
-     * Get scenario-specific path modifier for {@link ReportsDirectory#getPathForObject(Object)}.
-     * <p>
-     * <b>NOTE</b>: This method is declared in the {@link PathModifier} interface, which is extended
-     * by {@link PlatformTargetable}. This method provides a default implementation for test classes
-     * that extend {@link TestBase} and implement <b>PlatformTargetable</b>.
-     * 
-     * @param <P> target platform enumeration
-     * @return scenario-specific path modifier
-     * @see PathModifier#getSubPath()
-     */
-    @SuppressWarnings("unchecked")
-    public <P extends Enum<?> & PlatformEnum> String[] getSubPath() {
-        String[] subPath = {};
-        if (this instanceof PlatformTargetable) {
-            P targetPlatform = ((PlatformTargetable<P>) this).getTargetPlatform();
-            if (targetPlatform != null) {
-                subPath = new String[] {targetPlatform.getName()};
-            }
-        }
-        return subPath;
-    }
     
     /**
      * Get test run output directory.
