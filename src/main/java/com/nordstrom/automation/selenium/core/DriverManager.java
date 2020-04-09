@@ -115,6 +115,7 @@ public final class DriverManager {
                 if (instance.isTest(method)) {
                     long after = System.currentTimeMillis();
                     instance.adjustTimeout(after - prior);
+                    instance.activatePlatform(driver);
                 }
             }
             

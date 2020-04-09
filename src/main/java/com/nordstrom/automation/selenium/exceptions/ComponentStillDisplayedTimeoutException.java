@@ -13,7 +13,7 @@ public class ComponentStillDisplayedTimeoutException extends TimeoutException { 
     private static final long serialVersionUID = 5397614393701035129L;
 
     public ComponentStillDisplayedTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

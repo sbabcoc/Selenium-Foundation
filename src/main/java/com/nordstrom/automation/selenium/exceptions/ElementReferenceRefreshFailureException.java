@@ -14,7 +14,7 @@ public class ElementReferenceRefreshFailureException extends StaleElementReferen
     private static final long serialVersionUID = 417132799562814181L;
 
     public ElementReferenceRefreshFailureException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

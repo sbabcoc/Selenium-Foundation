@@ -6,7 +6,6 @@ import org.junit.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.common.file.PathUtils;
 
 @InitialPage(ExamplePage.class)
 public class JUnitModelTest extends JUnitBase {
@@ -78,11 +77,6 @@ public class JUnitModelTest extends JUnitBase {
     @Ignore
     public void testRefresh() {
         ModelTestCore.testRefresh(this);
-    }
-
-    @Override
-    public String getOutputDirectory() {
-        return PathUtils.ReportsDirectory.getPathForObject(this).toString();
     }
 
 }

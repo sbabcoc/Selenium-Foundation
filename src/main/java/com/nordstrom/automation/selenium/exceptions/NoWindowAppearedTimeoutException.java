@@ -13,7 +13,7 @@ public class NoWindowAppearedTimeoutException extends TimeoutException { //NOSON
     private static final long serialVersionUID = 1178667313414119377L;
 
     public NoWindowAppearedTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

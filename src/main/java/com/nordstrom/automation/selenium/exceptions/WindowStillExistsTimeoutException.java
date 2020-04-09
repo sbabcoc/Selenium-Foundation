@@ -13,7 +13,7 @@ public class WindowStillExistsTimeoutException extends TimeoutException { //NOSO
     private static final long serialVersionUID = 1228040448300937511L;
 
     public WindowStillExistsTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

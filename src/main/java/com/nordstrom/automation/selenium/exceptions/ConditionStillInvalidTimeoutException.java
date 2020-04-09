@@ -13,7 +13,7 @@ public class ConditionStillInvalidTimeoutException extends TimeoutException { //
     private static final long serialVersionUID = -5012103332012897882L;
 
     public ConditionStillInvalidTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

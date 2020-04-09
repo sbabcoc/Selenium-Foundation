@@ -15,7 +15,7 @@ public class ElementAbsentOrHiddenTimeoutException extends TimeoutException { //
     private static final long serialVersionUID = -2295630523192380636L;
 
     public ElementAbsentOrHiddenTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

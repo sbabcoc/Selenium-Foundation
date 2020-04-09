@@ -1,13 +1,13 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
-
 import org.openqa.selenium.WebDriver;
 
 import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.model.Page;
+import com.nordstrom.automation.selenium.platform.PlatformEnum;
 
 /**
  * This interface defines the contract for Selenium Foundation test classes.
@@ -127,6 +127,14 @@ public abstract class TestBase {
     public void adjustTimeout(long adjust) {
         // by default, do nothing
     }
+    
+    /**
+     * Activate the resolved target platform.
+     * 
+     * @param <P> target platform enumeration
+     * @param driver WebDriver object
+     */
+    public abstract <P extends Enum<?> & PlatformEnum> void activatePlatform(WebDriver driver);
     
     /**
      * Wrap the specified object in an {@link Optional} object.

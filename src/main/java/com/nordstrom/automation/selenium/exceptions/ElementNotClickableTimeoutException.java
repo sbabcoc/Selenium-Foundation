@@ -14,7 +14,7 @@ public class ElementNotClickableTimeoutException extends TimeoutException { //NO
     private static final long serialVersionUID = -8475358618203763123L;
 
     public ElementNotClickableTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }

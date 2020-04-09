@@ -7,7 +7,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
   selenium2Compile configurations.compile
-  selenium2Compile 'com.nordstrom.tools:testng-foundation:1.13.3'
+  selenium2Compile 'com.nordstrom.tools:testng-foundation:1.13.4'
   selenium2Compile 'com.nordstrom.tools:guava-agent:28.1'
   selenium2Compile 'commons-io:commons-io:2.4'
   selenium2Compile('org.seleniumhq.selenium:selenium-server:2.53.1') {

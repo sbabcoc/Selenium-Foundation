@@ -104,7 +104,9 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>selenium.grid.log.folder</b> <br> default: <b>logs</b> */
         GRID_LOGS_FOLDER("selenium.grid.log.folder", "logs"),
         /** name: <b>selenium.grid.no.redirect</b> <br> default: {@code false} */
-        GRID_NO_REDIRECT("selenium.grid.no.redirect", "false");
+        GRID_NO_REDIRECT("selenium.grid.no.redirect", "false"),
+        /** name: <b>selenium.context.platform</b> <br> default: {@code null} */
+        CONTEXT_PLATFORM("selenium.context.platform", null);
         
         private String propertyName;
         private String defaultValue;
@@ -499,6 +501,15 @@ public abstract class AbstractSeleniumConfig extends
      * @throws IOException on failure to create configuration file
      */
     public abstract Path createNodeConfig(String capabilities, URL hubUrl) throws IOException;
+    
+    /**
+     * Get the target platform for the current test context.
+     * 
+     * @return target platform for the current test context
+     */
+    public String getContextPlatform() {
+        return getConfig().getString(SeleniumSettings.CONTEXT_PLATFORM.key());
+    }
     
     /**
      * {@inheritDoc}

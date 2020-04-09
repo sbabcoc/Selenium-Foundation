@@ -13,7 +13,7 @@ public class ElementStillVisibleTimeoutException extends TimeoutException { //NO
     private static final long serialVersionUID = -3777087787464228714L;
 
     public ElementStillVisibleTimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 
 }
