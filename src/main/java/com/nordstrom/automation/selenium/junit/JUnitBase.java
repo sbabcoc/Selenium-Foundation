@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.junit;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import com.nordstrom.automation.junit.AtomIdentity;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -134,7 +135,15 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
     public boolean isAfterClass(final Method method) {
         return null != method.getAnnotation(AfterClass.class);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomIdentity getAtomIdentity() {
+        return getLinkedRule(ScreenshotCapture.class).getAtomIdentity();
+    }
+
     /**
      * {@inheritDoc}
      */
