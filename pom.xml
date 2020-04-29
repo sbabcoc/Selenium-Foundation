@@ -43,7 +43,7 @@
     <source-plugin.version>3.2.0</source-plugin.version>
     <javadoc-plugin.version>3.1.1</javadoc-plugin.version>
     <settings.version>2.3.3</settings.version>
-    <junit-foundation.version>11.2.0</junit-foundation.version>
+    <junit-foundation.version>12.2.0</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
     <logback-testng.version>1.3.1</logback-testng.version>
     <sonar.language>java</sonar.language>
