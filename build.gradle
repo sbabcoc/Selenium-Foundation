@@ -279,7 +279,7 @@ dependencies {
   apply from: "${profile}Deps.gradle"
   
   testCompile configurations["${profile}Compile"]
-    implementation 'org.testng:testng:6.9.6'
+  implementation 'org.testng:testng:6.9.6'
 }
 ext {
     junitFoundation = configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.name == 'junit-foundation' }
