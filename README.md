@@ -325,6 +325,8 @@ The **JUnitBase** class demonstrates several features of the **Selenium Foundati
 This static utility method wraps the specified object in an [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html) object. If the object to be wrapped is 'null', this method returns an empty optional.
 * **`RuleChainWalker.getAttachedRule(RuleChain, Class<T extends TestRule>)`**:  
 This static utility method gets reference to an instance of the specified test rule type on the supplied rule chain. In **JUnitBase**, this is used to acquire a reference to the **ScreenshotCapture** watcher for capturing on-demand screenshot artifacts.
+* **`ScreenshotCapture.getAtomIdentity()`**:  
+This instance method of **ScreenshotCapture** enables test code to acquire the [AtomIdentity](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/AtomIdentity.java) object for the current JUnit 4 test method. This object can be interrogated for many useful propeties of the test method, including test class instance, **Description** object, and instance parameters.
 * **`ScreenshotCapture.getDescription()`**:  
 This instance method of **ScreenshotCapture** enables test code to acquire the [Description](http://junit.org/junit4/javadoc/latest/org/junit/runner/Description.html) object for the current JUnit 4 test method. This object can be interrogated for many useful propeties of the test method, including method name, attached annotations, and containing class.
 
