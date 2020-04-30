@@ -315,7 +315,7 @@ com.nordstrom.automation.selenium.junit.RetryAnalyzer
 | --- |
 | junit.max.retry=2 |
 
-In this example, these two configurations will enable **JUnit Foundation** to retry tests that fail with **WebDriverException** twice before counting them as failures. See the [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation) documentation for more details.
+In this example, these two configurations will enable **JUnit Foundation** to retry tests that fail with **WebDriverException** twice before counting them as failures. See the [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation#automatic-retry-of-failed-tests) documentation for more details.
 
 ## DEMONSTRATED FEATURES
 
