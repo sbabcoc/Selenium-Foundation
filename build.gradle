@@ -187,6 +187,18 @@ signing {
   sign configurations.archives
 }
 
+install {
+  repositories {
+    mavenInstaller {
+      pom.scopeMappings.with {
+        mappings.clear()
+        addMapping(300, configurations.compile, 'compile')
+        addMapping(300, configurations["${profile}Compile"], 'compile')
+      }
+    }
+  }
+}
+
 uploadArchives {
   repositories {
     mavenDeployer {
@@ -215,39 +227,44 @@ uploadArchives {
         addMapping(300, configurations.compile, 'compile')
         addMapping(300, configurations["${profile}Compile"], 'compile')
       }
-            
-      pom.project {
-        name 'Selenium Foundation'
-        groupId project.group
-        artifactId rootProject.name
-        version archiveVer
-        packaging 'jar'
-        description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
-        url 'https://github.com/Nordstrom/Selenium-Foundation'
+    }
+  }
+}
 
-        scm {
-          connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
-          developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
-          url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
-          tag 'HEAD'
-        }
+def installer = install.repositories.mavenInstaller
+def deployer = uploadArchives.repositories.mavenDeployer
 
-        licenses {
-          license {
-            name 'The Apache License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          }
-        }
+[installer, deployer]*.pom*.whenConfigured { pom ->
+  pom.project {
+    name 'Selenium Foundation'
+    groupId project.group
+    artifactId rootProject.name
+    version archiveVer
+    packaging 'jar'
+    description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
+    url 'https://github.com/Nordstrom/Selenium-Foundation'
 
-        developers {
-          developer {
-            id 'scoba'
-            name 'Scott Babcock'
-            email 'scoba@hotmail.com'
-            organization 'Nordstrom'
-            organizationUrl 'https://shop.nordstrom.com'
-          }
-        }
+    scm {
+      connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+      developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
+      url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
+      tag 'HEAD'
+    }
+
+    licenses {
+      license {
+        name 'The Apache License, Version 2.0'
+        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+      }
+    }
+
+    developers {
+      developer {
+        id 'scoba'
+        name 'Scott Babcock'
+        email 'scoba@hotmail.com'
+        organization 'Nordstrom'
+        organizationUrl 'https://shop.nordstrom.com'
       }
     }
   }
