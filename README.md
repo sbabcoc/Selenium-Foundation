@@ -50,6 +50,11 @@ Both configurations of **Selenium Foundation** can by built from the command lin
 > **`gradle build`** `# build Selenium 3 configuration`  
 > **`gradle build -Pprofile=selenium2`** `# build Selenium 2 configuration`  
 
+Use the `install` task to install SNAPSHOT builds in your local Maven repository:
+
+> **`gradle install`** `# build Selenium 3 configuration`  
+> **`gradle install -Pprofile=selenium2`** `# build Selenium 2 configuration`  
+
 #### Maven Support
 
 Although Gradle is used to produce official releases, **Selenium Foundation** also includes a fully-functional Maven POM file.
