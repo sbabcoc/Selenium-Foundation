@@ -59,8 +59,8 @@ Use the `install` task to install SNAPSHOT builds in your local Maven repository
 
 Although Gradle is used to produce official releases, **Selenium Foundation** also includes a fully-functional Maven POM file.
 
-> **`mvn install -Pselenium3`** `# build Selenium 3 configuration`  
-> **`mvn install -Pselenium2`** `# build Selenium 2 configuration`
+> **`mvn package -Pselenium3`** `# build Selenium 3 configuration`  
+> **`mvn package -Pselenium2`** `# build Selenium 2 configuration`
 
 Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at `META-INF\maven\com.nordstrom.ui-tools\selenium-foundation\pom.xml`
 
