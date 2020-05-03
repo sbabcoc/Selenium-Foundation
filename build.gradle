@@ -187,6 +187,18 @@ signing {
   sign configurations.archives
 }
 
+install {
+  repositories {
+    mavenInstaller {
+      pom.scopeMappings.with {
+        mappings.clear()
+        addMapping(300, configurations.compile, 'compile')
+        addMapping(300, configurations["${profile}Compile"], 'compile')
+      }
+    }
+  }
+}
+
 uploadArchives {
   repositories {
     mavenDeployer {
@@ -210,18 +222,6 @@ uploadArchives {
         authentication(userName: ossrhUsername, password: ossrhPassword)
       }
 
-      pom.scopeMappings.with {
-        mappings.clear()
-        addMapping(300, configurations.compile, 'compile')
-        addMapping(300, configurations["${profile}Compile"], 'compile')
-      }
-    }
-  }
-}
-
-install {
-  repositories {
-    mavenInstaller {
       pom.scopeMappings.with {
         mappings.clear()
         addMapping(300, configurations.compile, 'compile')
