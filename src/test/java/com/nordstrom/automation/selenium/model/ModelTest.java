@@ -25,6 +25,11 @@ public class ModelTest extends TestNgBase {
     }
 
     @Test
+    public void testFrameByLocator() {
+        ModelTestCore.testFrameByLocator(this);
+    }
+
+    @Test
     public void testFrameByElement() {
         ModelTestCore.testFrameByElement(this);
     }
@@ -57,6 +62,16 @@ public class ModelTest extends TestNgBase {
     @Test
     public void testFrameMap() {
         ModelTestCore.testFrameMap(this);
+    }
+    
+    @Test
+    public void testShadowRootByLocator() {
+        ModelTestCore.testShadowRootByLocator(this);
+    }
+
+    @Test
+    public void testShadowRootByElement() {
+        ModelTestCore.testShadowRootByElement(this);
     }
 
     /**
