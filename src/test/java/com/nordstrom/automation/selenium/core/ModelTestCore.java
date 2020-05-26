@@ -98,7 +98,7 @@ public class ModelTestCore {
     public static void testFrameList(TestBase instance) {
         ExamplePage page = getPage(instance);
         List<FrameComponent> frameList = page.getFrameList();
-        assertEquals(frameList.size(), 3);
+        assertEquals(frameList.size(), 4);
         assertEquals(frameList.get(0).getPageContent(), FRAME_A);
         assertEquals(frameList.get(1).getPageContent(), FRAME_B);
         assertEquals(frameList.get(2).getPageContent(), FRAME_C);
@@ -108,7 +108,7 @@ public class ModelTestCore {
     public static void testFrameMap(TestBase instance) {
         ExamplePage page = getPage(instance);
         Map<Object, FrameComponent> frameMap = page.getFrameMap();
-        assertEquals(frameMap.size(), 3);
+        assertEquals(frameMap.size(), 4);
         assertEquals(frameMap.get(FRAME_A).getPageContent(), FRAME_A);
         assertEquals(frameMap.get(FRAME_B).getPageContent(), FRAME_B);
         assertEquals(frameMap.get(FRAME_C).getPageContent(), FRAME_C);
