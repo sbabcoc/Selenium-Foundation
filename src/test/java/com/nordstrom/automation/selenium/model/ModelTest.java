@@ -58,7 +58,7 @@ public class ModelTest extends TestNgBase {
     public void testFrameMap() {
         ModelTestCore.testFrameMap(this);
     }
-    
+
     /**
      * This test verifies that stale elements are automatically refreshed
      * and that the search context chain gets refreshed efficiently.

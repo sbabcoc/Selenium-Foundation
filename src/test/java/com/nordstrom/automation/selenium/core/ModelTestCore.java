@@ -93,7 +93,7 @@ public class ModelTestCore {
         assertEquals(frameList.get(1).getPageContent(), FRAME_B);
         assertEquals(frameList.get(2).getPageContent(), FRAME_C);
     }
-    
+
     public static void testFrameMap(TestBase instance) {
         ExamplePage page = getPage(instance);
         Map<Object, FrameComponent> frameMap = page.getFrameMap();
