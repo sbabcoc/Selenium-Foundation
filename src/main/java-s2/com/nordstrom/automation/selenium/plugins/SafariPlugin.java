@@ -21,7 +21,8 @@ public class SafariPlugin implements DriverPlugin {
                     "org.apache.commons.exec.Executor",
                     "org.openqa.selenium.remote.RemoteWebDriver",
                     "com.sun.jna.platform.RasterRangesUtils",
-                    "com.sun.jna.Library"};
+                    "com.sun.jna.Library",
+                    "org.jboss.netty.channel.ChannelFactory"};
     
     /**
      * {@inheritDoc}

@@ -71,7 +71,7 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>selenium.grid.launcher</b> <br> default: {@code null} */
         GRID_LAUNCHER("selenium.grid.launcher", null),
         /** name: <b>selenium.hub.config</b> <br> default: <b>hubConfig.json</b> */
-        HUB_CONFIG("selenium.hub.config", "hubConfig.json"),
+        HUB_CONFIG("selenium.hub.config", null),
         /**
          * This is URL for the Selenium Grid endpoint: [scheme:][//authority]/wd/hub
          * <p>

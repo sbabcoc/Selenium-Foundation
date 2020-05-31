@@ -32,8 +32,8 @@ import com.nordstrom.automation.testng.ListenerChain;
  *     order in which they're invoked. This is similar in behavior to a JUnit rule chain.</li>
  *     <li>The {@link LinkedListeners} annotation: <br>
  *     To attach listeners to an active <b>ListenerChain</b>, mark your test class with the <b>LinkedListeners</b>
- *     annotation. This <b>QuickStart</b> class is marked with a <b>LinkedListeners</b> annotation that specifies two
- *     listeners that manage several core features of <b>Selenium Foundation</b>: <ul>
+ *     annotation. <b>QuickStart</b> extends {@link TestNgBase}, which is marked with a <b>LinkedListeners</b>
+ *     annotation that specifies two listeners that manage several core features of <b>Selenium Foundation</b>: <ul>
  *         <li>{@link DriverManager}: <br>
  *         <b>DriverManager</b> is a TestNG listener that manages driver sessions and local Selenium Grid servers.</li>
  *         <li>{@link ExecutionFlowController}: <br>
