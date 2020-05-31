@@ -157,6 +157,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     GRID_LAUNCHER,
+                    "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
+                    "org.apache.commons.lang3.reflect.FieldUtils",
+                    "net.bytebuddy.matcher.ElementMatcher",
                     "org.openqa.selenium.BuildInfo",
                     "com.google.common.collect.ImmutableMap",
                     "com.beust.jcommander.JCommander",

@@ -1,6 +1,6 @@
 {
   "newSessionWaitTimeout": -1,
-  "capabilityMatcher": "org.openqa.grid.internal.utils.DefaultCapabilityMatcher",
+  "capabilityMatcher": "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
   "throwOnCapabilityNotPresent": true,
   "cleanUpCycle": 5000,
   "role": "hub",
