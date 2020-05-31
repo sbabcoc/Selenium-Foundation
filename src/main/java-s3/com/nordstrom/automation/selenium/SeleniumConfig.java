@@ -34,6 +34,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String JSON_TAIL = "] }";
     private static final String GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncherV3";
     private static final String HUB_PORT = "4445";
+    private static final String HUB_CONFIG = "hubConfig-s3.json";
     private static final String NODE_CONFIG = "nodeConfig-s3.json";
     
     /**
@@ -206,6 +207,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         Map<String, String> defaults = super.getDefaults();
         defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), GRID_LAUNCHER);
         defaults.put(SeleniumSettings.HUB_PORT.key(), HUB_PORT);
+        defaults.put(SeleniumSettings.HUB_CONFIG.key(), HUB_CONFIG);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
         return defaults;
     }
