@@ -374,6 +374,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         String shortName = contextClassName;
         int idx = shortName.lastIndexOf('.');
+        String protocol;
         
         if (idx > -1) {
             shortName = shortName.substring(idx + 1);
@@ -382,30 +383,36 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         String uri = contextClass.getResource(shortName + ".class").toString();
         
         if (uri.startsWith("file:")) {
-            throw new IllegalStateException("This class has been loaded from a directory and not from a jar file.");
-        }
-        
-        if (!uri.startsWith("jar:file:")) {
+            protocol = "file:";
+            String relPath = File.separatorChar + contextClassName.replace('.', File.separatorChar) + ".class";
+            if (uri.endsWith(relPath)) {
+                idx = uri.length() - relPath.length();
+            } else {
+                throw new IllegalStateException(
+                                "This class has been loaded from a class file, but I can't make sense of the path!");
+            }
+        } else if (uri.startsWith("jar:file:")) {
+            protocol = "jar:file:";
+            idx = uri.indexOf('!');
+            if (idx == -1) {
+                throw new IllegalStateException(
+                                "You appear to have loaded this class from a local jar file, but I can't make sense of the URL!");
+            }
+        } else {
             idx = uri.indexOf(':');
-            String protocol = (idx > -1) ? uri.substring(0, idx) : "(unknown)";
+            protocol = (idx > -1) ? uri.substring(0, idx) : "(unknown)";
             throw new IllegalStateException("This class has been loaded remotely via the " + protocol
                     + " protocol. Only loading from a jar on the local file system is supported.");
         }
-    
-        idx = uri.indexOf('!');
-    
-        if (idx > -1) {
-            try {
-                String fileName = URLDecoder.decode(uri.substring("jar:file:".length(), idx),
-                                Charset.defaultCharset().name());
-                return new File(fileName).getAbsolutePath();
-            } catch (UnsupportedEncodingException e) {
-                throw (InternalError) new InternalError("Default charset doesn't exist. Your VM is borked.").initCause(e);
-            }
-        }
         
-        throw new IllegalStateException(
-                "You appear to have loaded this class from a local jar file, but I can't make sense of the URL!");
+        try {
+            String fileName = URLDecoder.decode(uri.substring(protocol.length(), idx),
+                            Charset.defaultCharset().name());
+            return new File(fileName).getAbsolutePath();
+        } catch (UnsupportedEncodingException e) {
+            throw (InternalError) new InternalError(
+                            "Default charset doesn't exist. Your VM is borked.").initCause(e);
+        }
     }
 
     /**
