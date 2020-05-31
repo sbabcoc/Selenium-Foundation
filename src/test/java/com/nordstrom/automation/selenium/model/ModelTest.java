@@ -25,11 +25,6 @@ public class ModelTest extends TestNgBase {
     }
 
     @Test
-    public void testFrameByLocator() {
-        ModelTestCore.testFrameByLocator(this);
-    }
-
-    @Test
     public void testFrameByElement() {
         ModelTestCore.testFrameByElement(this);
     }
@@ -64,16 +59,6 @@ public class ModelTest extends TestNgBase {
         ModelTestCore.testFrameMap(this);
     }
     
-    @Test
-    public void testShadowRootByLocator() {
-        ModelTestCore.testShadowRootByLocator(this);
-    }
-
-    @Test
-    public void testShadowRootByElement() {
-        ModelTestCore.testShadowRootByElement(this);
-    }
-
     /**
      * This test verifies that stale elements are automatically refreshed
      * and that the search context chain gets refreshed efficiently.

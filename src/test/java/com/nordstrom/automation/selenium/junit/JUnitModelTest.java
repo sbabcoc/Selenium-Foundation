@@ -29,12 +29,6 @@ public class JUnitModelTest extends JUnitBase {
 
     @Test
     @Ignore
-    public void testFrameByLocator() {
-        ModelTestCore.testFrameByLocator(this);
-    }
-
-    @Test
-    @Ignore
     public void testFrameByElement() {
         ModelTestCore.testFrameByElement(this);
     }
@@ -73,18 +67,6 @@ public class JUnitModelTest extends JUnitBase {
     @Ignore
     public void testFrameMap() {
         ModelTestCore.testFrameMap(this);
-    }
-
-    @Test
-    @Ignore
-    public void testShadowRootByLocator() {
-        ModelTestCore.testShadowRootByLocator(this);
-    }
-
-    @Test
-    @Ignore
-    public void testShadowRootByElement() {
-        ModelTestCore.testShadowRootByElement(this);
     }
 
     /**
