@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -74,6 +76,10 @@ public final class JsUtility {
     private static final String MESSAGE_KEY = "message";
     
     private static final String DOCUMENT_READY = getScriptResource("documentReady.js");
+    
+    private static final List<String> JS_EXCEPTIONS = Arrays.asList(
+                    "org.openqa.selenium.WebDriverException",
+                    "org.openqa.selenium.JavascriptException");
     
     /**
      * Private constructor to prevent instantiation.
@@ -234,7 +240,7 @@ public final class JsUtility {
     public static RuntimeException propagate(final WebDriver driver, final WebDriverException exception) {
         Throwable thrown = exception;
         // if exception is a WebDriverException (not a sub-class)
-        if (exception.getClass().equals(WebDriverException.class)) {
+        if (JS_EXCEPTIONS.contains(exception.getClass().getName())) {
             // extract serialized exception object from message
             thrown = extractException(exception, exception.getMessage());
             

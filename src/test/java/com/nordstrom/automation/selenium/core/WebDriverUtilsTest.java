@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -93,9 +95,9 @@ public class WebDriverUtilsTest extends TestNgBase {
         SeleniumConfig config = SeleniumConfig.getConfig();
         String browserName = config.getCurrentCapabilities().getBrowserName();
         
-        assertEquals(WebDriverUtils.getBrowserName((SearchContext) driver), browserName);
-        assertEquals(WebDriverUtils.getBrowserName(page), browserName);
-        assertEquals(WebDriverUtils.getBrowserName(element), browserName);
+        assertThat(WebDriverUtils.getBrowserName((SearchContext) driver), equalToIgnoringCase(browserName));
+        assertThat(WebDriverUtils.getBrowserName(page), equalToIgnoringCase(browserName));
+        assertThat(WebDriverUtils.getBrowserName(element), equalToIgnoringCase(browserName));
         
         try {
             WebDriverUtils.getBrowserName(mock(WebDriver.class));
