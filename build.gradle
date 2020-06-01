@@ -292,11 +292,11 @@ dependencies {
     exclude group: 'org.testng', module: 'testng'
   }
   compile 'org.jsoup:jsoup:1.12.1'
+  compile('org.hamcrest:hamcrest-core:2.2') { force = true }
   
   apply from: "${profile}Deps.gradle"
   
   testCompile configurations["${profile}Compile"]
-  testCompile 'org.hamcrest:hamcrest-core:2.2'
   implementation 'org.testng:testng:6.9.6'
 }
 ext {
