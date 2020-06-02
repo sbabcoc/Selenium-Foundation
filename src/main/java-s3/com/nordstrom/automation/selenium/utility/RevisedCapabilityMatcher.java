@@ -1,7 +1,7 @@
 package com.nordstrom.automation.selenium.utility;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
-import static  org.openqa.selenium.remote.BrowserType.SAFARI;
+import static org.openqa.selenium.remote.BrowserType.SAFARI;
 import static org.openqa.selenium.remote.CapabilityType.BROWSER_NAME;
 
 import java.lang.reflect.Field;
