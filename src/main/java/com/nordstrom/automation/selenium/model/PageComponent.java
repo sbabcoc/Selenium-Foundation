@@ -22,9 +22,9 @@ import com.nordstrom.automation.selenium.support.Coordinator;
  *     <li>Create {@link #PageComponent(By, int, ComponentContainer) page component by locator and index}.</li>
  *     <li>Create {@link #PageComponent(RobustWebElement, ComponentContainer) page component by context element}.</li>
  * </ol>
- * Your page component class can implement any of these constructors, but #3 ({@code page component by context element}
- * ) is required if you wish to collect multiple instances in a {@link ComponentList} or {@link ComponentMap}. Also
- * note that you must override {@link #hashCode()} and {@link #equals(Object)} if you add significant fields.
+ * Your page component class can implement any of these constructors, but #3 ({@code page component by context
+ * element}) is required if you wish to collect multiple instances in a {@link ComponentList} or {@link ComponentMap}.
+ * Also note that you must override {@link #hashCode()} and {@link #equals(Object)} if you add significant fields.
  */
 public class PageComponent extends ComponentContainer implements WrapsElement {
 

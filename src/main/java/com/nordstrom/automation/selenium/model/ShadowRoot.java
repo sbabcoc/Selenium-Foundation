@@ -6,6 +6,19 @@ import org.openqa.selenium.SearchContext;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
+/**
+ * Extend this class when modeling a shadow root element, which is the attachment point for a shadow DOM.
+ * <p>
+ * This class defines three constructors:
+ * <ol>
+ *     <li>Create {@link #ShadowRoot(By, ComponentContainer) shadow root by locator}.</li>
+ *     <li>Create {@link #ShadowRoot(By, int, ComponentContainer) shadow root by locator and index}.</li>
+ *     <li>Create {@link #ShadowRoot(RobustWebElement, ComponentContainer) shadow root by host element}.</li>
+ * </ol>
+ * Your shadow root class can implement any of these constructors, but #3 ({@code shadow root by host element}) is
+ * required if you wish to collect multiple instances in a {@link ComponentList} or {@link ComponentMap}. Also note
+ * that you must override {@link #hashCode()} and {@link #equals(Object)} if you add significant fields.
+ */
 public class ShadowRoot extends PageComponent {
     
     private static final String SHADOW_ROOT = "return arguments[0].shadowRoot;";
@@ -45,7 +58,9 @@ public class ShadowRoot extends PageComponent {
     }
     
     /**
-     * 
+     * Verify that the specified root element is a shadow host with an 'open' shadow DOM.
+     * <p>
+     * <b>NOTE</b>: This method throws {@link ShadowRootContextException} if verification fails.
      */
     private void verifyShadowRoot() {
         if (null == getWrappedContext()) {
