@@ -1,10 +1,10 @@
 package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 public class ShadowRoot extends PageComponent {
     
@@ -49,7 +49,7 @@ public class ShadowRoot extends PageComponent {
      */
     private void verifyShadowRoot() {
         if (null == getWrappedContext()) {
-            throw new NoSuchElementException("Context is not a shadow host or has 'closed' shadow-DOM mode");
+            throw new ShadowRootContextException();
         }
     }
     

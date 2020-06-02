@@ -6,7 +6,10 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.List;
 import java.util.Map;
 
+import org.testng.SkipException;
+
 import com.nordstrom.automation.selenium.annotations.InitialPage;
+import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.automation.selenium.model.FrameComponent;
 import com.nordstrom.automation.selenium.model.ShadowRootComponent;
@@ -117,14 +120,22 @@ public class ModelTestCore {
     
     public static void testShadowRootByLocator(TestBase instance) {
         ExamplePage page = getPage(instance);
-        ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
-        assertEquals(shadowRoot.getContent(), SHADOW_DOM_A);
+        try {
+            ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
+            assertEquals(shadowRoot.getContent(), SHADOW_DOM_A);
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
     }
     
     public static void testShadowRootByElement(TestBase instance) {
         ExamplePage page = getPage(instance);
-        ShadowRootComponent shadowRoot = page.getShadowRootByElement();
-        assertEquals(shadowRoot.getContent(), SHADOW_DOM_B);
+        try {
+            ShadowRootComponent shadowRoot = page.getShadowRootByElement();
+            assertEquals(shadowRoot.getContent(), SHADOW_DOM_B);
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
     }
     
     /**
