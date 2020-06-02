@@ -13,7 +13,7 @@ public class HtmlUnitPlugin implements DriverPlugin {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.33.3&lt;/version&gt;
+     *  &lt;version&gt;2.40.0&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
@@ -33,7 +33,8 @@ public class HtmlUnitPlugin implements DriverPlugin {
                     "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
                     "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.parser.CSSParser",
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
-                    "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser"};
+                    "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser",
+                    "org.brotli.dec.Utils"};
     
     /**
      * {@inheritDoc}

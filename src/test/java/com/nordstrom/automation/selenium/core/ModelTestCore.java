@@ -6,9 +6,13 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.List;
 import java.util.Map;
 
+import org.testng.SkipException;
+
 import com.nordstrom.automation.selenium.annotations.InitialPage;
+import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.automation.selenium.model.FrameComponent;
+import com.nordstrom.automation.selenium.model.ShadowRootComponent;
 import com.nordstrom.automation.selenium.model.TableComponent;
 
 @InitialPage(ExamplePage.class)
@@ -21,7 +25,10 @@ public class ModelTestCore {
     private static final String FRAME_A = "Frame A";
     private static final String FRAME_B = "Frame B";
     private static final String FRAME_C = "Frame C";
+    private static final String FRAME_D = "Frame D";
     private static final String TABLE_ID = "t1";
+    private static final String SHADOW_DOM_A = "Shadow DOM A";
+    private static final String SHADOW_DOM_B = "Shadow DOM B";
     
     public static void testBasicPage(TestBase instance) {
         ExamplePage page = getPage(instance);
@@ -40,7 +47,7 @@ public class ModelTestCore {
         TableComponent component = page.getTable();
         verifyTable(component);
     }
-
+    
     /**
      * Verify the contents of the specified table component
      * 
@@ -55,22 +62,28 @@ public class ModelTestCore {
         assertArrayEquals(content.get(2).toArray(), CONTENT[2]);
     }
     
+    public static void testFrameByLocator(TestBase instance) {
+        ExamplePage page = getPage(instance);
+        FrameComponent component = page.getFrameByLocator();
+        assertEquals(component.getPageContent(), FRAME_A);
+    }
+    
     public static void testFrameByElement(TestBase instance) {
         ExamplePage page = getPage(instance);
         FrameComponent component = page.getFrameByElement();
-        assertEquals(component.getPageContent(), FRAME_A);
+        assertEquals(component.getPageContent(), FRAME_B);
     }
-
+    
     public static void testFrameByIndex(TestBase instance) {
         ExamplePage page = getPage(instance);
         FrameComponent component = page.getFrameByIndex();
-        assertEquals(component.getPageContent(), FRAME_B);
+        assertEquals(component.getPageContent(), FRAME_C);
     }
-
+    
     public static void testFrameById(TestBase instance) {
         ExamplePage page = getPage(instance);
         FrameComponent component = page.getFrameById();
-        assertEquals(component.getPageContent(), FRAME_C);
+        assertEquals(component.getPageContent(), FRAME_D);
     }
     
     public static void testComponentList(TestBase instance) {
@@ -88,21 +101,43 @@ public class ModelTestCore {
     public static void testFrameList(TestBase instance) {
         ExamplePage page = getPage(instance);
         List<FrameComponent> frameList = page.getFrameList();
-        assertEquals(frameList.size(), 3);
+        assertEquals(frameList.size(), 4);
         assertEquals(frameList.get(0).getPageContent(), FRAME_A);
         assertEquals(frameList.get(1).getPageContent(), FRAME_B);
         assertEquals(frameList.get(2).getPageContent(), FRAME_C);
+        assertEquals(frameList.get(3).getPageContent(), FRAME_D);
     }
-
+    
     public static void testFrameMap(TestBase instance) {
         ExamplePage page = getPage(instance);
         Map<Object, FrameComponent> frameMap = page.getFrameMap();
-        assertEquals(frameMap.size(), 3);
+        assertEquals(frameMap.size(), 4);
         assertEquals(frameMap.get(FRAME_A).getPageContent(), FRAME_A);
         assertEquals(frameMap.get(FRAME_B).getPageContent(), FRAME_B);
         assertEquals(frameMap.get(FRAME_C).getPageContent(), FRAME_C);
+        assertEquals(frameMap.get(FRAME_D).getPageContent(), FRAME_D);
     }
-
+    
+    public static void testShadowRootByLocator(TestBase instance) {
+        ExamplePage page = getPage(instance);
+        try {
+            ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
+            assertEquals(shadowRoot.getContent(), SHADOW_DOM_A);
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
+    }
+    
+    public static void testShadowRootByElement(TestBase instance) {
+        ExamplePage page = getPage(instance);
+        try {
+            ShadowRootComponent shadowRoot = page.getShadowRootByElement();
+            assertEquals(shadowRoot.getContent(), SHADOW_DOM_B);
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
+    }
+    
     /**
      * This test verifies that stale elements are automatically refreshed
      * and that the search context chain gets refreshed efficiently.
@@ -163,7 +198,7 @@ public class ModelTestCore {
         assertEquals(headRefreshCount, 1);
         assertArrayEquals(bodyRefreshCounts, new int[] {1, 1, 1});
     }
-
+    
     private static ExamplePage getPage(TestBase instance) {
         return (ExamplePage) instance.getInitialPage();
     }

@@ -52,6 +52,7 @@
     <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
     <dependency-plugin.version>3.1.1</dependency-plugin.version>
     <clean-plugin.version>3.1.0</clean-plugin.version>
+    <hamcrest.version>2.2</hamcrest.version>
   </properties>
   
   <scm>
@@ -92,6 +93,11 @@
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>${jsoup.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>${hamcrest.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -282,7 +288,7 @@
         <testng-foundation.version>2.0.1</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>28.1-jre</guava.version>
-        <htmlunit.version>2.33.3</htmlunit.version>
+        <htmlunit.version>2.40.0</htmlunit.version>
         <jcommander.version>1.78</jcommander.version>
         <commons-io.version>2.6</commons-io.version>
         <mockito.version>3.1.0</mockito.version>

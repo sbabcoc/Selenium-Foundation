@@ -324,6 +324,11 @@ public class RobustElementWrapper implements ReferenceFetcher {
                     try {
                         wrapper.wrapped = context.findElement(wrapper.locator);
                     } catch (NoSuchElementException e) {
+                        // if context is a web element
+                        if (context instanceof WebElement) {
+                            // force exception if context stale
+                            ((WebElement) context).getTagName();
+                        }
                         thrown = e;
                     }
                 }
