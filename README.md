@@ -84,7 +84,9 @@ Page classes can be explicitly associated with web application paths through the
 
 ### Customizable Transition Error Detection
 
-In addition to automatic landing page verification, you can register custom [transition error detectors](docs/TransitionErrorDetection.md). 
+In conjunction with automatic landing page verification, **Selenium Foundation** invokes registered custom [transition error detectors](docs/TransitionErrorDetection.md). Implement the [TransitionErrorDetector](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/interfaces/TransitionErrorDetector.java) interface, then register them in the corresponding service loader configuration file (**META-INF/services/com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector**).
+
+Examples of the sorts of conditions you may want to detect include error pages (e.g. - page not found) or non-context error messages (e.g. - communication issues, access token timeout). For recoverable conditions, error detectors can also server as error handler. For example, you could implement a detector that automatically logs back in if your test encounters an access timeout.
 
 ### Component Collection Classes
 
@@ -155,7 +157,7 @@ The **`@LinkedListeners`** annotation is processed by the **ListenerChain**, whi
 | --- |
 | testng.max.retry=2 |
 
-The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation) documentation for more details.
+The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation#attaching-retry-analyzers-via-retrymanager) documentation for more details.
 
 ## DEMONSTRATED FEATURES
 
