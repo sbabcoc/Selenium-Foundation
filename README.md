@@ -74,9 +74,17 @@ The [QuickStart](https://github.com/Nordstrom/Selenium-Foundation/blob/master/sr
 
 **Selenium Foundation** provides a complete set of base classes for building well-factored page models. This includes page components and frames. **Selenium Foundation** allows you to focus on modeling your application (instead of managing which window or frame the driver is addressing) by handling all driver targeting for you. You'll never see `driver.switchTo(...)` in page model automation built with **Selenium Foundation**, because the framework automatically ensures that the driver is addressing the window or frame associated with each page model method before it's invoked.
 
+### Support for Frame-Based Components and Shadow-DOM Hierarchies
+
+**Selenium Foundation** provides base classes for modeling frame-based components and shadow-DOM hierarchies. These base classes handle the specific details of interacting with these DOM features through the underlying Selenium API, managing search context and driver targeting for you. The implementation of each component is totally dedicated to the functionality of the elements you're modeling - never cluttered with boilerplate code to switch driver focus or traverse into shadow hierarchies.
+
 ### Landing Page Verification / Model-Directed Navigation
 
 Page classes can be explicitly associated with web application paths through the **`@PageUrl`** annotation. These associations can be declared as either fixed paths or patterns, and these declarations are used by **Selenium Foundation** to verify landing page paths at page transitions. You can also perform direct navigation to web application paths associated with page classes through the **`@PageUrl`** annotation.
+
+### Customizable Transition Error Detection
+
+In addition to automatic landing page verification, you can register custom [transition error detectors](docs/TransitionErrorDetection.md). 
 
 ### Component Collection Classes
 
