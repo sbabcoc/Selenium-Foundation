@@ -76,7 +76,7 @@ The [QuickStart](https://github.com/Nordstrom/Selenium-Foundation/blob/master/sr
 
 ### Support for Frame-Based Components and Shadow-DOM Hierarchies
 
-**Selenium Foundation** provides base classes for modeling frame-based components and shadow-DOM hierarchies. These base classes handle the specific details of interacting with these DOM features through the underlying Selenium API, managing search context and driver targeting for you. The implementation of each component is totally dedicated to the functionality of the elements you're modeling - never cluttered with boilerplate code to switch driver focus or traverse into shadow hierarchies.
+**Selenium Foundation** provides base classes for modeling frame-based components and shadow-DOM hierarchies. These base classes handle the specific details of interacting with these DOM features through the underlying Selenium API, managing search context and driver targeting for you. The implementation of your components will be totally dedicated to the functionality of the elements you're modeling - never cluttered with boilerplate code to switch driver focus or traverse into shadow hierarchies.
 
 ### Landing Page Verification / Model-Directed Navigation
 

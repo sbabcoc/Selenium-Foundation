@@ -4,8 +4,13 @@ In conjunction with automatic landing page verification, **Selenium Foundation**
 
 Examples of the sorts of conditions you may want to detect include error pages (e.g. - page not found) or non-context error messages (e.g. - communication issues, access token timeout). For recoverable conditions, error detectors can also server as error handler. For example, you could implement a detector that automatically logs back in if your test encounters an access timeout.
 
+**Selenium Foundation** calls your registered transition error detectors in three scenarios:
 
-##### Detector for '404 - Page Not Found'
+* While waiting for a new browser window to appear when transitioning to a landing page that opens in a new window
+* While waiting for a container (i.e. - page or component) that implements completion reporting to finish loading
+* While waiting for a reference element to go stale when transitioning to a landing page that doesn't implement load completion reporting
+
+###### Detector for '404 - Page Not Found'
 ```java
 package com.example;
 
@@ -43,3 +48,11 @@ public class PageNotFoundDetector implements TransitionErrorDetector {
 ```
 
 In the preceding example, the error detection code searches for an image tag with alternate test that begins with "404". (This detector would identify the current "page not found" page of GitHub itself.) Note the use of the "optional element" feature of **Selenium Foundation**, which determines if the indicated element can be found immediately. Even if the target session is configured with non-zero [implicit wait](https://www.selenium.dev/documentation/en/webdriver/waits/#implicit-wait) interval, the `findOptional()` call will return a result after a single scan of the search context. To determine if the optional element was actually found, invoke the `hasReference()` method.
+
+###### Detector for Non-Context Error Message
+```java
+```
+
+###### Detector to Handle Access Timeout
+```java
+```
