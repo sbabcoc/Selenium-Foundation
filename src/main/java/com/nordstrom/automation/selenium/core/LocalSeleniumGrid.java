@@ -384,7 +384,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         if (uri.startsWith("file:")) {
             protocol = "file:";
-            String relPath = File.separatorChar + contextClassName.replace('.', File.separatorChar) + ".class";
+            String relPath = '/' + contextClassName.replace('.', '/') + ".class";
             if (uri.endsWith(relPath)) {
                 idx = uri.length() - relPath.length();
             } else {
