@@ -98,4 +98,44 @@ In the preceding example, the error detection code determines if any elements ma
 
 ###### Detector to Handle Access Timeout
 ```java
+package com.example;
+
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import com.nordstrom.automation.selenium.core.ByType.ByEnum;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector;
+import com.nordstrom.automation.selenium.model.ComponentContainer;
+import com.nordstrom.automation.selenium.model.RobustWebElement;
+
+public class ErrorMessageDetector implements TransitionErrorDetector {
+
+    private enum Using implements ByEnum {
+        POPUP_DIALOG(By.cssSelector("div.popup-dialog"));
+        
+        private By locator;
+        
+        Using(By locator) {
+            this.locator = locator;
+        }
+        
+        @Override
+        public By locator() {
+            return locator;
+        }
+    }
+
+    @Override
+    public String scanForErrors(ComponentContainer context) {
+        List<WebElement> dialogs = context.findElements(Using.POPUP_DIALOG);
+        if (WebDriverUtils.filterHidden(dialogs)) {
+            return null;
+        }
+        for (WebElement dialog : dialogs) {
+            
+        }
+    }
+}
 ```
