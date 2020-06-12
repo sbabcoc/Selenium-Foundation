@@ -51,7 +51,50 @@ In the preceding example, the error detection code searches for an image tag wit
 
 ###### Detector for Non-Context Error Message
 ```java
+package com.example;
+
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import com.nordstrom.automation.selenium.core.ByType.ByEnum;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector;
+import com.nordstrom.automation.selenium.model.ComponentContainer;
+
+public class ErrorMessageDetector implements TransitionErrorDetector {
+
+    private enum Using implements ByEnum {
+        ALERT_CONTENT(By.cssSelector("div.a-alert-content"));
+        
+        private By locator;
+        
+        Using(By locator) {
+            this.locator = locator;
+        }
+        
+        @Override
+        public By locator() {
+            return locator;
+        }
+    }
+
+    @Override
+    public String scanForErrors(ComponentContainer context) {
+        List<WebElement> alerts = context.findElements(Using.ALERT_CONTENT);
+        if (WebDriverUtils.filterHidden(alerts)) {
+            return null;
+        }
+        StringBuilder errors = new StringBuilder();
+        for (WebElement alert : alerts) {
+            errors.append(alert.getText()).append('\n');
+        }
+        return errors.toString();
+    }
+}
 ```
+
+In the preceding example, the error detection code determines if any elements matching the specified locator are visible. If any visible alerts are found, the messages they contain are collected and returned. Note that this code assumes at least one matching element will be found (normally hidden). If no matching elements exist and the target session is configured with a non-zero implicit wait interval, landing page verification will be blocked until the wait interval expires.
 
 ###### Detector to Handle Access Timeout
 ```java
