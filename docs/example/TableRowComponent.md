@@ -1,4 +1,4 @@
-| [ModelTest.java](ModelTest.md) | [ExamplePage.java](ExamplePage.md) | [TableComponent.java](TableComponent.md) | **TableRowComponent.java** | [FrameComponent.java](FrameComponent.md) |
+| [ModelTest.java](ModelTest.md) | [ExamplePage.java](ExamplePage.md) | [TableComponent.java](TableComponent.md) | **TableRowComponent.java** | [FrameComponent.java](FrameComponent.md) | [ShadowRootComponent.java](ShadowRootComponent.md) |
 
 # Sample Code
 
@@ -15,36 +15,41 @@ import org.openqa.selenium.WebElement;
 
 public class TableRowComponent extends PageComponent {
 
-	public TableRowComponent(By locator, ComponentContainer parent) {
-		super(locator, parent);
-	}
-	
-	public TableRowComponent(RobustWebElement element, ComponentContainer parent) {
-		super(element, parent);
-	}
-	
-	protected enum Using {
-		TBL_CELL(By.cssSelector("th,td"));
-		
-		private By selector;
-		
-		Using(By selector) {
-			this.selector = selector;
-		}
-	}
-	
-	private List<WebElement> cells;
+    public TableRowComponent(By locator, ComponentContainer parent) {
+        super(locator, parent);
+    }
+    
+    public TableRowComponent(RobustWebElement element, ComponentContainer parent) {
+        super(element, parent);
+    }
+    
+    protected enum Using implements ByEnum {
+        TBL_CELL(By.cssSelector("th,td"));
+        
+        private By locator;
+        
+        Using(By locator) {
+            this.locator = locator;
+        }
 
-	public List<String> getContent() {
-		List<WebElement> cells = getCells();
-		return Arrays.asList(cells.get(0).getText(), cells.get(1).getText(), cells.get(2).getText());
-	}
-	
-	private List<WebElement> getCells() {
-		if (cells == null) {
-			cells = findElements(Using.TBL_CELL.selector);
-		}
-		return cells;
-	}
+        @Override
+        public By locator() {
+            return locator;
+        }
+    }
+    
+    private List<WebElement> cells;
+    
+    public List<String> getContent() {
+        List<WebElement> cells = getCells();
+        return Arrays.asList(cells.get(0).getText(), cells.get(1).getText(), cells.get(2).getText());
+    }
+    
+    private List<WebElement> getCells() {
+        if (cells == null) {
+            cells = findElements(Using.TBL_CELL);
+        }
+        return cells;
+    }
 }
 ```

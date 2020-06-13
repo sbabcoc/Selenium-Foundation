@@ -74,9 +74,19 @@ The [QuickStart](https://github.com/Nordstrom/Selenium-Foundation/blob/master/sr
 
 **Selenium Foundation** provides a complete set of base classes for building well-factored page models. This includes page components and frames. **Selenium Foundation** allows you to focus on modeling your application (instead of managing which window or frame the driver is addressing) by handling all driver targeting for you. You'll never see `driver.switchTo(...)` in page model automation built with **Selenium Foundation**, because the framework automatically ensures that the driver is addressing the window or frame associated with each page model method before it's invoked.
 
+### Support for Frame-Based Components and Shadow-DOM Hierarchies
+
+**Selenium Foundation** provides base classes for modeling frame-based components and shadow-DOM hierarchies. These base classes handle the specific details of interacting with these DOM features through the underlying Selenium API, managing search context and driver targeting for you. The implementation of your components will be totally dedicated to the functionality of the elements you're modeling - never cluttered with boilerplate code to switch driver focus or traverse into shadow hierarchies.
+
 ### Landing Page Verification / Model-Directed Navigation
 
 Page classes can be explicitly associated with web application paths through the **`@PageUrl`** annotation. These associations can be declared as either fixed paths or patterns, and these declarations are used by **Selenium Foundation** to verify landing page paths at page transitions. You can also perform direct navigation to web application paths associated with page classes through the **`@PageUrl`** annotation.
+
+### Customizable Transition Error Detection
+
+In conjunction with automatic landing page verification, **Selenium Foundation** invokes registered custom [transition error detectors](docs/TransitionErrorDetection.md). Implement the [TransitionErrorDetector](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/interfaces/TransitionErrorDetector.java) interface, then register your detectors in the corresponding service loader configuration file (**META-INF/services/com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector**).
+
+Examples of the sorts of conditions you may want to detect include error pages (e.g. - page not found) or non-context error messages (e.g. - communication issues, access token timeout). For recoverable conditions, error detectors can also server as error handler. For example, you could implement a detector that automatically logs back in if your test encounters an access timeout.
 
 ### Component Collection Classes
 
@@ -147,7 +157,7 @@ The **`@LinkedListeners`** annotation is processed by the **ListenerChain**, whi
 | --- |
 | testng.max.retry=2 |
 
-The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation) documentation for more details.
+The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation#attaching-retry-analyzers-via-retrymanager) documentation for more details.
 
 ## DEMONSTRATED FEATURES
 
