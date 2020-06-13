@@ -10,6 +10,8 @@ Examples of the sorts of conditions you may want to detect include error pages (
 * While waiting for a container (i.e. - page or component) that implements completion reporting to finish loading
 * While waiting for a reference element to go stale when transitioning to a landing page that doesn't implement load completion reporting
 
+Pay special attention to the second scenario. Your registered error detectors may be called in the context of page components; you can't assume that the context is always going to be a page object. If you always want to scan the entire page, you can use global XPath selectors in your implementations. This is the approach employed in the examples below. Alternatively, you can implement detectors that only examine specific contexts or context types (i.e. - `context instanceof SpecificComponent`).
+
 ###### Detector for '404 - Page Not Found'
 ```java
 package com.example;
@@ -25,7 +27,7 @@ public class PageNotFoundDetector implements TransitionErrorDetector {
     private static final String MESSAGE = "Page not found: %s";
 
     private enum Using implements ByEnum {
-        IMAGE_404(By.cssSelector("img[alt^='404']"));
+        IMAGE_404(By.xpath("//img[starts-with(@alt, '404')]"));
         
         private By locator;
         
@@ -41,6 +43,9 @@ public class PageNotFoundDetector implements TransitionErrorDetector {
 
     @Override
     public String scanForErrors(ComponentContainer context) {
+        if ( ! context instanceof Page) {
+            return null;
+        }
         RobustWebElement errorCheck = context.findOptional(Using.IMAGE_404);
         return errorCheck.hasReference() ? String.format(MESSAGE, context.getDriver().getCurrentUrl()) : null;
     }
@@ -65,7 +70,7 @@ import com.nordstrom.automation.selenium.model.ComponentContainer;
 public class ErrorMessageDetector implements TransitionErrorDetector {
 
     private enum Using implements ByEnum {
-        ALERT_CONTENT(By.cssSelector("div.a-alert-content"));
+        ALERT_CONTENT(By.xpath("//div[contains(concat(' ', @class, ' '), ' a-alert-content ')]"));
         
         private By locator;
         
@@ -100,8 +105,6 @@ In the preceding example, the error detection code determines if any elements ma
 ```java
 package com.example;
 
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.core.ByType.ByEnum;
@@ -112,8 +115,10 @@ import com.nordstrom.automation.selenium.model.RobustWebElement;
 
 public class ErrorMessageDetector implements TransitionErrorDetector {
 
+    private static final String MESSAGE = "Session timeout; auto-login failed: %s";
+
     private enum Using implements ByEnum {
-        POPUP_DIALOG(By.cssSelector("div.popup-dialog"));
+        LOGIN_POPUP(By.xpath("//div[contains(concat(' ', @class, ' '), ' login-popup ')]"));
         
         private By locator;
         
@@ -129,13 +134,17 @@ public class ErrorMessageDetector implements TransitionErrorDetector {
 
     @Override
     public String scanForErrors(ComponentContainer context) {
-        List<WebElement> dialogs = context.findElements(Using.POPUP_DIALOG);
-        if (WebDriverUtils.filterHidden(dialogs)) {
-            return null;
+        WebElement popup = context.findElement(Using.LOGIN_POPUP);
+        if (popup.isDisplayed()) {
+            LoginDialog dialog = new LoginDialog((RobustWebElement) popup, context.getParentPage());
+            if (dialog.login()) {
+                return String.format(MESSAGE, dialog.getError());
+            }
         }
-        for (WebElement dialog : dialogs) {
-            
-        }
+        return null;
     }
 }
 ```
+
+In the preceding example, the error detection code determines if the login dialog is visible. If so, the detector attempts to log back in, returning the dialog error message 
+if the attempt fails.
