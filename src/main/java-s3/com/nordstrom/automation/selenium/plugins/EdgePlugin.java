@@ -13,11 +13,12 @@ public class EdgePlugin implements DriverPlugin {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;selenium-edge-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;3.14.0&lt;/version&gt;
+     *  &lt;version&gt;3.141.59&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.edge.EdgeDriver"};
+                    "org.openqa.selenium.edge.EdgeDriver",
+                    "org.apache.commons.exec.Executor"};
     
     /**
      * {@inheritDoc}
