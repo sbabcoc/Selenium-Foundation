@@ -2,6 +2,11 @@ package com.nordstrom.automation.selenium;
 
 import java.util.Map;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import net.bytebuddy.implementation.Implementation;
+
 public interface DriverPlugin {
     
     /**
@@ -39,5 +44,16 @@ public interface DriverPlugin {
      * @return System property names
      */
     String[] getPropertyNames();
+    
+    /**
+     * Get default constructor for this driver's {@link WebElement} implementation.
+     * <p>
+     * <b>NOTE</b>: This is only needed for implementations that use non-default constructors.
+     * 
+     * @param driver target driver instance
+     * @param refClass class of {@code WebDriver} implementation
+     * @return default constructor implementation
+     */
+    Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass);
     
 }

@@ -2,10 +2,9 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class InternetExplorerPlugin implements DriverPlugin {
+public class InternetExplorerPlugin extends RemoteWebDriverPlugin {
     
     /**
      * <a href='https://www.microsoft.com/en-au/download/confirmation.aspx?id=44069'>IE WebDriver Tools</a>

@@ -2,10 +2,9 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class FirefoxPlugin implements DriverPlugin {
+public class FirefoxPlugin extends RemoteWebDriverPlugin {
     
     /**
      * For Selenium 2.53.1, use Firefox 47.0.1

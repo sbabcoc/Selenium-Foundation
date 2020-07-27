@@ -2,10 +2,9 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class SafariPlugin implements DriverPlugin {
+public class SafariPlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.safari.SafariDriver</b>

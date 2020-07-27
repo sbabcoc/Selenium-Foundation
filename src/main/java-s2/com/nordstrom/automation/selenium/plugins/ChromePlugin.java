@@ -2,10 +2,9 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class ChromePlugin implements DriverPlugin {
+public class ChromePlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.chrome.ChromeDriver</b>

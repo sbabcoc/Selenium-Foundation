@@ -1,9 +1,16 @@
 package com.nordstrom.automation.selenium.plugins;
 
+import java.lang.reflect.Constructor;
 import java.util.Map;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+
+import net.bytebuddy.implementation.Implementation;
+import net.bytebuddy.implementation.MethodCall;
 
 public class HtmlUnitPlugin implements DriverPlugin {
     
@@ -35,6 +42,9 @@ public class HtmlUnitPlugin implements DriverPlugin {
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
                     "org.eclipse.jetty.http.Syntax", "org.eclipse.jetty.xml.XmlParser",
                     "org.brotli.dec.Utils"};
+    
+    private static final String WEB_ELEMENT_CLASS_NAME =
+            "org.openqa.selenium.htmlunit.HtmlUnitWebElement";
     
     /**
      * {@inheritDoc}
@@ -74,6 +84,22 @@ public class HtmlUnitPlugin implements DriverPlugin {
     @Override
     public String[] getPropertyNames() {
         return HtmlUnitCaps.getPropertyNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass) {
+        if (refClass.getName().equals(WEB_ELEMENT_CLASS_NAME)) {
+            try {
+                Constructor<?> ctor = refClass.getConstructors()[0];
+                return MethodCall.invoke(ctor).onSuper().with(driver).with(Integer.valueOf(0)).with((Object) null);
+            } catch (SecurityException e) {
+                // nothing to do here
+            }
+        }
+        return null;
     }
 
 }

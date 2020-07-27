@@ -2,10 +2,9 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class OperaPlugin implements DriverPlugin {
+public class OperaPlugin extends RemoteWebDriverPlugin {
     
     /**
      * For Selenium 2.53.1, use Opera 40 and operadriver 0.2.2

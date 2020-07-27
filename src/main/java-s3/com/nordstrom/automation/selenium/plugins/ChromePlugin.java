@@ -2,18 +2,17 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class ChromePlugin implements DriverPlugin {
+public class ChromePlugin extends RemoteDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.chrome.ChromeDriver</b>
      * 
      * <pre>&lt;dependency&gt;
-     *    &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *    &lt;artifactId&gt;selenium-chrome-driver&lt;/artifactId&gt;
-     *    &lt;version&gt;3.14.0&lt;/version&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-chrome-driver&lt;/artifactId&gt;
+     *  &lt;version&gt;3.141.59&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
