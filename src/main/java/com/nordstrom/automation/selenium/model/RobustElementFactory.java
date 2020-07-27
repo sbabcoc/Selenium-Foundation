@@ -3,19 +3,23 @@ package com.nordstrom.automation.selenium.model;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.FieldAccessor;
+import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.MethodNameEqualityResolver;
 import net.bytebuddy.implementation.bind.annotation.BindingPriority;
@@ -98,32 +102,42 @@ public final class RobustElementFactory {
         WebElement reference = driver.findElement(By.cssSelector("*"));
         Class<? extends WebElement> refClass = reference.getClass();
         
-        Class<? extends WebElement> wrapperClass = new ByteBuddy()
-                        .subclass(refClass)
-                        .name(refClass.getPackage().getName() + ".Robust" + refClass.getSimpleName())
-                        .method(not(isDeclaredBy(Object.class)))
-                        .intercept(MethodDelegation.withEmptyConfiguration()
-                                .withBinders(TargetMethodAnnotationDrivenBinder.ParameterBinder.DEFAULTS)
-                                .withResolvers(MethodNameEqualityResolver.INSTANCE, BindingPriority.Resolver.INSTANCE)
-                                .filter(not(isDeclaredBy(Object.class)))
-                                .toField("interceptor"))
-                        .implement(RobustWebElement.class)
-                        .defineField("interceptor", RobustElementWrapper.class, Visibility.PRIVATE)
-                        .implement(InterceptionAccessor.class).intercept(FieldAccessor.ofBeanProperty())
-                        .make()
-                        .load(refClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
-                        .getLoaded();
+        Builder<? extends WebElement> builder = new ByteBuddy()
+                .subclass(refClass)
+                .name(refClass.getPackage().getName() + ".Robust" + refClass.getSimpleName());
+
+        for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+            Implementation ctorImpl = driverPlugin.getWebElementCtor(driver, refClass);
+            if (ctorImpl != null) {
+                builder = builder.defineConstructor(Visibility.PUBLIC).intercept(ctorImpl);
+                break;
+            }
+        }
+        
+        Class<? extends WebElement> wrapperClass = builder
+                .method(not(isDeclaredBy(Object.class)))
+                .intercept(MethodDelegation.withEmptyConfiguration()
+                        .withBinders(TargetMethodAnnotationDrivenBinder.ParameterBinder.DEFAULTS)
+                        .withResolvers(MethodNameEqualityResolver.INSTANCE, BindingPriority.Resolver.INSTANCE)
+                        .filter(not(isDeclaredBy(Object.class)))
+                        .toField("interceptor"))
+                .implement(RobustWebElement.class)
+                .defineField("interceptor", RobustElementWrapper.class, Visibility.PRIVATE)
+                .implement(InterceptionAccessor.class).intercept(FieldAccessor.ofBeanProperty())
+                .make()
+                .load(refClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+                .getLoaded();
         
         InstanceCreator creator;
         
         try {
             creator = new ByteBuddy()
-                            .subclass(InstanceCreator.class)
-                            .method(not(isDeclaredBy(Object.class)))
-                            .intercept(MethodDelegation.toConstructor(wrapperClass))
-                            .make()
-                            .load(wrapperClass.getClassLoader())
-                            .getLoaded().newInstance();
+                    .subclass(InstanceCreator.class)
+                    .method(not(isDeclaredBy(Object.class)))
+                    .intercept(MethodDelegation.toConstructor(wrapperClass))
+                    .make()
+                    .load(wrapperClass.getClassLoader())
+                    .getLoaded().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw UncheckedThrow.throwUnchecked(e);
         }

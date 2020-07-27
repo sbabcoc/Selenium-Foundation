@@ -11,10 +11,10 @@ public class HtmlUnitCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"htmlunit\", \"browserVersion\":\"firefox-68\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"htmlunit\", \"browserVersion\":\"chrome\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "htmlunit";
-    public static final String BASELINE = "{\"browserName\":\"htmlunit\"}";
+    public static final String BASELINE = "{\"browserName\":\"htmlunit\", \"browserVersion\":\"chrome\"}";
     
     private static final String[] PROPERTY_NAMES = {  };
     

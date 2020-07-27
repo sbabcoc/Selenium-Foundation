@@ -14,6 +14,7 @@ dependencies {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
   }
   selenium2Compile 'org.seleniumhq.selenium:selenium-support:2.53.1'
-  selenium2Compile 'org.seleniumhq.selenium:htmlunit-driver:2.21'
+  selenium2Compile 'net.sourceforge.htmlunit:htmlunit:2.21'
+  testCompile 'org.seleniumhq.selenium:htmlunit-driver:2.21'
   testCompile 'org.mockito:mockito-core:2.25.0'
 }
