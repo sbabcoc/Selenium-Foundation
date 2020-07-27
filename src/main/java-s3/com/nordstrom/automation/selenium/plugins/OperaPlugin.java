@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class OperaPlugin extends RemoteDriverPlugin {
+public class OperaPlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.opera.OperaDriver</b>

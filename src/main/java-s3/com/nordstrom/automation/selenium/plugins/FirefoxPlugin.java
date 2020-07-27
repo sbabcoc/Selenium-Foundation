@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class FirefoxPlugin extends RemoteDriverPlugin {
+public class FirefoxPlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.firefox.FirefoxDriver</b>
