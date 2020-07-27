@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class EdgePlugin extends RemoteDriverPlugin {
+public class EdgePlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.edge.EdgeDriver</b>

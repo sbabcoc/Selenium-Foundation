@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class InternetExplorerPlugin extends RemoteDriverPlugin {
+public class InternetExplorerPlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.ie.InternetExplorerDriver</b>

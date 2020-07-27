@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
-public class PhantomJsPlugin extends RemoteDriverPlugin {
+public class PhantomJsPlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.phantomjs.PhantomJSDriver</b>
