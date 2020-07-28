@@ -7,7 +7,7 @@
   
   <name>Selenium Foundation</name>
   <description>Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).</description>
-  <url>https://github.com/Nordstrom/Selenium-Foundation</url>
+  <url>https://github.com/sbabcoc/Selenium-Foundation</url>
   
   <licenses>
     <license>
@@ -56,9 +56,9 @@
   </properties>
   
   <scm>
-    <connection>scm:git:https://github.com/Nordstrom/Selenium-Foundation.git</connection>
-    <developerConnection>scm:git:https://github.com/Nordstrom/Selenium-Foundation.git</developerConnection>
-    <url>https://github.com/Nordstrom/Selenium-Foundation/tree/master</url>
+    <connection>scm:git:https://github.com/sbabcoc/Selenium-Foundation.git</connection>
+    <developerConnection>scm:git:https://github.com/sbabcoc/Selenium-Foundation.git</developerConnection>
+    <url>https://github.com/sbabcoc/Selenium-Foundation/tree/master</url>
     <tag>HEAD</tag>
   </scm>
 

@@ -242,12 +242,12 @@ def deployer = uploadArchives.repositories.mavenDeployer
     version archiveVer
     packaging 'jar'
     description 'Selenium Foundation is an automation framework designed to extend and enhance the capabilities provided by Selenium (WebDriver).'
-    url 'https://github.com/Nordstrom/Selenium-Foundation'
+    url 'https://github.com/sbabcoc/Selenium-Foundation'
 
     scm {
-      connection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
-      developerConnection 'scm:git:https://github.com/Nordstrom/Selenium-Foundation.git'
-      url 'https://github.com/Nordstrom/Selenium-Foundation/tree/master'
+      connection 'scm:git:https://github.com/sbabcoc/Selenium-Foundation.git'
+      developerConnection 'scm:git:https://github.com/sbabcoc/Selenium-Foundation.git'
+      url 'https://github.com/sbabcoc/Selenium-Foundation/tree/master'
       tag 'HEAD'
     }
 

@@ -5,7 +5,7 @@
 
 ## SELENIUM API SUPPORT
 
-**Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](https://github.com/Nordstrom/Selenium-Foundation/blob/master/build.gradle).
+**Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](https://github.com/sbabcoc/Selenium-Foundation/blob/master/build.gradle).
 
 ### Dependency Artifact Coordinates
 
@@ -66,7 +66,7 @@ Note that the version number in this POM file is merely a placeholder - a token 
 
 ## GETTING STARTED
 
-The [QuickStart](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation), and the [Settings API](https://github.com/Nordstrom/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
+The [QuickStart](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation), and the [Settings API](https://github.com/sbabcoc/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
 
 ## HIGHLIGHTS
 
@@ -84,13 +84,13 @@ Page classes can be explicitly associated with web application paths through the
 
 ### Customizable Transition Error Detection
 
-In conjunction with automatic landing page verification, **Selenium Foundation** invokes registered custom [transition error detectors](docs/TransitionErrorDetection.md). Implement the [TransitionErrorDetector](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/interfaces/TransitionErrorDetector.java) interface, then register your detectors in the corresponding service loader configuration file (**META-INF/services/com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector**).
+In conjunction with automatic landing page verification, **Selenium Foundation** invokes registered custom [transition error detectors](docs/TransitionErrorDetection.md). Implement the [TransitionErrorDetector](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/interfaces/TransitionErrorDetector.java) interface, then register your detectors in the corresponding service loader configuration file (**META-INF/services/com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector**).
 
 Examples of the sorts of conditions you may want to detect include error pages (e.g. - page not found) or non-context error messages (e.g. - communication issues, access token timeout). For recoverable conditions, error detectors can also server as error handler. For example, you could implement a detector that automatically logs back in if your test encounters an access timeout.
 
 ### Component Collection Classes
 
-**Selenium Foundation** also includes collection classes ([ComponentList](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentList.java), [ComponentMap](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentMap.java), [FrameList](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameList.java), and [FrameMap](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameMap.java)) that enable you to define collections of components for your page models. For example, you can define a **SearchResultTile** component and include a map of these tiles keyed by product ID in your **SearchResultsPage** class. **Selenium Foundation** collections are lazy-initialized automatically - the composition of the collection is determined when it's instantiated, but each item in the collection is only populated when it's explicitly referenced.
+**Selenium Foundation** also includes collection classes ([ComponentList](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentList.java), [ComponentMap](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentMap.java), [FrameList](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameList.java), and [FrameMap](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameMap.java)) that enable you to define collections of components for your page models. For example, you can define a **SearchResultTile** component and include a map of these tiles keyed by product ID in your **SearchResultsPage** class. **Selenium Foundation** collections are lazy-initialized automatically - the composition of the collection is determined when it's instantiated, but each item in the collection is only populated when it's explicitly referenced.
 
 ### Automatic Stale Element Reference Protection
 
@@ -125,25 +125,25 @@ To assist in root-cause analysis, **Selenium Foundation** automatically captures
 
 ## TESTNG REQUIRED ELEMENTS
 
-There are several required elements that must be included in every TestNG test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [TestNgBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/support/TestNgBase.java) class as a starter. This class includes all of the required elements outlined below, and adds the [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/ScreenshotCapture.java) and [PageSourceCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/PageSourceCapture.java) listeners.
+There are several required elements that must be included in every TestNG test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [TestNgBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/support/TestNgBase.java) class as a starter. This class includes all of the required elements outlined below, and adds the [ScreenshotCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/ScreenshotCapture.java) and [PageSourceCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/PageSourceCapture.java) listeners.
 
-**TestNgBase** is an abstract class that implements the [TestBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/core/TestBase.java) interface, which provides a common abstraction for both TestNG and JUnit 4 tests.
+**TestNgBase** is an abstract class that implements the [TestBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/core/TestBase.java) interface, which provides a common abstraction for both TestNG and JUnit 4 tests.
 
 ### Outline of Required Elements
 
 The following is an outline of the elements that must be included in every TestNG test that uses **Selenium Foundation**:
 
-* [ListenerChain](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/ListenerChain.java):  
+* [ListenerChain](https://github.com/sbabcoc/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/ListenerChain.java):  
 **ListenerChain** is a TestNG listener that enables you to add other listeners at runtime and guarantees the order in which they're invoked. This is similar in behavior to a JUnit 4 rule chain.
-* The [@LinkedListeners](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/LinkedListeners.java) annotation:  
- To attach listeners to an active **ListenerChain**, mark your test class with the **`@LinkedListeners`** annotation. The [TestNgBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/support/TestNgBase.java) class is marked with a **`@LinkedListeners`** annotation that specifies four listeners that manage several core features of **Selenium Foundation**:
-  * [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/ScreenshotCapture.java):  
+* The [@LinkedListeners](https://github.com/sbabcoc/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/LinkedListeners.java) annotation:  
+ To attach listeners to an active **ListenerChain**, mark your test class with the **`@LinkedListeners`** annotation. The [TestNgBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/support/TestNgBase.java) class is marked with a **`@LinkedListeners`** annotation that specifies four listeners that manage several core features of **Selenium Foundation**:
+  * [ScreenshotCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/ScreenshotCapture.java):  
   **ScreenshotCapture** is a TestNG listener that automatically captures screenshots in the event of test failures. Tests are also able to request on-demand screenshot capture through the `captureArtifact(ITestResult)` method.
-  * [PageSourceCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/PageSourceCapture.java):  
+  * [PageSourceCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/PageSourceCapture.java):  
   **PageSourceCapture** is a TestNG listener that automatically captures page source in the event of test failures. Tests are also able to request on-demand page source capture through the `captureArtifact(ITestResult)` method.
-  * [DriverListener](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/DriverListener.java):  
+  * [DriverListener](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/listeners/DriverListener.java):  
   **DriverListener** is a TestNG listener that manages driver sessions and local Selenium Grid servers.
-  * [ExecutionFlowController](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/ExecutionFlowController.java):  
+  * [ExecutionFlowController](https://github.com/sbabcoc/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/ExecutionFlowController.java):  
   **ExecutionFlowController** is a TestNG listener that propagates test context attributes:  
   [_before_ method] → [test method] → [_after_ method]
 
@@ -151,23 +151,23 @@ The **`@LinkedListeners`** annotation is processed by the **ListenerChain**, whi
 
 ## AUTOMATIC RETRY OF FAILED TESTS
 
-**Selenium Foundation** includes a context-specific extension of the [RetryManager](https://github.com/Nordstrom/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/RetryManager.java) analyzer of [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation). This retry analyzer considers any test that fails due to a **WebDriverException** to be retriable. By default, this retry analyzer is disabled. To enable automatic retry of **WebDriverException** failures, specify a positive value for the **MAX_RETRY** setting of **TestNG Foundation**:
+**Selenium Foundation** includes a context-specific extension of the [RetryManager](https://github.com/sbabcoc/TestNG-Foundation/blob/master/src/main/java/com/nordstrom/automation/testng/RetryManager.java) analyzer of [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation). This retry analyzer considers any test that fails due to a **WebDriverException** to be retriable. By default, this retry analyzer is disabled. To enable automatic retry of **WebDriverException** failures, specify a positive value for the **MAX_RETRY** setting of **TestNG Foundation**:
 
 | _testng.properties_ |
 | --- |
 | testng.max.retry=2 |
 
-The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation#attaching-retry-analyzers-via-retrymanager) documentation for more details.
+The base class for this retry analyzer enables you to add your own analyzers through the **ServiceLoader**. You can also entirely replace this analyzer with your own. See the [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation#attaching-retry-analyzers-via-retrymanager) documentation for more details.
 
 ## DEMONSTRATED FEATURES
 
 The **QuickStart** class demonstrates several important **Selenium Foundation** features:
 
-* [InitialPage](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/annotations/InitialPage.java):  
+* [InitialPage](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/annotations/InitialPage.java):  
 **InitialPage** is a Java annotation that enables you to specify the initial page class and/or URL that should be loaded at the start of the test method. This can be applied to each test individually, or it can be applied at the class level to specify the default page for all tests in the class. It can also be applied to **`@Before...`** configuration methods to provide driver sessions opened to the desired page.
-* [SeleniumConfig](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/SeleniumConfig.java):  
+* [SeleniumConfig](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/SeleniumConfig.java):  
 **SeleniumConfig** declares settings and methods related to Selenium WebDriver and Grid configuration. This class is built on the **Settings API**, composed of defaults, stored values, and System properties.
-* [SeleniumSettings](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/SeleniumConfig.java):  
+* [SeleniumSettings](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/SeleniumConfig.java):  
 **SeleniumSettings** declares the constants, property names, and default values for the settings managed by SeleniumConfig. Defaults can be overridden via System properties or the _settings.propeties_ file in your user "home" directory. See **ESSENTIAL SETTINGS** below for more details.
 * [ReporterAppender](https://github.com/sbabcoc/logback-testng/blob/master/src/main/java/com/github/sbabcoc/logback/testng/ReporterAppender.java):  
 **ReporterAppender** is a **Logback** appender for TestNG Reporter. The **Selenium Foundation** project ships with a _logback.xml_ file that attaches this appender. See the complete **logback-testng** information page [here](https://github.com/sbabcoc/logback-testng).
@@ -250,15 +250,15 @@ In addition to the TestNG support documented above, **Selenium Foundation** also
 
 ## JUnit 4 Required Elements
 
-There are several required elements that must be included in every JUnit 4 test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [JUnitBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class as a starter. This class includes all of the required elements outlined below.
+There are several required elements that must be included in every JUnit 4 test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [JUnitBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class as a starter. This class includes all of the required elements outlined below.
 
-**JUnitBase** is an abstract class that implements the [TestBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/core/TestBase.java) interface, which provides a common abstraction for both TestNG and JUnit 4 tests.
+**JUnitBase** is an abstract class that implements the [TestBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/core/TestBase.java) interface, which provides a common abstraction for both TestNG and JUnit 4 tests.
 
 ### Outline of Required Elements
 
 The following is an outline of the elements that must be included in every JUnit 4 project that uses **Selenium Foundation**:
 
-* **JUnit Foundation** [event notifications](https://github.com/Nordstrom/JUnit-Foundation#how-to-enable-notifications):  
+* **JUnit Foundation** [event notifications](https://github.com/sbabcoc/JUnit-Foundation#how-to-enable-notifications):  
 The JUnit support provided by **Selenium Foundation** relies on event notifications published by **JUnit Foundation**. Notifications are enabled by a Java agent, which uses bytecode enhancement to install hooks on test and configuration methods.
 ###### Maven configuration for Java agent:
 ```xml
@@ -298,24 +298,24 @@ test.doFirst {
 }
 ```
 
-* [DriverWatcher](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
-**DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions. It provides initial page support, and it also supplies a JUnit 4 [TestWatcher](https://junit.org/junit4/javadoc/4.12/org/junit/rules/TestWatcher.html):
+* [DriverWatcher](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
+**DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://github.com/sbabcoc/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions. It provides initial page support, and it also supplies a JUnit 4 [TestWatcher](https://junit.org/junit4/javadoc/4.12/org/junit/rules/TestWatcher.html):
   * **`DriverWatcher.getTestWatcher()`**:  
   The test rule returned by this static method is responsible for closing the driver attached to the current test method.
-* [DriverListener](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverListener.java):  
-**DriverListener** implements the **JUnit Foundation** [ShutdownListener](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/ShutdownListener.java) interface to shut down the local Selenium Grid serves at the end of the run.
+* [DriverListener](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverListener.java):  
+**DriverListener** implements the **JUnit Foundation** [ShutdownListener](https://github.com/sbabcoc/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/ShutdownListener.java) interface to shut down the local Selenium Grid serves at the end of the run.
 * [RuleChain](http://junit.org/junit4/javadoc/latest/org/junit/rules/RuleChain.html):  
- Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies three watchers that manage core features of **Selenium Foundation**:
-  * [ScreenshotCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/ScreenshotCapture.java):  
+ Use **RuleChain** for attaching test rules that must be applied in a specific order. The [JUnitBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/JUnitBase.java) class includes a **RuleChain** that specifies three watchers that manage core features of **Selenium Foundation**:
+  * [ScreenshotCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/ScreenshotCapture.java):  
   **ScreenshotCapture** is a JUnit 4 test watcher that automatically captures a screenshot in the event of test failure.
-  * [PageSourceCapture](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/PageSourceCapture.java):  
+  * [PageSourceCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/PageSourceCapture.java):  
   **PageSourceCapture** is a JUnit 4 test watcher that automatically captures page source in the event of test failures.
-  * [DriverWatcher](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
+  * [DriverWatcher](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
   As described previously, the test watcher returned by `DriverWatcher.getTestWatcher()` closes the driver attached to the current test method.
 
 ## AUTOMATIC RETRY OF FAILED TESTS
 
-**Selenium Foundation** includes an implementation of the [JUnitRetryAnalyzer](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/JUnitRetryAnalyzer.java) interface of [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation). This retry analyzer considers any test that fails due to a **WebDriverException** to be retriable. By default, this retry analyzer is disabled. To enable automatic retry of **WebDriverException** failures:
+**Selenium Foundation** includes an implementation of the [JUnitRetryAnalyzer](https://github.com/sbabcoc/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/JUnitRetryAnalyzer.java) interface of [JUnit Foundation](https://github.com/sbabcoc/JUnit-Foundation). This retry analyzer considers any test that fails due to a **WebDriverException** to be retriable. By default, this retry analyzer is disabled. To enable automatic retry of **WebDriverException** failures:
 
 * Add a service loader retry analyzer configuration file in the **_META-INF/services_** folder:
 
@@ -330,7 +330,7 @@ com.nordstrom.automation.selenium.junit.RetryAnalyzer
 | --- |
 | junit.max.retry=2 |
 
-In this example, these two configurations will enable **JUnit Foundation** to retry tests that fail with **WebDriverException** twice before counting them as failures. See the [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation#automatic-retry-of-failed-tests) documentation for more details.
+In this example, these two configurations will enable **JUnit Foundation** to retry tests that fail with **WebDriverException** twice before counting them as failures. See the [JUnit Foundation](https://github.com/sbabcoc/JUnit-Foundation#automatic-retry-of-failed-tests) documentation for more details.
 
 ## DEMONSTRATED FEATURES
 
@@ -341,10 +341,10 @@ This static utility method wraps the specified object in an [Optional](https://g
 * **`RuleChainWalker.getAttachedRule(RuleChain, Class<T extends TestRule>)`**:  
 This static utility method gets reference to an instance of the specified test rule type on the supplied rule chain. In **JUnitBase**, this is used to acquire a reference to the **ScreenshotCapture** watcher for capturing on-demand screenshot artifacts.
 * **`ScreenshotCapture.getAtomIdentity()`**:  
-This instance method of **ScreenshotCapture** enables test code to acquire the [AtomIdentity](https://github.com/Nordstrom/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/AtomIdentity.java) object for the current JUnit 4 test method. This object can be interrogated for many useful propeties of the test method, including test class instance, **Description** object, and instance parameters.
+This instance method of **ScreenshotCapture** enables test code to acquire the [AtomIdentity](https://github.com/sbabcoc/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/AtomIdentity.java) object for the current JUnit 4 test method. This object can be interrogated for many useful propeties of the test method, including test class instance, **Description** object, and instance parameters.
 * **`ScreenshotCapture.getDescription()`**:  
 This instance method of **ScreenshotCapture** enables test code to acquire the [Description](http://junit.org/junit4/javadoc/latest/org/junit/runner/Description.html) object for the current JUnit 4 test method. This object can be interrogated for many useful propeties of the test method, including method name, attached annotations, and containing class.
 
 # FEATURE PARITY
 
-All of the features of **Selenium Foundation** are available regardless of which testing framework you choose - either TestNG or JUnit 4. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from both TestNG (via [ModelTest](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)) and JUnit 4 (via [JUnitModelTest](https://github.com/Nordstrom/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)).
+All of the features of **Selenium Foundation** are available regardless of which testing framework you choose - either TestNG or JUnit 4. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from both TestNG (via [ModelTest](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)) and JUnit 4 (via [JUnitModelTest](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)).
