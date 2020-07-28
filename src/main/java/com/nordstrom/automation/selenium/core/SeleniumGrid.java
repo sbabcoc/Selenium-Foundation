@@ -46,7 +46,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  * your project's configuration, <b>Selenium Foundation</b> will launch and manage a local instance for you.
  * <p>
  * As stated in the main 
- * <a href='https://github.com/Nordstrom/Selenium-Foundation/blob/master/README.md#grid-based-driver-creation'>README
+ * <a href='https://github.com/sbabcoc/Selenium-Foundation/blob/master/README.md#grid-based-driver-creation'>README
  * </a> file, <b>Selenium Foundation</b> acquires local browser sessions from a local Grid instance to avoid divergent
  * behavior and special-case code to support both local and remote operation.
  */

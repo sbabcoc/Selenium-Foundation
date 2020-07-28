@@ -9,8 +9,8 @@ The configuration of **Selenium Foundation** projects is an aggregation of sever
   * Specification of JUnit watcher classes
 * Configuration settings for...
   * ... Selenium Foundation (_settings.properties_)
-  * ... [TestNG Foundation](https://github.com/Nordstrom/TestNG-Foundation) (_testng.properties_)
-  * ... [JUnit Foundation](https://github.com/Nordstrom/JUnit-Foundation) (_junit.properties_)
+  * ... [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation) (_testng.properties_)
+  * ... [JUnit Foundation](https://github.com/sbabcoc/JUnit-Foundation) (_junit.properties_)
 
 Note that configuration settings can be overridden via System properties, and reasonable defaults are provided where they make sense. More on this in the next section.
 
@@ -83,7 +83,7 @@ The static `getConfig()` method returns a **`SeleniumConfig`** object that provi
 * `getSeleniumGrid()` - Get an object that represents the active Selenium Grid.
 * `shutdownGrid(boolean localOnly)` - Shut down the active Selenium Grid.
 
-As indicated previously, the set of drivers supported by the local Grid instance managed by **Selenium Foundation** is configured with a ServiceLoader [provider configuration file](https://github.com/Nordstrom/Selenium-Foundation/blob/master/src/test/resources/META-INF/services/com.nordstrom.automation.selenium.DriverPlugin). Note that the file that link connects to isn't just a static sample file; it's the actual provider configuration file for the project unit tests.
+As indicated previously, the set of drivers supported by the local Grid instance managed by **Selenium Foundation** is configured with a ServiceLoader [provider configuration file](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/test/resources/META-INF/services/com.nordstrom.automation.selenium.DriverPlugin). Note that the file that link connects to isn't just a static sample file; it's the actual provider configuration file for the project unit tests.
 
 As of this writing, the unit tests are configured to use [HtmlUnit](http://htmlunit.sourceforge.net/). Described as "a GUI-less browser for Java programs", this browser is perfect for rendering the simple pages used to exercise the features of **Selenium Foundation**. In addition to this ServiceLoader configuration file, the Java project itself must declare the dependencies that are required by the corresponding driver. These dependencies are dependent on the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves.
 
