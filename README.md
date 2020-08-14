@@ -289,14 +289,21 @@ The JUnit support provided by **Selenium Foundation** relies on event notificati
 ```  
 ###### Gradle configuration for Java agent:  
 ```gradle
-ext {
-    junitFoundation = configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.name == 'junit-foundation' }
-}
-
-test.doFirst {
-    jvmArgs "-javaagent:${junitFoundation.file}"
+test {
+    jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
 }
 ```
+###### Gradle configuration (Android Studio):  
+```gradle
+android {
+    testOptions {
+        unitTests.all {
+            jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
+        }
+    }
+}
+```
+
 
 * [DriverWatcher](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/junit/DriverWatcher.java):  
 **DriverWatcher** implements the **JUnit Foundation**  [MethodWatcher](https://github.com/sbabcoc/JUnit-Foundation/blob/master/src/main/java/com/nordstrom/automation/junit/MethodWatcher.java) interface to manage driver sessions. It provides initial page support, and it also supplies a JUnit 4 [TestWatcher](https://junit.org/junit4/javadoc/4.12/org/junit/rules/TestWatcher.html):
