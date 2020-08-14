@@ -299,9 +299,7 @@ dependencies {
   testCompile configurations["${profile}Compile"]
   implementation 'org.testng:testng:6.9.6'
 }
-ext {
-    junitFoundation = configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.name == 'junit-foundation' }
-}
-test.doFirst {
-    jvmArgs "-javaagent:${junitFoundation.file}"
+
+test {
+    jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
 }
