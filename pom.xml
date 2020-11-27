@@ -38,12 +38,12 @@
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
     <java-utils.version>1.10.0</java-utils.version>
-    <toolchains-plugin.version>1.1</toolchains-plugin.version>
+    <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <source-plugin.version>3.2.0</source-plugin.version>
     <javadoc-plugin.version>3.1.1</javadoc-plugin.version>
     <settings.version>2.3.3</settings.version>
-    <junit-foundation.version>12.2.0</junit-foundation.version>
+    <junit-foundation.version>12.5.0</junit-foundation.version>
     <logback.version>1.2.3</logback.version>
     <logback-testng.version>1.3.1</logback-testng.version>
     <sonar.language>java</sonar.language>
@@ -144,8 +144,7 @@
         </property>
       </activation>
       <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <compile-jdk.version>1.7</compile-jdk.version>
         <testng-foundation.version>1.13.4</testng-foundation.version>
         <selenium.version>2.53.1</selenium.version>
         <guava-agent.version>28.1</guava-agent.version>
@@ -259,18 +258,6 @@
               </execution>
             </executions>
           </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-toolchains-plugin</artifactId>
-            <configuration>
-              <toolchains>
-                <jdk>
-                  <version>1.7</version>
-                  <vendor>oracle</vendor>
-                </jdk>
-              </toolchains>
-            </configuration>
-          </plugin>
         </plugins>
       </build>
     </profile>
@@ -283,8 +270,7 @@
         </property>
       </activation>
       <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <compile-jdk.version>1.8</compile-jdk.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>28.1-jre</guava.version>
@@ -413,18 +399,6 @@
               </execution>
             </executions>
           </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-toolchains-plugin</artifactId>
-            <configuration>
-              <toolchains>
-                <jdk>
-                  <version>1.8</version>
-                  <vendor>oracle</vendor>
-                </jdk>
-              </toolchains>
-            </configuration>
-          </plugin>
         </plugins>
       </build>
     </profile>
@@ -433,11 +407,6 @@
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-toolchains-plugin</artifactId>
-          <version>${toolchains-plugin.version}</version>
-        </plugin>      
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
@@ -453,6 +422,11 @@
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${jacoco.version}</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${compiler-plugin.version}</version>
+        </plugin>      
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -483,19 +457,6 @@
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-toolchains-plugin</artifactId>
-                    <versionRange>[1.0.0,)</versionRange>
-                    <goals>
-                      <goal>toolchain</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <versionRange>[1.0.0,)</versionRange>
                     <goals>
@@ -513,17 +474,6 @@
       </plugins>
     </pluginManagement>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-toolchains-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>toolchain</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
@@ -572,8 +522,24 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${compile-jdk.version}</source>
+          <target>${compile-jdk.version}</target>
+          <jdkToolchain>
+            <version>${compile-jdk.version}</version>
+            <vendor>oracle</vendor>
+          </jdkToolchain>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <jdkToolchain>
+            <version>${compile-jdk.version}</version>
+            <vendor>oracle</vendor>
+          </jdkToolchain>
           <argLine>-javaagent:${com.nordstrom.tools:junit-foundation:jar}</argLine>
         </configuration>
       </plugin>
