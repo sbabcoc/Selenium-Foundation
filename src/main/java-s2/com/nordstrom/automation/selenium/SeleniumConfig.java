@@ -235,7 +235,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             // hack for RegistrationRequest bug
             nodeConfig.setRole(GridRole.NODE);
             
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+            try(OutputStream fos = new FileOutputStream(filePath.toFile());
+                OutputStream out = new BufferedOutputStream(fos)) {
                 out.write(nodeConfig.toJSON().getBytes(StandardCharsets.UTF_8));
             }
         }

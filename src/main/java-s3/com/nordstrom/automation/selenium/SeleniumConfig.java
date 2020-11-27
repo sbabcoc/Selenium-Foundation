@@ -235,7 +235,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
             nodeConfig.capabilities = capabilitiesList;
             nodeConfig.hub = hubUrl.toString();
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+            try(OutputStream fos = new FileOutputStream(filePath.toFile());
+                OutputStream out = new BufferedOutputStream(fos)) {
                 out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
             }
         }

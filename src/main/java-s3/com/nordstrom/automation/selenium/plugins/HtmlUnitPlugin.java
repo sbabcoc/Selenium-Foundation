@@ -6,13 +6,12 @@ import java.util.Map;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.MethodCall;
 
-public class HtmlUnitPlugin implements DriverPlugin {
+public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
     
     /**
      * <b>org.openqa.selenium.htmlunit.HtmlUnitDriver</b>

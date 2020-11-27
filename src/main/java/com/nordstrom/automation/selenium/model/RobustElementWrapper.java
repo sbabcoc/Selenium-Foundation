@@ -117,10 +117,11 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 selector = ByType.xpathLocatorFor(this.locator);
                 if (this.index > 0) {
                     selector += "[" + (this.index + 1) + "]";
+                    this.locator = By.xpath(this.selector);
+                    this.index = CARDINAL;
+                } else {
+                	strategy = Strategy.JS_XPATH;
                 }
-                strategy = Strategy.JS_XPATH;
-                
-                this.locator = By.xpath(this.selector);
             } else if (findsByCssSelector) {
                 selector = ByType.cssLocatorFor(this.locator);
                 if (selector != null) {
@@ -204,7 +205,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * @return web element
      */
     public WebElement findOptional(final By by) {
-        return RobustElementFactory.getElement(this, locator, OPTIONAL);
+        return RobustElementFactory.getElement(this, by, OPTIONAL);
     }
 
     /**
