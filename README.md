@@ -18,9 +18,9 @@ To add a dependency on **Selenium Foundation** for Maven, use the following:
   <groupId>com.nordstrom.ui-tools</groupId>
   <artifactId>selenium-foundation</artifactId>
   <!-- either Selenium 2 support: -->
-  <version>18.3.0-s2</version>
+  <version>18.4.1-s2</version>
   <!-- or Selenium 3 support: -->
-  <version>18.3.0-s3</version>
+  <version>18.4.1-s3</version>
 </dependency>
 ```
 
@@ -29,9 +29,9 @@ To add a dependency for Gradle:
 ```java
 dependencies {
   // either Selenium 2 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:18.3.0-s2'
+  compile 'com.nordstrom.ui-tools:selenium-foundation:18.4.1-s2'
   // or Selenium 3 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:18.3.0-s3'
+  compile 'com.nordstrom.ui-tools:selenium-foundation:18.4.1-s3'
 }
 ```
 
@@ -39,7 +39,7 @@ dependencies {
 
 #### Building in Eclipse
 
-For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plugin. By default, this project will build it's **Selenium 3** configuration. To build the **Selenium 2** configuration, add this program argument to the run configuration for the `build` task:
+For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plugin. By default, this project will build its **Selenium 3** configuration. To build the **Selenium 2** configuration, add this program argument to the run configuration for the `build` task:
 
 > `-Pprofile=selenium2`
 
