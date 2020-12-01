@@ -11,7 +11,7 @@ public class InternetExplorerCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"internet explorer\", \"maxInstances\":1, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"internet explorer\",\"maxInstances\":1,\"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "internet explorer";
     public static final String OPTIONS_KEY = "se:ieOptions";

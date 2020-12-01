@@ -11,11 +11,11 @@ public class PhantomJsCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\": \"phantomjs\", \"maxInstances\": 5, \"seleniumProtocol\": \"WebDriver\"}";
+                    "{\"browserName\":\"phantomjs\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "phantomjs";
     public static final String BASELINE = "{\"browserName\":\"phantomjs\"}";
-    public static final String LOGGING = "{\"browserName\":\"phantomjs\", \"loggingPrefs\": {\"browser\": \"WARNING\"}}";
+    public static final String LOGGING = "{\"browserName\":\"phantomjs\",\"loggingPrefs\":{\"browser\":\"WARNING\"}}";
     
     private static final String[] PROPERTY_NAMES = {
                     "phantomjs.binary.path",

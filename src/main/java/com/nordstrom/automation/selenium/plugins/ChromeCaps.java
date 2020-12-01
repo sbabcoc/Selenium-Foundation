@@ -11,7 +11,7 @@ public class ChromeCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"chrome\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"chrome\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "chrome";
     public static final String OPTIONS_KEY = "goog:chromeOptions";

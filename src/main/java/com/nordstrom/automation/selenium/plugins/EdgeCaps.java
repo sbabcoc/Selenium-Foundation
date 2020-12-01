@@ -11,7 +11,7 @@ public class EdgeCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"MicrosoftEdge\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"MicrosoftEdge\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "MicrosoftEdge";
     public static final String OPTIONS_KEY = "edgeOptions";

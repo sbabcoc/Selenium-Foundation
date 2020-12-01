@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -31,6 +33,7 @@ import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
@@ -42,8 +45,8 @@ public abstract class AbstractSeleniumConfig extends
                 SettingsCore<AbstractSeleniumConfig.SeleniumSettings> {
 
     private static final String SETTINGS_FILE = "settings.properties";
-    private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
-    /** value: <b>{"browserName": "htmlunit"}</b> */
+    private static final String CAPS_PATTERN = "{\"browserName\":\"%s\"}";
+    /** value: <b>{"browserName":"htmlunit"}</b> */
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
@@ -106,7 +109,9 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>selenium.grid.no.redirect</b> <br> default: {@code false} */
         GRID_NO_REDIRECT("selenium.grid.no.redirect", "false"),
         /** name: <b>selenium.context.platform</b> <br> default: {@code null} */
-        CONTEXT_PLATFORM("selenium.context.platform", null);
+        CONTEXT_PLATFORM("selenium.context.platform", null),
+        /** name: <b>selenium.caps.refiner</b>  <br> default: {@code null} */
+        CAPS_REFINER("selenium.caps.refiner", null);
         
         private String propertyName;
         private String defaultValue;
@@ -380,15 +385,25 @@ public abstract class AbstractSeleniumConfig extends
      * @return {@link Capabilities} object for the configured browser specification 
      */ 
     public Capabilities getCurrentCapabilities() {
+        Capabilities capabilities = null;
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
+        String browserCaps = getString(SeleniumSettings.BROWSER_CAPS.key());
+        String capsRefiner = getString(SeleniumSettings.CAPS_REFINER.key());
         if (browserName != null) {
-            return getSeleniumGrid().getPersonality(getConfig(), browserName);
+            capabilities = getSeleniumGrid().getPersonality(getConfig(), browserName);
+        } else if (browserCaps != null) {
+            capabilities = getCapabilitiesForJson(browserCaps)[0];
+        } else {
+            throw new IllegalStateException("Neither browser name nor capabilities are specified");
         }
-        String capabilities = getString(SeleniumSettings.BROWSER_CAPS.key());
-        if (capabilities != null) {
-            return getCapabilitiesForJson(capabilities)[0];
+        if (capsRefiner != null) {
+            Map<String, Object> currentCaps = new HashMap<>(capabilities.asMap());
+            Map<String, Object> refinerCaps = DataUtils.fromString(capsRefiner, HashMap.class);
+            currentCaps.putAll(refinerCaps);
+            String mergedCaps = DataUtils.toString(currentCaps);
+            capabilities = getCapabilitiesForJson(mergedCaps)[0];
         }
-        throw new IllegalStateException("Neither browser name nor capabilities are specified");
+        return capabilities;
     }
     
     /**

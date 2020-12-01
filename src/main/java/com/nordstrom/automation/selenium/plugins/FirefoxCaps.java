@@ -11,7 +11,7 @@ public class FirefoxCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"firefox\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"firefox\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "firefox";
     public static final String OPTIONS_KEY = "moz:firefoxOptions";

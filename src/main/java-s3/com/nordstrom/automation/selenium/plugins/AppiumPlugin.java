@@ -1,18 +1,8 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
-import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
-
-import net.bytebuddy.implementation.Implementation;
 
 /**
  * To expose the massive variations supported by 'appium', the capabilities will be collected in a "settings"
@@ -52,48 +42,62 @@ import net.bytebuddy.implementation.Implementation;
  * Design question: How do we specify automation targets for 'appium' test runs?
  * Unless a specific node is specified, each test will run on every attached node. 
  */
-public class AppiumPlugin implements DriverPlugin {
+public class AppiumPlugin extends RemoteWebDriverPlugin {
 
+    /**
+     * <b>org.openqa.selenium.chrome.ChromeDriver</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;io.appium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;java-client&lt;/artifactId&gt;
+     *  &lt;version&gt;7.4.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     */
+    /**
+     * <b>org.openqa.selenium.chrome.ChromeDriver</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;io.appium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;java-client&lt;/artifactId&gt;
+     *  &lt;version&gt;3.4.1&lt;/version&gt;
+     *  &lt;exclusions&gt;
+     *    &lt;exclusion&gt;
+     *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *      &lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+     *    &lt;/exclusion&gt;
+     *  &lt;/exclusions&gt;
+     *&lt;/dependency&gt;</pre>
+     */
+    private static final String[] DEPENDENCY_CONTEXTS = {
+                    "io.appium.java_client.AppiumDriver"}; //,
+//                    "org.apache.commons.exec.Executor",
+//                    "org.openqa.selenium.remote.RemoteWebDriver",
+//                    "com.sun.jna.platform.RasterRangesUtils",
+//                    "com.sun.jna.Library"};
+    
     @Override
     public String[] getDependencyContexts() {
-        return new String[0];
+        return DEPENDENCY_CONTEXTS;
     }
 
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        // TODO Auto-generated method stub
-        return null;
+        return AppiumCaps.getCapabilities();
     }
 
     @Override
     public String getBrowserName() {
-        // TODO Auto-generated method stub
-        return null;
+        return AppiumCaps.BROWSER_NAME;
     }
 
     @Override
     public Map<String, String> getPersonalities() {
-        // TODO Auto-generated method stub
-        return null;
+        return AppiumCaps.getPersonalities();
     }
 
     @Override
     public String[] getPropertyNames() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            GridServer hubServer, DriverPlugin driverPlugin, Path workingPath, Path outputPath) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return AppiumCaps.getPropertyNames();
     }
 
 }

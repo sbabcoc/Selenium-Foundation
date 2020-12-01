@@ -11,7 +11,7 @@ public class SafariCaps {
     }
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"safari\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+                    "{\"browserName\":\"safari\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "safari";
     public static final String OPTIONS_KEY = "safari.options";

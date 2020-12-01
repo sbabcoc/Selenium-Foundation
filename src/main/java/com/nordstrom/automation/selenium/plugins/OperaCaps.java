@@ -16,7 +16,7 @@ public class OperaCaps {
         throw new AssertionError("OperaCaps is a static constants class that cannot be instantiated");
     }
 
-    private static final String CAPABILITIES = "{\"browserName\":\"operablink\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
+    private static final String CAPABILITIES = "{\"browserName\":\"operablink\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     public static final String BROWSER_NAME = "operablink";
     public static final String OPERA_BINARY = "selenium.opera.binary";

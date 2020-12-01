@@ -378,6 +378,17 @@
           <artifactId>mockito-core</artifactId>
           <scope>test</scope>
         </dependency>
+<!-- <dependency> -->
+<!--   <groupId>io.appium</groupId> -->
+<!--   <artifactId>java-client</artifactId> -->
+<!--   <version>7.4.1</version> -->
+<!--   <exclusions> -->
+<!--     <exclusion> -->
+<!--       <groupId>org.seleniumhq.selenium</groupId> -->
+<!--       <artifactId>selenium-java</artifactId> -->
+<!--     </exclusion> -->
+<!--   </exclusions> -->
+<!-- </dependency> -->
       </dependencies>
       <build>
         <directory>target-s3</directory>

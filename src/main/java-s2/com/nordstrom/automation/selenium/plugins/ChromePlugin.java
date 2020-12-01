@@ -10,9 +10,9 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
      * <b>org.openqa.selenium.chrome.ChromeDriver</b>
      * 
      * <pre>&lt;dependency&gt;
-     *    &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
-     *    &lt;artifactId&gt;selenium-chrome-driver&lt;/artifactId&gt;
-     *    &lt;version&gt;2.53.1&lt;/version&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-chrome-driver&lt;/artifactId&gt;
+     *  &lt;version&gt;2.53.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
