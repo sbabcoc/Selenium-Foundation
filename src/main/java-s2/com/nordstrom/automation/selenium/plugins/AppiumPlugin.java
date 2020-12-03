@@ -50,7 +50,7 @@ public class AppiumPlugin extends RemoteWebDriverPlugin {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;io.appium&lt;/groupId&gt;
      *  &lt;artifactId&gt;java-client&lt;/artifactId&gt;
-     *  &lt;version&gt;7.4.1&lt;/version&gt;
+     *  &lt;version&gt;3.4.1&lt;/version&gt;
      *  &lt;exclusions&gt;
      *    &lt;exclusion&gt;
      *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
