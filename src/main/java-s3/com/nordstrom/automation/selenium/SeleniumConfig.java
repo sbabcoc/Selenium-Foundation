@@ -20,7 +20,6 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
 
-import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -235,6 +234,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
             List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
             GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
+            nodeConfig.hub = null;
             nodeConfig.capabilities = capabilitiesList;
             nodeConfig.hubHost = hubUrl.getHost();
             nodeConfig.hubPort = hubUrl.getPort();

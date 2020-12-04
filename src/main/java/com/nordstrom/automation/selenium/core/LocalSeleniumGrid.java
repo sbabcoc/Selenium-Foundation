@@ -31,6 +31,11 @@ import com.google.common.collect.ObjectArrays;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -228,6 +233,17 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         // specify server role
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
+        
+        argsList.add(OPT_SERVLETS);
+        argsList.add(ExamplePageServlet.class.getName());
+        argsList.add(OPT_SERVLETS);
+        argsList.add(FrameA_Servlet.class.getName());
+        argsList.add(OPT_SERVLETS);
+        argsList.add(FrameB_Servlet.class.getName());
+        argsList.add(OPT_SERVLETS);
+        argsList.add(FrameC_Servlet.class.getName());
+        argsList.add(OPT_SERVLETS);
+        argsList.add(FrameD_Servlet.class.getName());
         
         // if starting a Grid node
         if (role == GridRole.NODE) {

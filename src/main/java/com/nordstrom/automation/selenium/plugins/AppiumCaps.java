@@ -15,7 +15,8 @@ public class AppiumCaps {
     		 "\"platformVersion\":\"11\"," + 
     		 "\"deviceName\":\"Android Emulator\"," + 
     		 "\"browserName\":\"Chrome\"," + 
-    		 "\"automationName\":\"UiAutomator2\"}";
+    		 "\"automationName\":\"UiAutomator2\"," +
+    		 "\"autoGrantPermissions\":true}";
 
     public static final String BROWSER_NAME = "appium";
     public static final String BASELINE = "{\"platformName\":\"Android\"}";
