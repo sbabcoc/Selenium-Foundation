@@ -237,33 +237,33 @@
           <artifactId>mockito-core</artifactId>
           <scope>test</scope>
         </dependency>
-<dependency>
-  <groupId>io.appium</groupId>
-  <artifactId>java-client</artifactId>
-  <version>3.4.1</version>
-  <exclusions>
-    <exclusion>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </exclusion>
-    <exclusion>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-    </exclusion>
-    <exclusion>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </exclusion>
-    <exclusion>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </exclusion>
-    <exclusion>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </exclusion>
-  </exclusions>
-</dependency>
+<!-- <dependency> -->
+<!--   <groupId>io.appium</groupId> -->
+<!--   <artifactId>java-client</artifactId> -->
+<!--   <version>3.4.1</version> -->
+<!--   <exclusions> -->
+<!--     <exclusion> -->
+<!--       <groupId>com.google.code.gson</groupId> -->
+<!--       <artifactId>gson</artifactId> -->
+<!--     </exclusion> -->
+<!--     <exclusion> -->
+<!--       <groupId>org.seleniumhq.selenium</groupId> -->
+<!--       <artifactId>selenium-java</artifactId> -->
+<!--     </exclusion> -->
+<!--     <exclusion> -->
+<!--       <groupId>org.apache.httpcomponents</groupId> -->
+<!--       <artifactId>httpclient</artifactId> -->
+<!--     </exclusion> -->
+<!--     <exclusion> -->
+<!--       <groupId>com.google.guava</groupId> -->
+<!--       <artifactId>guava</artifactId> -->
+<!--     </exclusion> -->
+<!--     <exclusion> -->
+<!--       <groupId>org.apache.commons</groupId> -->
+<!--       <artifactId>commons-lang3</artifactId> -->
+<!--     </exclusion> -->
+<!--   </exclusions> -->
+<!-- </dependency> -->
       </dependencies>
       <build>
         <directory>target-s2</directory>
@@ -405,61 +405,41 @@
           <artifactId>mockito-core</artifactId>
           <scope>test</scope>
         </dependency>
-<dependency>
-  <groupId>io.appium</groupId>
-  <artifactId>java-client</artifactId>
-  <version>7.4.1</version>
-  <exclusions>
-    <exclusion>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-    </exclusion>
-    <exclusion>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-support</artifactId>
-    </exclusion>
-    <exclusion>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-api</artifactId>
-    </exclusion>
+<!-- <dependency> -->
+<!--   <groupId>io.appium</groupId> -->
+<!--   <artifactId>java-client</artifactId> -->
+<!--   <version>7.4.1</version> -->
+<!--   <exclusions> -->
 <!--     <exclusion> -->
-<!--       <groupId>com.google.code.gson</groupId> -->
-<!--       <artifactId>gson</artifactId> -->
-<!--     </exclusion> -->
-    <exclusion>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </exclusion>
-<!--     <exclusion> -->
-<!--       <groupId>cglib</groupId> -->
-<!--       <artifactId>cglib</artifactId> -->
+<!--       <groupId>org.seleniumhq.selenium</groupId> -->
+<!--       <artifactId>selenium-java</artifactId> -->
 <!--     </exclusion> -->
 <!--     <exclusion> -->
-<!--       <groupId>commons-validator</groupId> -->
-<!--       <artifactId>commons-validator</artifactId> -->
-<!--     </exclusion> -->
-    <exclusion>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </exclusion>
-    <exclusion>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </exclusion>
-<!--     <exclusion> -->
-<!--       <groupId>org.springframework</groupId> -->
-<!--       <artifactId>spring-context</artifactId> -->
+<!--       <groupId>org.seleniumhq.selenium</groupId> -->
+<!--       <artifactId>selenium-support</artifactId> -->
 <!--     </exclusion> -->
 <!--     <exclusion> -->
-<!--       <groupId>org.aspectj</groupId> -->
-<!--       <artifactId>aspectjweaver</artifactId> -->
+<!--       <groupId>org.seleniumhq.selenium</groupId> -->
+<!--       <artifactId>selenium-api</artifactId> -->
 <!--     </exclusion> -->
-    <exclusion>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </exclusion>
-  </exclusions>
-</dependency>
+<!--     <exclusion> -->
+<!--       <groupId>org.apache.httpcomponents</groupId> -->
+<!--       <artifactId>httpclient</artifactId> -->
+<!--     </exclusion> -->
+<!--     <exclusion> -->
+<!--       <groupId>org.apache.commons</groupId> -->
+<!--       <artifactId>commons-lang3</artifactId> -->
+<!--     </exclusion> -->
+<!--     <exclusion> -->
+<!--       <groupId>commons-io</groupId> -->
+<!--       <artifactId>commons-io</artifactId> -->
+<!--     </exclusion> -->
+<!--     <exclusion> -->
+<!--       <groupId>org.slf4j</groupId> -->
+<!--       <artifactId>slf4j-api</artifactId> -->
+<!--     </exclusion> -->
+<!--   </exclusions> -->
+<!-- </dependency> -->
       </dependencies>
       <build>
         <directory>target-s3</directory>

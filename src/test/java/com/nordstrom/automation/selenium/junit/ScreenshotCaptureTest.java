@@ -12,7 +12,7 @@ import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.common.file.PathUtils;
 
 @InitialPage(ExamplePage.class)
-public class ScreenshotCaptureTest extends JUnitBase {
+public class ScreenshotCaptureTest extends JUnitRoot {
     
     @Test
     public void testScreenshotCapture() {

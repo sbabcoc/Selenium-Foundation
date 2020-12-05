@@ -26,10 +26,10 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
-import com.nordstrom.automation.selenium.support.TestNgBase;
+import com.nordstrom.automation.selenium.model.TestNgRoot;
 
 @InitialPage(ExamplePage.class)
-public class WebDriverUtilsTest extends TestNgBase {
+public class WebDriverUtilsTest extends TestNgRoot {
 
     @NoDriver
     @Test(expectedExceptions = {AssertionError.class},

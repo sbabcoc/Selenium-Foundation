@@ -10,6 +10,7 @@ import com.github.sbabcoc.logback.testng.ReporterAppender;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.model.ExamplePage;
+import com.nordstrom.automation.selenium.model.TestNgRoot;
 import com.nordstrom.automation.selenium.support.TestNgBase;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
@@ -152,7 +153,7 @@ import com.nordstrom.automation.testng.ListenerChain;
  * Required Configuration</a> procedure.
  */
 @InitialPage(ExamplePage.class)
-public class QuickStart extends TestNgBase {
+public class QuickStart extends TestNgRoot {
     
     private static final String PAGE_TITLE = "Example Page";
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);
