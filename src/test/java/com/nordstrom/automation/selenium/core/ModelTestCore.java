@@ -207,11 +207,11 @@ public class ModelTestCore {
         return (ExamplePage) instance.getInitialPage();
     }
 
-	public static void setHubAsTarget() {
-		SeleniumConfig config = SeleniumConfig.getConfig();
-		URL hubUrl = config.getHubUrl();
-		System.setProperty(TARGET_HOST.key(), hubUrl.getHost());
-		System.setProperty(TARGET_PORT.key(), Integer.toString(hubUrl.getPort()));
-	}
+    public static void setHubAsTarget() {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        URL hubUrl = config.getHubUrl();
+        System.setProperty(TARGET_HOST.key(), hubUrl.getHost());
+        System.setProperty(TARGET_PORT.key(), Integer.toString(hubUrl.getPort()));
+    }
     
 }

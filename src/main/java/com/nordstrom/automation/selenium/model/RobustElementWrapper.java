@@ -120,7 +120,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
                     this.locator = By.xpath(this.selector);
                     this.index = CARDINAL;
                 } else {
-                	strategy = Strategy.JS_XPATH;
+                    strategy = Strategy.JS_XPATH;
                 }
             } else if (findsByCssSelector) {
                 selector = ByType.cssLocatorFor(this.locator);

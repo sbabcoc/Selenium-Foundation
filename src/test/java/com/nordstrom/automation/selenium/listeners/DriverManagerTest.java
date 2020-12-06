@@ -12,9 +12,9 @@ import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.model.TestNgRoot;
 
 public class DriverManagerTest extends TestNgRoot {
-	
+    
     @BeforeMethod(groups = {"WithDriverBefore"})
-	@InitialPage(pageUrl=@PageUrl("/grid/admin/ExamplePageServlet"))
+    @InitialPage(pageUrl=@PageUrl("/grid/admin/ExamplePageServlet"))
     public void beforeMethodWithDriver() {
         assertTrue(nabDriver().isPresent(), "Driver should have been created");
     }

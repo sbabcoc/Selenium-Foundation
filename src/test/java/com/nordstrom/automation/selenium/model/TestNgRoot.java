@@ -6,10 +6,10 @@ import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.support.TestNgBase;
 
 public class TestNgRoot extends TestNgBase {
-	
-	@BeforeClass
-	public static void beforeClass() {
-		ModelTestCore.setHubAsTarget();
-	}
+    
+    @BeforeClass
+    public static void beforeClass() {
+        ModelTestCore.setHubAsTarget();
+    }
 
 }

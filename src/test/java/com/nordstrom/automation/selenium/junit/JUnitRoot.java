@@ -6,9 +6,9 @@ import com.nordstrom.automation.selenium.core.ModelTestCore;
 
 public class JUnitRoot extends JUnitBase {
 
-	@BeforeClass
-	public static void beforeClass() {
-		ModelTestCore.setHubAsTarget();
-	}
+    @BeforeClass
+    public static void beforeClass() {
+        ModelTestCore.setHubAsTarget();
+    }
 
 }
