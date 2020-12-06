@@ -14,25 +14,25 @@ import com.google.common.io.Resources;
 
 public class ExamplePageServlet extends HttpServlet {
 
-	private static final long serialVersionUID = -2195313096162880627L;
+    private static final long serialVersionUID = -2195313096162880627L;
 
-	protected String pageSource;
+    protected String pageSource;
 
-	@Override
-	public void init() throws ServletException {
-		pageSource = getResource("ExamplePage.html");
-	}
+    @Override
+    public void init() throws ServletException {
+        pageSource = getResource("ExamplePage.html");
+    }
 
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		// Set response content type
-		response.setContentType("text/html");
+        // Set response content type
+        response.setContentType("text/html");
 
-		// Actual logic goes here.
-		PrintWriter out = response.getWriter();
-	    out.print(pageSource);
-	}
+        // Actual logic goes here.
+        PrintWriter out = response.getWriter();
+        out.print(pageSource);
+    }
 
     /**
      * Get the content of the name resource
@@ -48,44 +48,44 @@ public class ExamplePageServlet extends HttpServlet {
             throw new IllegalArgumentException("Failed to load JavaScript resource '" + resource + "'", e);
         }
     }
-    
+
     public static class FrameA_Servlet extends ExamplePageServlet {
-    	
-		private static final long serialVersionUID = 4547909165192240389L;
 
-		@Override
-    	public void init() throws ServletException {
-    		pageSource = getResource("frame_a.html");
-    	}
+        private static final long serialVersionUID = 4547909165192240389L;
+
+        @Override
+        public void init() throws ServletException {
+            pageSource = getResource("frame_a.html");
+        }
     }
-    
+
     public static class FrameB_Servlet extends ExamplePageServlet {
-    	
-		private static final long serialVersionUID = 4547909165192240389L;
 
-		@Override
-    	public void init() throws ServletException {
-    		pageSource = getResource("frame_b.html");
-    	}
+        private static final long serialVersionUID = 4547909165192240389L;
+
+        @Override
+        public void init() throws ServletException {
+            pageSource = getResource("frame_b.html");
+        }
     }
-    
+
     public static class FrameC_Servlet extends ExamplePageServlet {
-    	
-		private static final long serialVersionUID = 4547909165192240389L;
 
-		@Override
-    	public void init() throws ServletException {
-    		pageSource = getResource("frame_c.html");
-    	}
+        private static final long serialVersionUID = 4547909165192240389L;
+
+        @Override
+        public void init() throws ServletException {
+            pageSource = getResource("frame_c.html");
+        }
     }
-    
-    public static class FrameD_Servlet extends ExamplePageServlet {
-    	
-		private static final long serialVersionUID = 4547909165192240389L;
 
-		@Override
-    	public void init() throws ServletException {
-    		pageSource = getResource("frame_d.html");
-    	}
+    public static class FrameD_Servlet extends ExamplePageServlet {
+
+        private static final long serialVersionUID = 4547909165192240389L;
+
+        @Override
+        public void init() throws ServletException {
+            pageSource = getResource("frame_d.html");
+        }
     }
 }
