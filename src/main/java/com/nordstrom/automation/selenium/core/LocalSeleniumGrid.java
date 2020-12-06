@@ -234,19 +234,20 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
         
-        argsList.add(OPT_SERVLETS);
-        argsList.add(ExamplePageServlet.class.getName());
-        argsList.add(OPT_SERVLETS);
-        argsList.add(FrameA_Servlet.class.getName());
-        argsList.add(OPT_SERVLETS);
-        argsList.add(FrameB_Servlet.class.getName());
-        argsList.add(OPT_SERVLETS);
-        argsList.add(FrameC_Servlet.class.getName());
-        argsList.add(OPT_SERVLETS);
-        argsList.add(FrameD_Servlet.class.getName());
-        
-        // if starting a Grid node
-        if (role == GridRole.NODE) {
+        // if starting a Grid hub
+        if (role == GridRole.HUB) {
+            argsList.add(OPT_SERVLETS);
+            argsList.add(ExamplePageServlet.class.getName());
+            argsList.add(OPT_SERVLETS);
+            argsList.add(FrameA_Servlet.class.getName());
+            argsList.add(OPT_SERVLETS);
+            argsList.add(FrameB_Servlet.class.getName());
+            argsList.add(OPT_SERVLETS);
+            argsList.add(FrameC_Servlet.class.getName());
+            argsList.add(OPT_SERVLETS);
+            argsList.add(FrameD_Servlet.class.getName());
+        // otherwise, if starting a Grid node
+        } else if (role == GridRole.NODE) {
             // add lifecycle servlet
             argsList.add(OPT_SERVLETS);
             argsList.add(LifecycleServlet.class.getName());
