@@ -118,8 +118,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
             outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
-			LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer,
-					workingPath, outputPath);
+            LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer,
+                    workingPath, outputPath);
             waitUntilReady(nodeServer, outputPath, hostTimeout);
             nodeServers.add(nodeServer);
         }
@@ -198,9 +198,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help</a>
      */
-	public static LocalGridServer start(final String launcherClassName, final String[] dependencyContexts,
-			final GridRole role, final Integer port, final Path configPath, final Path workingPath,
-			final Path outputPath, final String... propertyNames) {
+    public static LocalGridServer start(final String launcherClassName, final String[] dependencyContexts,
+            final GridRole role, final Integer port, final Path configPath, final Path workingPath,
+            final Path outputPath, final String... propertyNames) {
         
         String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();

@@ -32,10 +32,10 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      * @return {@link LocalGridServer} object for specified node
      * @throws IOException if an I/O error occurs
      */
-	@Override
-	public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-			GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException {
-    	
+    @Override
+    public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+            GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException {
+        
         String[] combinedContexts = LocalSeleniumGrid.combineDependencyContexts(dependencyContexts, this);
         Path nodeConfigPath = config.createNodeConfig(getCapabilities(config), hubServer.getUrl());
         String[] propertyNames = getPropertyNames();
