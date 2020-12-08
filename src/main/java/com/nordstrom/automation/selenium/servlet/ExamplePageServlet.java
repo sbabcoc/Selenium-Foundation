@@ -61,7 +61,7 @@ public class ExamplePageServlet extends HttpServlet {
 
     public static class FrameB_Servlet extends ExamplePageServlet {
 
-        private static final long serialVersionUID = 4547909165192240389L;
+        private static final long serialVersionUID = 5903212244921125263L;
 
         @Override
         public void init() throws ServletException {
@@ -71,7 +71,7 @@ public class ExamplePageServlet extends HttpServlet {
 
     public static class FrameC_Servlet extends ExamplePageServlet {
 
-        private static final long serialVersionUID = 4547909165192240389L;
+        private static final long serialVersionUID = 1448462233121165298L;
 
         @Override
         public void init() throws ServletException {
@@ -81,7 +81,7 @@ public class ExamplePageServlet extends HttpServlet {
 
     public static class FrameD_Servlet extends ExamplePageServlet {
 
-        private static final long serialVersionUID = 4547909165192240389L;
+        private static final long serialVersionUID = 1444648483821114876L;
 
         @Override
         public void init() throws ServletException {
