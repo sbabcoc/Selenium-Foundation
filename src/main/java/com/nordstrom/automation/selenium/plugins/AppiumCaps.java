@@ -13,22 +13,22 @@ public class AppiumCaps {
     private static final Map<String, String> CAPS_MAP;
     
     static {
-    	Map<String, String> capsMap = new HashMap<>();
-    	capsMap.put("UiAutomator2",
-    			"{\"automationName\":\"UiAutomator2\"," +
+        Map<String, String> capsMap = new HashMap<>();
+        capsMap.put("UiAutomator2",
+                "{\"automationName\":\"UiAutomator2\"," +
                  "\"platformName\":\"Android\"," +
                  "\"browserName\":\"Chrome\"," +
                  "\"maxInstances\":1," +
                  "\"deviceName\":\"Android Emulator\"," +
                  "\"autoGrantPermissions\":true}");
-    	capsMap.put("XCUITest",
-    			"{\"automationName\":\"XCUITest\"," +
+        capsMap.put("XCUITest",
+                "{\"automationName\":\"XCUITest\"," +
                  "\"platformName\":\"iOS\"," +
                  "\"browserName\":\"Safari\"," +
                  "\"maxInstances\":1," +
                  "\"deviceName\":\"iPhone Simulator\"}");
-    	
-    	CAPS_MAP = Collections.unmodifiableMap(capsMap);
+        
+        CAPS_MAP = Collections.unmodifiableMap(capsMap);
     }
 
     public static final String[] DRIVER_NAMES =

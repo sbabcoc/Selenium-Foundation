@@ -16,7 +16,7 @@ import net.bytebuddy.implementation.Implementation;
 
 public class AppiumPlugin implements DriverPlugin {
 
-	private static final String[] DEPENDENCY_CONTEXTS = {};
+    private static final String[] DEPENDENCY_CONTEXTS = {};
     
     @Override
     public String[] getDependencyContexts() {
@@ -43,19 +43,19 @@ public class AppiumPlugin implements DriverPlugin {
         return AppiumCaps.getPropertyNames();
     }
 
-	@Override
-	public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-			GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
-		// TODO Auto-generated method stub
-		// Create subclass of LocalGridServer.
-		// Override default status request string and shutdown(...) method
-		return null;
-	}
+    @Override
+    public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+            GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
+        // TODO Auto-generated method stub
+        // Create subclass of LocalGridServer.
+        // Override default status request string and shutdown(...) method
+        return null;
+    }
 
-	@Override
-	public Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

@@ -45,7 +45,8 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
             GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException {
         
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, this);
-        Path nodeConfigPath = null; //config.createNodeConfig(getCapabilities(config), hubServer.getUrl());
+        String capabilities = getCapabilitiesForDriver(config, driverName);
+        Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
         String[] propertyNames = getPropertyNames();
         return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
                 Integer.valueOf(-1), nodeConfigPath, workingPath, outputPath, propertyNames);
@@ -68,9 +69,11 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
     }
     
     /**
+     * Ensure that the specified driver is supported by this plugin.
      * 
-     * @param driverName
-     * @return
+     * @param driverName name of driver in question
+     * @return normalized driver name
+     * @throws IllegalArgumentException if this plugin doesn't support the specified driver
      */
     String requireDriverName(String driverName) {
         if (this.driverName.equalsIgnoreCase(driverName)) {
