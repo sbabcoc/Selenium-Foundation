@@ -7,7 +7,7 @@ import java.util.Map;
 public class ChromeCaps {
     
     private ChromeCaps() {
-        throw new AssertionError("EdgeCaps is a static constants class that cannot be instantiated");
+        throw new AssertionError("ChromeCaps is a static constants class that cannot be instantiated");
     }
 
     public static final String DRIVER_NAME = "chrome";

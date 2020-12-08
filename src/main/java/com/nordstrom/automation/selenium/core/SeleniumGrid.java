@@ -243,12 +243,14 @@ public class SeleniumGrid {
         if ((json == null) || json.isEmpty()) {
             String message = String.format("Specified personality '%s' not supported by local Grid", personality);
             String browserName = personality.split("\\.")[0];
-            if (browserName.equals(personality)) {
-                throw new RuntimeException(message);
-            } else {
+            if ( ! browserName.equals(personality)) {
                 LOGGER.warn("{}; revert to browser name '{}'", message, browserName);
-                return config.getCapabilitiesForName(browserName)[0];
+                Capabilities[] capsList = config.getCapabilitiesForName(browserName);
+                if (capsList.length > 0) {
+                    return capsList[0];
+                }
             }
+            throw new RuntimeException(message);
         } else {
             return config.getCapabilitiesForJson(json)[0];
         }
