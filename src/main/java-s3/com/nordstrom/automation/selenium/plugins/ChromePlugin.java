@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class ChromePlugin extends RemoteWebDriverPlugin {
     
+    public ChromePlugin() {
+        super(ChromeCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.chrome.ChromeDriver</b>
      * 
@@ -32,26 +36,20 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getCapabilities(SeleniumConfig config) {
+    public String getCapabilitiesForDriver(SeleniumConfig config, String driverName) {
+        requireDriverName(driverName);
         return ChromeCaps.getCapabilities();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getBrowserName() {
-        return ChromeCaps.BROWSER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, String> getPersonalities() {
+    public Map<String, String> getPersonalitiesForDriver(String driverName) {
+        requireDriverName(driverName);
         return ChromeCaps.getPersonalities();
     }
-
+    
     /**
      * {@inheritDoc}
      */

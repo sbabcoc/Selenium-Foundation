@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class SafariPlugin extends RemoteWebDriverPlugin {
     
+    public SafariPlugin() {
+        super(SafariCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.safari.SafariDriver</b>
      * 
@@ -31,7 +35,8 @@ public class SafariPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getCapabilities(SeleniumConfig config) {
+    public String getCapabilitiesForDriver(SeleniumConfig config, String driverName) {
+        requireDriverName(driverName);
         return SafariCaps.getCapabilities();
     }
 
@@ -39,15 +44,16 @@ public class SafariPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getBrowserName() {
-        return SafariCaps.BROWSER_NAME;
+    public String getDriverName() {
+        return SafariCaps.DRIVER_NAME;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> getPersonalities() {
+    public Map<String, String> getPersonalitiesForDriver(String driverName) {
+        requireDriverName(driverName);
         return SafariCaps.getPersonalities();
     }
 

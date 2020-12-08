@@ -111,7 +111,9 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>selenium.context.platform</b> <br> default: {@code null} */
         CONTEXT_PLATFORM("selenium.context.platform", null),
         /** name: <b>selenium.caps.refiner</b>  <br> default: {@code null} */
-        CAPS_REFINER("selenium.caps.refiner", null);
+        CAPS_REFINER("selenium.caps.refiner", null),
+        /** name <b>appium.cli.args</b> <br> default: {@code null} */
+        APPIUM_CLI_ARGS("appium.cli.args", null);
         
         private String propertyName;
         private String defaultValue;

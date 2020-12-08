@@ -10,24 +10,23 @@ public class PhantomJsCaps {
         throw new AssertionError("PhantomJsCaps is a static constants class that cannot be instantiated");
     }
 
+    public static final String DRIVER_NAME = "phantomjs";
+    private static final String[] PROPERTY_NAMES = { "phantomjs.binary.path",
+            "phantomjs.ghostdriver.path", "phantomjs.logfile.path" };
+
     private static final String CAPABILITIES =
                     "{\"browserName\":\"phantomjs\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
-    public static final String BROWSER_NAME = "phantomjs";
-    public static final String BASELINE = "{\"browserName\":\"phantomjs\"}";
-    public static final String LOGGING = "{\"browserName\":\"phantomjs\",\"loggingPrefs\":{\"browser\":\"WARNING\"}}";
+    private static final String BASELINE = "{\"browserName\":\"phantomjs\"}";
     
-    private static final String[] PROPERTY_NAMES = {
-                    "phantomjs.binary.path",
-                    "phantomjs.ghostdriver.path",
-                    "phantomjs.logfile.path"};
+    private static final String LOGGING = "{\"browserName\":\"phantomjs\",\"loggingPrefs\":{\"browser\":\"WARNING\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put(BROWSER_NAME, BASELINE);
-        personalities.put("phantomjs.logging", LOGGING);
+        personalities.put(DRIVER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME + ".logging", LOGGING);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

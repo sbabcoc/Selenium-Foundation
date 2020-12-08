@@ -16,22 +16,21 @@ public class OperaCaps {
         throw new AssertionError("OperaCaps is a static constants class that cannot be instantiated");
     }
 
-    private static final String CAPABILITIES = "{\"browserName\":\"operablink\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
-    
-    public static final String BROWSER_NAME = "operablink";
+    public static final String DRIVER_NAME = "operablink";
     public static final String OPERA_BINARY = "selenium.opera.binary";
     public static final String OPTIONS_KEY = "operaOptions";
     public static final String BINARY_KEY = "binary";
-    
-    public static final String BASELINE = "{\"browserName\":\"operablink\"}";
-    
     private static final String[] PROPERTY_NAMES = { "webdriver.opera.driver" };
+    
+    private static final String CAPABILITIES = "{\"browserName\":\"operablink\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+    
+    private static final String BASELINE = "{\"browserName\":\"operablink\"}";
     
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put(BROWSER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME, BASELINE);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

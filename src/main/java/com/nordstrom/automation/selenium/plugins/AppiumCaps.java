@@ -10,16 +10,29 @@ public class AppiumCaps {
         throw new AssertionError("AppiumCaps is a static constants class that cannot be instantiated");
     }
 
-    private static final String CAPABILITIES = 
-            "{\"platformName\":\"Android\"," +
-             "\"platformVersion\":\"11\"," + 
-             "\"deviceName\":\"Android Emulator\"," + 
-             "\"browserName\":\"Chrome\"," + 
-             "\"automationName\":\"UiAutomator2\"," +
-             "\"autoGrantPermissions\":true}";
+    private static final Map<String, String> CAPS_MAP;
+    
+    static {
+    	Map<String, String> capsMap = new HashMap<>();
+    	capsMap.put("UiAutomator2",
+    			"{\"automationName\":\"UiAutomator2\"," +
+                 "\"platformName\":\"Android\"," +
+                 "\"browserName\":\"Chrome\"," +
+                 "\"maxInstances\":1," +
+                 "\"deviceName\":\"Android Emulator\"," +
+                 "\"autoGrantPermissions\":true}");
+    	capsMap.put("XCUITest",
+    			"{\"automationName\":\"XCUITest\"," +
+                 "\"platformName\":\"iOS\"," +
+                 "\"browserName\":\"Safari\"," +
+                 "\"maxInstances\":1," +
+                 "\"deviceName\":\"iPhone Simulator\"}");
+    	
+    	CAPS_MAP = Collections.unmodifiableMap(capsMap);
+    }
 
-    public static final String BROWSER_NAME = "appium";
-    public static final String BASELINE = "{\"platformName\":\"Android\"}";
+    public static final String[] DRIVER_NAMES =
+            { "UiAutomator2", "XCUITest", "Espresso", "YouiEngine", "Futter", "Windows", "Mac", "Mac2" };
 
     private static final String[] PROPERTY_NAMES = {};
 
@@ -27,12 +40,11 @@ public class AppiumCaps {
 
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put(BROWSER_NAME, BASELINE);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
 
-    public static String getCapabilities() {
-        return CAPABILITIES;
+    public static String getCapabilities(String automationName) {
+        return CAPS_MAP.get(automationName);
     }
 
     public static Map<String, String> getPersonalities() {

@@ -22,26 +22,28 @@ public interface DriverPlugin {
     String[] getDependencyContexts();
     
     /**
-     * Get driver capabilities as JSON string.
+     * Get capabilities for specified driver as JSON string.
      * 
      * @param config {@link SeleniumConfig} object
+     * @param driverName name of driver in question
      * @return JSON driver capabilities
      */
-    String getCapabilities(SeleniumConfig config);
+    String getCapabilitiesForDriver(SeleniumConfig config, String driverName);
     
     /**
-     * Get name of browser supported by this plug-in.
+     * Get names of drivers supported by this plug-in.
      * 
-     * @return browser name
+     * @return driver names
      */
-    String getBrowserName();
+    String[] getDriverNames();
     
     /**
      * Get driver "personalities" provided by this plug-in.
      * 
+     * @param driverName name of driver in question
      * @return named collection of capabilities records
      */
-    Map<String, String> getPersonalities();
+    Map<String, String> getPersonalitiesForDriver(String driverName);
     
     /**
      * Get names of supported System properties.

@@ -10,20 +10,20 @@ public class InternetExplorerCaps {
         throw new AssertionError("InternetExplorerCaps is a static constants class that cannot be instantiated");
     }
 
+    public static final String DRIVER_NAME = "internet explorer";
+    public static final String OPTIONS_KEY = "se:ieOptions";
+    private static final String[] PROPERTY_NAMES = { "webdriver.ie.driver" };
+    
     private static final String CAPABILITIES =
                     "{\"browserName\":\"internet explorer\",\"maxInstances\":1,\"seleniumProtocol\":\"WebDriver\"}";
     
-    public static final String BROWSER_NAME = "internet explorer";
-    public static final String OPTIONS_KEY = "se:ieOptions";
-    public static final String BASELINE = "{\"browserName\":\"internet explorer\"}";
-    
-    private static final String[] PROPERTY_NAMES = { "webdriver.ie.driver" };
+    private static final String BASELINE = "{\"browserName\":\"internet explorer\"}";
     
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put(BROWSER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME, BASELINE);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

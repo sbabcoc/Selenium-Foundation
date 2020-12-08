@@ -13,6 +13,10 @@ import net.bytebuddy.implementation.MethodCall;
 
 public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
     
+    public HtmlUnitPlugin() {
+        super(HtmlUnitCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.htmlunit.HtmlUnitDriver</b>
      * 
@@ -59,7 +63,8 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getCapabilities(SeleniumConfig config) {
+    public String getCapabilitiesForDriver(SeleniumConfig config, String driverName) {
+        requireDriverName(driverName);
         return HtmlUnitCaps.getCapabilities();
     }
 
@@ -67,15 +72,8 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getBrowserName() {
-        return HtmlUnitCaps.BROWSER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, String> getPersonalities() {
+    public Map<String, String> getPersonalitiesForDriver(String driverName) {
+        requireDriverName(driverName);
         return HtmlUnitCaps.getPersonalities();
     }
 

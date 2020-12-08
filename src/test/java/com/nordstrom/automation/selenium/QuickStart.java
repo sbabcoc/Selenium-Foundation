@@ -79,7 +79,7 @@ import com.nordstrom.automation.testng.ListenerChain;
  *         <th style="text-align: center; border: 1px solid black;">Default</th>
  *     </tr>
  *     <tr>
- *         <td style="text-align: left; border: 1px solid black;">{@link SeleniumSettings#BROWSER_NAME BROWSER_NAME}</td>
+ *         <td style="text-align: left; border: 1px solid black;">{@link SeleniumSettings#DRIVER_NAME BROWSER_NAME}</td>
  *         <td style="text-align: left; border: 1px solid black;">selenium.browser.name</td>
  *         <td style="text-align: center; border: 1px solid black;">(none) *</td>
  *     </tr>
@@ -96,7 +96,7 @@ import com.nordstrom.automation.testng.ListenerChain;
  * </table>
  * <p>
  * * <b>NOTE</b>: By default, HtmlUnit is selected as the browser. For easier override, this is specified through
- * {@link SeleniumSettings#BROWSER_CAPS BROWSER_CAPS} instead of {@link SeleniumSettings#BROWSER_NAME BROWSER_NAME}.
+ * {@link SeleniumSettings#BROWSER_CAPS BROWSER_CAPS} instead of {@link SeleniumSettings#DRIVER_NAME BROWSER_NAME}.
  * For details, see <a href="../../../../../../../docs/ManipulateSettingsWithSeleniumConfig.md">Manipulate Settings
  * with SeleniumConfig</a>. 
  * <p>
@@ -120,7 +120,7 @@ import com.nordstrom.automation.testng.ListenerChain;
  * </table>
  * <p>
  * This sample <i>settings.properties</i> file overrides the values of {@link SeleniumSettings#TARGET_HOST TARGET_HOST}
- * and {@link SeleniumSettings#BROWSER_NAME BROWSER_NAME}. The latter can be overridden by System property declaration:
+ * and {@link SeleniumSettings#DRIVER_NAME BROWSER_NAME}. The latter can be overridden by System property declaration:
  * <p>
  * <blockquote>{@code -Dselenium.browser.name=firefox}</blockquote>
  * <p>

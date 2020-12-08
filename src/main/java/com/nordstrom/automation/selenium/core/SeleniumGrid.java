@@ -118,6 +118,8 @@ public class SeleniumGrid {
     
     /**
      * Add supported personalities of the specified Grid node.
+     * <p>
+     * <b>NOTE</b>: 
      * 
      * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of Grid hub
@@ -134,7 +136,11 @@ public class SeleniumGrid {
                 capsList = (List<Map>) conf.get("capabilities");
             }
             for (Map<String, Object> capsItem : capsList) {
-                personalities.put((String) capsItem.get("browserName"), config.toJson(capsItem));
+                String personalityName = (String) capsItem.get("automationName");
+                if (personalityName == null) {
+                    personalityName = (String) capsItem.get("browserName");
+                }
+                personalities.put(personalityName, config.toJson(capsItem));
             }
         }
     }
@@ -144,8 +150,10 @@ public class SeleniumGrid {
      */
     private void addPluginPersonalities() {
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
-            if (personalities.containsKey(driverPlugin.getBrowserName())) {
-                personalities.putAll(driverPlugin.getPersonalities());
+            for (String driverName : driverPlugin.getDriverNames()) {
+                if (personalities.containsKey(driverName)) {
+                    personalities.putAll(driverPlugin.getPersonalitiesForDriver(driverName));
+                }
             }
         }
     }
@@ -233,10 +241,14 @@ public class SeleniumGrid {
     public Capabilities getPersonality(SeleniumConfig config, String personality) {
         String json = personalities.get(personality);
         if ((json == null) || json.isEmpty()) {
+            String message = String.format("Specified personality '%s' not supported by local Grid", personality);
             String browserName = personality.split("\\.")[0];
-            LOGGER.warn("Specified personality '{}' not supported by local Grid; revert to browser name '{}'",
-                            personality, browserName);
-            return config.getCapabilitiesForName(browserName)[0];
+            if (browserName.equals(personality)) {
+                throw new RuntimeException(message);
+            } else {
+                LOGGER.warn("{}; revert to browser name '{}'", message, browserName);
+                return config.getCapabilitiesForName(browserName)[0];
+            }
         } else {
             return config.getCapabilitiesForJson(json)[0];
         }
@@ -245,8 +257,8 @@ public class SeleniumGrid {
     public static class GridServer {
         private GridRole role;
         private URL serverUrl;
-        private String statusRequest;
-        private String shutdownRequest;
+        protected String statusRequest;
+        protected String shutdownRequest;
         
         public static final String GRID_CONSOLE = "/grid/console";
         public static final String HUB_BASE = "/wd/hub";
