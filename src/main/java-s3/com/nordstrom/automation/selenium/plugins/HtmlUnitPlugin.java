@@ -70,14 +70,6 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getDriverName() {
-        return HtmlUnitCaps.DRIVER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<String, String> getPersonalitiesForDriver(String driverName) {
         requireDriverName(driverName);
         return HtmlUnitCaps.getPersonalities();

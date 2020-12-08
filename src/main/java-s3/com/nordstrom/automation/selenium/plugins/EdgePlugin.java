@@ -44,14 +44,6 @@ public class EdgePlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getDriverName() {
-        return EdgeCaps.DRIVER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<String, String> getPersonalitiesForDriver(String driverName) {
         requireDriverName(driverName);
         return EdgeCaps.getPersonalities();

@@ -45,14 +45,6 @@ public class OperaPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getDriverName() {
-        return OperaCaps.DRIVER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<String, String> getPersonalitiesForDriver(String driverName) {
         requireDriverName(driverName);
         return OperaCaps.getPersonalities();

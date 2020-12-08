@@ -67,10 +67,6 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
         return driverNames;
     }
     
-    protected String getDriverName() {
-        return driverName;
-    }
-    
     /**
      * 
      * @param driverName

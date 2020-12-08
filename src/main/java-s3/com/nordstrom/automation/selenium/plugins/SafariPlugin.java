@@ -44,14 +44,6 @@ public class SafariPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getDriverName() {
-        return SafariCaps.DRIVER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<String, String> getPersonalitiesForDriver(String driverName) {
         requireDriverName(driverName);
         return SafariCaps.getPersonalities();

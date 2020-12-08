@@ -51,14 +51,6 @@ public class PhantomJsPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getDriverName() {
-        return PhantomJsCaps.DRIVER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<String, String> getPersonalitiesForDriver(String driverName) {
         requireDriverName(driverName);
         return PhantomJsCaps.getPersonalities();

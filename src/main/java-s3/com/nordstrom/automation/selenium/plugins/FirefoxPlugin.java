@@ -45,16 +45,8 @@ public class FirefoxPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getDriverName() {
-        return FirefoxCaps.DRIVER_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<String, String> getPersonalitiesForDriver(String driverName) {
-        requireDriverName(driverName);
+        requireDriverName(driverName)
         return FirefoxCaps.getPersonalities();
     }
 
