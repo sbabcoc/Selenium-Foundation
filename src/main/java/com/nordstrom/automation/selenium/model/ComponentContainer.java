@@ -635,7 +635,7 @@ public abstract class ComponentContainer
                 if (pathUri.isAbsolute()) {
                     return pathUri.toString();
                 } else {
-                    builder.setPath(URI.create(LOOPBACK + builder.getPath() + "/").resolve("./" + path).getPath());
+                    builder.setPath(URI.create(LOOPBACK + targetUri.getPath() + "/").resolve("./" + path).getPath());
                 }
             }
             

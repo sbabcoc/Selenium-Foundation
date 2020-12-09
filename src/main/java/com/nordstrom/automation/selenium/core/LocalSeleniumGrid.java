@@ -199,16 +199,15 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         // if starting a Grid hub
         if (role == GridRole.HUB) {
+            String servlets = new StringBuilder()
+                    .append(ExamplePageServlet.class.getName()).append(',')
+                    .append(FrameA_Servlet.class.getName()).append(',')
+                    .append(FrameB_Servlet.class.getName()).append(',')
+                    .append(FrameC_Servlet.class.getName()).append(',')
+                    .append(FrameD_Servlet.class.getName()).toString();
+            
             argsList.add(OPT_SERVLETS);
-            argsList.add(ExamplePageServlet.class.getName());
-            argsList.add(OPT_SERVLETS);
-            argsList.add(FrameA_Servlet.class.getName());
-            argsList.add(OPT_SERVLETS);
-            argsList.add(FrameB_Servlet.class.getName());
-            argsList.add(OPT_SERVLETS);
-            argsList.add(FrameC_Servlet.class.getName());
-            argsList.add(OPT_SERVLETS);
-            argsList.add(FrameD_Servlet.class.getName());
+            argsList.add(servlets);
         // otherwise, if starting a Grid node
         } else if (role == GridRole.NODE) {
             // add lifecycle servlet

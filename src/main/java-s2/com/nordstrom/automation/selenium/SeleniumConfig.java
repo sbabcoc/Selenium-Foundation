@@ -154,6 +154,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     null,
                     "com.nordstrom.tools.GuavaAgent",           // guava-agent
                     "net.bytebuddy.matcher.ElementMatcher",     // guava-agent
+                    "com.nordstrom.automation.selenium.servlet.ExamplePageServlet",
                     "com.google.common.util.concurrent.SimpleTimeLimiter",
                     "com.google.gson.JsonIOException",
                     "org.openqa.selenium.remote.JsonToBeanConverter",

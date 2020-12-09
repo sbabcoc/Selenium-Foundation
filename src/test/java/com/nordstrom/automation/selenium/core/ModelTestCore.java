@@ -1,14 +1,15 @@
 package com.nordstrom.automation.selenium.core;
 
 import static org.junit.Assert.assertEquals;
-import static com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings.TARGET_HOST;
-import static com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings.TARGET_PORT;
 import static org.junit.Assert.assertArrayEquals;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.testng.SkipException;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -210,8 +211,15 @@ public class ModelTestCore {
     public static void setHubAsTarget() {
         SeleniumConfig config = SeleniumConfig.getConfig();
         URL hubUrl = config.getHubUrl();
-        System.setProperty(TARGET_HOST.key(), hubUrl.getHost());
-        System.setProperty(TARGET_PORT.key(), Integer.toString(hubUrl.getPort()));
+        try {
+            URI targetUri = new URIBuilder()
+                    .setScheme(hubUrl.getProtocol())
+                    .setHost(hubUrl.getHost())
+                    .setPort(hubUrl.getPort())
+                    .build().normalize();
+            config.setTargetUri(targetUri);
+        } catch (URISyntaxException e) {
+        }
     }
     
 }

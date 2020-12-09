@@ -354,6 +354,30 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
+     * Set the target URI.
+     * <p>
+     * <b>NOTE</b>: This method also updates the following target URI components: 
+     *     {@link SeleniumSettings#TARGET_SCHEME scheme}, {@link SeleniumSettings#TARGET_CREDS credentials},
+     *     {@link SeleniumSettings#TARGET_HOST host}, {@link SeleniumSettings#TARGET_PORT port}, and
+     *     {@link SeleniumSettings#TARGET_PATH base path}
+     * 
+     * @param targetUri target URI
+     */
+    public void setTargetUri(URI targetUri) {
+        this.targetUri = targetUri;
+        System.setProperty(SeleniumSettings.TARGET_PATH.key(), targetUri.getPath());
+        System.setProperty(SeleniumSettings.TARGET_SCHEME.key(), targetUri.getScheme());
+        System.setProperty(SeleniumSettings.TARGET_HOST.key(), targetUri.getHost());
+        System.setProperty(SeleniumSettings.TARGET_PORT.key(), Integer.toString(targetUri.getPort()));
+        String userInfo = targetUri.getUserInfo();
+        if (userInfo != null) {
+            System.setProperty(SeleniumSettings.TARGET_CREDS.key(), userInfo);
+        } else {
+            System.clearProperty(SeleniumSettings.TARGET_CREDS.key());
+        }
+    }
+    
+    /**
      * Get the path to the Selenium Grid node configuration.
      * 
      * @return Selenium Grid node configuration path

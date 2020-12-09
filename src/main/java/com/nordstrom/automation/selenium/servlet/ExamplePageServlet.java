@@ -15,8 +15,11 @@ import com.google.common.io.Resources;
 public class ExamplePageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -2195313096162880627L;
+    private static final String PATH = "/grid/admin";
 
     protected String pageSource;
+    protected String target;
+    
 
     @Override
     public void init() throws ServletException {
@@ -25,7 +28,19 @@ public class ExamplePageServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        
+        synchronized(pageSource) {
+            if (target == null) {
+                // convert relative servlet page references to absolute form
+                // NOTE: This works around a Selenium 2 Grid server issue.
+                String scheme = request.getScheme();
+                String host = request.getServerName();
+                int port = request.getServerPort();
+                target = scheme + "://" + host + ":" + port + PATH;
+                pageSource = pageSource.replaceAll(PATH, target);
+            }
+        }
+        
         // Set response content type
         response.setContentType("text/html");
 
