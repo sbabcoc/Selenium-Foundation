@@ -12,7 +12,7 @@ public class PhantomJsCaps {
 
     public static final String DRIVER_NAME = "phantomjs";
     private static final String[] PROPERTY_NAMES = 
-    	{ "phantomjs.binary.path", "phantomjs.ghostdriver.path", "phantomjs.logfile.path" };
+        { "phantomjs.binary.path", "phantomjs.ghostdriver.path", "phantomjs.logfile.path" };
 
     private static final String CAPABILITIES =
                     "{\"browserName\":\"phantomjs\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
@@ -20,10 +20,10 @@ public class PhantomJsCaps {
     private static final String BASELINE = "{\"browserName\":\"phantomjs\"}";
     
     private static final String LOGGING = 
-    		"{\"browserName\":\"phantomjs\"," +
-    		 "\"loggingPrefs\":{\"browser\":\"WARNING\"}," +
-    	     "\"personality\":\"phantomjs.logging\"" +
-    		"}";
+            "{\"browserName\":\"phantomjs\"," +
+             "\"loggingPrefs\":{\"browser\":\"WARNING\"}," +
+             "\"personality\":\"phantomjs.logging\"" +
+            "}";
     
     private static final Map<String, String> PERSONALITIES;
     
