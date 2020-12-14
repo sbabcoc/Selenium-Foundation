@@ -21,15 +21,16 @@ public class ChromeCaps {
                     "{\"browserName\":\"chrome\"," +
                      "\"goog:chromeOptions\":{" +
                          "\"args\":[\"--disable-infobars\"]," +
-                         "\"prefs\":{\"credentials_enable_service\":false}" +
-                    "}}";
+                         "\"prefs\":{\"credentials_enable_service\":false}}" +
+                    "}";
     
     private static final String HEADLESS =
                     "{\"browserName\":\"chrome\"," +
                      "\"goog:chromeOptions\":{" +
                          "\"args\":[\"--disable-infobars\",\"--headless\",\"--disable-gpu\"]," +
-                         "\"prefs\":{\"credentials_enable_service\":false}" +
-                    "}}";
+                         "\"prefs\":{\"credentials_enable_service\":false}}," +
+                     "\"personality\":\"chrome.headless\"" +
+                    "}";
     
     private static final Map<String, String> PERSONALITIES;
     

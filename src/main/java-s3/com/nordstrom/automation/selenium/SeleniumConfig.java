@@ -226,13 +226,27 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
+        // convert capabilities string to [JsonInput] object
+        JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
+        // convert [JsonInput] object to list of [MutableCapabilities] objects
+        List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
+        // for each [MutableCapabilities] object
+        for (MutableCapabilities theseCaps : capabilitiesList) {
+            // apply specified node modifications (if any)
+            theseCaps.merge(applyModifications(theseCaps, NODE_MODS_SUFFIX));
+        }
+        
+        // get path to node configuration template
         String nodeConfigPath = getNodeConfigPath().toString();
+        // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        String hashCode = String.format("%08X", Objects.hash(capabilities, hubUrl));
+        // get hash code of capabilities list and hub URL as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl));
+        // assemble node configuration file path with capabilities hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
+        
+        // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
-            JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
-            List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
             GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
             nodeConfig.hub = null;
             nodeConfig.capabilities = capabilitiesList;

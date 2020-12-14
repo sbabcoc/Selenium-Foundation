@@ -223,13 +223,27 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
+        // assemble complete JSON registration request
+        String input = JSON_HEAD + capabilities + JSON_TAIL;
+        // convert JSON registration request to list of [DesiredCapabilities] objects
+        List<DesiredCapabilities> capabilitiesList = RegistrationRequest.getNewInstance(input).getCapabilities();
+        // for each [DesiredCapabilities] object
+        for (DesiredCapabilities theseCaps : capabilitiesList) {
+            // apply specified node modifications (if any)
+            theseCaps.merge(applyModifications(theseCaps, NODE_MODS_SUFFIX));
+        }
+        
+        // get path to node configuration template
         String nodeConfigPath = getNodeConfigPath().toString();
+        // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        String hashCode = String.format("%08X", Objects.hash(capabilities, hubUrl));
+        // get hash code of capabilities list and hub URL as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl));
+        // assemble node configuration file path with capabilities hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
+        
+        // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
-            String input = JSON_HEAD + capabilities + JSON_TAIL;
-            List<DesiredCapabilities> capabilitiesList = RegistrationRequest.getNewInstance(input).getCapabilities();
             RegistrationRequest nodeConfig = new RegistrationRequest();
             nodeConfig.loadFromJSON(nodeConfigPath);
             nodeConfig.setCapabilities(capabilitiesList);

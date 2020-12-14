@@ -29,6 +29,8 @@ import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
@@ -48,6 +50,8 @@ public abstract class AbstractSeleniumConfig extends
     private static final String CAPS_PATTERN = "{\"browserName\":\"%s\"}";
     /** value: <b>{"browserName":"htmlunit"}</b> */
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
+    protected static final String NODE_MODS_SUFFIX = ".node.mods";
+    private static final String CAPS_MODS_SUFFIX = ".caps.mods";
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
     /**
@@ -110,10 +114,12 @@ public abstract class AbstractSeleniumConfig extends
         GRID_NO_REDIRECT("selenium.grid.no.redirect", "false"),
         /** name: <b>selenium.context.platform</b> <br> default: {@code null} */
         CONTEXT_PLATFORM("selenium.context.platform", null),
-        /** name: <b>selenium.caps.refiner</b>  <br> default: {@code null} */
-        CAPS_REFINER("selenium.caps.refiner", null),
-        /** name <b>appium.cli.args</b> <br> default: {@code null} */
-        APPIUM_CLI_ARGS("appium.cli.args", null);
+        /** name: <b>appium.cli.args</b> <br> default: {@code null} */
+        APPIUM_CLI_ARGS("appium.cli.args", null),
+        /** name: <b>appium.binary.path</b> <br> default: {@code null} */
+        APPIUM_BINARY_PATH("appium.binary.path", null),
+        /** name: <b>node.binary.path</b> <br> default: {@code null} */
+        NODE_BINARY_PATH("node.binary.path", null);
         
         private String propertyName;
         private String defaultValue;
@@ -414,7 +420,6 @@ public abstract class AbstractSeleniumConfig extends
         Capabilities capabilities = null;
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
         String browserCaps = getString(SeleniumSettings.BROWSER_CAPS.key());
-        String capsRefiner = getString(SeleniumSettings.CAPS_REFINER.key());
         if (browserName != null) {
             capabilities = getSeleniumGrid().getPersonality(getConfig(), browserName);
         } else if (browserCaps != null) {
@@ -422,14 +427,73 @@ public abstract class AbstractSeleniumConfig extends
         } else {
             throw new IllegalStateException("Neither browser name nor capabilities are specified");
         }
-        if (capsRefiner != null) {
-            Map<String, Object> currentCaps = new HashMap<>(capabilities.asMap());
-            Map<String, Object> refinerCaps = DataUtils.fromString(capsRefiner, HashMap.class);
-            currentCaps.putAll(refinerCaps);
-            String mergedCaps = DataUtils.toString(currentCaps);
-            capabilities = getCapabilitiesForJson(mergedCaps)[0];
+        return applyModifications(capabilities, CAPS_MODS_SUFFIX);
+    }
+    
+    /**
+     * Apply configured modifications to the specified <b>Capabilities</b> object.
+     * <p>
+     * <b>NOTE</b>: Modifications are specified in the configuration as either JSON strings or file paths
+     * (absolute, relative, or simple filename). Property names for modifications correspond to "personality"
+     * values within the capabilities themselves (in order of precedence): 
+     * <p>
+     * <ul>
+     *     <li><b>personality</b>: Selenium Foundation "personality" name</li>
+     *     <li><b>automationName</b>: 'appium' automation engine name</li>
+     *     <li><b>browserName</b>: Selenium driver browser name</li>
+     * </ul>
+     * 
+     * The first defined value is selected as the "personality" of the specified <b>Capabilities</b> object.
+     * The full name of the property used to specify modifications is the "personality" plus a context-specific
+     * suffix: 
+     * <p>
+     * <ul>
+     *     <li>For node configuration capabilities: <b>&lt;personality&gt;.node.mods</b></li>
+     *     <li>For "desired capabilities" requests: <b>&lt;personality&gt;.caps.mods</b></li>
+     * </ul>
+     * 
+     * @param capabilities target capabilities object
+     * @param propertySuffix suffix for configuration property name
+     * @return original capabilities merged with configured modifications (if any)
+     */
+    protected Capabilities applyModifications(final Capabilities capabilities, final String propertySuffix) {
+        String personality = (String) capabilities.getCapability("personality");
+        if (personality == null) {
+            personality = (String) capabilities.getCapability("automationName");
+            if (personality == null) {
+                personality = (String) capabilities.getCapability("browserName");
+                if (personality == null) {
+                    return capabilities;
+                }
+            }
         }
-        return capabilities;
+        
+        String propertyName = personality + propertySuffix;
+        String modifications = getString(propertyName);
+        
+        if (modifications == null) {
+            return capabilities;
+        }
+        
+        String modsJson = modifications;
+        String modsPath = getConfigPath(modifications);
+        
+        if (modsPath != null) {
+            try {
+                Path path = Paths.get(modsPath);
+                URL url = path.toUri().toURL();
+                modsJson = Resources.toString(url, Charsets.UTF_8);
+            } catch (IOException e) {
+                // highly unlikely
+                return capabilities;
+            }
+        }
+        
+        Map<String, Object> currentCaps = new HashMap<>(capabilities.asMap());
+        Map<String, Object> refinerCaps = DataUtils.fromString(modsJson, HashMap.class);
+        currentCaps.putAll(refinerCaps);
+        String mergedCaps = DataUtils.toString(currentCaps);
+        return getCapabilitiesForJson(mergedCaps)[0];
     }
     
     /**

@@ -16,6 +16,9 @@ import net.bytebuddy.implementation.Implementation;
 
 public class AppiumPlugin implements DriverPlugin {
 
+    private static final String APPIUM_PATH = "APPIUM_BINARY_PATH";
+    private static final String NODE_PATH = "NODE_BINARY_PATH";
+    
     private static final String[] DEPENDENCY_CONTEXTS = {};
     
     @Override

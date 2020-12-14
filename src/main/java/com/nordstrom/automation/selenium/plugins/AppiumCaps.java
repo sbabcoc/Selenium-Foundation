@@ -27,6 +27,18 @@ public class AppiumCaps {
                  "\"browserName\":\"Safari\"," +
                  "\"maxInstances\":1," +
                  "\"deviceName\":\"iPhone Simulator\"}");
+        capsMap.put("Espresso",
+                "{\"automationName\":\"Espresso\"," +
+                 "\"platformName\":\"Android\"," +
+                 "\"maxInstances\":1}");
+        capsMap.put("Mac2",
+                "{\"automationName\":\"Mac2\"," +
+                 "\"platformName\":\"Mac\"," +
+                 "\"maxInstances\":5}");
+        capsMap.put("Windows",
+                "{\"automationName\":\"Windows\"," +
+                 "\"platformName\":\"Windows\"," +
+                 "\"maxInstances\":5}");
         
         CAPS_MAP = Collections.unmodifiableMap(capsMap);
     }

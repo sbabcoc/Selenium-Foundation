@@ -21,9 +21,9 @@ public class FirefoxCaps {
     
     private static final String HEADLESS =
                     "{\"browserName\":\"firefox\"," +
-                     "\"moz:firefoxOptions\":{" +
-                         "\"args\":[\"-headless\"]" +
-                    "}}";
+                     "\"moz:firefoxOptions\":{\"args\":[\"-headless\"]}," +
+                     "\"personality\":\"firefox.headless\"" +
+                    "}";
     
     private static final Map<String, String> PERSONALITIES;
     
