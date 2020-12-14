@@ -230,7 +230,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         // for each [DesiredCapabilities] object
         for (DesiredCapabilities theseCaps : capabilitiesList) {
             // apply specified node modifications (if any)
-            theseCaps.merge(applyModifications(theseCaps, NODE_MODS_SUFFIX));
+            theseCaps.merge(getModifications(theseCaps, NODE_MODS_SUFFIX));
         }
         
         // get path to node configuration template
@@ -268,6 +268,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     public Capabilities[] getCapabilitiesForJson(String capabilities) {
         String input = JSON_HEAD + capabilities + JSON_TAIL;
         return RegistrationRequest.getNewInstance(input).getCapabilities().toArray(new Capabilities[0]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Capabilities mergeCapabilities(Capabilities capabilities, Capabilities modifications) {
+        return ((DesiredCapabilities) capabilities).merge(modifications);
     }
     
     /**

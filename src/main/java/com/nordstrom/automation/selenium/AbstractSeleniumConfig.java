@@ -12,8 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -35,7 +33,6 @@ import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
-import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
@@ -427,11 +424,12 @@ public abstract class AbstractSeleniumConfig extends
         } else {
             throw new IllegalStateException("Neither browser name nor capabilities are specified");
         }
-        return applyModifications(capabilities, CAPS_MODS_SUFFIX);
+        Capabilities modifications = getModifications(capabilities, CAPS_MODS_SUFFIX);
+        return mergeCapabilities(capabilities, modifications);
     }
     
     /**
-     * Apply configured modifications to the specified <b>Capabilities</b> object.
+     * Get configured modifications for the specified <b>Capabilities</b> object.
      * <p>
      * <b>NOTE</b>: Modifications are specified in the configuration as either JSON strings or file paths
      * (absolute, relative, or simple filename). Property names for modifications correspond to "personality"
@@ -454,16 +452,16 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @param capabilities target capabilities object
      * @param propertySuffix suffix for configuration property name
-     * @return original capabilities merged with configured modifications (if any)
+     * @return configured modifications; {@code null} if none configured
      */
-    protected Capabilities applyModifications(final Capabilities capabilities, final String propertySuffix) {
+    protected Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
         String personality = (String) capabilities.getCapability("personality");
         if (personality == null) {
             personality = (String) capabilities.getCapability("automationName");
             if (personality == null) {
                 personality = (String) capabilities.getCapability("browserName");
                 if (personality == null) {
-                    return capabilities;
+                    return null;
                 }
             }
         }
@@ -472,7 +470,7 @@ public abstract class AbstractSeleniumConfig extends
         String modifications = getString(propertyName);
         
         if (modifications == null) {
-            return capabilities;
+            return null;
         }
         
         String modsJson = modifications;
@@ -485,15 +483,11 @@ public abstract class AbstractSeleniumConfig extends
                 modsJson = Resources.toString(url, Charsets.UTF_8);
             } catch (IOException e) {
                 // highly unlikely
-                return capabilities;
+                return null;
             }
         }
         
-        Map<String, Object> currentCaps = new HashMap<>(capabilities.asMap());
-        Map<String, Object> refinerCaps = DataUtils.fromString(modsJson, HashMap.class);
-        currentCaps.putAll(refinerCaps);
-        String mergedCaps = DataUtils.toString(currentCaps);
-        return getCapabilitiesForJson(mergedCaps)[0];
+        return getCapabilitiesForJson(modsJson)[0];
     }
     
     /**
@@ -513,6 +507,15 @@ public abstract class AbstractSeleniumConfig extends
      * @return list of {@link Capabilities} objects
      */
     public abstract Capabilities[] getCapabilitiesForJson(final String capabilities);
+    
+    /**
+     * Apply the indicated modifications to the specified <b>Capabilities</b> object.
+     * 
+     * @param target target capabilities object
+     * @param change revisions being merged (may be {@code null})
+     * @return target capabilities object with revisions applied
+     */
+    public abstract Capabilities mergeCapabilities(final Capabilities target, final Capabilities change);
     
     /**
      * Convert the specified browser capabilities object to a JSON string.
