@@ -274,8 +274,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
-    public Capabilities mergeCapabilities(Capabilities capabilities, Capabilities modifications) {
-        return ((DesiredCapabilities) capabilities).merge(modifications);
+    public Capabilities mergeCapabilities(Capabilities target, Capabilities change) {
+        return ((DesiredCapabilities) target).merge(change);
     }
     
     /**
