@@ -473,11 +473,15 @@ public abstract class AbstractSeleniumConfig extends
             return null;
         }
         
+        // assume config'd mods are JSON
         String modsJson = modifications;
+        // try to resolve config'd mods as file path
         String modsPath = getConfigPath(modifications);
         
+        // if mods file found
         if (modsPath != null) {
             try {
+                // load contents of mods file
                 Path path = Paths.get(modsPath);
                 URL url = path.toUri().toURL();
                 modsJson = Resources.toString(url, Charsets.UTF_8);
@@ -487,6 +491,7 @@ public abstract class AbstractSeleniumConfig extends
             }
         }
         
+        // return mods as [Capabilities] object
         return getCapabilitiesForJson(modsJson)[0];
     }
     
