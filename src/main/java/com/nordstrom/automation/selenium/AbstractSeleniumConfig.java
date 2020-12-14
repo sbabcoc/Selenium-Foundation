@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
@@ -47,8 +49,13 @@ public abstract class AbstractSeleniumConfig extends
     private static final String CAPS_PATTERN = "{\"browserName\":\"%s\"}";
     /** value: <b>{"browserName":"htmlunit"}</b> */
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
+    
     protected static final String NODE_MODS_SUFFIX = ".node.mods";
     private static final String CAPS_MODS_SUFFIX = ".caps.mods";
+    
+    private static final String APPIUM_PATH = "APPIUM_BINARY_PATH";
+    private static final String NODE_PATH = "NODE_BINARY_PATH";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
     /**
@@ -116,7 +123,11 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>appium.binary.path</b> <br> default: {@code null} */
         APPIUM_BINARY_PATH("appium.binary.path", null),
         /** name: <b>node.binary.path</b> <br> default: {@code null} */
-        NODE_BINARY_PATH("node.binary.path", null);
+        NODE_BINARY_PATH("node.binary.path", null),
+        /** name: <b>npm.binary.path</b> <br> default: {@code null} */
+        NPM_BINARY_PATH("npm.binary.path", null),
+        /** name: <b>main.script.path</b> <br> default: {@code null} */
+        MAIN_SCRIPT_PATH("main.script.path", null);
         
         private String propertyName;
         private String defaultValue;
@@ -240,6 +251,28 @@ public abstract class AbstractSeleniumConfig extends
     
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Map<String, String> getDefaults() {
+        Map<String, String> defaults = super.getDefaults();
+        
+        Map<String, String> env = System.getenv();
+        String appiumPath = env.get(APPIUM_PATH);
+        String nodePath = env.get(NODE_PATH);
+        
+        if (appiumPath != null) {
+            defaults.put(SeleniumSettings.APPIUM_BINARY_PATH.key(), appiumPath);
+        }
+        
+        if (nodePath != null) {
+            defaults.put(SeleniumSettings.NODE_BINARY_PATH.key(), nodePath);
+        }
+        
+        return defaults;
     }
 
     /**

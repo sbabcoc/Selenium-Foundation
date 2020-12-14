@@ -44,7 +44,7 @@ public class AppiumCaps {
     }
 
     public static final String[] DRIVER_NAMES =
-            { "UiAutomator2", "XCUITest", "Espresso", "YouiEngine", "Futter", "Windows", "Mac", "Mac2" };
+            { "UiAutomator2", "XCUITest", "Espresso", "Mac2", "Windows" };
 
     private static final String[] PROPERTY_NAMES = {};
 

@@ -431,7 +431,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param role {@link GridRole} of local Grid server
          * @param process {@link Process} of local Grid server
          */
-        LocalGridServer(String host, Integer port, GridRole role, Process process) {
+        protected LocalGridServer(String host, Integer port, GridRole role, Process process) {
             super(getServerUrl(host, port), role);
             this.process = process;
             this.builder = new StringBuilder();
