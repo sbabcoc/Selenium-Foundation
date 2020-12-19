@@ -35,8 +35,7 @@ public class EdgePlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getCapabilitiesForDriver(SeleniumConfig config, String driverName) {
-        requireDriverName(driverName);
+    public String getCapabilities(SeleniumConfig config) {
         return EdgeCaps.getCapabilities();
     }
 
@@ -44,8 +43,7 @@ public class EdgePlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> getPersonalitiesForDriver(String driverName) {
-        requireDriverName(driverName);
+    public Map<String, String> getPersonalities() {
         return EdgeCaps.getPersonalities();
     }
 

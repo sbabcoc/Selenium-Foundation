@@ -20,12 +20,10 @@ import net.bytebuddy.implementation.Implementation;
  */
 public abstract class RemoteWebDriverPlugin implements DriverPlugin {
     
-    private String driverName;
-    private String[] driverNames;
+    private String browserName;
     
-    protected RemoteWebDriverPlugin(String driverName) {
-        this.driverName = driverName;
-        this.driverNames = new String[] { driverName };
+    protected RemoteWebDriverPlugin(String browserName) {
+        this.browserName = browserName;
     }
     
     /**
@@ -45,7 +43,7 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
             GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException {
         
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, this);
-        String capabilities = getCapabilitiesForDriver(config, driverName);
+        String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
         String[] propertyNames = getPropertyNames();
         return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
@@ -64,24 +62,10 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String[] getDriverNames() {
-        return driverNames;
+    public String getBrowserName() {
+        return browserName;
     }
     
-    /**
-     * Ensure that the specified driver is supported by this plugin.
-     * 
-     * @param driverName name of driver in question
-     * @return normalized driver name
-     * @throws IllegalArgumentException if this plugin doesn't support the specified driver
-     */
-    String requireDriverName(String driverName) {
-        if (this.driverName.equalsIgnoreCase(driverName)) {
-            return this.driverName;
-        }
-        throw new IllegalArgumentException(getClass().getSimpleName() + " does not support driver: " + driverName);
-    }
-
     /**
      * Combine driver dependency contexts with the specified core Selenium Grid contexts.
      *

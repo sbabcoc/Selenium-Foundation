@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.grid.common.GridRole;
@@ -28,30 +26,36 @@ import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedExcept
 
 import net.bytebuddy.implementation.Implementation;
 
-public class AppiumPlugin implements DriverPlugin {
+public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     private static final String[] DEPENDENCY_CONTEXTS = {};
     private static final String[] APPIUM_PATH_TAIL = { "appium", "build", "lib", "main.js" };
+    
+    private String browserName;
+    
+    protected AbstractAppiumPlugin(String browserName) {
+        this.browserName = browserName;
+    }
     
     @Override
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
     }
 
-    @Override
-    public String getCapabilitiesForDriver(SeleniumConfig config, String driverName) {
-        return AppiumCaps.getCapabilities(driverName);
-    }
+//    @Override
+//    public String getCapabilities(SeleniumConfig config) {
+//        return AppiumCaps.getCapabilities();
+//    }
 
     @Override
-    public String[] getDriverNames() {
-        return AppiumCaps.DRIVER_NAMES;
+    public String getBrowserName() {
+        return browserName;
     }
 
-    @Override
-    public Map<String, String> getPersonalitiesForDriver(String driverName) {
-        return AppiumCaps.getPersonalities();
-    }
+//    @Override
+//    public Map<String, String> getPersonalities() {
+//        return AppiumCaps.getPersonalities();
+//    }
 
     @Override
     public String[] getPropertyNames() {
@@ -62,12 +66,7 @@ public class AppiumPlugin implements DriverPlugin {
     public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
         
-        // ISSUE: Driver plug-in is only specified by fully-qualified class name.
-        // How do I determine which actual engine(s) to start? This is [driverName],
-        // which is unresolved below. For one-engine servers, the plug-in sets this
-        // with a hard-coded string in the superclass constructor.
-        
-        String capabilities = getCapabilitiesForDriver(config, driverName);
+        String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
         String[] propertyNames = getPropertyNames();
         

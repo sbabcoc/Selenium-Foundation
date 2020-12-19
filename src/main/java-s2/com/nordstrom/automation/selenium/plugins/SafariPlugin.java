@@ -39,8 +39,7 @@ public class SafariPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String getCapabilitiesForDriver(SeleniumConfig config, String driverName) {
-        requireDriverName(driverName);
+    public String getCapabilities(SeleniumConfig config) {
         return SafariCaps.getCapabilities();
     }
 
@@ -48,8 +47,7 @@ public class SafariPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> getPersonalitiesForDriver(String driverName) {
-        requireDriverName(driverName);
+    public Map<String, String> getPersonalities() {
         return SafariCaps.getPersonalities();
     }
 

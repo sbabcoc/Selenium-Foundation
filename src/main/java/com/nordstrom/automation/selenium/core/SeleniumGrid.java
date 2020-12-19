@@ -150,10 +150,8 @@ public class SeleniumGrid {
      */
     private void addPluginPersonalities() {
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
-            for (String driverName : driverPlugin.getDriverNames()) {
-                if (personalities.containsKey(driverName)) {
-                    personalities.putAll(driverPlugin.getPersonalitiesForDriver(driverName));
-                }
+            if (personalities.containsKey(driverPlugin.getBrowserName())) {
+                personalities.putAll(driverPlugin.getPersonalities());
             }
         }
     }
