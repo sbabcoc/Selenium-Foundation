@@ -13,6 +13,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.remote.service.DriverService;
 
 import com.google.common.collect.ImmutableList;
@@ -20,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -30,6 +32,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     private static final String[] DEPENDENCY_CONTEXTS = {};
     private static final String[] APPIUM_PATH_TAIL = { "appium", "build", "lib", "main.js" };
+    private static final String[] PROPERTY_NAMES = {};
     
     private String browserName;
     
@@ -42,24 +45,14 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         return DEPENDENCY_CONTEXTS;
     }
 
-//    @Override
-//    public String getCapabilities(SeleniumConfig config) {
-//        return AppiumCaps.getCapabilities();
-//    }
-
     @Override
     public String getBrowserName() {
         return browserName;
     }
 
-//    @Override
-//    public Map<String, String> getPersonalities() {
-//        return AppiumCaps.getPersonalities();
-//    }
-
     @Override
     public String[] getPropertyNames() {
-        return AppiumCaps.getPropertyNames();
+        return PROPERTY_NAMES;
     }
 
     @Override
@@ -68,15 +61,56 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         
         String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
-        String[] propertyNames = getPropertyNames();
         
+        GridRole role = GridRole.NODE;
+        String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
 
         argsList.add(findNodeBinary().getAbsolutePath());
         argsList.add(findMainScript().getAbsolutePath());
         
+        String hostUrl = GridUtility.getLocalHost();
+        int port = -1;
         
-        return null;
+        // specify server host
+        argsList.add("--address");
+        argsList.add(hostUrl);
+        
+        Integer portNum = port;
+        // if port auto-select spec'd
+        if (portNum.intValue() == -1) {
+            // acquire available port
+            portNum = Integer.valueOf(PortProber.findFreePort());
+        }
+        
+        // specify server port
+        argsList.add("--port");
+        argsList.add(portNum.toString());
+        
+        String cliArgs = config.getString(SeleniumSettings.APPIUM_CLI_ARGS.key());
+        if (cliArgs != null) {
+            argsList.add(cliArgs);
+        }
+        
+        argsList.add("--nodeconfig");
+        argsList.add(nodeConfigPath.toString());
+        
+        ProcessBuilder builder = new ProcessBuilder(argsList);
+        builder.redirectErrorStream(true);
+        
+        if (workingPath != null) {
+            builder.directory(workingPath.toFile());
+        }
+        
+        if (outputPath != null) {
+            builder.redirectOutput(outputPath.toFile());
+        }
+        
+        try {
+            return new AppiumGridServer(hostUrl, portNum, role, builder.start());
+        } catch (IOException e) {
+            throw new GridServerLaunchFailedException(gridRole, e);
+        }
     }
 
     @Override
@@ -94,6 +128,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             super(host, port, role, process);
         }
         
+        @Override
+        public String getReadyMessage() {
+            return "successfully registered";
+        }
     }
     
     private static File findNPM() throws GridServerLaunchFailedException {

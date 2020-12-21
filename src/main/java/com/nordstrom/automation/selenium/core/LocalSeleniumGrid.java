@@ -54,7 +54,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_HOST = "-host";
     private static final String OPT_PORT = "-port";
     private static final String OPT_SERVLETS = "-servlets";
-    private static final String GRID_REGISTER = "/grid/register";
+    //private static final String GRID_REGISTER = "/grid/register";
     
     public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         super(config, hubServer, nodeServers);
@@ -140,8 +140,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                     throws IOException, InterruptedException, TimeoutException {
         long maxTime = System.currentTimeMillis() + maxWait;
         try (InputStream inputStream = (outputPath != null) ? Files.newInputStream(outputPath)
-                        : server.process.getInputStream()) {
-            while (appendAndCheckFor(inputStream, server.readyMessage, server.builder)) {
+                        : server.getProcess().getInputStream()) {
+            while (appendAndCheckFor(inputStream, server.getReadyMessage(), server.getOutputBuilder())) {
                 if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
                     throw new TimeoutException("Timed out waiting for Grid server to be ready");
                 }
@@ -164,8 +164,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         if ( ! recv.isEmpty()) {
             builder.append(recv);
             int readyMsgIndex = builder.indexOf(readyMessage);
-            int registerIndex = builder.indexOf(GRID_REGISTER);
-            return ((readyMsgIndex == -1) || (registerIndex == -1));
+            return (readyMsgIndex == -1);
         }
         return true;
     }
@@ -449,6 +448,15 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          */
         public Process getProcess() {
             return process;
+        }
+        
+        /**
+         * Get the string builder used to collect the process output of this local Grid server.
+         * 
+         * @return process output {@link StringBuilder} 
+         */
+        public StringBuilder getOutputBuilder() {
+            return builder;
         }
         
         /**

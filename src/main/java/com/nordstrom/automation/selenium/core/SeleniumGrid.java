@@ -119,7 +119,13 @@ public class SeleniumGrid {
     /**
      * Add supported personalities of the specified Grid node.
      * <p>
-     * <b>NOTE</b>: 
+     * <b>NOTE</b>: Names of node personalities are derived from the following capabilities
+     * (in order of precedence):
+     * 
+     * <ul>
+     *     <li><b>automationName</b>: 'appium' automation name</li>
+     *     <li><b>browserName</b>: name of target browser</li>
+     * </ul>
      * 
      * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of Grid hub
