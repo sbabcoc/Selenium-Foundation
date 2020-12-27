@@ -95,31 +95,13 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         
         String executable = findNodeBinary().getAbsolutePath();
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        return new AppiumGridServer(hostUrl, portNum, GridRole.NODE, process, workingPath, outputPath);
+        return new LocalGridServer(hostUrl, portNum, GridRole.NODE, process, workingPath, outputPath);
     }
 
     @Override
     public Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass) {
         // TODO Auto-generated method stub
         return null;
-    }
-    
-    public static class AppiumGridServer extends LocalGridServer {
-
-        // Create subclass of LocalGridServer.
-        // Override default status request string and shutdown(...) method
-        
-        AppiumGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
-            super(host, port, role, process, workingPath, outputPath);
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean shutdown(boolean localOnly) throws InterruptedException {
-            return super.shutdown(localOnly);
-        }
     }
     
     private static File findNPM() throws GridServerLaunchFailedException {

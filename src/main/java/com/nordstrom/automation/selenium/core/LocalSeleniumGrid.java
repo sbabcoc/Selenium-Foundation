@@ -13,10 +13,12 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
 import org.openqa.grid.common.GridRole;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -78,7 +80,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         Path outputPath = GridUtility.getOutputPath(config, GridRole.HUB);
         LocalGridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB,
                         hubPort, hubConfigPath, workingPath, outputPath);
-        waitUntilReady(hubServer, outputPath, hostTimeout);
+        waitUntilReady(hubServer, hostTimeout);
         
         // store hub host URL in system property for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
@@ -112,7 +114,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
             LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer,
                     workingPath, outputPath);
-            waitUntilReady(nodeServer, outputPath, hostTimeout);
+            waitUntilReady(nodeServer, hostTimeout);
+            waitUntilRegistered(config, hubServer, nodeServer, hostTimeout);
             nodeServers.add(nodeServer);
         }
         
@@ -129,7 +132,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @throws IOException if an I/O error occurs
      * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
      */
-    protected static void waitUntilReady(LocalGridServer server, Path outputPath, long maxWait)
+    protected static void waitUntilReady(LocalGridServer server, long maxWait)
                     throws IOException, InterruptedException, TimeoutException {
         long maxTime = System.currentTimeMillis() + maxWait;
         while (!server.isActive()) {
@@ -138,6 +141,25 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
             Thread.sleep(100);
         }
+    }
+    
+    protected static void waitUntilRegistered(SeleniumConfig config, GridServer hubServer, LocalGridServer nodeServer,
+            long maxWait) throws IOException, InterruptedException, TimeoutException {
+        URL hubUrl = hubServer.getUrl();
+        String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
+        long maxTime = System.currentTimeMillis() + maxWait;
+        while (!isNodeRegistered(config, hubUrl, nodeEndpoint)) {
+            if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
+                throw new TimeoutException("Timed out waiting for Grid node to be registered");
+            }
+            Thread.sleep(100);
+        }
+        
+    }
+    
+    private static boolean isNodeRegistered(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
+        Capabilities capabilities = GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint)[0];
+        return capabilities.is("success");
     }
 
     /**
@@ -241,7 +263,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param role {@link GridRole} of local Grid server
          * @param process {@link Process} of local Grid server
          */
-        protected LocalGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
+        public LocalGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
             super(getServerUrl(host, port), role);
             
             if (workingPath != null) {
