@@ -109,8 +109,8 @@ public abstract class AbstractSeleniumConfig extends
         WAIT_TIMEOUT("selenium.timeout.wait", "15"),
         /** name: <b>selenium.timeout.host</b> <br> default: <b>30</b> */
         HOST_TIMEOUT("selenium.timeout.host", "30"),
-//        /** name: <b>selenium.grid.working.dir</b> <br> default: {@code null} */
-//        GRID_WORKING_DIR("selenium.grid.working.dir", null),
+        /** name: <b>selenium.grid.working.dir</b> <br> default: {@code null} */
+        GRID_WORKING_DIR("selenium.grid.working.dir", null),
         /** name: <b>selenium.grid.log.folder</b> <br> default: <b>logs</b> */
         GRID_LOGS_FOLDER("selenium.grid.log.folder", "logs"),
         /** name: <b>selenium.grid.no.redirect</b> <br> default: {@code false} */

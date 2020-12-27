@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -14,6 +15,7 @@ import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.net.PortProber;
+import org.openqa.selenium.os.CommandLine;
 import org.openqa.selenium.remote.service.DriverService;
 
 import com.google.common.collect.ImmutableList;
@@ -57,7 +59,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     @Override
     public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            GridServer hubServer, Path outputPath) throws IOException {
+            GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
         
         String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
@@ -66,7 +68,6 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
 
-        argsList.add(findNodeBinary().getAbsolutePath());
         argsList.add(findMainScript().getAbsolutePath());
         
         String hostUrl = GridUtility.getLocalHost();
@@ -95,18 +96,22 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add("--nodeconfig");
         argsList.add(nodeConfigPath.toString());
         
-        ProcessBuilder builder = new ProcessBuilder(argsList);
-        builder.redirectErrorStream(true);
+        String executable = findNodeBinary().getAbsolutePath();
+        CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
+        
+        if (workingPath != null) {
+            process.setWorkingDirectory(workingPath.toString());
+        }
         
         if (outputPath != null) {
-            builder.redirectOutput(outputPath.toFile());
+            try {
+                process.copyOutputTo(new FileOutputStream(outputPath.toFile()));
+            } catch (FileNotFoundException e) {
+                throw new GridServerLaunchFailedException(gridRole, e);
+            }
         }
         
-        try {
-            return new AppiumGridServer(hostUrl, portNum, role, builder.start());
-        } catch (IOException e) {
-            throw new GridServerLaunchFailedException(gridRole, e);
-        }
+        return new AppiumGridServer(hostUrl, portNum, role, process);
     }
 
     @Override
@@ -120,7 +125,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         // Create subclass of LocalGridServer.
         // Override default status request string and shutdown(...) method
         
-        AppiumGridServer(String host, Integer port, GridRole role, Process process) {
+        AppiumGridServer(String host, Integer port, GridRole role, CommandLine process) {
             super(host, port, role, process);
         }
         

@@ -40,14 +40,14 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      */
     @Override
     public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            GridServer hubServer, final Path outputPath) throws IOException {
+            GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException {
         
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, this);
         String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
         String[] propertyNames = getPropertyNames();
         return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
-                Integer.valueOf(0), nodeConfigPath, outputPath, propertyNames);
+                Integer.valueOf(0), nodeConfigPath, workingPath, outputPath, propertyNames);
     }
 
     /**

@@ -1,20 +1,42 @@
 package com.nordstrom.automation.selenium.core;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
+
 import org.openqa.grid.common.GridRole;
+import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.net.PortProber;
+import org.openqa.selenium.os.CommandLine;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.google.common.base.Joiner;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -30,6 +52,12 @@ import com.nordstrom.common.base.UncheckedThrow;
  */
 public class LocalSeleniumGrid extends SeleniumGrid {
 
+    private static final String OPT_ROLE = "-role";
+    private static final String OPT_HOST = "-host";
+    private static final String OPT_PORT = "-port";
+    private static final String OPT_SERVLETS = "-servlets";
+    //private static final String GRID_REGISTER = "/grid/register";
+    
     public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         super(config, hubServer, nodeServers);
     }
@@ -52,11 +80,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
         String[] dependencyContexts = config.getDependencyContexts();
-//      long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
-        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(0));
+        long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
+        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
+        String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
+        Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
         Path outputPath = GridUtility.getOutputPath(config, GridRole.HUB);
         LocalGridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB,
-                        hubPort, hubConfigPath, outputPath);
+                        hubPort, hubConfigPath, workingPath, outputPath);
+        waitUntilReady(hubServer, outputPath, hostTimeout);
         
         // store hub host URL in system property for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
@@ -88,7 +119,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
             outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
-            LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer, outputPath);
+            LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer,
+                    workingPath, outputPath);
+            waitUntilReady(nodeServer, outputPath, hostTimeout);
             nodeServers.add(nodeServer);
         }
         
@@ -96,11 +129,51 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
 
     /**
+     * Wait for the specified Grid server to indicate that it's ready.
+     * 
+     * @param server {@link LocalGridServer} object to wait for.
+     * @param outputPath {@link Path} to output log file; {@code null} if not redirected
+     * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
+     * @throws InterruptedException if this thread was interrupted
+     * @throws IOException if an I/O error occurs
+     * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
+     */
+    protected static void waitUntilReady(LocalGridServer server, Path outputPath, long maxWait)
+                    throws IOException, InterruptedException, TimeoutException {
+        long maxTime = System.currentTimeMillis() + maxWait;
+        while (!server.isActive()) {
+            if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
+                throw new TimeoutException("Timed out waiting for Grid server to be ready");
+            }
+            Thread.sleep(100);
+        }
+    }
+
+    /**
+     * Append available channel input to the supplied string builder and check for the specified prompt.
+     * 
+     * @param inputStream {@link InputStream} from which input is read
+     * @param readyMessage prompt to check for
+     * @param builder {@link StringBuilder} object to which input is appended
+     * @return {@code false} is prompt is found or channel is closed; otherwise {@code true}
+     * @throws IOException if an I/O error occurs
+     */
+    protected static boolean appendAndCheckFor(InputStream inputStream, String readyMessage, StringBuilder builder) throws IOException {
+        String recv = GridUtility.readAvailable(inputStream);
+        if ( ! recv.isEmpty()) {
+            builder.append(recv);
+            int readyMsgIndex = builder.indexOf(readyMessage);
+            return (readyMsgIndex == -1);
+        }
+        return true;
+    }
+
+    /**
      * Start a Selenium Grid server with the specified arguments in a separate process.
      * 
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
-     * @param gridRole role of Grid server being started
+     * @param role role of Grid server being started
      * @param port port that Grid server should use; -1 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
@@ -112,28 +185,233 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      *      Getting Command-Line Help</a>
      */
     public static LocalGridServer start(final String launcherClassName, final String[] dependencyContexts,
-            final GridRole gridRole, final Integer port, final Path configPath,
-            final Path outputPath, final String... propertyNames) throws IOException {
+            final GridRole role, final Integer port, final Path configPath, final Path workingPath,
+            final Path outputPath, final String... propertyNames) {
         
-        LocalGridDriverService.Builder builder = 
-                new LocalGridDriverService.Builder(launcherClassName, dependencyContexts, gridRole, configPath, propertyNames);
+        String gridRole = role.toString().toLowerCase();
+        List<String> argsList = new ArrayList<>();
         
-        builder.usingPort((port == 0) ? PortProber.findFreePort() : port);
+        // specify server role
+        argsList.add(OPT_ROLE);
+        argsList.add(gridRole);
         
-        if (outputPath != null) {
-            builder.withLogFile(outputPath.toFile());
+        // if starting a Grid hub
+        if (role == GridRole.HUB) {
+            String servlets = new StringBuilder()
+                    .append(ExamplePageServlet.class.getName()).append(',')
+                    .append(FrameA_Servlet.class.getName()).append(',')
+                    .append(FrameB_Servlet.class.getName()).append(',')
+                    .append(FrameC_Servlet.class.getName()).append(',')
+                    .append(FrameD_Servlet.class.getName()).toString();
+            
+            argsList.add(OPT_SERVLETS);
+            argsList.add(servlets);
+        // otherwise, if starting a Grid node
+        } else if (role == GridRole.NODE) {
+            // add lifecycle servlet
+            argsList.add(OPT_SERVLETS);
+            argsList.add(LifecycleServlet.class.getName());
         }
         
-        try {
-            return new LocalGridServer(builder);
-        } catch (IOException e) {
-            throw new GridServerLaunchFailedException(gridRole.toString().toLowerCase(), e);
+        String hostUrl = GridUtility.getLocalHost();
+        
+        // specify server host
+        argsList.add(OPT_HOST);
+        argsList.add(hostUrl);
+        
+        Integer portNum = port;
+        // if port auto-select spec'd
+        if (portNum.intValue() == 0) {
+            // acquire available port
+            portNum = Integer.valueOf(PortProber.findFreePort());
+        }
+        
+        // specify server port
+        argsList.add(OPT_PORT);
+        argsList.add(portNum.toString());
+        
+        // specify server configuration file
+        argsList.add("-" + gridRole + "Config");
+        argsList.add(configPath.toString());
+        
+        // specify Grid launcher class name
+        argsList.add(0, launcherClassName);
+        
+        // propagate Java System properties
+        for (String name : propertyNames) {
+            String value = System.getProperty(name);
+            if (value != null) {
+                argsList.add(0, "-D" + name + "=" + value);
+            }
+        }
+        
+        // get assembled classpath string
+        String classPath = getClasspath(dependencyContexts);
+        // split on Java agent list separator
+        String[] pathBits = classPath.split("\n");
+        // if agent(s) specified
+        if (pathBits.length > 1) {
+            // extract classpath
+            classPath = pathBits[0];
+            // for each specified agent...
+            for (String agentPath : pathBits[1].split("\t")) {
+                // ... specify a 'javaagent' argument
+                argsList.add(0, "-javaagent:" + agentPath);
+            }
+        }
+        
+        // specify Java class path
+        argsList.add(0, classPath);
+        argsList.add(0, "-cp");
+        
+        String executable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
+        
+        if (workingPath != null) {
+            process.setWorkingDirectory(workingPath.toString());
+        }
+        
+        if (outputPath != null) {
+            try {
+                process.copyOutputTo(new FileOutputStream(outputPath.toFile()));
+            } catch (FileNotFoundException e) {
+                throw new GridServerLaunchFailedException(gridRole, e);
+            }
+        }
+        
+        return new LocalGridServer(hostUrl, portNum, role, process);
+    }
+
+    /**
+     * Assemble a classpath string from the specified array of dependencies.
+     * <p>
+     * <b>NOTE</b>: If any of the specified dependency contexts names the {@code premain} class of a Java agent, the
+     * string returned by this method will contain two records delimited by a {@code newline} character:
+     * 
+     * <ul>
+     *     <li>0 - assembled classpath string</li>
+     *     <li>1 - tab-delimited list of Java agent paths</li>
+     * </ul>
+     * 
+     * @param dependencyContexts array of dependency contexts
+     * @return assembled classpath string (see <b>NOTE</b>)
+     */
+    public static String getClasspath(final String[] dependencyContexts) {
+        Set<String> agentList = new HashSet<>();
+        Set<String> pathList = new HashSet<>();
+        for (String contextClassName : dependencyContexts) {
+            // get JAR path for this dependency context
+            String jarPath = findJarPathFor(contextClassName);
+            // if this context names the premain class of a Java agent
+            if (contextClassName.equals(getJarPremainClass(jarPath))) {
+                // collect agent path
+                agentList.add(jarPath);
+            // otherwise
+            } else {
+                // collect class path
+                pathList.add(jarPath);
+            }
+        }
+        // assemble classpath string
+        String classPath = Joiner.on(File.pathSeparator).join(pathList);
+        // if no agents were found
+        if (agentList.isEmpty()) {
+            // classpath only
+            return classPath;
+        } else {
+            // classpath plus tab-delimited list of agent paths 
+            return classPath + "\n" + Joiner.on("\t").join(agentList);
         }
     }
 
+    /**
+     * If the provided class has been loaded from a JAR file that is on the
+     * local file system, will find the absolute path to that JAR file.
+     * 
+     * @param contextClassName
+     *            The JAR file that contained the class file that represents
+     *            this class will be found.
+     * @return absolute path to the JAR file from which the specified class was
+     *            loaded
+     * @throws IllegalStateException
+     *           If the specified class was loaded from a directory or in some
+     *           other way (such as via HTTP, from a database, or some other
+     *           custom class-loading device).
+     */
+    public static String findJarPathFor(final String contextClassName) {
+        Class<?> contextClass;
+        
+        try {
+            contextClass = Class.forName(contextClassName);
+        } catch (ClassNotFoundException e) {
+            throw UncheckedThrow.throwUnchecked(e);
+        }
+        
+        String shortName = contextClassName;
+        int idx = shortName.lastIndexOf('.');
+        String protocol;
+        
+        if (idx > -1) {
+            shortName = shortName.substring(idx + 1);
+        }
+        
+        String uri = contextClass.getResource(shortName + ".class").toString();
+        
+        if (uri.startsWith("file:")) {
+            protocol = "file:";
+            String relPath = '/' + contextClassName.replace('.', '/') + ".class";
+            if (uri.endsWith(relPath)) {
+                idx = uri.length() - relPath.length();
+            } else {
+                throw new IllegalStateException(
+                                "This class has been loaded from a class file, but I can't make sense of the path!");
+            }
+        } else if (uri.startsWith("jar:file:")) {
+            protocol = "jar:file:";
+            idx = uri.indexOf('!');
+            if (idx == -1) {
+                throw new IllegalStateException(
+                                "You appear to have loaded this class from a local jar file, but I can't make sense of the URL!");
+            }
+        } else {
+            idx = uri.indexOf(':');
+            protocol = (idx > -1) ? uri.substring(0, idx) : "(unknown)";
+            throw new IllegalStateException("This class has been loaded remotely via the " + protocol
+                    + " protocol. Only loading from a jar on the local file system is supported.");
+        }
+        
+        try {
+            String fileName = URLDecoder.decode(uri.substring(protocol.length(), idx),
+                            Charset.defaultCharset().name());
+            return new File(fileName).getAbsolutePath();
+        } catch (UnsupportedEncodingException e) {
+            throw (InternalError) new InternalError(
+                            "Default charset doesn't exist. Your VM is borked.").initCause(e);
+        }
+    }
+
+    /**
+     * Extract the 'Premain-Class' attribute from the manifest of the indicated JAR file.
+     * 
+     * @param jarPath absolute path to the JAR file
+     * @return value of 'Premain-Class' attribute; {@code null} if unspecified
+     */
+    public static String  getJarPremainClass(String jarPath) {
+        try(InputStream inputStream = new FileInputStream(jarPath);
+            JarInputStream jarStream = new JarInputStream(inputStream)) {
+            Manifest manifest = jarStream.getManifest();
+            if (manifest != null) {
+                return manifest.getMainAttributes().getValue("Premain-Class");
+            }
+        } catch (IOException e) {
+            // nothing to do here
+        }
+        return null;
+    }
+    
     public static class LocalGridServer extends GridServer {
 
-        private LocalGridDriverService service;
+        private CommandLine process;
         
         /**
          * Constructor for local Grid server object.
@@ -142,16 +420,20 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param port port of local Grid server
          * @param role {@link GridRole} of local Grid server
          * @param process {@link Process} of local Grid server
-         * @throws IOException 
          */
-        protected LocalGridServer(LocalGridDriverService.Builder builder) throws IOException {
-            super(getServerUrl(builder.getHost(), builder.getPort()), builder.getRole());
-            this.service = builder.build();
-            this.service.start();
+        protected LocalGridServer(String host, Integer port, GridRole role, CommandLine process) {
+            super(getServerUrl(host, port), role);
+            this.process = process;
+            this.process.executeAsync();
         }
         
-        public LocalGridDriverService getService() {
-            return service;
+        /**
+         * Get process for this local Grid server.
+         * 
+         * @return {@link Process} object
+         */
+        public CommandLine getProcess() {
+            return process;
         }
         
         /**
@@ -171,5 +453,4 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
         }
     }
-    
 }
