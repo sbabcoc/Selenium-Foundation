@@ -56,7 +56,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_HOST = "-host";
     private static final String OPT_PORT = "-port";
     private static final String OPT_SERVLETS = "-servlets";
-    //private static final String GRID_REGISTER = "/grid/register";
     
     public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         super(config, hubServer, nodeServers);
@@ -147,25 +146,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
             Thread.sleep(100);
         }
-    }
-
-    /**
-     * Append available channel input to the supplied string builder and check for the specified prompt.
-     * 
-     * @param inputStream {@link InputStream} from which input is read
-     * @param readyMessage prompt to check for
-     * @param builder {@link StringBuilder} object to which input is appended
-     * @return {@code false} is prompt is found or channel is closed; otherwise {@code true}
-     * @throws IOException if an I/O error occurs
-     */
-    protected static boolean appendAndCheckFor(InputStream inputStream, String readyMessage, StringBuilder builder) throws IOException {
-        String recv = GridUtility.readAvailable(inputStream);
-        if ( ! recv.isEmpty()) {
-            builder.append(recv);
-            int readyMsgIndex = builder.indexOf(readyMessage);
-            return (readyMsgIndex == -1);
-        }
-        return true;
     }
 
     /**
