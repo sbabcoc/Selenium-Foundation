@@ -6,6 +6,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -306,6 +308,10 @@ public class SeleniumGrid {
             return serverUrl;
         }
         
+        public boolean isActive() {
+            return GridUtility.isHostActive(serverUrl, statusRequest);
+        }
+        
         /**
          * Stop the Selenium Grid server represented by this object.
          * 
@@ -314,7 +320,7 @@ public class SeleniumGrid {
          * @throws InterruptedException if this thread was interrupted
          */
         public boolean shutdown(final boolean localOnly) throws InterruptedException {
-            return shutdown(serverUrl, statusRequest, shutdownRequest, localOnly);
+            return shutdown(this, shutdownRequest, localOnly);
         }
 
         /**
@@ -327,14 +333,16 @@ public class SeleniumGrid {
          * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
          * @throws InterruptedException if this thread was interrupted
          */
-        public static boolean shutdown(final URL serverUrl, final String statusRequest,
-                        final String shutdownRequest, final boolean localOnly) throws InterruptedException {
+        public static boolean shutdown(final GridServer gridServer, final String shutdownRequest,
+                final boolean localOnly) throws InterruptedException {
+            
+            URL serverUrl = gridServer.getUrl();
             
             if (localOnly && !GridUtility.isLocalHost(serverUrl)) {
                 return false;
             }
             
-            if (GridUtility.isHostActive(serverUrl, statusRequest)) {
+            if (gridServer.isActive()) {
                 try {
                     GridUtility.getHttpResponse(serverUrl, shutdownRequest);
                     waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
@@ -345,6 +353,64 @@ public class SeleniumGrid {
             }
             
             return true;
+        }
+    }
+
+    /**
+     * Wait up to the specified interval for the indicated URL(s) to be available.
+     * <p>
+     * <b>NOTE</b>: This method was back-ported from the {@link org.openqa.selenium.net.UrlChecker UrlChecker} class in
+     * Selenium 3 to compile under Java 7.
+     * 
+     * @param timeout timeout interval
+     * @param unit granularity of specified timeout
+     * @param url URL to poll for availability
+     * @throws org.openqa.selenium.net.UrlChecker.TimeoutException if indicated URL is still available after specified
+     *     interval.
+     */
+    public static void waitUntilAvailable(long timeout, TimeUnit unit, final URL... urls)
+            throws org.openqa.selenium.net.UrlChecker.TimeoutException {
+        long start = System.nanoTime();
+        try {
+            Future<Void> callback = EXECUTOR.submit(new Callable<Void>() {
+                public Void call() throws InterruptedException {
+                    HttpURLConnection connection = null;
+
+                    long sleepMillis = MIN_POLL_INTERVAL_MS;
+                    while (true) {
+                        if (Thread.interrupted()) {
+                            throw new InterruptedException();
+                        }
+                        for (URL url : urls) {
+                            try {
+                                connection = connectToUrl(url);
+                                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                                    return null;
+                                }
+                            } catch (IOException e) {
+                                // Ok, try again.
+                            } finally {
+                                if (connection != null) {
+                                    connection.disconnect();
+                                }
+                            }
+                        }
+                        MILLISECONDS.sleep(sleepMillis);
+                        sleepMillis = (sleepMillis >= MAX_POLL_INTERVAL_MS) ? sleepMillis : sleepMillis * 2;
+                    }
+                }
+            });
+            callback.get(timeout, unit);
+        } catch (java.util.concurrent.TimeoutException e) {
+            throw new org.openqa.selenium.net.UrlChecker.TimeoutException(
+                    String.format("Timed out waiting for %s to be available after %d ms", Arrays.toString(urls),
+                            MILLISECONDS.convert(System.nanoTime() - start, NANOSECONDS)),
+                    e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 

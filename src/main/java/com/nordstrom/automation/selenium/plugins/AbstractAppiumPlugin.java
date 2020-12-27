@@ -57,7 +57,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     @Override
     public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
+            GridServer hubServer, Path outputPath) throws IOException {
         
         String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
@@ -98,10 +98,6 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         ProcessBuilder builder = new ProcessBuilder(argsList);
         builder.redirectErrorStream(true);
         
-        if (workingPath != null) {
-            builder.directory(workingPath.toFile());
-        }
-        
         if (outputPath != null) {
             builder.redirectOutput(outputPath.toFile());
         }
@@ -128,9 +124,12 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             super(host, port, role, process);
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public String getReadyMessage() {
-            return "successfully registered";
+        public boolean shutdown(boolean localOnly) throws InterruptedException {
+            return super.shutdown(localOnly);
         }
     }
     

@@ -63,7 +63,7 @@ public interface DriverPlugin {
      * @throws IOException if an I/O error occurs
      */
     LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException;
+            GridServer hubServer, final Path outputPath) throws IOException;
     
     /**
      * Get default constructor for this driver's {@link WebElement} implementation.

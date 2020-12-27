@@ -109,8 +109,8 @@ public abstract class AbstractSeleniumConfig extends
         WAIT_TIMEOUT("selenium.timeout.wait", "15"),
         /** name: <b>selenium.timeout.host</b> <br> default: <b>30</b> */
         HOST_TIMEOUT("selenium.timeout.host", "30"),
-        /** name: <b>selenium.grid.working.dir</b> <br> default: {@code null} */
-        GRID_WORKING_DIR("selenium.grid.working.dir", null),
+//        /** name: <b>selenium.grid.working.dir</b> <br> default: {@code null} */
+//        GRID_WORKING_DIR("selenium.grid.working.dir", null),
         /** name: <b>selenium.grid.log.folder</b> <br> default: <b>logs</b> */
         GRID_LOGS_FOLDER("selenium.grid.log.folder", "logs"),
         /** name: <b>selenium.grid.no.redirect</b> <br> default: {@code false} */
@@ -466,7 +466,7 @@ public abstract class AbstractSeleniumConfig extends
      * <b>NOTE</b>: Modifications are specified in the configuration as either JSON strings or file paths
      * (absolute, relative, or simple filename). Property names for modifications correspond to "personality"
      * values within the capabilities themselves (in order of precedence): 
-     * <p>
+     * 
      * <ul>
      *     <li><b>personality</b>: Selenium Foundation "personality" name</li>
      *     <li><b>automationName</b>: 'appium' automation engine name</li>
@@ -476,7 +476,7 @@ public abstract class AbstractSeleniumConfig extends
      * The first defined value is selected as the "personality" of the specified <b>Capabilities</b> object.
      * The full name of the property used to specify modifications is the "personality" plus a context-specific
      * suffix: 
-     * <p>
+     * 
      * <ul>
      *     <li>For node configuration capabilities: <b>&lt;personality&gt;.node.mods</b></li>
      *     <li>For "desired capabilities" requests: <b>&lt;personality&gt;.caps.mods</b></li>

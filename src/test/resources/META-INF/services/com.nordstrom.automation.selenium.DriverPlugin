@@ -1,2 +1,2 @@
 com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin
-com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin
+#com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin

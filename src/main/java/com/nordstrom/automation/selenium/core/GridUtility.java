@@ -264,11 +264,8 @@ public final class GridUtility {
             String logsFolder = config.getString(SeleniumSettings.GRID_LOGS_FOLDER.key());
             Path logsPath = Paths.get(logsFolder);
             if (!logsPath.isAbsolute()) {
-                String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
-                if (workingDir == null || workingDir.isEmpty()) {
-                    workingDir = System.getProperty("user.dir");
-                }
-                logsPath = Paths.get(workingDir, logsFolder);
+                String userDir = System.getProperty("user.dir");
+                logsPath = Paths.get(userDir, logsFolder);
             }
             
             try {
