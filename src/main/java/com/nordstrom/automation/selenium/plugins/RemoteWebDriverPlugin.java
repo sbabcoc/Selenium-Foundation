@@ -16,7 +16,7 @@ import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import net.bytebuddy.implementation.Implementation;
 
 /**
- * This class provides the base plugin implementation for drivers that extent {@code RemoteWebDriver}.
+ * This class provides the base plugin implementation for drivers that extend {@code RemoteWebDriver}.
  */
 public abstract class RemoteWebDriverPlugin implements DriverPlugin {
     

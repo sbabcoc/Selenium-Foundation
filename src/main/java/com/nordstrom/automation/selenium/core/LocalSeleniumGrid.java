@@ -18,7 +18,6 @@ import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
-import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -85,37 +84,13 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         // store hub host URL in system property for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
         
-        // two flavors of nodes: standalone (e.g. - appium) or hosted (e.g. - chrome)
-        // => bury the distinction by providing a 'start()' method that returns a GridServer object
-        // => provide interface method to create capabilities list from JSON string
-        //    ... createCapabilitiesList(String jsonStr)
-        // => provide configuration interface method to create node configuration files from capabilities lists
-        //    ... createNodeConfig(List<Capabilities>)
-        //    ... file name: "nodeConfig-<apiVer>-<hashCode>.json"
-        //    ... code will check for existing file
-        
-        // use native implementation to assemble node configuration
-        // add interface methods to AbstractSeleniumConfig to manipulate config as JSON:
-        // - load node configuration file
-        // - replace "capabilities" property with empty list
-        // - add capability object to "capabilities" property
-        // - serialize JSON object to file
-        
-        // s2: RegistrationRequest.loadFromJSON(String filePath)
-        //     RegistrationRequest.setCapabilities(List<DesiredCapabilities>)
-        //     RegistrationRequest.toJson()
-        
-        // s3: GridNodeConfiguration.loadFromJSON(String filePath)
-        //     NOTE: GridNodeConfiguration.capabilities is public
-        //     Json.toJson(Object toConvert)
-    
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
             outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
             LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer,
                     workingPath, outputPath);
             waitUntilReady(nodeServer, hostTimeout);
-            waitUntilRegistered(config, hubServer, nodeServer, hostTimeout);
+            waitUntilRegistered(config, nodeServer, hostTimeout);
             nodeServers.add(nodeServer);
         }
         
@@ -143,12 +118,21 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         }
     }
     
-    protected static void waitUntilRegistered(SeleniumConfig config, GridServer hubServer, LocalGridServer nodeServer,
-            long maxWait) throws IOException, InterruptedException, TimeoutException {
-        URL hubUrl = hubServer.getUrl();
+    /**
+     * Wait for the specified node server to be registered with the active Grid hub.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param nodeServer {@link LocalGridServer node server} to wait for
+     * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
+     * @throws InterruptedException if this thread was interrupted
+     * @throws IOException if an I/O error occurs
+     * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
+     */
+    protected static void waitUntilRegistered(SeleniumConfig config, LocalGridServer nodeServer, long maxWait)
+            throws IOException, InterruptedException, TimeoutException {
         String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
         long maxTime = System.currentTimeMillis() + maxWait;
-        while (!isNodeRegistered(config, hubUrl, nodeEndpoint)) {
+        while (!isNodeRegistered(config, nodeEndpoint)) {
             if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
                 throw new TimeoutException("Timed out waiting for Grid node to be registered");
             }
@@ -157,8 +141,16 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
     }
     
-    private static boolean isNodeRegistered(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
-        Capabilities capabilities = GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint)[0];
+    /**
+     * Determine if the specified node server is registered with the active Grid hub.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param nodeEndpoint node endpoint
+     * @return {@code true} if the node is registered; otherwise {@code false}
+     * @throws IOException if an I/O error occurs
+     */
+    private static boolean isNodeRegistered(SeleniumConfig config, String nodeEndpoint) throws IOException {
+        Capabilities capabilities = GridUtility.getNodeCapabilities(config, config.getHubUrl(), nodeEndpoint)[0];
         return capabilities.is("success");
     }
 

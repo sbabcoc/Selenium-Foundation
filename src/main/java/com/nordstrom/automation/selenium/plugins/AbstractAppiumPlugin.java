@@ -15,10 +15,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
-import org.openqa.selenium.remote.service.DriverService;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -26,9 +23,13 @@ import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.automation.selenium.utility.BinaryFinder;
 
 import net.bytebuddy.implementation.Implementation;
 
+/**
+ * This class provides the base plugin implementation for drivers provided by {@code appium}.
+ */
 public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     private static final String[] DEPENDENCY_CONTEXTS = {};
@@ -41,21 +42,33 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         this.browserName = browserName;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String[] getDependencyContexts() {
         return DEPENDENCY_CONTEXTS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getBrowserName() {
         return browserName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String[] getPropertyNames() {
         return PROPERTY_NAMES;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
@@ -98,16 +111,31 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         return new LocalGridServer(hostUrl, portNum, GridRole.NODE, process, workingPath, outputPath);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass) {
         // TODO Auto-generated method stub
         return null;
     }
     
+    /**
+     * Find the 'npm' (Node Package Manager) binary.
+     * 
+     * @return path to the 'npm' binary as a {@link File} object
+     * @throws GridServerLaunchFailedException if 'npm' isn't found
+     */
     private static File findNPM() throws GridServerLaunchFailedException {
         return findBinary("npm", SeleniumSettings.NPM_BINARY_PATH, "'npm' package manager");
     }
     
+    /**
+     * Find the 'node' binary.
+     * 
+     * @return path to the 'node' binary as a {@link File} object
+     * @throws GridServerLaunchFailedException if 'npm' isn't found
+     */
     private static File findNodeBinary() throws GridServerLaunchFailedException {
         return findBinary("node", SeleniumSettings.NODE_BINARY_PATH, "'node' JavaScript runtime");
     }
@@ -115,15 +143,18 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     /**
      * Find the 'appium' main script in the global 'node' modules repository.
      * 
-     * @return
-     * @throws IOException 
+     * @return path path to the 'appium' main script as a {@link File} object
+     * @throws GridServerLaunchFailedException if the 'appium' main script isn't found
      */
     private static File findMainScript() throws GridServerLaunchFailedException {
+        // check configuration for path to 'appium' main script
         try {
             return findBinary("main.js", SeleniumSettings.MAIN_SCRIPT_PATH, "'appium' main script");
         } catch (GridServerLaunchFailedException eaten) {
-            // nothing to go here
+            // path not specified - check modules repository below
         }
+        
+        // check for 'appium' main script in global 'node' modules repository
         
         String nodeModulesRoot;
         File npm = findNPM().getAbsoluteFile();
@@ -153,12 +184,13 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     }
     
     /**
+     * Find the specified binary.
      * 
-     * @param exeName
-     * @param setting
-     * @param what
-     * @return
-     * @throws GridServerLaunchFailedException
+     * @param exeName file name of binary to find
+     * @param setting associated configuration setting
+     * @param what human-readable description of binary
+     * @return path to specified binary as a {link File} object
+     * @throws GridServerLaunchFailedException if specified binary isn't found
      */
     private static File findBinary(String exeName, SeleniumSettings setting, String what)
             throws GridServerLaunchFailedException {
@@ -171,37 +203,15 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     }
     
     /**
+     * Assemble a 'file not found' exception for the indicated binary.
      * 
-     * @param what
-     * @param setting
-     * @return
+     * @param what human-readable description of binary
+     * @param setting associated configuration setting
+     * @return {@link FileNotFoundException} object
      */
     private static IOException fileNotFound(String what, SeleniumSettings setting) {
         String template = "%s not found; configure the %s setting (key: %s)";
         return new FileNotFoundException(String.format(template, what, setting.name(), setting.key()));
-    }
-    
-    static class BinaryFinder extends DriverService {
-
-        private BinaryFinder(File executable, int port, ImmutableList<String> args,
-                ImmutableMap<String, String> environment) throws IOException {
-            super(executable, port, args, environment);
-        }
-
-        /**
-        *
-        * @param exeName Name of the executable file to look for in PATH
-        * @param exeProperty Name of a system property that specifies the path to the executable file
-        * @param exeDocs The link to the driver documentation page
-        * @param exeDownload The link to the driver download page
-        *
-        * @return The driver executable as a {@link File} object
-        * @throws IllegalStateException if the executable is not found or cannot be executed
-        */
-        static File findBinary(String exeName, String exeProperty, String exeDocs, String exeDownload) {
-            return DriverService.findExecutable(exeName, exeProperty, exeDocs, exeDownload);
-        }
-
     }
 
 }

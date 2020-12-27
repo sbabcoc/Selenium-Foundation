@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.os.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,6 +263,9 @@ public class SeleniumGrid {
         }
     }
 
+    /**
+     * This class represents a single Selenium Grid server (hub or node).
+     */
     public static class GridServer {
         private GridRole role;
         private URL serverUrl;
