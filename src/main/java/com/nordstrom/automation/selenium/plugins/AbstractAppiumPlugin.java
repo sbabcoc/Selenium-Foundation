@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -64,8 +63,6 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
         
-        GridRole role = GridRole.NODE;
-        String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
 
         argsList.add(findMainScript().getAbsolutePath());
@@ -98,20 +95,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         
         String executable = findNodeBinary().getAbsolutePath();
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        
-        if (workingPath != null) {
-            process.setWorkingDirectory(workingPath.toString());
-        }
-        
-        if (outputPath != null) {
-            try {
-                process.copyOutputTo(new FileOutputStream(outputPath.toFile()));
-            } catch (FileNotFoundException e) {
-                throw new GridServerLaunchFailedException(gridRole, e);
-            }
-        }
-        
-        return new AppiumGridServer(hostUrl, portNum, role, process);
+        return new AppiumGridServer(hostUrl, portNum, GridRole.NODE, process, workingPath, outputPath);
     }
 
     @Override
@@ -125,8 +109,8 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         // Create subclass of LocalGridServer.
         // Override default status request string and shutdown(...) method
         
-        AppiumGridServer(String host, Integer port, GridRole role, CommandLine process) {
-            super(host, port, role, process);
+        AppiumGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
+            super(host, port, role, process, workingPath, outputPath);
         }
         
         /**

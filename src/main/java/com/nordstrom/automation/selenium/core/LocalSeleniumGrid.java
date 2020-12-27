@@ -226,20 +226,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         String executable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        
-        if (workingPath != null) {
-            process.setWorkingDirectory(workingPath.toString());
-        }
-        
-        if (outputPath != null) {
-            try {
-                process.copyOutputTo(new FileOutputStream(outputPath.toFile()));
-            } catch (FileNotFoundException e) {
-                throw new GridServerLaunchFailedException(gridRole, e);
-            }
-        }
-        
-        return new LocalGridServer(hostUrl, portNum, role, process);
+        return new LocalGridServer(hostUrl, portNum, role, process, workingPath, outputPath);
     }
 
     public static class LocalGridServer extends GridServer {
@@ -254,8 +241,21 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param role {@link GridRole} of local Grid server
          * @param process {@link Process} of local Grid server
          */
-        protected LocalGridServer(String host, Integer port, GridRole role, CommandLine process) {
+        protected LocalGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
             super(getServerUrl(host, port), role);
+            
+            if (workingPath != null) {
+                process.setWorkingDirectory(workingPath.toString());
+            }
+            
+            if (outputPath != null) {
+                try {
+                    process.copyOutputTo(new FileOutputStream(outputPath.toFile()));
+                } catch (FileNotFoundException e) {
+                    throw new GridServerLaunchFailedException(role.toString().toLowerCase(), e);
+                }
+            }
+            
             this.process = process;
             this.process.executeAsync();
         }
