@@ -26,12 +26,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.os.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -343,15 +345,19 @@ public class SeleniumGrid {
             }
             
             if (gridServer.isActive()) {
-                try {
-                    GridUtility.getHttpResponse(serverUrl, shutdownRequest);
-                    waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
-                    Thread.sleep(1000);
-                } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
-                    throw UncheckedThrow.throwUnchecked(e);
+                if ( ! gridServer.isHub() && (gridServer instanceof LocalGridServer)) {
+                    ((LocalGridServer) gridServer).getProcess().destroy();
+                } else {
+                    try {
+                        GridUtility.getHttpResponse(serverUrl, shutdownRequest);
+                        waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
+                    } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
+                        throw UncheckedThrow.throwUnchecked(e);
+                    }
                 }
             }
             
+            Thread.sleep(1000);
             return true;
         }
     }
