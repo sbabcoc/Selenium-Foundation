@@ -101,7 +101,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * Wait for the specified Grid server to indicate that it's ready.
      * 
      * @param server {@link LocalGridServer} object to wait for.
-     * @param outputPath {@link Path} to output log file; {@code null} if not redirected
      * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
      * @throws InterruptedException if this thread was interrupted
      * @throws IOException if an I/O error occurs
@@ -254,6 +253,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param port port of local Grid server
          * @param role {@link GridRole} of local Grid server
          * @param process {@link Process} of local Grid server
+         * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+         * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
          */
         public LocalGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
             super(getServerUrl(host, port), role);

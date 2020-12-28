@@ -330,8 +330,7 @@ public class SeleniumGrid {
         /**
          * Stop the specified Selenium Grid server.
          * 
-         * @param serverUrl Selenium server URL
-         * @param statusRequest Selenium server status request
+         * @param gridServer {@link GridServer} object for hub or node
          * @param shutdownRequest Selenium server shutdown request
          * @param localOnly {@code true} to target only local Grid server
          * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
@@ -372,7 +371,7 @@ public class SeleniumGrid {
      * 
      * @param timeout timeout interval
      * @param unit granularity of specified timeout
-     * @param url URL to poll for availability
+     * @param urls URLs to poll for availability
      * @throws org.openqa.selenium.net.UrlChecker.TimeoutException if indicated URL is still available after specified
      *     interval.
      */
