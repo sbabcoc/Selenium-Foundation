@@ -117,7 +117,7 @@ public class WebDriverUtilsTest extends TestNgRoot {
         assertFalse(WebDriverUtils.filterHidden(elements));
         assertEquals(elements.size(), total - 1);
         
-        elements = page.findElements(By.id("hidden-para"));
+        elements = page.findElements(By.cssSelector("#hidden-para"));
         total = elements.size();
         assertEquals(total, 1);
         assertTrue(WebDriverUtils.filterHidden(elements));
