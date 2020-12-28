@@ -70,6 +70,7 @@ sourceSets {
     }
     compileClasspath = sourceSets.main.output + configurations.selenium2Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium2Runtime
+    output.resourcesDir = new File(buildRoot, 'classes')
   }
   selenium3 {
     java {
@@ -81,6 +82,7 @@ sourceSets {
     }
     compileClasspath = sourceSets.main.output + configurations.selenium3Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium3Runtime
+    output.resourcesDir = new File(buildRoot, 'classes')
   }
   test {
     java {
