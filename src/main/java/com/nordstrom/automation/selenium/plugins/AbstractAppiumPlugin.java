@@ -149,7 +149,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     private static File findMainScript() throws GridServerLaunchFailedException {
         // check configuration for path to 'appium' main script
         try {
-            return findBinary("main.js", SeleniumSettings.MAIN_SCRIPT_PATH, "'appium' main script");
+            return findBinary("main.js", SeleniumSettings.APPIUM_BINARY_PATH, "'appium' main script");
         } catch (GridServerLaunchFailedException eaten) {
             // path not specified - check modules repository below
         }
@@ -177,7 +177,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             nodeModulesRoot = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8).trim();
             File appiumMain = Paths.get(nodeModulesRoot, APPIUM_PATH_TAIL).toFile();
             if (appiumMain.exists()) return appiumMain;
-            throw fileNotFound("'appium' main script", SeleniumSettings.MAIN_SCRIPT_PATH);
+            throw fileNotFound("'appium' main script", SeleniumSettings.APPIUM_BINARY_PATH);
         } catch (IOException cause) {
             throw new GridServerLaunchFailedException("node", cause);
         }

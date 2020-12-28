@@ -124,9 +124,7 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>node.binary.path</b> <br> default: {@code null} */
         NODE_BINARY_PATH("node.binary.path", null),
         /** name: <b>npm.binary.path</b> <br> default: {@code null} */
-        NPM_BINARY_PATH("npm.binary.path", null),
-        /** name: <b>main.script.path</b> <br> default: {@code null} */
-        MAIN_SCRIPT_PATH("main.script.path", null);
+        NPM_BINARY_PATH("npm.binary.path", null);
         
         private String propertyName;
         private String defaultValue;
