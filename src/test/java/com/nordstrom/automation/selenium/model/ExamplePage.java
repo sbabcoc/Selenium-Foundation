@@ -12,7 +12,7 @@ import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.ByType;
 
-@PageUrl(scheme="file", value="ExamplePage.html")
+@PageUrl("/grid/admin/ExamplePageServlet")
 public class ExamplePage extends Page {
 
     public ExamplePage(WebDriver driver) {

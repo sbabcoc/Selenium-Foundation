@@ -11,10 +11,10 @@ import org.testng.annotations.Test;
 import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.support.TestNgBase;
+import com.nordstrom.automation.selenium.model.TestNgRoot;
 
 @InitialPage(ExamplePage.class)
-public class ScreenshotCaptureTest extends TestNgBase {
+public class ScreenshotCaptureTest extends TestNgRoot {
     
     @Test
     public void testScreenshotCapture() {

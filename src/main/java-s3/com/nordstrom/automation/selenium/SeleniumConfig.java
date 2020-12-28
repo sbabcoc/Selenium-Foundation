@@ -32,10 +32,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "] }";
-    private static final String GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncherV3";
-    private static final String HUB_PORT = "4445";
-    private static final String HUB_CONFIG = "hubConfig-s3.json";
-    private static final String NODE_CONFIG = "nodeConfig-s3.json";
+    private static final String DEFAULT_GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncherV3";
+    private static final String DEFAULT_HUB_PORT = "4445";
+    private static final String DEFAULT_HUB_CONFIG = "hubConfig-s3.json";
+    private static final String DEFAULT_NODE_CONFIG = "nodeConfig-s3.json";
     
     /**
      * <b>org.openqa.grid.selenium.GridLauncherV3</b>
@@ -157,7 +157,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    GRID_LAUNCHER,
+                    null,
                     "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
                     "org.apache.commons.lang3.reflect.FieldUtils",
                     "net.bytebuddy.matcher.ElementMatcher",
@@ -175,6 +175,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     static {
         try {
             seleniumConfig = new SeleniumConfig();
+            DEPENDENCY_CONTEXTS[0] = seleniumConfig.getString(SeleniumSettings.GRID_LAUNCHER.key());
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
         }
@@ -205,10 +206,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = super.getDefaults();
-        defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), GRID_LAUNCHER);
-        defaults.put(SeleniumSettings.HUB_PORT.key(), HUB_PORT);
-        defaults.put(SeleniumSettings.HUB_CONFIG.key(), HUB_CONFIG);
-        defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
+        defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), DEFAULT_GRID_LAUNCHER);
+        defaults.put(SeleniumSettings.HUB_PORT.key(), DEFAULT_HUB_PORT);
+        defaults.put(SeleniumSettings.HUB_CONFIG.key(), DEFAULT_HUB_CONFIG);
+        defaults.put(SeleniumSettings.NODE_CONFIG.key(), DEFAULT_NODE_CONFIG);
         return defaults;
     }
     
@@ -225,17 +226,34 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
+        // convert capabilities string to [JsonInput] object
+        JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
+        // convert [JsonInput] object to list of [MutableCapabilities] objects
+        List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
+        // for each [MutableCapabilities] object
+        for (MutableCapabilities theseCaps : capabilitiesList) {
+            // apply specified node modifications (if any)
+            theseCaps.merge(getModifications(theseCaps, NODE_MODS_SUFFIX));
+        }
+        
+        // get path to node configuration template
         String nodeConfigPath = getNodeConfigPath().toString();
+        // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        String hashCode = String.format("%08X", Objects.hash(capabilities, hubUrl));
+        // get hash code of capabilities list and hub URL as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl));
+        // assemble node configuration file path with capabilities hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
+        
+        // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
-            JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
-            List<MutableCapabilities> capabilitiesList = GridNodeConfiguration.loadFromJSON(input).capabilities;
             GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
+            nodeConfig.hub = null;
             nodeConfig.capabilities = capabilitiesList;
-            nodeConfig.hub = hubUrl.toString();
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+            nodeConfig.hubHost = hubUrl.getHost();
+            nodeConfig.hubPort = hubUrl.getPort();
+            try(OutputStream fos = new FileOutputStream(filePath.toFile());
+                OutputStream out = new BufferedOutputStream(fos)) {
                 out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
             }
         }
@@ -249,6 +267,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     public Capabilities[] getCapabilitiesForJson(String capabilities) {
         JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
         return GridNodeConfiguration.loadFromJSON(input).capabilities.toArray(new Capabilities[0]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Capabilities mergeCapabilities(Capabilities target, Capabilities change) {
+        return target.merge(change);
     }
     
     /**

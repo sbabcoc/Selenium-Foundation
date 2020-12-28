@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class OperaPlugin extends RemoteWebDriverPlugin {
     
+    public OperaPlugin() {
+        super(OperaCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.opera.OperaDriver</b>
      * 
@@ -34,14 +38,6 @@ public class OperaPlugin extends RemoteWebDriverPlugin {
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return OperaCaps.getCapabilities(config);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return OperaCaps.BROWSER_NAME;
     }
 
     /**

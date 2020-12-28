@@ -33,7 +33,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
@@ -108,7 +107,7 @@ public final class GridUtility {
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver() {
-        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+        SeleniumConfig config = SeleniumConfig.getConfig();
         URL remoteAddress = config.getSeleniumGrid().getHubServer().getUrl();
         Capabilities capabilities = config.getCurrentCapabilities();
         return getDriver(remoteAddress, capabilities);

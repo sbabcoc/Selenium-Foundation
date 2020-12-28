@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class FirefoxPlugin extends RemoteWebDriverPlugin {
     
+    public FirefoxPlugin() {
+        super(FirefoxCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.firefox.FirefoxDriver</b>
      * 
@@ -34,14 +38,6 @@ public class FirefoxPlugin extends RemoteWebDriverPlugin {
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return FirefoxCaps.getCapabilities();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return FirefoxCaps.BROWSER_NAME;
     }
 
     /**

@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class PhantomJsPlugin extends RemoteWebDriverPlugin {
     
+    public PhantomJsPlugin() {
+        super(PhantomJsCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.phantomjs.PhantomJSDriver</b>
      * 
@@ -40,14 +44,6 @@ public class PhantomJsPlugin extends RemoteWebDriverPlugin {
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return PhantomJsCaps.getCapabilities();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return PhantomJsCaps.BROWSER_NAME;
     }
 
     /**

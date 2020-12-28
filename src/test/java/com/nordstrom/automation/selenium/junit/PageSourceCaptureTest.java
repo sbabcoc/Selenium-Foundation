@@ -13,7 +13,7 @@ import com.nordstrom.automation.selenium.model.ExamplePage;
 import com.nordstrom.common.file.PathUtils;
 
 @InitialPage(ExamplePage.class)
-public class PageSourceCaptureTest extends JUnitBase {
+public class PageSourceCaptureTest extends JUnitRoot {
     
     @Test
     public void testPageSourceCapture() {

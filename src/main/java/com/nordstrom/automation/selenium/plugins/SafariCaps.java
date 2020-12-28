@@ -10,22 +10,20 @@ public class SafariCaps {
         throw new AssertionError("SafariCaps is a static constants class that cannot be instantiated");
     }
 
-    private static final String CAPABILITIES =
-                    "{\"browserName\":\"safari\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
-    
-    public static final String BROWSER_NAME = "safari";
+    public static final String DRIVER_NAME = "safari";
     public static final String OPTIONS_KEY = "safari.options";
-    public static final String BASELINE = "{\"browserName\":\"safari\"}";
+    private static final String[] PROPERTY_NAMES = { "webdriver.safari.driver", "webdriver.safari.noinstall" };
+
+    private static final String CAPABILITIES =
+                    "{\"browserName\":\"safari\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
-    private static final String[] PROPERTY_NAMES = {
-                    "webdriver.safari.driver",
-                    "webdriver.safari.noinstall"};
+    private static final String BASELINE = "{\"browserName\":\"safari\"}";
     
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put(BROWSER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME, BASELINE);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

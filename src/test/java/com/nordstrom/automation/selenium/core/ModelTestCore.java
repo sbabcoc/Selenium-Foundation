@@ -3,11 +3,16 @@ package com.nordstrom.automation.selenium.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.testng.SkipException;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.model.ExamplePage;
@@ -201,6 +206,20 @@ public class ModelTestCore {
     
     private static ExamplePage getPage(TestBase instance) {
         return (ExamplePage) instance.getInitialPage();
+    }
+
+    public static void setHubAsTarget() {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        URL hubUrl = config.getHubUrl();
+        try {
+            URI targetUri = new URIBuilder()
+                    .setScheme(hubUrl.getProtocol())
+                    .setHost(hubUrl.getHost())
+                    .setPort(hubUrl.getPort())
+                    .build().normalize();
+            config.setTargetUri(targetUri);
+        } catch (URISyntaxException e) {
+        }
     }
     
 }

@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class InternetExplorerPlugin extends RemoteWebDriverPlugin {
     
+    public InternetExplorerPlugin() {
+        super(InternetExplorerCaps.DRIVER_NAME);
+    }
+    
     /**
      * <a href='https://www.microsoft.com/en-au/download/confirmation.aspx?id=44069'>IE WebDriver Tools</a>
      * <p>
@@ -38,14 +42,6 @@ public class InternetExplorerPlugin extends RemoteWebDriverPlugin {
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return InternetExplorerCaps.getCapabilities();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return InternetExplorerCaps.BROWSER_NAME;
     }
 
     /**

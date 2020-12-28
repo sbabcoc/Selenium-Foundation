@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -27,6 +28,8 @@ import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
@@ -42,9 +45,16 @@ public abstract class AbstractSeleniumConfig extends
                 SettingsCore<AbstractSeleniumConfig.SeleniumSettings> {
 
     private static final String SETTINGS_FILE = "settings.properties";
-    private static final String CAPS_PATTERN = "{\"browserName\": \"%s\"}";
-    /** value: <b>{"browserName": "htmlunit"}</b> */
+    private static final String CAPS_PATTERN = "{\"browserName\":\"%s\"}";
+    /** value: <b>{"browserName":"htmlunit"}</b> */
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
+    
+    protected static final String NODE_MODS_SUFFIX = ".node.mods";
+    private static final String CAPS_MODS_SUFFIX = ".caps.mods";
+    
+    private static final String APPIUM_PATH = "APPIUM_BINARY_PATH";
+    private static final String NODE_PATH = "NODE_BINARY_PATH";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
     /**
@@ -106,7 +116,17 @@ public abstract class AbstractSeleniumConfig extends
         /** name: <b>selenium.grid.no.redirect</b> <br> default: {@code false} */
         GRID_NO_REDIRECT("selenium.grid.no.redirect", "false"),
         /** name: <b>selenium.context.platform</b> <br> default: {@code null} */
-        CONTEXT_PLATFORM("selenium.context.platform", null);
+        CONTEXT_PLATFORM("selenium.context.platform", null),
+        /** name: <b>appium.cli.args</b> <br> default: {@code null} */
+        APPIUM_CLI_ARGS("appium.cli.args", null),
+        /** name: <b>appium.binary.path</b> <br> default: {@code null} */
+        APPIUM_BINARY_PATH("appium.binary.path", null),
+        /** name: <b>node.binary.path</b> <br> default: {@code null} */
+        NODE_BINARY_PATH("node.binary.path", null),
+        /** name: <b>npm.binary.path</b> <br> default: {@code null} */
+        NPM_BINARY_PATH("npm.binary.path", null),
+        /** name: <b>main.script.path</b> <br> default: {@code null} */
+        MAIN_SCRIPT_PATH("main.script.path", null);
         
         private String propertyName;
         private String defaultValue;
@@ -231,6 +251,28 @@ public abstract class AbstractSeleniumConfig extends
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Map<String, String> getDefaults() {
+        Map<String, String> defaults = super.getDefaults();
+        
+        Map<String, String> env = System.getenv();
+        String appiumPath = env.get(APPIUM_PATH);
+        String nodePath = env.get(NODE_PATH);
+        
+        if (appiumPath != null) {
+            defaults.put(SeleniumSettings.APPIUM_BINARY_PATH.key(), appiumPath);
+        }
+        
+        if (nodePath != null) {
+            defaults.put(SeleniumSettings.NODE_BINARY_PATH.key(), nodePath);
+        }
+        
+        return defaults;
+    }
 
     /**
      * Get the Selenium configuration object.
@@ -347,6 +389,30 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
+     * Set the target URI.
+     * <p>
+     * <b>NOTE</b>: This method also updates the following target URI components: 
+     *     {@link SeleniumSettings#TARGET_SCHEME scheme}, {@link SeleniumSettings#TARGET_CREDS credentials},
+     *     {@link SeleniumSettings#TARGET_HOST host}, {@link SeleniumSettings#TARGET_PORT port}, and
+     *     {@link SeleniumSettings#TARGET_PATH base path}
+     * 
+     * @param targetUri target URI
+     */
+    public void setTargetUri(URI targetUri) {
+        this.targetUri = targetUri;
+        System.setProperty(SeleniumSettings.TARGET_PATH.key(), targetUri.getPath());
+        System.setProperty(SeleniumSettings.TARGET_SCHEME.key(), targetUri.getScheme());
+        System.setProperty(SeleniumSettings.TARGET_HOST.key(), targetUri.getHost());
+        System.setProperty(SeleniumSettings.TARGET_PORT.key(), Integer.toString(targetUri.getPort()));
+        String userInfo = targetUri.getUserInfo();
+        if (userInfo != null) {
+            System.setProperty(SeleniumSettings.TARGET_CREDS.key(), userInfo);
+        } else {
+            System.clearProperty(SeleniumSettings.TARGET_CREDS.key());
+        }
+    }
+    
+    /**
      * Get the path to the Selenium Grid node configuration.
      * 
      * @return Selenium Grid node configuration path
@@ -380,15 +446,85 @@ public abstract class AbstractSeleniumConfig extends
      * @return {@link Capabilities} object for the configured browser specification 
      */ 
     public Capabilities getCurrentCapabilities() {
+        Capabilities capabilities = null;
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
+        String browserCaps = getString(SeleniumSettings.BROWSER_CAPS.key());
         if (browserName != null) {
-            return getSeleniumGrid().getPersonality(getConfig(), browserName);
+            capabilities = getSeleniumGrid().getPersonality(getConfig(), browserName);
+        } else if (browserCaps != null) {
+            capabilities = getCapabilitiesForJson(browserCaps)[0];
+        } else {
+            throw new IllegalStateException("Neither browser name nor capabilities are specified");
         }
-        String capabilities = getString(SeleniumSettings.BROWSER_CAPS.key());
-        if (capabilities != null) {
-            return getCapabilitiesForJson(capabilities)[0];
+        Capabilities modifications = getModifications(capabilities, CAPS_MODS_SUFFIX);
+        return mergeCapabilities(capabilities, modifications);
+    }
+    
+    /**
+     * Get configured modifications for the specified <b>Capabilities</b> object.
+     * <p>
+     * <b>NOTE</b>: Modifications are specified in the configuration as either JSON strings or file paths
+     * (absolute, relative, or simple filename). Property names for modifications correspond to "personality"
+     * values within the capabilities themselves (in order of precedence): 
+     * 
+     * <ul>
+     *     <li><b>personality</b>: Selenium Foundation "personality" name</li>
+     *     <li><b>automationName</b>: 'appium' automation engine name</li>
+     *     <li><b>browserName</b>: Selenium driver browser name</li>
+     * </ul>
+     * 
+     * The first defined value is selected as the "personality" of the specified <b>Capabilities</b> object.
+     * The full name of the property used to specify modifications is the "personality" plus a context-specific
+     * suffix: 
+     * 
+     * <ul>
+     *     <li>For node configuration capabilities: <b>&lt;personality&gt;.node.mods</b></li>
+     *     <li>For "desired capabilities" requests: <b>&lt;personality&gt;.caps.mods</b></li>
+     * </ul>
+     * 
+     * @param capabilities target capabilities object
+     * @param propertySuffix suffix for configuration property name
+     * @return configured modifications; {@code null} if none configured
+     */
+    protected Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
+        String personality = (String) capabilities.getCapability("personality");
+        if (personality == null) {
+            personality = (String) capabilities.getCapability("automationName");
+            if (personality == null) {
+                personality = (String) capabilities.getCapability("browserName");
+                if (personality == null) {
+                    return null;
+                }
+            }
         }
-        throw new IllegalStateException("Neither browser name nor capabilities are specified");
+        
+        String propertyName = personality + propertySuffix;
+        String modifications = getString(propertyName);
+        
+        if (modifications == null) {
+            return null;
+        }
+        
+        // assume config'd mods are JSON
+        String modsJson = modifications;
+        // try to resolve config'd mods as file path
+        String modsPath = getConfigPath(modifications);
+        
+        // if mods file found
+        if (modsPath != null) {
+            try {
+                // load contents of mods file
+                Path path = Paths.get(modsPath);
+                URL url = path.toUri().toURL();
+                modsJson = Resources.toString(url, Charsets.UTF_8);
+            } catch (IOException e) {
+                // highly unlikely
+                return null;
+            }
+        }
+        
+        // return mods as [Capabilities] object
+        return getCapabilitiesForJson(modsJson)[0];
     }
     
     /**
@@ -408,6 +544,15 @@ public abstract class AbstractSeleniumConfig extends
      * @return list of {@link Capabilities} objects
      */
     public abstract Capabilities[] getCapabilitiesForJson(final String capabilities);
+    
+    /**
+     * Apply the indicated modifications to the specified <b>Capabilities</b> object.
+     * 
+     * @param target target capabilities object
+     * @param change revisions being merged (may be {@code null})
+     * @return target capabilities object with revisions applied
+     */
+    public abstract Capabilities mergeCapabilities(final Capabilities target, final Capabilities change);
     
     /**
      * Convert the specified browser capabilities object to a JSON string.

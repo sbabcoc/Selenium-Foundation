@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class EdgePlugin extends RemoteWebDriverPlugin {
     
+    public EdgePlugin() {
+        super(EdgeCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.edge.EdgeDriver</b>
      * 
@@ -33,14 +37,6 @@ public class EdgePlugin extends RemoteWebDriverPlugin {
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return EdgeCaps.getCapabilities();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return EdgeCaps.BROWSER_NAME;
     }
 
     /**

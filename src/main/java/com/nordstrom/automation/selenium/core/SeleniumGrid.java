@@ -6,6 +6,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -118,6 +121,14 @@ public class SeleniumGrid {
     
     /**
      * Add supported personalities of the specified Grid node.
+     * <p>
+     * <b>NOTE</b>: Names of node personalities are derived from the following capabilities
+     * (in order of precedence):
+     * 
+     * <ul>
+     *     <li><b>automationName</b>: 'appium' automation name</li>
+     *     <li><b>browserName</b>: name of target browser</li>
+     * </ul>
      * 
      * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of Grid hub
@@ -134,7 +145,11 @@ public class SeleniumGrid {
                 capsList = (List<Map>) conf.get("capabilities");
             }
             for (Map<String, Object> capsItem : capsList) {
-                personalities.put((String) capsItem.get("browserName"), config.toJson(capsItem));
+                String personalityName = (String) capsItem.get("automationName");
+                if (personalityName == null) {
+                    personalityName = (String) capsItem.get("browserName");
+                }
+                personalities.put(personalityName, config.toJson(capsItem));
             }
         }
     }
@@ -233,20 +248,29 @@ public class SeleniumGrid {
     public Capabilities getPersonality(SeleniumConfig config, String personality) {
         String json = personalities.get(personality);
         if ((json == null) || json.isEmpty()) {
+            String message = String.format("Specified personality '%s' not supported by local Grid", personality);
             String browserName = personality.split("\\.")[0];
-            LOGGER.warn("Specified personality '{}' not supported by local Grid; revert to browser name '{}'",
-                            personality, browserName);
-            return config.getCapabilitiesForName(browserName)[0];
+            if ( ! browserName.equals(personality)) {
+                LOGGER.warn("{}; revert to browser name '{}'", message, browserName);
+                Capabilities[] capsList = config.getCapabilitiesForName(browserName);
+                if (capsList.length > 0) {
+                    return capsList[0];
+                }
+            }
+            throw new RuntimeException(message);
         } else {
             return config.getCapabilitiesForJson(json)[0];
         }
     }
 
+    /**
+     * This class represents a single Selenium Grid server (hub or node).
+     */
     public static class GridServer {
         private GridRole role;
         private URL serverUrl;
-        private String statusRequest;
-        private String shutdownRequest;
+        protected String statusRequest;
+        protected String shutdownRequest;
         
         public static final String GRID_CONSOLE = "/grid/console";
         public static final String HUB_BASE = "/wd/hub";
@@ -288,6 +312,10 @@ public class SeleniumGrid {
             return serverUrl;
         }
         
+        public boolean isActive() {
+            return GridUtility.isHostActive(serverUrl, statusRequest);
+        }
+        
         /**
          * Stop the Selenium Grid server represented by this object.
          * 
@@ -296,7 +324,7 @@ public class SeleniumGrid {
          * @throws InterruptedException if this thread was interrupted
          */
         public boolean shutdown(final boolean localOnly) throws InterruptedException {
-            return shutdown(serverUrl, statusRequest, shutdownRequest, localOnly);
+            return shutdown(this, shutdownRequest, localOnly);
         }
 
         /**
@@ -309,24 +337,88 @@ public class SeleniumGrid {
          * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
          * @throws InterruptedException if this thread was interrupted
          */
-        public static boolean shutdown(final URL serverUrl, final String statusRequest,
-                        final String shutdownRequest, final boolean localOnly) throws InterruptedException {
+        public static boolean shutdown(final GridServer gridServer, final String shutdownRequest,
+                final boolean localOnly) throws InterruptedException {
+            
+            URL serverUrl = gridServer.getUrl();
             
             if (localOnly && !GridUtility.isLocalHost(serverUrl)) {
                 return false;
             }
             
-            if (GridUtility.isHostActive(serverUrl, statusRequest)) {
-                try {
-                    GridUtility.getHttpResponse(serverUrl, shutdownRequest);
-                    waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
-                    Thread.sleep(1000);
-                } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
-                    throw UncheckedThrow.throwUnchecked(e);
+            if (gridServer.isActive()) {
+                if ( ! gridServer.isHub() && (gridServer instanceof LocalGridServer)) {
+                    ((LocalGridServer) gridServer).getProcess().destroy();
+                } else {
+                    try {
+                        GridUtility.getHttpResponse(serverUrl, shutdownRequest);
+                        waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
+                    } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
+                        throw UncheckedThrow.throwUnchecked(e);
+                    }
                 }
             }
             
+            Thread.sleep(1000);
             return true;
+        }
+    }
+
+    /**
+     * Wait up to the specified interval for the indicated URL(s) to be available.
+     * <p>
+     * <b>NOTE</b>: This method was back-ported from the {@link org.openqa.selenium.net.UrlChecker UrlChecker} class in
+     * Selenium 3 to compile under Java 7.
+     * 
+     * @param timeout timeout interval
+     * @param unit granularity of specified timeout
+     * @param url URL to poll for availability
+     * @throws org.openqa.selenium.net.UrlChecker.TimeoutException if indicated URL is still available after specified
+     *     interval.
+     */
+    public static void waitUntilAvailable(long timeout, TimeUnit unit, final URL... urls)
+            throws org.openqa.selenium.net.UrlChecker.TimeoutException {
+        long start = System.nanoTime();
+        try {
+            Future<Void> callback = EXECUTOR.submit(new Callable<Void>() {
+                public Void call() throws InterruptedException {
+                    HttpURLConnection connection = null;
+
+                    long sleepMillis = MIN_POLL_INTERVAL_MS;
+                    while (true) {
+                        if (Thread.interrupted()) {
+                            throw new InterruptedException();
+                        }
+                        for (URL url : urls) {
+                            try {
+                                connection = connectToUrl(url);
+                                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                                    return null;
+                                }
+                            } catch (IOException e) {
+                                // Ok, try again.
+                            } finally {
+                                if (connection != null) {
+                                    connection.disconnect();
+                                }
+                            }
+                        }
+                        MILLISECONDS.sleep(sleepMillis);
+                        sleepMillis = (sleepMillis >= MAX_POLL_INTERVAL_MS) ? sleepMillis : sleepMillis * 2;
+                    }
+                }
+            });
+            callback.get(timeout, unit);
+        } catch (java.util.concurrent.TimeoutException e) {
+            throw new org.openqa.selenium.net.UrlChecker.TimeoutException(
+                    String.format("Timed out waiting for %s to be available after %d ms", Arrays.toString(urls),
+                            MILLISECONDS.convert(System.nanoTime() - start, NANOSECONDS)),
+                    e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 

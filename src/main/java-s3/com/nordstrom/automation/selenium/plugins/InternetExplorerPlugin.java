@@ -6,6 +6,10 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class InternetExplorerPlugin extends RemoteWebDriverPlugin {
     
+    public InternetExplorerPlugin() {
+        super(InternetExplorerCaps.DRIVER_NAME);
+    }
+    
     /**
      * <b>org.openqa.selenium.ie.InternetExplorerDriver</b>
      * 
@@ -34,14 +38,6 @@ public class InternetExplorerPlugin extends RemoteWebDriverPlugin {
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return InternetExplorerCaps.getCapabilities();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return InternetExplorerCaps.BROWSER_NAME;
     }
 
     /**

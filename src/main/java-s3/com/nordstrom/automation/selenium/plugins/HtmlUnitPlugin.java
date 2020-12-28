@@ -6,13 +6,16 @@ import java.util.Map;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.MethodCall;
 
-public class HtmlUnitPlugin implements DriverPlugin {
+public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
+    
+    public HtmlUnitPlugin() {
+        super(HtmlUnitCaps.DRIVER_NAME);
+    }
     
     /**
      * <b>org.openqa.selenium.htmlunit.HtmlUnitDriver</b>
@@ -60,14 +63,6 @@ public class HtmlUnitPlugin implements DriverPlugin {
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return HtmlUnitCaps.getCapabilities();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBrowserName() {
-        return HtmlUnitCaps.BROWSER_NAME;
     }
 
     /**

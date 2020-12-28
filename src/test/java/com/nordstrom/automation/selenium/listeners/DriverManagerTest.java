@@ -9,12 +9,12 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.support.TestNgBase;
+import com.nordstrom.automation.selenium.model.TestNgRoot;
 
-public class DriverManagerTest extends TestNgBase {
+public class DriverManagerTest extends TestNgRoot {
     
-    @InitialPage(pageUrl=@PageUrl(scheme="file", value="ExamplePage.html"))
     @BeforeMethod(groups = {"WithDriverBefore"})
+    @InitialPage(pageUrl=@PageUrl("/grid/admin/ExamplePageServlet"))
     public void beforeMethodWithDriver() {
         assertTrue(nabDriver().isPresent(), "Driver should have been created");
     }

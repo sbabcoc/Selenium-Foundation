@@ -29,14 +29,15 @@ import com.nordstrom.automation.settings.SettingsCore;
 @SuppressWarnings({"squid:S1200", "squid:S2972", "squid:MaximumInheritanceDepth"})
 public class SeleniumConfig extends AbstractSeleniumConfig {
     
-    private static final String HUB = "hub";
+    private static final String HUB_HOST = "hubHost";
+    private static final String HUB_PORT = "hubPort";
     
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
-    private static final String GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncher";
-    private static final String HUB_PORT = "4444";
-    private static final String HUB_CONFIG = "hubConfig-s2.json";
-    private static final String NODE_CONFIG = "nodeConfig-s2.json";
+    private static final String DEFAULT_GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncher";
+    private static final String DEFAULT_HUB_PORT = "4444";
+    private static final String DEFAULT_HUB_CONFIG = "hubConfig-s2.json";
+    private static final String DEFAULT_NODE_CONFIG = "nodeConfig-s2.json";
     
     /**
      * <b>org.openqa.grid.selenium.GridLauncher</b>
@@ -150,9 +151,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    GRID_LAUNCHER,
+                    null,
                     "com.nordstrom.tools.GuavaAgent",           // guava-agent
                     "net.bytebuddy.matcher.ElementMatcher",     // guava-agent
+                    "com.nordstrom.automation.selenium.servlet.ExamplePageServlet",
                     "com.google.common.util.concurrent.SimpleTimeLimiter",
                     "com.google.gson.JsonIOException",
                     "org.openqa.selenium.remote.JsonToBeanConverter",
@@ -170,6 +172,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     static {
         try {
             seleniumConfig = new SeleniumConfig();
+            DEPENDENCY_CONTEXTS[0] = seleniumConfig.getString(SeleniumSettings.GRID_LAUNCHER.key());
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
         }
@@ -200,10 +203,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = super.getDefaults();
-        defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), GRID_LAUNCHER);
-        defaults.put(SeleniumSettings.HUB_PORT.key(), HUB_PORT);
-        defaults.put(SeleniumSettings.HUB_CONFIG.key(), HUB_CONFIG);
-        defaults.put(SeleniumSettings.NODE_CONFIG.key(), NODE_CONFIG);
+        defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), DEFAULT_GRID_LAUNCHER);
+        defaults.put(SeleniumSettings.HUB_PORT.key(), DEFAULT_HUB_PORT);
+        defaults.put(SeleniumSettings.HUB_CONFIG.key(), DEFAULT_HUB_CONFIG);
+        defaults.put(SeleniumSettings.NODE_CONFIG.key(), DEFAULT_NODE_CONFIG);
         return defaults;
     }
     
@@ -220,22 +223,38 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
+        // assemble complete JSON registration request
+        String input = JSON_HEAD + capabilities + JSON_TAIL;
+        // convert JSON registration request to list of [DesiredCapabilities] objects
+        List<DesiredCapabilities> capabilitiesList = RegistrationRequest.getNewInstance(input).getCapabilities();
+        // for each [DesiredCapabilities] object
+        for (DesiredCapabilities theseCaps : capabilitiesList) {
+            // apply specified node modifications (if any)
+            theseCaps.merge(getModifications(theseCaps, NODE_MODS_SUFFIX));
+        }
+        
+        // get path to node configuration template
         String nodeConfigPath = getNodeConfigPath().toString();
+        // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        String hashCode = String.format("%08X", Objects.hash(capabilities, hubUrl));
+        // get hash code of capabilities list and hub URL as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl));
+        // assemble node configuration file path with capabilities hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
+        
+        // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
-            String input = JSON_HEAD + capabilities + JSON_TAIL;
-            List<DesiredCapabilities> capabilitiesList = RegistrationRequest.getNewInstance(input).getCapabilities();
             RegistrationRequest nodeConfig = new RegistrationRequest();
             nodeConfig.loadFromJSON(nodeConfigPath);
             nodeConfig.setCapabilities(capabilitiesList);
-            nodeConfig.getConfiguration().put(HUB, hubUrl.toString());
+            nodeConfig.getConfiguration().put(HUB_HOST, hubUrl.getHost());
+            nodeConfig.getConfiguration().put(HUB_PORT, hubUrl.getPort());
 
             // hack for RegistrationRequest bug
             nodeConfig.setRole(GridRole.NODE);
             
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+            try(OutputStream fos = new FileOutputStream(filePath.toFile());
+                OutputStream out = new BufferedOutputStream(fos)) {
                 out.write(nodeConfig.toJSON().getBytes(StandardCharsets.UTF_8));
             }
         }
@@ -249,6 +268,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     public Capabilities[] getCapabilitiesForJson(String capabilities) {
         String input = JSON_HEAD + capabilities + JSON_TAIL;
         return RegistrationRequest.getNewInstance(input).getCapabilities().toArray(new Capabilities[0]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Capabilities mergeCapabilities(Capabilities target, Capabilities change) {
+        return ((DesiredCapabilities) target).merge(change);
     }
     
     /**

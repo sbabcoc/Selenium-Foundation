@@ -1,9 +1,14 @@
 package com.nordstrom.automation.selenium;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
+import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 
 import net.bytebuddy.implementation.Implementation;
 
@@ -44,6 +49,21 @@ public interface DriverPlugin {
      * @return System property names
      */
     String[] getPropertyNames();
+    
+    /**
+     * Start local Selenium Grid node for this driver.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param launcherClassName fully-qualified class name for Grid launcher
+     * @param dependencyContexts common dependency contexts for all Grid nodes
+     * @param hubServer Grid hub server with which node should register
+     * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+     * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
+     * @return {@link LocalGridServer} object for specified node
+     * @throws IOException if an I/O error occurs
+     */
+    LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+            GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException;
     
     /**
      * Get default constructor for this driver's {@link WebElement} implementation.

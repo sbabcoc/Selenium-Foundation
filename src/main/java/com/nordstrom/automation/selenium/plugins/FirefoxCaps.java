@@ -10,27 +10,27 @@ public class FirefoxCaps {
         throw new AssertionError("FirefoxCaps is a static constants class that cannot be instantiated");
     }
 
-    private static final String CAPABILITIES =
-                    "{\"browserName\":\"firefox\", \"maxInstances\":5, \"seleniumProtocol\":\"WebDriver\"}";
-    
-    public static final String BROWSER_NAME = "firefox";
+    public static final String DRIVER_NAME = "firefox";
     public static final String OPTIONS_KEY = "moz:firefoxOptions";
-    public static final String BASELINE = "{\"browserName\":\"firefox\"}";
-    
-    public static final String HEADLESS =
-                    "{\"browserName\":\"firefox\"," +
-                     "\"moz:firefoxOptions\":{" +
-                         "\"args\":[\"-headless\"]" +
-                    "}}";
-    
     private static final String[] PROPERTY_NAMES = { "webdriver.gecko.driver" };
+    
+    private static final String CAPABILITIES =
+                    "{\"browserName\":\"firefox\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+    
+    private static final String BASELINE = "{\"browserName\":\"firefox\"}";
+    
+    private static final String HEADLESS =
+                    "{\"browserName\":\"firefox\"," +
+                     "\"moz:firefoxOptions\":{\"args\":[\"-headless\"]}," +
+                     "\"personality\":\"firefox.headless\"" +
+                    "}";
     
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
-        personalities.put(BROWSER_NAME, BASELINE);
-        personalities.put("firefox.headless", HEADLESS);
+        personalities.put(DRIVER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME + ".headless", HEADLESS);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

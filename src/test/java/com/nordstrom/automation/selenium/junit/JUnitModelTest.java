@@ -8,7 +8,7 @@ import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.model.ExamplePage;
 
 @InitialPage(ExamplePage.class)
-public class JUnitModelTest extends JUnitBase {
+public class JUnitModelTest extends JUnitRoot {
 
     @Test
     public void testBasicPage() {
