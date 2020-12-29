@@ -70,7 +70,7 @@ sourceSets {
     }
     compileClasspath = sourceSets.main.output + configurations.selenium2Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium2Runtime
-    output.resourcesDir = new File(buildRoot, 'classes')
+    output.resourcesDir = "${buildRoot}/classes"
   }
   selenium3 {
     java {
@@ -82,7 +82,7 @@ sourceSets {
     }
     compileClasspath = sourceSets.main.output + configurations.selenium3Compile
     runtimeClasspath = output + compileClasspath + configurations.selenium3Runtime
-    output.resourcesDir = new File(buildRoot, 'classes')
+    output.resourcesDir = "${buildRoot}/classes"
   }
   test {
     java {
@@ -141,6 +141,7 @@ task("${profile}Jar", type: Jar) {
   }
   archiveName = archiveBase + '.jar'
   destinationDir = libsDir
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 clean {
