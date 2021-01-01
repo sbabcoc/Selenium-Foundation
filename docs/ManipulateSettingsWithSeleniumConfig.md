@@ -107,11 +107,37 @@ Currently, plug-ins are provided for the following browsers:
 | Browser | Selenium 2 | Selenium 3 |
 | --- |:---:|:---:|
 | Chrome | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
+| Edge | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
 | Firefox | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
 | HtmlUnit | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
+| Internet Explorer | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
+| Opera | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
 | PhantomJS | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
+| Safari | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
 
-Note that **Selenium Foundation** also includes plug-ins for _Edge_, _Internet Explorer_, _Opera_, and _Safari_ - but at the time of this writing, the drivers for these browsers don't appear to be functional. 
+#### Appium Support
+
+In addition to support for desktop browsers, **Selenium Foundation** provides the ability to drive mobile and desktop applications via Appium. Currently, plug-ins are provided for the following automation engines:
+
+| Automation Engine | Plug-In |
+| --- |:---:|
+| Espresso | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/EspressoPlugin.java) |
+| Mac2 | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/Mac2Plugin.java) |
+| UiAutomator2 | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/UiAutomator2Plugin.java) |
+| Windows | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/WindowsPlugin.java) |
+| XCUITest | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/XCUITestPlugin.java) |
+
+Note that these plug-ins are not version-specific; each will work with either Selenium 2 or Selenium 3 API, and no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need 
+
+Selenium 3
+io.appium
+java-client
+7.4.1
+
+Selenium 2
+io.appium
+java-client
+4.1.2
 
 ### Browser Capabilities
 
