@@ -27,10 +27,10 @@ Each release of **Selenium Foundation** is published in two flavors: `s2` for Se
 
 **`SeleniumConfig`** declares settings and methods related to Selenium WebDriver and Grid configuration. This class is built on the **Settings API**, composed of defaults, stored values, and System properties. **`SeleniumSettings`** declares the constants, property names, and default values for the settings managed by **`SeleniumConfig`**. Defaults can be overridden via System properties or the _settings.properties_ file typically found in your user "home" directory.
 
-The configuration object itself is maintained as a static singleton, ubiquitously available through a static method of the abstract base class:
+The configuration object itself is maintained as a static singleton, ubiquitously available through a static method of the `SeleniumConfig` class:
 
 ```java
-SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+SeleniumConfig config = SeleniumConfig.getConfig();
 ```
 
 ## OVERRIDING DEFAULTS 
@@ -38,7 +38,7 @@ SeleniumConfig config = AbstractSeleniumConfig.getConfig();
 **`SeleniumConfig`** searches a series of locations for a _settings.properties_ file. This file will typically be stored in your user "home" folder. Any settings declared in this file will override the defaults assigned in the **`SeleniumSettings`** enumeration. Settings that are declared as System properties will override both the defaults assigned by **`SeleniumSettings`** and settings declared in _settings.properties_. For example: 
 
 | _settings.properties_ |
-|---|
+|:---|
 | selenium.target.host=my.server.com |
 | selenium.browser.name=chrome |
 
@@ -65,11 +65,12 @@ As mentioned previously, you're able to override defaults in **`SeleniumConfig`*
 
 **`SeleniumConfig`** also provides version-specific default values for several settings:
 
-| Setting | `s2` Default | `s3` Default |
-|---|---|---|
-| **`GRID_LAUNCHER`** | org.openqa.grid.selenium.GridLauncher | org.openqa.grid.selenium.GridLauncherV3 |
-| **`HUB_PORT`** | 4444 | 4445 |
-| **`NODE_CONFIG`** | nodeConfig-s2.json | nodeConfig-s3.json |
+| Setting | Property | `s2` Default | `s3` Default |
+|---|---|---|---|
+| **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncher | org.openqa.grid.selenium.GridLauncherV3 |
+| **`HUB_PORT`** | `selenium.hub.port` | 4444 | 4445 |
+| **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s2.json | hubConfig-s3.json |
+| **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s2.json | nodeConfig-s3.json |
 
 ## THE **`SeleniumSettings`** OBJECT
 
@@ -87,7 +88,7 @@ As indicated previously, the set of drivers supported by the local Grid instance
 
 As of this writing, the unit tests are configured to use [HtmlUnit](http://htmlunit.sourceforge.net/). Described as "a GUI-less browser for Java programs", this browser is perfect for rendering the simple pages used to exercise the features of **Selenium Foundation**. In addition to this ServiceLoader configuration file, the Java project itself must declare the dependencies that are required by the corresponding driver. These dependencies are dependent on the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves.
 
-Here are the Maven dependencies for the **Selenium 2** version of **`HtmlUnitPlugin`**:
+For example, here are the Maven dependencies for the **Selenium 2** version of **`HtmlUnitPlugin`**:
 
 ```xml
 <dependency>
@@ -102,7 +103,9 @@ Here are the Maven dependencies for the **Selenium 2** version of **`HtmlUnitPlu
 </dependency>
 ```
 
-Currently, plug-ins are provided for the following browsers:
+#### Desktop Browser Support
+
+**Selenium Foundation** provides the ability to drive web applications through common desktop browsers. Currently, plug-ins are available for the following browsers:
 
 | Browser | Selenium 2 | Selenium 3 |
 | --- |:---:|:---:|
@@ -115,9 +118,9 @@ Currently, plug-ins are provided for the following browsers:
 | PhantomJS | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
 | Safari | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
 
-#### Appium Support
+#### Appium Automation Engine Support
 
-In addition to support for desktop browsers, **Selenium Foundation** provides the ability to drive mobile and desktop applications via Appium. Currently, plug-ins are provided for the following automation engines:
+In addition to support for desktop browsers, **Selenium Foundation** provides the ability to drive mobile and desktop applications via Appium. Currently, plug-ins are available for the following automation engines:
 
 | Automation Engine | Plug-In |
 | --- |:---:|
@@ -127,17 +130,19 @@ In addition to support for desktop browsers, **Selenium Foundation** provides th
 | Windows | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/WindowsPlugin.java) |
 | XCUITest | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/XCUITestPlugin.java) |
 
-Note that these plug-ins are not version-specific; each will work with either Selenium 2 or Selenium 3 API, and no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need 
+Note that these plug-ins are not version-specific; each will work with either Selenium 2 or Selenium 3 API, and no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](http://appium.io/docs/en/about-appium/getting-started/) on you system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
 
-Selenium 3
-io.appium
-java-client
-7.4.1
+| Item | Setting | Property | Default |
+| --- | --- | --- | --- |
+| **NodeJS** | **`NODE_BINARY_PATH`** | `node.binary.path` | NODE_BINARY_PATH environment variable |
+| **NPM** | **`NPM_BINARY_PATH`** | `npm.binary.path` | (none) |
+| **Appium** | **`APPIUM_BINARY_PATH`** | `appium.binary.path` | APPIUM_BINARY_PATH environment variable |
 
-Selenium 2
-io.appium
-java-client
-4.1.2
+Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**.
+
+| Selenium 2 | Selenium 3 |
+|---|---|
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;4.1.2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 ### Browser Capabilities
 
