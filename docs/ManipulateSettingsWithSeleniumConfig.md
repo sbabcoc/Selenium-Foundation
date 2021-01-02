@@ -62,6 +62,7 @@ As mentioned previously, you're able to override defaults in **`SeleniumConfig`*
 * Convert object to JSON string: `toJson(Object obj)`
 * Get context class names for Grid dependencies: `getDependencyContexts()`
 * Create Grid node configuration file from JSON: `createNodeConfig(String jsonStr, URL hubUrl)`
+* Merge capabilities objects: `mergeCapabilities(Capabilities target, Capabilities change)`
 
 **`SeleniumConfig`** also provides version-specific default values for several settings:
 
@@ -84,7 +85,7 @@ The static `getConfig()` method returns a **`SeleniumConfig`** object that provi
 * `getSeleniumGrid()` - Get an object that represents the active Selenium Grid.
 * `shutdownGrid(boolean localOnly)` - Shut down the active Selenium Grid.
 
-As indicated previously, the set of drivers supported by the local Grid instance managed by **Selenium Foundation** is configured with a ServiceLoader [provider configuration file](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/test/resources/META-INF/services/com.nordstrom.automation.selenium.DriverPlugin). Note that the file that link connects to isn't just a static sample file; it's the actual provider configuration file for the project unit tests.
+As indicated previously, the set of drivers supported by the local Grid instance managed by **Selenium Foundation** is configured with a ServiceLoader [provider configuration file](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/test/resources/META-INF/services/com.nordstrom.automation.selenium.DriverPlugin). Note that the file at that link isn't just a static sample file; it's the actual provider configuration file for the project unit tests.
 
 As of this writing, the unit tests are configured to use [HtmlUnit](http://htmlunit.sourceforge.net/). Described as "a GUI-less browser for Java programs", this browser is perfect for rendering the simple pages used to exercise the features of **Selenium Foundation**. In addition to this ServiceLoader configuration file, the Java project itself must declare the dependencies that are required by the corresponding driver. These dependencies are dependent on the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves.
 
@@ -135,10 +136,10 @@ Note that these plug-ins are not version-specific; each will work with either Se
 | Item | Setting | Property | Default |
 | --- | --- | --- | --- |
 | **NodeJS** | **`NODE_BINARY_PATH`** | `node.binary.path` | NODE_BINARY_PATH environment variable |
-| **NPM** | **`NPM_BINARY_PATH`** | `npm.binary.path` | (none) |
+| **NPM** | **`NPM_BINARY_PATH`** | `npm.binary.path` | _(none)_ |
 | **Appium** | **`APPIUM_BINARY_PATH`** | `appium.binary.path` | APPIUM_BINARY_PATH environment variable |
 
-Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**. Here are the Maven artifact coordinates that correspond to each version of the **Selenium** API:
+Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**. Here are the Maven artifact coordinates that correspond to each version of the **Selenium API**:
 
 | Selenium 2 | Selenium 3 |
 |:---|:---|
@@ -189,6 +190,8 @@ With this implementation, every test method will be provided with a Chrome brows
 | **`TARGET_PATH`** | selenium.target.path | / |
 
 **`TARGET_PORT`** enables you to specify a non-default port number. **`TARGET_PATH`** enables you to specify a base path from which all pages originate. **`TARGET_CREDS`** is used to provide credentials in standard URL format.
+
+There's also a `setTargetUri(URI targetUrl)` method that enables you to set this core value and its component settings dynamically. The **Selenium Foundation** unit tests use this method to set the root of their page navigations to the hub server of the local Grid instance.
 
 ### Timeout Settings and the `WaitType` Enumeration 
 
