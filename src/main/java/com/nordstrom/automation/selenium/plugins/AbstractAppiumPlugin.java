@@ -107,54 +107,54 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         String[] cliArgs = config.getStringArray(SeleniumSettings.APPIUM_CLI_ARGS.key());
         // if args specified
         if (cliArgs != null) {
-        	int head = 0;
-        	int tail = 0;
-        	int next = 0;
-        	int index = 0;
-    		boolean doLoop;
-    		
-    		// iterate over specifications
-        	for (String thisArg : cliArgs) {
-        		doLoop = true;
-        		Matcher matcher = OPTION_PATTERN.matcher(thisArg);
-        		
-        		// until done
-        		while (doLoop) {
-        			// save list end index
-                	index = argsList.size();
-        			
-                	// if option found
-        			if (matcher.find()) {
-        				// add option to args list
-        				argsList.add(matcher.group(1));
-        				// set last value tail 
-        				tail = matcher.start();
-        				// save next value head
-        				next = matcher.end() + 1;
-        			// otherwise
-        			} else {
-        				// set final value tail
-        				tail = thisArg.length();
-        				// set 'done'
-        				doLoop = false;
-        			}
-        			
-        			// if maybe value
-        			if (head < tail) {
-        				// extract potential value, trimming ends
-        				String value = thisArg.substring(head, tail).trim();
-        				
-        				// if value is defined
-        				if ( ! value.isEmpty()) {
-        					// insert at saved index
-        					argsList.add(index, value);
-        				}
-        			}
-        			
-        			// advance
-        			head = next;
-        		}
-        	}
+            int head = 0;
+            int tail = 0;
+            int next = 0;
+            int index = 0;
+            boolean doLoop;
+            
+            // iterate over specifications
+            for (String thisArg : cliArgs) {
+                doLoop = true;
+                Matcher matcher = OPTION_PATTERN.matcher(thisArg);
+                
+                // until done
+                while (doLoop) {
+                    // save list end index
+                    index = argsList.size();
+                    
+                    // if option found
+                    if (matcher.find()) {
+                        // add option to args list
+                        argsList.add(matcher.group(1));
+                        // set last value tail 
+                        tail = matcher.start();
+                        // save next value head
+                        next = matcher.end() + 1;
+                    // otherwise
+                    } else {
+                        // set final value tail
+                        tail = thisArg.length();
+                        // set 'done'
+                        doLoop = false;
+                    }
+                    
+                    // if maybe value
+                    if (head < tail) {
+                        // extract potential value, trimming ends
+                        String value = thisArg.substring(head, tail).trim();
+                        
+                        // if value is defined
+                        if ( ! value.isEmpty()) {
+                            // insert at saved index
+                            argsList.add(index, value);
+                        }
+                    }
+                    
+                    // advance
+                    head = next;
+                }
+            }
         }
         
         argsList.add("--nodeconfig");
