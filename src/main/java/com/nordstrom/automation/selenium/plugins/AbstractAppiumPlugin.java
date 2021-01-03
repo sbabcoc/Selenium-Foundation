@@ -8,6 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.grid.common.GridRole;
@@ -35,6 +38,8 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     private static final String[] DEPENDENCY_CONTEXTS = {};
     private static final String[] APPIUM_PATH_TAIL = { "appium", "build", "lib", "main.js" };
     private static final String[] PROPERTY_NAMES = {};
+    
+    private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
     
     private String browserName;
     
@@ -98,9 +103,58 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add("--port");
         argsList.add(portNum.toString());
         
-        String cliArgs = config.getString(SeleniumSettings.APPIUM_CLI_ARGS.key());
+        // allow specification of multiple command line arguments
+        String[] cliArgs = config.getStringArray(SeleniumSettings.APPIUM_CLI_ARGS.key());
+        // if args specified
         if (cliArgs != null) {
-            argsList.add(cliArgs);
+        	int head = 0;
+        	int tail = 0;
+        	int next = 0;
+        	int index = 0;
+    		boolean doLoop;
+    		
+    		// iterate over specifications
+        	for (String thisArg : cliArgs) {
+        		doLoop = true;
+        		Matcher matcher = OPTION_PATTERN.matcher(thisArg);
+        		
+        		// until done
+        		while (doLoop) {
+        			// save list end index
+                	index = argsList.size();
+        			
+                	// if option found
+        			if (matcher.find()) {
+        				// add option to args list
+        				argsList.add(matcher.group(1));
+        				// set last value tail 
+        				tail = matcher.start();
+        				// save next value head
+        				next = matcher.end() + 1;
+        			// otherwise
+        			} else {
+        				// set final value tail
+        				tail = thisArg.length();
+        				// set 'done'
+        				doLoop = false;
+        			}
+        			
+        			// if maybe value
+        			if (head < tail) {
+        				// extract potential value, trimming ends
+        				String value = thisArg.substring(head, tail).trim();
+        				
+        				// if value is defined
+        				if ( ! value.isEmpty()) {
+        					// insert at saved index
+        					argsList.add(index, value);
+        				}
+        			}
+        			
+        			// advance
+        			head = next;
+        		}
+        	}
         }
         
         argsList.add("--nodeconfig");
