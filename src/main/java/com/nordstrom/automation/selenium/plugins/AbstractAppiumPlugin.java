@@ -86,18 +86,11 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add(findMainScript().getAbsolutePath());
         
         String hostUrl = GridUtility.getLocalHost();
-        int port = 0;
+        Integer portNum = Integer.valueOf(PortProber.findFreePort());
         
         // specify server host
         argsList.add("--address");
         argsList.add(hostUrl);
-        
-        Integer portNum = port;
-        // if port auto-select spec'd
-        if (portNum.intValue() == 0) {
-            // acquire available port
-            portNum = Integer.valueOf(PortProber.findFreePort());
-        }
         
         // specify server port
         argsList.add("--port");
