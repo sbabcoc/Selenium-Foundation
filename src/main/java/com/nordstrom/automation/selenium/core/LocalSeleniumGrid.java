@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
 import org.openqa.grid.common.GridRole;
-import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
@@ -186,11 +185,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             // add ExamplePage servlets
             argsList.add(OPT_SERVLETS);
             argsList.add(SERVLETS);
-        // otherwise
-        } else {
-            // add LifecycleServlet
-            argsList.add(OPT_SERVLETS);
-            argsList.add(LifecycleServlet.class.getName());
         }
         
         String hostUrl = GridUtility.getLocalHost();
