@@ -13,27 +13,16 @@ The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium
 
 To add a dependency on **Selenium Foundation** for Maven, use the following:
 
-```xml
-<dependency>
-  <groupId>com.nordstrom.ui-tools</groupId>
-  <artifactId>selenium-foundation</artifactId>
-  <!-- either Selenium 2 support: -->
-  <version>18.4.1-s2</version>
-  <!-- or Selenium 3 support: -->
-  <version>18.4.1-s3</version>
-</dependency>
-```
+| Selenium 2 | Selenium 3 |
+|:---|:---|
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;19.0.3-s2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;19.0.3-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 To add a dependency for Gradle:
 
-```java
-dependencies {
-  // either Selenium 2 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:18.4.1-s2'
-  // or Selenium 3 support:
-  compile 'com.nordstrom.ui-tools:selenium-foundation:18.4.1-s3'
-}
-```
+| Platform | Dependency |
+|:---:|:---|
+| **Selenium 2** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:19.0.3-s2'<br/>}</pre> |
+| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:19.0.3-s3'<br/>}</pre> |
 
 ### Building Selenium Foundation
 
