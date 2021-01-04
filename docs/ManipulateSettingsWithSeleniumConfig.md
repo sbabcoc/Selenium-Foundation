@@ -139,11 +139,15 @@ Note that these plug-ins are not version-specific; each will work with either Se
 | **NPM** | **`NPM_BINARY_PATH`** | `npm.binary.path` | _(none)_ |
 | **Appium** | **`APPIUM_BINARY_PATH`** | `appium.binary.path` | APPIUM_BINARY_PATH environment variable |
 
-Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**. Here are the Maven artifact coordinates that correspond to each version of the **Selenium API**:
+Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency in your Java projects to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**. Here are the Maven artifact coordinates that correspond to each version of the **Selenium API**:
 
 | Selenium 2 | Selenium 3 |
 |:---|:---|
 | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;4.1.2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+
+#### Appium Server Arguments
+
+**Selenium Foundation** gives you the ability to completely control the configuration of the `Appium` Grid node that it uses to provide sessions for your tests, via the **`APPIUM_CLI_ARGS`** setting. This setting can define multiple `Appium` server arguments together, and can be declared multiple times when specified in the _settings.properties_ file. These are presented to **Selenium Foundation** as a collection of values that it processes and passes on to 'Appium` when it launches the Grid node.
 
 ### Browser Capabilities
 
