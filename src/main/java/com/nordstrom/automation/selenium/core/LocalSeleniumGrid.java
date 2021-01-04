@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
 import org.openqa.grid.common.GridRole;
+import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
@@ -73,7 +74,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
         String[] dependencyContexts = config.getDependencyContexts();
         long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
-        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
+        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(0));
         String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
         Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
         Path outputPath = GridUtility.getOutputPath(config, GridRole.HUB);
@@ -159,7 +160,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
      * @param role role of Grid server being started
-     * @param port port that Grid server should use; -1 to specify auto-configuration
+     * @param port port that Grid server should use; 0 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
@@ -182,8 +183,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         // if starting a Grid hub
         if (role == GridRole.HUB) {
+            // add ExamplePage servlets
             argsList.add(OPT_SERVLETS);
             argsList.add(SERVLETS);
+        // otherwise
+        } else {
+            // add LifecycleServlet
+            argsList.add(OPT_SERVLETS);
+            argsList.add(LifecycleServlet.class.getName());
         }
         
         String hostUrl = GridUtility.getLocalHost();

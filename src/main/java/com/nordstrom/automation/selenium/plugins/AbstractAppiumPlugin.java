@@ -170,7 +170,6 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      */
     @Override
     public Implementation getWebElementCtor(WebDriver driver, Class<? extends WebElement> refClass) {
-        // TODO Auto-generated method stub
         return null;
     }
     

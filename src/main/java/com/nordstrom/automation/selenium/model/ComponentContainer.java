@@ -166,7 +166,7 @@ public abstract class ComponentContainer
     }
     
     /**
-     * Get SearchContextWait object with 10 second timeout
+     * Get SearchContextWait object with 15 second timeout
      * 
      * @param context search context
      * @return new SearchContextWait object
@@ -595,7 +595,7 @@ public abstract class ComponentContainer
      *             value of the {@code host} element is empty, the host of {@code targetUri} is set to {@code null}.
      *             </li>
      *         <li>If the {@code port} element is specified, its value overrides the port of {@code targetUri}. If the
-     *             value of the {@code port} element is empty, the port of {@code targetUri} is set to <b>-1</b>.</li>
+     *             value of the {@code port} element is empty, the port of {@code targetUri} is set to <b>0</b>.</li>
      *     </ul></li>
      *     <li>For <b>HTTP</b> URLs that require query parameters, these parameters must be included in the
      *         {@code value} element of the specified {@link PageUrl} annotation. The {@code params} element of the
@@ -652,7 +652,7 @@ public abstract class ComponentContainer
             }
             
             if (!PLACEHOLDER.equals(port)) {
-                builder.setPort(port.isEmpty() ? -1 : Integer.parseInt(port));
+                builder.setPort(port.isEmpty() ? 0 : Integer.parseInt(port));
             }
             
             result = builder.toString();
