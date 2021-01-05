@@ -4,9 +4,9 @@
 
 | Application | Driver |
 |---|---|
-| 71.0.3578.98 (latest) | [2.45](https://chromedriver.storage.googleapis.com/index.html?path=2.45/) |
+| 87.0.4280.88 | [87.0.4280.88](https://chromedriver.storage.googleapis.com/index.html?path=87.0.4280.88/) |
 
-```
+```xml
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-chrome-driver</artifactId>
@@ -18,9 +18,9 @@
 
 | Application | Driver |
 |---|---|
-| ? | ? |
+| 87.0.664.66 | [87.0.664.66 (x64)](https://msedgedriver.azureedge.net/87.0.664.66/edgedriver_win64.zip) |
 
-```
+```xml
 <dependency>
   <groupId>org.seleniumhq.selenium</groupId>
   <artifactId>selenium-edge-driver</artifactId>
@@ -32,9 +32,9 @@
 
 | Application | Driver |
 |---|---|
-| [47.0.1](https://ftp.mozilla.org/pub/firefox/releases/47.0.1/) | N/A |
+| [84.0.1](https://ftp.mozilla.org/pub/firefox/releases/84.0.1/) | N/A |
 
-```
+```xml
 <dependency>
   <groupId>org.seleniumhq.selenium</groupId>
   <artifactId>selenium-firefox-driver</artifactId>
@@ -46,7 +46,7 @@
 
 **HtmlUnit** is a headless browser composed entirely of Maven dependencies. No application or driver binaries exist for **HtmlUnit**.
 
-```
+```xml
 <dependency>
   <groupId>net.sourceforge.htmlunit</groupId>
   <artifactId>htmlunit</artifactId>
@@ -63,9 +63,9 @@
 
 | Application | Driver |
 |---|---|
-| [11.0.9600.19129CO](http://g.msn.com/1me10IE11ENUS/WOL_Win7_64Full) | [2.53.1](https://selenium-release.storage.googleapis.com/index.html?path=2.53/) |
+| [11.00.9600.16428](https://www.microsoft.com/en-us/download/confirmation.aspx?id=41628) | [2.53.1](https://selenium-release.storage.googleapis.com/index.html?path=2.53/) |
 
-```
+```xml
 <dependency>
   <groupId>org.seleniumhq.selenium</groupId>
   <artifactId>selenium-ie-driver</artifactId>
@@ -77,9 +77,9 @@
 
 | Application | Driver |
 |---|---|
-| [40.0.2308.90](https://ftp.opera.com/pub/opera/desktop/40.0.2308.90/) | [0.2.2](https://github.com/operasoftware/operachromiumdriver/releases/tag/v0.2.2) |
+| [73.0.3856.284](https://ftp.opera.com/pub/opera/desktop/73.0.3856.284/) | [87.0.4280.67](https://github.com/operasoftware/operachromiumdriver/releases/tag/v.87.0.4280.67) |
 
-```
+```xml
 <!-- NOTE: The Selenium Foundation project includes this artifact -->
 <dependency>
   <groupId>org.seleniumhq.selenium</groupId>
@@ -96,7 +96,7 @@
 |---|---|
 | N/A | [2.1.1](https://bitbucket.org/ariya/phantomjs/downloads/) |
 
-```
+```xml
 <dependency>
   <groupId>com.codeborne</groupId>
   <artifactId>phantomjsdriver</artifactId>
@@ -108,9 +108,9 @@
 
 | Application | Driver |
 |---|---|
-| ? | ? |
+| 14.0.2 | N/A |
 
-```
+```xml
 <dependency>
   <groupId>org.seleniumhq.selenium</groupId>
   <artifactId>selenium-safari-driver</artifactId>
