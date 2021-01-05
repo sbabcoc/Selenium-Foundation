@@ -66,64 +66,236 @@ public abstract class AbstractSeleniumConfig extends
      * {@code settings.properties} file and System property declarations.
      */
     public enum SeleniumSettings implements SettingsCore.SettingsAPI {
-        /** name: <b>selenium.target.scheme</b> <br> default: <b>http</b> */
-        TARGET_SCHEME("selenium.target.scheme", "http"),
-        /** name: <b>selenium.target.creds</b> <br> default: {@code null} */
-        TARGET_CREDS("selenium.target.creds", null),
-        /** name: <b>selenium.target.host</b> <br> default: <b>localhost</b> */
-        TARGET_HOST("selenium.target.host", "localhost"),
-        /** name: <b>selenium.target.port</b> <br> default: {@code null} */
-        TARGET_PORT("selenium.target.port", null),
-        /** name: <b>selenium.target.path</b> <br> default: <b>/</b> */
-        TARGET_PATH("selenium.target.path", "/"),
-        /** name: <b>selenium.grid.shutdown</b> <br> default: <b>true</b> */
-        SHUTDOWN_GRID("selenium.grid.shutdown", "true"),
-        /** name: <b>selenium.grid.launcher</b> <br> default: {@code null} */
-        GRID_LAUNCHER("selenium.grid.launcher", null),
-        /** name: <b>selenium.hub.config</b> <br> default: <b>hubConfig.json</b> */
-        HUB_CONFIG("selenium.hub.config", null),
         /**
-         * This is URL for the Selenium Grid endpoint: [scheme:][//authority]/wd/hub
+         * Scheme component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
          * <p>
-         * name: <b>selenium.hub.host</b> <br> default: {@code null} */
+         * name: <b>selenium.target.scheme</b><br>
+         * default: <b>http</b>
+         */
+        TARGET_SCHEME("selenium.target.scheme", "http"),
+        
+        /**
+         * Credentials component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
+         * <p>
+         * name: <b>selenium.target.creds</b><br>
+         * default: {@code null}
+         */
+        TARGET_CREDS("selenium.target.creds", null),
+        
+        /**
+         * Host component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
+         * <p>
+         * name: <b>selenium.target.host</b><br>
+         * default: <b>localhost</b>
+         */
+        TARGET_HOST("selenium.target.host", "localhost"),
+        
+        /**
+         * Port component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
+         * <p>
+         * name: <b>selenium.target.port</b><br>
+         * default: {@code null}
+         */
+        TARGET_PORT("selenium.target.port", null),
+        
+        /**
+         * Path component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
+         * <p>
+         * name: <b>selenium.target.path</b><br>
+         * default: <b>/</b>
+         */
+        TARGET_PATH("selenium.target.path", "/"),
+        
+        /**
+         * This setting specifies whether the local <b>Selenium Grid</b> instance will be shut down at the end of the
+         * test run.
+         * <p>
+         * name: <b>selenium.grid.shutdown</b><br>
+         * default: <b>true</b>
+         */
+        SHUTDOWN_GRID("selenium.grid.shutdown", "true"),
+        
+        /**
+         * This setting specifies the fully-qualified name of the <b>GridLauncher</b> class, which provides a
+         * command-line interface for configuring and launching <b>Selenium Grid</b> servers implemented in Java.
+         * <p>
+         * name: <b>selenium.grid.launcher</b><br>
+         * Selenium 2: <b>org.openqa.grid.selenium.GridLauncher</b><br>
+         * Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b>
+         */
+        GRID_LAUNCHER("selenium.grid.launcher", null),
+        
+        /**
+         * This setting specifies the configuration file name/path for the local <b>Selenium Grid</b> hub server.
+         * <p>
+         * name: <b>selenium.hub.config</b><br>
+         * Selenium 2: <b>hubConfig-s2.json</b><br>
+         * Selenium 3: <b>hubConfig-s3.json</b>
+         */
+        HUB_CONFIG("selenium.hub.config", null),
+        
+        /**
+         * This is the URL for the <b>Selenium Grid</b> endpoint: [scheme:][//authority]/wd/hub
+         * <p>
+         * name: <b>selenium.hub.host</b><br>
+         * Selenium 2: <b>http://&lt;{@code localhost}&gt;:4444/wd/hub</b><br>
+         * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4445/wd/hub</b>
+         */
         HUB_HOST("selenium.hub.host", null),
-        /** name: <b>selenium.hub.port</b> <br> default: {@code null} */
+        
+        /**
+         * This is the port assigned to the local <b>Selenium Grid</b> hub server.
+         * <p>
+         * name: <b>selenium.hub.port</b><br>
+         * Selenium 2: <b>4444</b><br>
+         * Selenium 3: <b>4445</b>
+         */
         HUB_PORT("selenuim.hub.port", null),
-        /** name: <b>selenium.hub.shutdown</b> <br> default: <b>/lifecycle-manager?action=shutdown</b> */
-        HUB_SHUTDOWN("selenium.hub.shutdown", "/lifecycle-manager?action=shutdown"),
-        /** name: <b>selenium.node.config</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies the configuration template name/path for local <b>Selenium Grid</b> node servers.
+         * <p>
+         * name: <b>selenium.node.config</b><br>
+         * Selenium 2: <b>nodeConfig-s2.json</b><br>
+         * Selenium 3: <b>nodeConfig-s3.json</b>
+         */
         NODE_CONFIG("selenium.node.config", null),
-        /** name: <b>selenium.node.shutdown</b> <br> default: <b>/extra/LifecycleServlet?action=shutdown</b> */
-        NODE_SHUTDOWN("selenium.node.shutdown", "/extra/LifecycleServlet?action=shutdown"),
-        /** name: <b>selenium.browser.name</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies the browser name or "personality" for new session requests.
+         * <p>
+         * name: <b>selenium.browser.name</b><br>
+         * default: {@code null}
+         */
         BROWSER_NAME("selenium.browser.name", null),
-        /** name: <b>selenium.browser.caps</b> <br> default: {@link AbstractSeleniumConfig#DEFAULT_CAPS DEFAULT_CAPS} */
+        
+        /**
+         * If {@link #BROWSER_NAME} is undefined, this setting specifies the {@link Capabilities} for new session
+         * requests.
+         * <p>
+         * name: <b>selenium.browser.caps</b><br>
+         * default: {@link #DEFAULT_CAPS}
+         */
         BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
-        /** name: <b>selenium.timeout.pageload</b> <br> default: <b>30</b> */
+        
+        /**
+         * This setting specifies the maximum allowed interval for a page to finish loading.
+         * <p>
+         * name: <b>selenium.timeout.pageload</b><br>
+         * default: <b>30</b>
+         */
         PAGE_LOAD_TIMEOUT("selenium.timeout.pageload", "30"),
-        /** name: <b>selenium.timeout.implied</b> <br> default: <b>15</b> */
+        
+        /**
+         * This setting specifies the maximum amount of time the driver will search for an element.
+         * <p>
+         * name: <b>selenium.timeout.implied</b><br>
+         * default: <b>15</b>
+         */
         IMPLIED_TIMEOUT("selenium.timeout.implied", "15"),
-        /** name: <b>selenium.timeout.script</b> <br> default: <b>30</b> */
+        
+        /**
+         * This setting specifies the maximum allowed interval for an asynchronous script to finish.
+         * <p>
+         * name: <b>selenium.timeout.script</b><br>
+         * default: <b>30</b>
+         */
         SCRIPT_TIMEOUT("selenium.timeout.script", "30"),
-        /** name: <b>selenium.timeout.wait</b> <br> default: <b>15</b> */
+        
+        /**
+         * This setting specifies the maximum amount of time to wait for a search context event.
+         * <p>
+         * name: <b>selenium.timeout.wait</b><br>
+         * default: <b>15</b>
+         */
         WAIT_TIMEOUT("selenium.timeout.wait", "15"),
-        /** name: <b>selenium.timeout.host</b> <br> default: <b>30</b> */
+        
+        /**
+         * This setting specifies the maximum amount of time to wait for a Grid server to launch.
+         * <p>
+         * name: <b>selenium.timeout.host</b><br>
+         * default: <b>30</b>
+         */
         HOST_TIMEOUT("selenium.timeout.host", "30"),
-        /** name: <b>selenium.grid.working.dir</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies the working directory for local <b>Selenium Grid</b> server processes.
+         * <p>
+         * name: <b>selenium.grid.working.dir</b><br>
+         * default: {@code null}
+         */
         GRID_WORKING_DIR("selenium.grid.working.dir", null),
-        /** name: <b>selenium.grid.log.folder</b> <br> default: <b>logs</b> */
+        
+        /**
+         * This setting specifies the log file folder for local <b>Selenium Grid</b> server processes.
+         * <p>
+         * <b>NOTE</b>: If a relative path is specified, {@link #GRID_WORKING_DIR} is used as parent. If that's
+         * unspecified, the working directory for the current Java process is used (i.e. - {@code user.dir}).
+         * <p>
+         * name: <b>selenium.grid.log.folder</b><br>
+         * default: <b>logs</b>
+         */
         GRID_LOGS_FOLDER("selenium.grid.log.folder", "logs"),
-        /** name: <b>selenium.grid.no.redirect</b> <br> default: {@code false} */
+        
+        /**
+         * This setting specifies whether output from local <b>Selenium Grid</b> servers is captured in log files.
+         * <p>
+         * name: <b>selenium.grid.no.redirect</b><br>
+         * default: {@code false}
+         */
         GRID_NO_REDIRECT("selenium.grid.no.redirect", "false"),
-        /** name: <b>selenium.context.platform</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies the target platform for the current test context.
+         * <p>
+         * name: <b>selenium.context.platform</b><br>
+         * default: {@code null}
+         */
         CONTEXT_PLATFORM("selenium.context.platform", null),
-        /** name: <b>appium.cli.args</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies server arguments passes on to {@code Appium} when it's launched as a local
+         * <b>Selenium Grid</b> node server.
+         * <p>
+         * <b>NOTE</b>: This setting can define multiple {@code Appium} server arguments together, and can be
+         * declared multiple times when specified in the <i>settings.properties</i> file.
+         * <p>
+         * name: <b>appium.cli.args</b><br>
+         * default: {@code null}
+         */
         APPIUM_CLI_ARGS("appium.cli.args", null),
-        /** name: <b>appium.binary.path</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies the path to the {@code Appium} main script file.
+         * <p>
+         * <b>NOTE</b>: If this setting is undefined, <b>Selenium Foundation</b> will check for the main script file in
+         * the {@code Appium} package in the global Node package repository.
+         * <p>
+         * name: <b>appium.binary.path</b><br>
+         * default: value of <b>APPIUM_BINARY_PATH</b> environment variable
+         */
         APPIUM_BINARY_PATH("appium.binary.path", null),
-        /** name: <b>node.binary.path</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies the path to the {@code NodeJS} JavaScript runtime.
+         * <p>
+         * <b>NOTE</b>: If this setting is unspecified, <b>Selenium Foundation</b> will search for {@code NodeJS} on
+         * the System path.
+         * <p>
+         * name: <b>node.binary.path</b><br>
+         * default: value of <b>NODE_BINARY_PATH</b> environment variable
+         */
         NODE_BINARY_PATH("node.binary.path", null),
-        /** name: <b>npm.binary.path</b> <br> default: {@code null} */
+        
+        /**
+         * This setting specifies the path to the {@code NPM} (Node Package Manager) utility.
+         * <p>
+         * <b>NOTE</b>: If this setting is unspecified, <b>Selenium Foundation</b> will search for {@code NPM} on the
+         * System path.
+         * <p>
+         * name: <b>npm.binary.path</b><br>
+         * default: {@code null}
+         */
         NPM_BINARY_PATH("npm.binary.path", null);
         
         private String propertyName;
@@ -213,7 +385,7 @@ public abstract class AbstractSeleniumConfig extends
         }
         
         /**
-         * Get the timeout interval for this wait type.<br>
+         * Get the timeout interval for this wait type.
          * 
          * @param config {@link SeleniumConfig} object to interrogate
          * @return wait type timeout interval
@@ -295,8 +467,8 @@ public abstract class AbstractSeleniumConfig extends
         if (hubUrl == null) {
             String hostStr = getString(SeleniumSettings.HUB_HOST.key());
             if (hostStr == null) {
-                Integer portNum = getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(-1));
-                if (portNum.intValue() != -1) {
+                Integer portNum = getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(0));
+                if (portNum.intValue() != 0) {
                     hostStr = "http://" + GridUtility.getLocalHost() + ":" + portNum.toString() + GridServer.HUB_BASE;
                 }
             }

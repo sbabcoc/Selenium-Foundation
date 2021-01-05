@@ -56,7 +56,7 @@ import com.nordstrom.automation.selenium.model.ComponentContainer;
  *             value of the {@code host} element is empty, the host of {@code targetUri} is set to {@code null}.
  *             </li>
  *         <li>If the {@code port} element is specified, its value overrides the port of {@code targetUri}. If the
- *             value of the {@code port} element is empty, the port of {@code targetUri} is set to <b>-1</b>.</li>
+ *             value of the {@code port} element is empty, the port of {@code targetUri} is set to <b>0</b>.</li>
  *     </ul></li>
  *     <li>For <b>HTTP</b> URLs that require query parameters, these parameters must be included in the
  *         {@code value} element of the specified {@link PageUrl} annotation. The {@code params} element of the
