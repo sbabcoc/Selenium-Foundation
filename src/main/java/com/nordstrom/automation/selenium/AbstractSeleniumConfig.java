@@ -67,7 +67,7 @@ public abstract class AbstractSeleniumConfig extends
      */
     public enum SeleniumSettings implements SettingsCore.SettingsAPI {
         /**
-         * Scheme component for the {@link #getTargetURL target URI}.
+         * Scheme component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
          * <p>
          * name: <b>selenium.target.scheme</b><br>
          * default: <b>http</b>
@@ -75,7 +75,7 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_SCHEME("selenium.target.scheme", "http"),
         
         /**
-         * Credentials component for the {@link #getTargetURL target URI}.
+         * Credentials component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
          * <p>
          * name: <b>selenium.target.creds</b><br>
          * default: {@code null}
@@ -83,7 +83,7 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_CREDS("selenium.target.creds", null),
         
         /**
-         * Host component for the {@link #getTargetURL target URI}.
+         * Host component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
          * <p>
          * name: <b>selenium.target.host</b><br>
          * default: <b>localhost</b>
@@ -91,7 +91,7 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_HOST("selenium.target.host", "localhost"),
         
         /**
-         * Port component for the {@link #getTargetURL target URI}.
+         * Port component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
          * <p>
          * name: <b>selenium.target.port</b><br>
          * default: {@code null}
@@ -99,7 +99,7 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_PORT("selenium.target.port", null),
         
         /**
-         * Path component for the {@link #getTargetURL target URI}.
+         * Path component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
          * <p>
          * name: <b>selenium.target.path</b><br>
          * default: <b>/</b>
@@ -255,7 +255,7 @@ public abstract class AbstractSeleniumConfig extends
         
         /**
          * This setting specifies server arguments passes on to {@code Appium} when it's launched as a local
-         * <Selenium Grid</b> node server.
+         * <b>Selenium Grid</b> node server.
          * <p>
          * <b>NOTE</b>: This setting can define multiple {@code Appium} server arguments together, and can be
          * declared multiple times when specified in the <i>settings.properties</i> file.
