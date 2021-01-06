@@ -16,6 +16,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import static net.bytebuddy.matcher.ElementMatchers.hasMethodName;
+import static net.bytebuddy.matcher.ElementMatchers.hasSignature;
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static net.bytebuddy.matcher.ElementMatchers.not;
 
@@ -91,9 +92,24 @@ public abstract class Enhanceable<T> {
                 
                 ElementMatcher.Junction<MethodDescription> matcher = ElementMatchers.none();
                 
+                // iterate over bypass classes/interfaces
                 for (Class<?> bypassClass : bypassClasses) {
-                    for (Method method : bypassClass.getMethods()) {
-                        matcher = matcher.or(is(method));
+                    // if bypassing an interface
+                    if (bypassClass.isInterface()) {
+                        // iterate over interface methods
+                        for (Method method : bypassClass.getMethods()) {
+                            // match this method's signature
+                            matcher = matcher.or(
+                                    hasSignature(new MethodDescription.ForLoadedMethod(method)
+                                            .asSignatureToken()));
+                        }
+                    // otherwise (bypassing a class)
+                    } else {
+                        // iterate over class methods
+                        for (Method method : bypassClass.getMethods()) {
+                            // match this method exactly
+                            matcher = matcher.or(is(method));
+                        }
                     }
                 }
                 
