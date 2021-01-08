@@ -62,15 +62,16 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      * {@inheritDoc}
      */
     @Override
-    public Optional<Page> nabInitialPage() {
-        return TestBase.optionalOf(initialPage);
+    @SuppressWarnings("unchecked")
+    public <T extends Page> Optional<T> nabInitialPage() {
+        return (Optional<T>) TestBase.optionalOf(initialPage);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setInitialPage(final Page pageObj) {
+    public <T extends Page> void setInitialPage(final T pageObj) {
         initialPage = pageObj;
     }
     
