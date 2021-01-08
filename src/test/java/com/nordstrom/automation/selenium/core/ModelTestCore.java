@@ -205,7 +205,7 @@ public class ModelTestCore {
     }
     
     private static ExamplePage getPage(TestBase instance) {
-        return (ExamplePage) instance.getInitialPage();
+        return instance.getInitialPage();
     }
 
     public static void setHubAsTarget() {

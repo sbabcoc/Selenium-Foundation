@@ -139,15 +139,15 @@ public abstract class TestNgBase extends TestBase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Optional<Page> nabInitialPage() {
-        return (Optional<Page>) TestAttribute.INITIAL_PAGE.nab();
+    public <T extends Page> Optional<T> nabInitialPage() {
+        return (Optional<T>) TestAttribute.INITIAL_PAGE.nab();
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setInitialPage(final Page initialPage) {
+    public <T extends Page> void setInitialPage(final T initialPage) {
         TestAttribute.INITIAL_PAGE.track(initialPage);
     }
     

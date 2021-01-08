@@ -76,13 +76,14 @@ public abstract class TestBase {
     /**
      * Get the initial page for the current test.
      * 
+     * @param <T> subclass of {@link Page}
      * @return initial page for the current test
      * @throws InitialPageNotSpecifiedException No initial page has been specified
      */
-    public Page getInitialPage() {
-        Optional<Page> optInitialPage = nabInitialPage();
+    public <T extends Page> T getInitialPage() {
+        Optional<T> optInitialPage = nabInitialPage();
         if (optInitialPage.isPresent()) {
-            return optInitialPage.get();
+            return (T) optInitialPage.get();
         }
         throw new InitialPageNotSpecifiedException();
     }
@@ -101,16 +102,18 @@ public abstract class TestBase {
      * <b>NOTE</b>: It's uncommon that you'll need to access this {@link Optional} value directly. You'll typically
      * use the {@link #getInitialPage} and {@link #hasInitialPage} methods instead.
      * 
+     * @param <T> subclass of {@link Page}
      * @return (optional) initial page for the current test
      */
-    public abstract Optional<Page> nabInitialPage();
+    public abstract <T extends Page> Optional<T> nabInitialPage();
     
     /**
      * Set the initial page for the current test.
      * 
+     * @param <T> subclass of {@link Page}
      * @param pageObj initial page for the current test
      */
-    public abstract void setInitialPage(Page pageObj);
+    public abstract <T extends Page> void setInitialPage(T pageObj);
     
     /**
      * Get test run output directory.
