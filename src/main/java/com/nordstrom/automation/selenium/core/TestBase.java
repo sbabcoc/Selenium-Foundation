@@ -83,7 +83,7 @@ public abstract class TestBase {
     public <T extends Page> T getInitialPage() {
         Optional<T> optInitialPage = nabInitialPage();
         if (optInitialPage.isPresent()) {
-            return (T) optInitialPage.get();
+            return optInitialPage.get();
         }
         throw new InitialPageNotSpecifiedException();
     }
