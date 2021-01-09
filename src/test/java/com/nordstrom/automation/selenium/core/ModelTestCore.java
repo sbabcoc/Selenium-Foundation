@@ -206,7 +206,7 @@ public class ModelTestCore {
     
     public static void setHubAsTarget() {
         SeleniumConfig config = SeleniumConfig.getConfig();
-        URL hubUrl = config.getHubUrl();
+        URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
         try {
             URI targetUri = new URIBuilder()
                     .setScheme(hubUrl.getProtocol())
