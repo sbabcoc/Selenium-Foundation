@@ -179,13 +179,11 @@ public class SeleniumGrid {
      * @throws TimeoutException if host timeout interval exceeded
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException, InterruptedException, TimeoutException {
-        if (GridUtility.isHubActive(hubUrl)) {
+        if ((hubUrl != null) && GridUtility.isHubActive(hubUrl)) {
+            // ensure that hub port is available as a discrete setting
+            System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
             return new SeleniumGrid(config, hubUrl);
         } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
-            if (hubUrl != null) {
-                // ensure that hub port is available as a discrete setting
-                System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
-            }
             return LocalSeleniumGrid.launch(config, config.getHubConfigPath());
         }
         throw new IllegalStateException("Specified remote hub URL '" + hubUrl + "' isn't active");

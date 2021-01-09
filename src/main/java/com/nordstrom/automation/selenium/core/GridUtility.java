@@ -92,6 +92,8 @@ public final class GridUtility {
      * @throws IOException The request triggered an I/O exception
      */
     public static HttpResponse getHttpResponse(final URL hostUrl, final String request) throws IOException {
+        Objects.requireNonNull(hostUrl, "[hostUrl] must be non-null");
+        Objects.requireNonNull(request, "[request] must be non-null");
         HttpClient client = HttpClientBuilder.create().build();
         URL sessionURL = new URL(hostUrl.getProtocol(), hostUrl.getAuthority(), request);
         BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
