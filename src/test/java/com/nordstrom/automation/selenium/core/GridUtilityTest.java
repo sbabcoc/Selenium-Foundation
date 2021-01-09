@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeoutException;
 
 import org.testng.annotations.BeforeClass;
@@ -30,11 +32,28 @@ public class GridUtilityTest extends TestNgBase {
         }
     }
     
+    @NoDriver
+    @Test(expectedExceptions = {NullPointerException.class},
+            expectedExceptionsMessageRegExp = "\\[hostUrl\\] must be non-null")
+    public void testHostNullCheck() {
+        GridUtility.isHostActive(null, "/");
+    }
+    
+    @NoDriver
+    @Test(expectedExceptions = {NullPointerException.class},
+            expectedExceptionsMessageRegExp = "\\[request\\] must be non-null")
+    public void testRequestNullCheck() throws MalformedURLException {
+        URL hostUrl = new URL("http://" + GridUtility.getLocalHost());
+        GridUtility.isHostActive(hostUrl, null);
+    }
+    
     @Test
     @NoDriver
     public void testIsActive() throws IOException, InterruptedException, TimeoutException {
         SeleniumConfig config = SeleniumConfig.getConfig();
-        assertFalse(GridUtility.isHubActive(config.getHubUrl()), "Configured local hub should initially be inactive");
+        if (config.getHubUrl() != null) {
+            assertFalse(GridUtility.isHubActive(config.getHubUrl()), "Configured local hub should initially be inactive");
+        }
         config.getSeleniumGrid();
         assertTrue(GridUtility.isHubActive(config.getHubUrl()), "Configured local hub should have been activated");
     }
