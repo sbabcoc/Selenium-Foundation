@@ -458,20 +458,12 @@ public abstract class AbstractSeleniumConfig extends
     
     /**
      * Get the URL for the configured Selenium Grid hub host.
-     * <p>
-     * <b>NOTE</b>: If this configuration lacks a hub host, but defines a hub port, a 'localhost' URL is assembled.
      * 
-     * @return {@link URL} for hub host; {@code null} if configuration lacks both hub host and hub port
+     * @return {@link URL} for hub host; {@code null} if hub host is unspecified
      */
     public synchronized URL getHubUrl() {
         if (hubUrl == null) {
             String hostStr = getString(SeleniumSettings.HUB_HOST.key());
-            if (hostStr == null) {
-                Integer portNum = getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(0));
-                if (portNum.intValue() != 0) {
-                    hostStr = "http://" + GridUtility.getLocalHost() + ":" + portNum.toString() + GridServer.HUB_BASE;
-                }
-            }
             if (hostStr != null) {
                 try {
                     hubUrl = new URL(hostStr);

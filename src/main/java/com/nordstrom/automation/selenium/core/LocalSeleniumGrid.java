@@ -81,8 +81,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                         hubPort, hubConfigPath, workingPath, outputPath);
         waitUntilReady(hubServer, hostTimeout);
         
-        // store hub host URL in system property for subsequent retrieval
+        // store hub host and hub port in system properties for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
+        System.setProperty(SeleniumSettings.HUB_PORT.key(), hubPort.toString());
         
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
