@@ -29,9 +29,9 @@ import org.openqa.selenium.Capabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -180,6 +180,7 @@ public class SeleniumGrid {
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException, InterruptedException, TimeoutException {
         if ((hubUrl != null) && GridUtility.isHubActive(hubUrl)) {
+            // ensure that hub port is available as a discrete setting
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
             return new SeleniumGrid(config, hubUrl);
         } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
