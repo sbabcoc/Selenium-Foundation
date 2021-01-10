@@ -13,16 +13,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.base.Optional;
-import com.google.common.reflect.TypeToken;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.listeners.PageSourceCapture;
-import com.nordstrom.automation.selenium.listeners.PlatformInterceptor.PlatformIdentity;
 import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.model.Page;
-import com.nordstrom.automation.selenium.platform.PlatformEnum;
-import com.nordstrom.automation.selenium.platform.PlatformTargetable;
-import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
@@ -174,24 +169,6 @@ public abstract class TestNgBase extends TestBase {
             long timeout = testResult.getMethod().getTimeOut();
             if (timeout > 0) {
                 testResult.getMethod().setTimeOut(timeout + adjust);
-            }
-        }
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings({"serial", "unchecked"})
-    public <P extends Enum<?> & PlatformEnum> void activatePlatform(WebDriver driver) {
-        if (this instanceof PlatformTargetable) {
-            ITestResult testResult = Reporter.getCurrentTestResult();
-            if (testResult != null) {
-                String description = testResult.getMethod().getDescription();
-                PlatformIdentity<P> identity = DataUtils.fromString(description, new TypeToken<PlatformIdentity<P>>(){}.getType());
-                if (identity != null) {
-                    ((PlatformTargetable<P>) this).activatePlatform(driver, identity.deserialize());
-                }
             }
         }
     }
