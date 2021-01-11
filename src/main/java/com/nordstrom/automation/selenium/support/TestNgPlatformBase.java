@@ -20,11 +20,11 @@ import com.nordstrom.common.base.UncheckedThrow;
 @Listeners(PlatformInterceptor.class)
 public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> extends TestNgBase implements PlatformTargetable<P> {
     
-    private static final String PLATFORM = "Platform";
-    
     private final Class<P> platformClass;
     private final Method values;
 
+    private static final String PLATFORM = "Platform";
+    
     public TestNgPlatformBase(Class<P> platformClass) {
         this.platformClass = platformClass;
         try {
@@ -34,11 +34,17 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String[] getSubPath() {
         return new String[] { getTargetPlatform().getName() };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public P getTargetPlatform() {
@@ -49,24 +55,43 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("serial")
-    public void activatePlatform(WebDriver driver, P platform) throws PlatformActivationFailedException {
+    public void activatePlatform(WebDriver driver) {
         ITestResult testResult = Reporter.getCurrentTestResult();
         if (testResult != null) {
             String description = testResult.getMethod().getDescription();
             PlatformIdentity<P> identity = DataUtils.fromString(description, new TypeToken<PlatformIdentity<P>>(){}.getType());
             if (identity != null) {
-                testResult.setAttribute(PLATFORM, identity.deserialize());
+                P platform = identity.deserialize();
+                testResult.setAttribute(PLATFORM, platform);
+                activatePlatform(driver, platform);
             }
         }
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void activatePlatform(WebDriver driver, P platform) throws PlatformActivationFailedException {
+        // by default, do nothing
+    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public P[] getValidPlatforms() {
         return values();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public P platformFromString(String name) {
         for (P platform : values()) {
@@ -77,6 +102,9 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<P> getPlatformType() {
         return platformClass;

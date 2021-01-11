@@ -19,9 +19,6 @@ import com.nordstrom.automation.junit.ArtifactParams;
 import com.nordstrom.automation.junit.RuleChainWalker;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.model.Page;
-import com.nordstrom.automation.selenium.platform.PlatformEnum;
-import com.nordstrom.automation.selenium.platform.PlatformTargetable;
-import com.nordstrom.automation.selenium.platform.TargetPlatformRule;
 import com.nordstrom.common.file.PathUtils;
 
 /**
@@ -29,9 +26,6 @@ import com.nordstrom.common.file.PathUtils;
  */
 public abstract class JUnitBase extends TestBase implements ArtifactParams {
     
-    @Rule
-    public TargetPlatformRule<?> targetPlatformRule = new TargetPlatformRule<>(this);
-
     /** This method rule manages driver lifetimes and opens initial pages. */
     @Rule
     public final RuleChain ruleChain = RuleChain
@@ -83,20 +77,6 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
         return PathUtils.ReportsDirectory.getPathForObject(this).toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public <P extends Enum<?> & PlatformEnum> void activatePlatform(WebDriver driver) {
-        if (this instanceof PlatformTargetable) {
-            P platform = (P) targetPlatformRule.getPlatform();
-            if (platform != null) {
-                ((PlatformTargetable<P>) this).activatePlatform(driver, platform);
-            }
-        }
-    }
-    
     /**
      * {@inheritDoc}
      */
