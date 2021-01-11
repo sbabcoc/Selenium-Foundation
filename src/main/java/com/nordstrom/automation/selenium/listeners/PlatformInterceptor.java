@@ -39,11 +39,11 @@ public class PlatformInterceptor implements IMethodInterceptor {
 
         // iterate over method list
         for (IMethodInstance thisMethod : methods) {
-            Object platformConstant = resolveTargetPlatform(thisMethod);
+            PlatformEnum platformConstant = resolveTargetPlatform(thisMethod);
             
             // if this method supports the current target platform
-            if (TargetPlatformHandler.shouldRun(contextPlatform, (PlatformEnum) platformConstant)) {
-                addMethodForPlatform(result, thisMethod, (PlatformEnum) platformConstant);
+            if (TargetPlatformHandler.shouldRun(contextPlatform, platformConstant)) {
+                addMethodForPlatform(result, thisMethod, platformConstant);
             }
         }
 
@@ -86,7 +86,7 @@ public class PlatformInterceptor implements IMethodInterceptor {
         if (platformConstant != null) {
             ITestNGMethod method = testMethod.getMethod();
             PlatformIdentity<P> identity = new PlatformIdentity<>((P) platformConstant, method.getDescription());
-            testMethod.getMethod().setDescription(DataUtils.toString(identity));
+            method.setDescription(DataUtils.toString(identity));
         }
         methodList.add(testMethod);
     }
@@ -127,6 +127,7 @@ public class PlatformInterceptor implements IMethodInterceptor {
         private PlatformIdentity(P platformConst, String description) {
             setConstName(platformConst.name());
             setClassName(platformConst.getClass().getName());
+            setDescription(description);
         }
         
         public void setConstName(String constName) {

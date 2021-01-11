@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.platform;
 
-/** This class contains support methods used by our target platform implementation. */
+/**
+ * This class contains support methods used by our target platform implementation.
+ */
 public class TargetPlatformHandler {
     
     /**
