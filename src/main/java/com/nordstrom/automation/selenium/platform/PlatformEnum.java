@@ -1,7 +1,7 @@
 package com.nordstrom.automation.selenium.platform;
 
 /**
- * This interface provides common methods for collections of 
+ * This interface provides common methods for collections of platform constants.
  */
 public interface PlatformEnum {
     
