@@ -3,6 +3,45 @@
 # INTRODUCTION
 **Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium** (_WebDriver_).
 
+#### Table of Contents
+
+* [Selenium API Support](#selenium-api-support)
+* [Dependency Artifact Coordinates](#dependency-artifact-coordinates)
+* [Building Selenium Foundation](#building-selenium-foundation)
+  * [Building in Eclipse](#building-in-eclipse)
+  * [Building from Command Line](#building-from-command-line)
+  * [Maven Support](#maven-support)
+* [Getting Started](#getting-started)
+  * [Required Configuration](#required-configuration)
+* [Highlights](#highlights)
+  * [Automatic Driver Targeting](#automatic-driver-targeting)
+  * [Automatic Targeted Session Configuration](#automatic-targeted-session-configuration)
+  * [Support for Frame-Based Components and Shadow-DOM Hierarchies](#support-for-frame-based-components-and-shadow-dom-hierarchies)
+  * [Landing Page Verification and Model-Directed Navigation](#landing-page-verification-and-model-directed-navigation)
+  * [Customizable Transition Error Detection](#customizable-transition-error-detection)
+  * [Component Collection Classes](#component-collection-classes)
+  * [Automatic Stale Element Reference Protection](#automatic-stale-element-reference-protection)
+  * [Optional Elements](#optional-elements)
+  * [Page-Load Synchronization](#page-load-synchronization)
+  * [Grid-Based Driver Creation](#grid-based-driver-creation)
+  * [Automatic Phase-to-Phase Driver Hand-Off](#automatic-phase-to-phase-driver-hand-off)
+  * [Automatic Capture of Screenshots and Page Source](#automatic-capture-of-screenshots-and-page-source)
+  * [Support for TestNG and JUnit 4](#support-for-testng-and-junit-4)
+  * [Essential Settings](#essential-settings)
+  * [Overriding Defaults](#overriding-defaults)
+  * [Installing Drivers](#installing-drivers)
+
+#### In-Depth Documentation
+
+* [Building Page Objects with Selenium Foundation](docs/BuildingPageObjectsWithSeleniumFoundation.md)
+* [JUnit 4 Support](docs/JUnit4Support.md)
+* [JavaScript Enhancements](docs/JavaScriptEnhancements.md)
+* [Selenium Foundation](docs/SeleniumFoundation.md)
+* [Structuring Page Models with Components](docs/StructuringPageModelsWithComponents.md)
+* [Target Platform Feature](docs/TargetPlatformFeature.md)
+* [TestNG Support](docs/TestNGSupport.md)
+* [Transition Error Detection](docs/TransitionErrorDetection.md)
+
 ## Selenium API Support
 
 **Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](https://github.com/sbabcoc/Selenium-Foundation/blob/master/build.gradle).
@@ -78,7 +117,7 @@ The [QuickStart](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/
 
 **Selenium Foundation** provides base classes for modeling frame-based components and shadow-DOM hierarchies. These base classes handle the specific details of interacting with these DOM features through the underlying Selenium API, managing search context and driver targeting for you. The implementation of your components will be totally dedicated to the functionality of the elements you're modeling - never cluttered with boilerplate code to switch driver focus or traverse into shadow hierarchies.
 
-### Landing Page Verification / Model-Directed Navigation
+### Landing Page Verification and Model-Directed Navigation
 
 Page classes can be explicitly associated with web application paths through the **`@PageUrl`** annotation. These associations can be declared as either fixed paths or patterns, and these declarations are used by **Selenium Foundation** to verify landing page paths at page transitions. You can also perform direct navigation to web application paths associated with page classes through the **`@PageUrl`** annotation.
 
