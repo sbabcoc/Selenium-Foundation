@@ -1,4 +1,4 @@
-# Selenium Foundation Project Configuration
+# Introduction
 
 The configuration of **Selenium Foundation** projects is an aggregation of several factors:
 
@@ -64,14 +64,6 @@ As mentioned previously, you're able to override defaults in **`SeleniumConfig`*
 * Create Grid node configuration file from JSON: `createNodeConfig(String jsonStr, URL hubUrl)`
 * Merge capabilities objects: `mergeCapabilities(Capabilities target, Capabilities change)`
 
-**`SeleniumConfig`** also provides version-specific default values for several settings:
-
-| Setting | Property | `s2` Default | `s3` Default |
-|---|---|---|---|
-| **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncher | org.openqa.grid.selenium.GridLauncherV3 |
-| **`HUB_PORT`** | `selenium.hub.port` | 4444 | 4445 |
-| **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s2.json | hubConfig-s3.json |
-| **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s2.json | nodeConfig-s3.json |
 
 ## THE **`SeleniumSettings`** OBJECT
 
@@ -79,30 +71,29 @@ The static `getConfig()` method returns a **`SeleniumConfig`** object that provi
 
 ### Selenium Grid Configuration
 
+| Setting | Property Name | Default |
+|---|---|---|
+| **`HUB_HOST`** | `selenium.hub.host` | _(none)_ |
+
+This setting specifies the URL of the **Selenium Grid** hub server that will supply sessions for your tests. No default value is specified for this setting. If you specify a value for this setting, you must provide the full URL of an active hub server, including the base path. For example:
+
+> `-Dselenium.hub.host=http://192.168.1.2/wd/hub`
+
+> If this setting is left undefined or specifies an inactive `localhost` URL, **Selenium Foundation** will automatically launch a local Grid instance as specified by the [local Grid configuration](LocalGridConfiguration).
+
+#### Selenium Grid Configuration Methods 
+
 **`SeleniumConfig`** provides several methods related to local and remote Selenium Grid configuration:
 
-* `getHubUrl()` - Get the URL for the configured Selenium Grid hub host. If the current configuration doesn't specify a hub host, but defines a hub port, a `localhost` URL is assembled.
-* `getSeleniumGrid()` - Get an object that represents the active Selenium Grid.
-* `shutdownGrid(boolean localOnly)` - Shut down the active Selenium Grid.
+* `getSeleniumGrid()` - Get an object that represents the active Selenium Grid. If indicated, this method wil launch a local Grid instance.
+* `getHubUrl()` - Get the URL for the configured Selenium Grid hub host. In local Grid configurations, this value will be populated when the Grid is launched.
+* `shutdownGrid(boolean localOnly)` - Shut down the active Selenium Grid. To enable shutdown of remote Grid instances, attached Grid nodes must install the **`LifecycleServlet`**:
 
-As indicated previously, the set of drivers supported by the local Grid instance managed by **Selenium Foundation** is configured with a ServiceLoader [provider configuration file](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/test/resources/META-INF/services/com.nordstrom.automation.selenium.DriverPlugin). Note that the file at that link isn't just a static sample file; it's the actual provider configuration file for the project unit tests.
+> -servlets org.openqa.grid.web.servlet.LifecycleServlet
 
-As of this writing, the unit tests are configured to use [HtmlUnit](http://htmlunit.sourceforge.net/). Described as "a GUI-less browser for Java programs", this browser is perfect for rendering the simple pages used to exercise the features of **Selenium Foundation**. In addition to this ServiceLoader configuration file, the Java project itself must declare the dependencies that are required by the corresponding driver. These dependencies are dependent on the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves.
+#### Grid Configuration for Selenium Foundation unit tests
 
-For example, here are the Maven dependencies for the **Selenium 2** version of **`HtmlUnitPlugin`**:
-
-```xml
-<dependency>
-  <groupId>net.sourceforge.htmlunit</groupId>
-  <artifactId>htmlunit</artifactId>
-  <version>2.22</version>
-</dependency>
-<dependency>
-  <groupId>org.seleniumhq.selenium</groupId>
-  <artifactId>htmlunit-driver</artifactId>
-  <version>2.22</version>
-</dependency>
-```
+As of this writing, the unit tests are [configured](LocalGridConfiguration.md) to get their browsers from a local Selenium Grid instance serving [HtmlUnit](http://htmlunit.sourceforge.net/) sessions. Described as "a GUI-less browser for Java programs", this browser is perfect for rendering the simple pages used to exercise the features of **Selenium Foundation**. 
 
 #### Desktop Browser Support
 
@@ -171,7 +162,7 @@ public class MyChromeTest extends TestNgBase implements DriverProvider {
     
     @Override
     public WebDriver provideDriver(Method method) {
-        SeleniumConfig config = AbstractSeleniumConfig.getConfig();
+        SeleniumConfig config = SeleniumConfig.getConfig();
         URL remoteAddress = config.getSeleniumGrid().getHubServer().getUrl();
         Capabilities desiredCapabilities = config.getCapabilitiesForName("chrome");
         return GridUtility.getDriver(remoteAddress, desiredCapabilities);
@@ -210,3 +201,7 @@ The following table documents the timeout settings defined by **Selenium Foundat
 | **`HOST_TIMEOUT`** | selenium.timeout.host | 30 | Selenium Foundation HTTP host wait timeout interval. |
 
 Typically, these settings are not accessed directly. Rather, they are proxied through the **`WaitType`** enumeration to streamline the process of reading the timeout intervals and acquiring search context wait objects.
+
+
+
+> Written with [StackEdit](https://stackedit.io/).

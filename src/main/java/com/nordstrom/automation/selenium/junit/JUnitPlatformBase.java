@@ -18,7 +18,7 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
     private final Method values;
 
     @Rule
-    public TargetPlatformRule<?> targetPlatformRule = new TargetPlatformRule<>(this);
+    public TargetPlatformRule<P> targetPlatformRule = new TargetPlatformRule<>(this);
 
     public JUnitPlatformBase(Class<P> platformClass) {
         this.platformClass = platformClass;
@@ -41,18 +41,16 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     public P getTargetPlatform() {
-        return (P) targetPlatformRule.getPlatform();
+        return targetPlatformRule.getPlatform();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     public void activatePlatform(WebDriver driver) {
-        P platform = (P) targetPlatformRule.getPlatform();
+        P platform = targetPlatformRule.getPlatform();
         if (platform != null) {
             activatePlatform(driver, platform);
         }

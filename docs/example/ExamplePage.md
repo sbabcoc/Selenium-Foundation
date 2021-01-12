@@ -18,7 +18,7 @@ import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.ByType;
 
-@PageUrl(scheme="file", value="ExamplePage.html")
+@PageUrl("/grid/admin/ExamplePageServlet")
 public class ExamplePage extends Page {
 
     public ExamplePage(WebDriver driver) {
@@ -36,6 +36,7 @@ public class ExamplePage extends Page {
     private Map<Object, FrameComponent> frameMap;
     private ShadowRootComponent shadowRootByLocator;
     private ShadowRootComponent shadowRootByElement;
+    private int refreshCount;
     
     protected static final String FRAME_A_ID = "frame-a";
     protected static final String FRAME_B_ID = "frame-b";
@@ -151,5 +152,36 @@ public class ExamplePage extends Page {
         }
         return shadowRootByElement;
     }
+    
+    @Override
+    public SearchContext refreshContext(long expiration) {
+        refreshCount++;
+        return super.refreshContext(expiration);
+    }
+    
+    public int getRefreshCount() {
+        return refreshCount;
+    }
+    
+    public String getInputLocator() {
+        return ByType.cssLocatorFor(Using.INPUT);
+    }
+    
+    public boolean setInputValue(String value) {
+        return updateValue(findElement(Using.INPUT), value);
+    }
+    
+    public String getInputValue() {
+        return findElement(Using.INPUT).getAttribute("value");
+    }
+    
+    public String getCheckLocator() {
+        return ByType.cssLocatorFor(Using.CHECK);
+    }
+    
+    public boolean isBoxChecked() {
+        return findElement(Using.CHECK).isSelected();
+    }
+    
 }
 ```
