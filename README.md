@@ -59,7 +59,7 @@ The [QuickStart](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/
 
 ### Required Configuration
 
-**Selenium Foundation** supports both **TestNG** and **JUnit 4** frameworks, but the default configuration doesn't activate test lifecycle features for either of them. 
+**Selenium Foundation** supports both **TestNG** and **JUnit 4** frameworks, but the default configuration doesn't activate test lifecycle features for either of them. Choose your platform and apply the corresponding required configuration to your project:
 
 * [TestNG Required Configuration](docs/TestNGSupport.md#testng-required-configuration)
 * [JUnit 4 Required Configuration](docs/JUnit4Support.md#junit-4-required-configuration)
