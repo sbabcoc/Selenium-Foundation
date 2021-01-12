@@ -115,7 +115,6 @@ public final class DriverManager {
                 if (instance.isTest(method)) {
                     long after = System.currentTimeMillis();
                     instance.adjustTimeout(after - prior);
-                    instance.activatePlatform(driver);
                 }
             }
             
@@ -123,6 +122,7 @@ public final class DriverManager {
             if (initialPage != null) {
                 Page page = Page.openInitialPage(initialPage, optDriver.get(), config.getTargetUri());
                 instance.setInitialPage(instance.prepInitialPage(page));
+                instance.activatePlatform(instance.getDriver());
             }
         }
     }

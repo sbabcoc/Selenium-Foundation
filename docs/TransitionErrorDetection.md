@@ -148,3 +148,5 @@ public class ErrorMessageDetector implements TransitionErrorDetector {
 
 In the preceding example, the error detection code determines if the login dialog is visible. If so, the detector attempts to log back in, returning the dialog error message 
 if the attempt fails.
+
+> Written with [StackEdit](https://stackedit.io/).

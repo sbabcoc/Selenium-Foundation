@@ -4,7 +4,7 @@ By applying the page-model pattern, you can produce a cohesive, behavior-based A
 
 However, modeling an application based solely on its pages produces a very flat model. It's quite common for a web application page to contain groups of elements that are logically associated (e.g. - billing address on an order information page). It's also common to encounter pages with multiple occurrences of an element grouping (e.g. - item tiles on a search results page). Factoring these grouping out into **page components** can greatly enrich your models, presenting a conceptual framework that automation developers will recognize.
 
-If your target application uses frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead. More on this later.
+If your target application uses shadow DOM components or frames to structure its content, you will be amazed at the ease with which your models interact with them. With automatic driver targeting, **Selenium Foundation** entirely removes explicit context switching from your implementation, allowing you to focus on functionality instead. More on this later.
 
 ###### Page Component and Frame Map from  [ExamplePage.java](example/ExamplePage.md)
 ```java
@@ -13,17 +13,17 @@ private TableComponent table;
 private Map<Object, FrameComponent> frameMap;
 ...
 public TableComponent getTable() {
-	if (table == null) {
-		table = new TableComponent(Using.TABLE.locator, this);
-	}
-	return table;
+    if (table == null) {
+        table = new TableComponent(Using.TABLE.locator, this);
+    }
+    return table;
 }
 ...
 public Map<Object, FrameComponent> getFrameMap() {
-	if (frameMap == null) {
-		frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
-	}
-	return frameMap;
+    if (frameMap == null) {
+        frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
+    }
+    return frameMap;
 }
 ...
 ```
@@ -36,11 +36,11 @@ In the **Selenium WebDriver** API, a search context is defined by the range of e
 
 The search context of a page component encompasses a subset of the elements of the context(s) in which it is contained. In other words, elements within the bounds of the component can be found by searches in encompassing contexts. However, the same cannot be said for frames, because...
 
-## Frames define distinct search contexts
+## Shadow DOM components and frames define distinct search contexts
 
-The preceding descriptions of search contexts omits one important detail - frames define distinct search contexts. Elements within the bounds of a frame **cannot** be found by searches in encompassing contexts. In the browser, frames are handled as separate documents. From a conceptual standpoint, a frame **IS-A** page, and the <span style="color:blue">Frame</span> class of **Selenium Foundation** models this concept by extending the <span style="color:blue">Page</span> class.
+The preceding descriptions of search contexts omits one important detail - shadow DOM components and frames define distinct search contexts. Elements within the bounds of a shadow DOM or frame **cannot** be found by searches in encompassing contexts. In the browser, shadow DOM components encapsulate their own styles and states, and frames are handled as separate documents. (From a conceptual standpoint, a frame **IS-A** page, and the <span style="color:blue">Frame</span> class of **Selenium Foundation** models this concept by extending the <span style="color:blue">Page</span> class.)
 
-The search context of a frame is completely isolated, and the driver target needs to be switched to this context to interact with it. Without **Selenium Foundation**, the task of frame driver targeting can be frustrating and confusing. Once you've modeled a frame as a <span style="color:blue">Frame</span> object, **Selenium Foundation** handles driver targeting for you automatically. More on this below.
+The search context of a shadow DOM component or frame is completely isolated, and the driver needs to be switched to this context to interact with it. Without **Selenium Foundation**, the task of driver targeting can be frustrating and confusing. However, once you've modeled one of these features as a <span style="color:blue">ShadowRoot</span> or <span style="color:blue">Frame</span> object, **Selenium Foundation** handles driver targeting for you automatically. More on this below.
 
 ## A word about XPath locators
 
@@ -91,11 +91,43 @@ private static final String FRAME_A = "Frame A";
 
 @Test
 public void testFrameByElement() {
-	ExamplePage page = getPage();
-	FrameComponent component = page.getFrameByElement();
-	assertEquals(component.getPageContent(), FRAME_A);
+    ExamplePage page = getPage();
+    FrameComponent component = page.getFrameByElement();
+    assertEquals(component.getPageContent(), FRAME_A);
 }
 ...
+```
+
+# Shadow DOM Search Contexts
+
+When interacting with shadow DOM components in plain-vanilla **Selenium WebDriver**, it's easy to get disoriented. You need to find the element that the shadow DOM is attached to, then acquire the search context from the `shadowRoot` property of that element. Without some sort of logical encasulation, it's easy to forget that this boundary exists and trip over it.
+
+With **Selenium Foundation**, it's easy to create this encapsulation. Just model your shadow DOM component as a subclass of <span style="color:blue">ShadowRoot</span>, and the framework takes care of the details for you. Your model interacts with this component in exactly the same way it does with every other type of component, and all of the implementation within your <span style="color:blue">ShadowRoot</span> component uses the same functions and features available elsewhere.
+
+> #### A Note about finding elements within shadow DOM components
+> One key difference between shadow DOM components and more familiar search contexts
+> is that shadow DOM **`document fragments`** only support searching by CSS selectors.
+
+The following example demonstrates automatic context switching. Note that neither the test nor the shadow DOM component includes any code to switch the search context to the encapsulated document fragment. **Selenium Foundation** automatically switches the search context to the shadow DOM when the **`getContent()`** method is called.
+
+###### Context Switching Demonstration from [ExampleTest.java](example/ExampleTest.md)
+```java
+...
+private static final String SHADOW_DOM_A = "Shadow DOM A";
+
+@Test
+public void testShadowRootByLocator() {
+    ExamplePage page = getPage();
+    try {
+        ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
+        assertEquals(shadowRoot.getContent(), SHADOW_DOM_A);
+    } catch (ShadowRootContextException e) {
+        throw new SkipException(e.getMessage(), e);
+    }
+}
+...
+
+Take note of the `try` block in this example. If **Selenium Foundation** is unable to acquire the shadow root reference from the selected host element, it throws a **`ShadowRootContextException`**. This indicates either that the context element is not a shadow host, or that the attached shadow DOM is closed. In this code, which was extracted from the **Selenium Foundation** unit tests, the exception is caught and wrapped to harmlessly flag the test as "skipped", because the **HtmlUnit** browser used by the unit tests doesn't provide the shadow DOM feature.
 ```
 
 # Component Nesting and Aggregation
@@ -117,17 +149,17 @@ private TableRowComponent tableHdr;
 private List<TableRowComponent> tableRows;
 
 private TableRowComponent getTableHdr() {
-	if (tableHdr == null) {
-		tableHdr = new TableRowComponent(Using.HDR_ROW.locator, this);
-	}
-	return tableHdr;
+    if (tableHdr == null) {
+        tableHdr = new TableRowComponent(Using.HDR_ROW.locator, this);
+    }
+    return tableHdr;
 }
 
 private List<TableRowComponent> getTableRows() {
-	if (tableRows == null) {
-		tableRows = newComponentList(TableRowComponent.class, Using.TBL_ROW.locator);
-	}
-	return tableRows;
+    if (tableRows == null) {
+        tableRows = newComponentList(TableRowComponent.class, Using.TBL_ROW.locator);
+    }
+    return tableRows;
 }
 ...
 ```
@@ -140,10 +172,10 @@ The following example demonstrates a [page](example/ExamplePage.md) that include
 private Map<Object, FrameComponent> frameMap;
 
 public Map<Object, FrameComponent> getFrameMap() {
-	if (frameMap == null) {
-		frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
-	}
-	return frameMap;
+    if (frameMap == null) {
+        frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
+    }
+    return frameMap;
 }
 ...
 ```
@@ -181,13 +213,13 @@ Switching the driver focus to a frame context is an expensive process, so **Sele
 ###### Producing map keys with frame content (from [FrameComponent.java](example/FrameComponent.md))
 ```java
 ...
-	public static Object getKey(SearchContext context) {
-		RobustWebElement element = (RobustWebElement) context;
-		WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
-		Object key = driver.findElement(Using.HEADING.selector).getText();
-		switchToParentFrame(element);
-		return key;
-	}
+    public static Object getKey(SearchContext context) {
+        RobustWebElement element = (RobustWebElement) context;
+        WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
+        Object key = driver.findElement(Using.HEADING.selector).getText();
+        switchToParentFrame(element);
+        return key;
+    }
 ...
 ```
 
@@ -202,3 +234,5 @@ When a component collection is initially created, the only details **Selenium Fo
 ## Immutability of Component Collections
 
 Component lists and maps are immutable. These collections are derived from the content of the web application page they represent. Allowing the composition of these collections to be altered by adding, removing, or replacing items would break the one-to-one relationship between the actual page content and the model evinced by the collection.
+
+> Written with [StackEdit](https://stackedit.io/).

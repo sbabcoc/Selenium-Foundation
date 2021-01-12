@@ -1,6 +1,7 @@
+
 # Introduction
 
-Using the page-model pattern to implement WebDriver automation provides many structural benefits. However, plain-vanilla Selenium doesn't provide much in the way of base-class support for building page objects. **Selenium Foundation** includes a whole range of building blocks to help you create efficient, reliable WebDriver automation.
+Using the page-model pattern to implement WebDriver automation provides many structural benefits. However, plain-vanilla Selenium doesn't provide much in the way of base-class support for building page objects. **Selenium Foundation** includes a whole range of building blocks to help you create efficient, reliable WebDriver automation.
 
 ###### Page-model class
 ```java
@@ -56,7 +57,7 @@ To make your code more maintainable and readable, we recommend the use of locato
 
 # Declaring Web Application Page Path
 
-Typically, each page-model class is associated with a single page of the application under test, located at a fixed path (e.g. - <span style="color:blue">_/c/nordstrom_</span>). It's also common for the paths of web application pages to conform with a pattern or template (e.g. - <span style="color:blue">_/s/&lt;item-description&gt;/&lt;item-identifier&gt;_</span>). **Selenium Foundation** provides a <span style="color:blue">@PageUrl</span> annotation that enables you to associate page-model classes with their corresponding paths.
+Typically, each page-model class is associated with a single page of the application under test, located at a fixed path (e.g. - <span style="color:blue">_/c/nordstrom_</span>). It's also common for the paths of web application pages to conform with a pattern or template (e.g. - <span style="color:blue">_/s/&lt;item-description&gt;/&lt;item-identifier&gt;_</span>). **Selenium Foundation** provides a <span style="color:blue">@PageUrl</span> annotation that enables you to associate page-model classes with their corresponding paths.
 
 An example of this annotation is found in the simple page class found above. The specified path ("/") declares that this page-model class is associated with the root of the target web application - in this case, Google. Template-based paths look like this:
 
@@ -68,7 +69,7 @@ public class ProductPage extends Page {
 }
 ```
 
-In this form of the <span style="color:blue">@PageUrl</span> annotation, the pattern attribute specifies a regular expression that identifies the valid format for the path, and the _value_ attribute provides an exemplar.
+In this form of the <span style="color:blue">@PageUrl</span> annotation, the pattern attribute specifies a regular expression that identifies the valid format for the path, and the _value_ attribute provides an exemplar.
 
 Once a page-model class is associated with a fixed path, the class itself is all you need for direct navigation:
 
@@ -80,13 +81,13 @@ ProductPage productPage = someOtherPage.openAnnotatedPage(ProductPage.class, fal
 ...
 ```
 
-In this example, **Selenium Foundation** navigates to the path specified by the <span style="color:yellowgreen">**_value_**</span> attribute of the <span style="color:blue">@PageUrl</span> annotation of the <span style="color:blue">ProductPage</span> class. This is the exemplar page for this class.
+In this example, **Selenium Foundation** navigates to the path specified by the <span style="color:yellowgreen">**_value_**</span> attribute of the <span style="color:blue">@PageUrl</span> annotation of the <span style="color:blue">ProductPage</span> class. This is the exemplar page for this class.
 
 # Page Transition Synchronization
 
-Whenever a page object method returns a new page object, this informs **Selenium Foundation** that the method triggered a page transition. In response, **Selenium Foundation** performs basic synchronization - waiting for a previously-acquired web element reference to go stale. This strategy is effective for basic web applications with simple page load behavior.
+Whenever a page object method returns a new page object, this informs **Selenium Foundation** that the method triggered a page transition. In response, **Selenium Foundation** performs basic synchronization - waiting for a previously-acquired web element reference to go stale. This strategy is effective for basic web applications with simple page load behavior.
 
-For web applications with more complex page load behavior (single-page, dynamic content, etc.), the <span style="color:blue">DetectsLoadCompletion</span> interface enables implementers to provide custom page-load completion detection:
+For web applications with more complex page load behavior (single-page, dynamic content, etc.), the <span style="color:blue">DetectsLoadCompletion</span> interface enables implementers to provide custom page-load completion detection:
 
 ###### DetectsLoadCompletion
 ```java
@@ -105,7 +106,7 @@ public class OpctPage extends Page implements DetectsLoadCompletion {
 
 In this example, the page is done loading when the value of the <span style="color:yellowgreen">**_cursor_**</span> CSS property of the **_<span style="color:yellowgreen">body</span>_** tag no longer equals _"<span style="color:red">wait</span>"_. This method, which is declared by the new container object, will be called every 500 mS until it returns _'true'_ or the page load timeout interval expires. Any type of container class can implement <span style="color:blue">DetectsLoadCompletion</span> - page, component, or frame.
 
-Note that automatic page load synchronization is activated by a method that returns a <span style="color:yellowgreen">**new**</span> page object. No synchronization is performed if a method returns the page object it's standing on (i.e. - 'this'). However, the <span style="color:blue">DetectsLoadCompletion</span> interface includes a static method to invoke the same page-load synchronization logic that **Selenium Foundation** would:
+Note that automatic page load synchronization is activated by a method that returns a <span style="color:yellowgreen">**new**</span> page object. No synchronization is performed if a method returns the page object it's standing on (i.e. - 'this'). However, the <span style="color:blue">DetectsLoadCompletion</span> interface includes a static method to invoke the same page-load synchronization logic that **Selenium Foundation** would:
 
 ###### Explicit synchronization
 ```java
@@ -127,13 +128,13 @@ In this scenario, the <span style="color:blue">Dialog</span> class doesn't imple
 
 # Automatic Driver Targeting
 
-For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing. For more details, see the **Automatic Driver Targeting** section on [Selenium Foundation Test Support](SeleniumFoundationTestSupport.md)
+For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing. For more details, see the **Automatic Driver Targeting** section on [Selenium Foundation Test Support](SeleniumFoundationTestSupport.md)
 
 # Wrapped Element References
 
-One of the most common sources of "noise" failures in WebDriver automation is the <span style="color:blue">StaleElementReferenceException</span>, which occurs when you try to use a web element reference that the driver no longer recognizes. Some action of the user or the application has altered the structure or content of the page, causing the browser to decide that it needs to rebuild its model of the page (the DOM), replacing all of its previous element identifiers with new ones. Even if the structure and content of the page is identical to what it was previously (e.g. - simply refreshing the page), element references that were acquired prior to the browser rebuilding the DOM are unusable. This can be particularly vexing when you're automating a web application with dynamic content. Your automation can fail at any moment, and your code quickly becomes littered with try/catch blocks as you try to prevent these random, pointless failures.
+One of the most common sources of "noise" failures in WebDriver automation is the <span style="color:blue">StaleElementReferenceException</span>, which occurs when you try to use a web element reference that the driver no longer recognizes. Some action of the user or the application has altered the structure or content of the page, causing the browser to decide that it needs to rebuild its model of the page (the DOM), replacing all of its previous element identifiers with new ones. Even if the structure and content of the page is identical to what it was previously (e.g. - simply refreshing the page), element references that were acquired prior to the browser rebuilding the DOM are unusable. This can be particularly vexing when you're automating a web application with dynamic content. Your automation can fail at any moment, and your code quickly becomes littered with try/catch blocks as you try to prevent these random, pointless failures.
 
-**Selenium Foundation** saves you from this frustration by producing and using wrapped element references that automatically handle stale element reference failures. The <span style="color:blue">RobustWebElement</span> class is a fault-tolerant wrapper for native WebElement objects. It retains the locator that was used to find the reference and the context in which the search was performed, and every wrapper method includes handling for <span style="color:blue">StaleElementReferenceException</span> failures. Whenever a stale reference is encountered, <span style="color:blue">RobustWebElement</span> uses the original locator and search context to re-acquire the reference that went stale. Prior to locating a new reference for an affected element, the search context hierarchy is refreshed as needed.
+**Selenium Foundation** saves you from this frustration by producing and using wrapped element references that automatically handle stale element reference failures. The <span style="color:blue">RobustWebElement</span> class is a fault-tolerant wrapper for native WebElement objects. It retains the locator that was used to find the reference and the context in which the search was performed, and every wrapper method includes handling for <span style="color:blue">StaleElementReferenceException</span> failures. Whenever a stale reference is encountered, <span style="color:blue">RobustWebElement</span> uses the original locator and search context to re-acquire the reference that went stale. Prior to locating a new reference for an affected element, the search context hierarchy is refreshed as needed.
 
 *   If a new reference for the affected element is acquired, the request that triggered the <span style="color:blue">StaleElementReferenceException</span> failure will be re-issued. Your automation will continue to run, completely unaware that the entire world shifted underneath.
 *   If the attempt to re-acquire the element reference or refresh the search context hierarchy fails, the original exception is re-thrown. This gives you the diagnostic information about what your automation was attempting to accomplish at the point where it failed.
@@ -170,3 +171,5 @@ In almost all respects, optional elements for which references have been acquire
 *   For optional <span style="color:blue">RobustWebElement</span> objects...
     *   ... invoking most methods will result in a <span style="color:blue">NullPointerException</span> failure, caused by <span style="color:blue">NoSuchElementException</span>.
     *   ... invoking **`isDisplayed()`** or **`isEnabled()`** will return _'false'_.
+
+> Written with [StackEdit](https://stackedit.io/).
