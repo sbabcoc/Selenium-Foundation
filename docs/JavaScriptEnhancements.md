@@ -2,7 +2,7 @@
 
 **WebDriver** provides the core functionality that enables automated tests to execute arbitrary chunks of JavaScript code in the browser. Execution is either synchronous or asynchronous, and returned results (if any) are automatically converted to Java data types.
 
-If the script has a return value (i.e. - if the script contains a <span style="color:blue">**`return`**</span> statement), the following rules are applied:
+If the script has a return value (i.e. - if the script contains a **`return`** statement), the following rules are applied:
 
 *   For an HTML element, a WebElement is returned
 *   For a decimal, a Double is returned
@@ -14,11 +14,11 @@ If the script has a return value (i.e. - if the script contains a <span style="c
 
 Each argument must be a number, a boolean, a String, a WebElement, or a List of any combination of the above. An exception will be thrown if the arguments do not meet these criteria. The arguments will be made available to the JavaScript via the "arguments" magic variable, as if the function were called via `Function.apply`.
 
-Within the script, use <span style="color:blue">**`document`**</span> to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
+Within the script, use **`document`** to refer to the current document. Note that local variables will not be available once the script has finished executing, though global variables will persist.
 
 # Extended Capabilities from **Selenium Foundation**
 
-**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the <span style="color:blue">_com.nordstrom.automation.selenium.core_</span> package, and the script files are found in <span style="color:blue">_src/main/resources_</span>. **JsUtility** and its supporting scripts provide the following capabilities:
+**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the _`com.nordstrom.automation.selenium.core`_ package, and the script files are found in _`src/main/resources`_. **JsUtility** and its supporting scripts provide the following capabilities:
 
 *   Run JavaScript (with or without result)
 *   Load script files as strings
