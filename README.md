@@ -33,14 +33,15 @@
 
 #### In-Depth Documentation
 
-* [Building Page Objects with Selenium Foundation](docs/BuildingPageObjectsWithSeleniumFoundation.md)
-* [JUnit 4 Support](docs/JUnit4Support.md)
-* [JavaScript Enhancements](docs/JavaScriptEnhancements.md)
-* [Selenium Foundation](docs/SeleniumFoundation.md)
-* [Structuring Page Models with Components](docs/StructuringPageModelsWithComponents.md)
-* [Target Platform Feature](docs/TargetPlatformFeature.md)
+* [Welcome to Selenium Foundation](docs/WelcomeToSeleniumFoundation.md)
+* [Configuring Project Settings](docs/ConfiguringProjectSettings.md)
 * [TestNG Support](docs/TestNGSupport.md)
+* [JUnit 4 Support](docs/JUnit4Support.md)
+* [Target Platform Feature](docs/TargetPlatformFeature.md)
+* [Building Page Objects](docs/BuildingPageObjects.md)
+* [Page Components](docs/PageComponents.md)
 * [Transition Error Detection](docs/TransitionErrorDetection.md)
+* [JavaScript Enhancements](docs/JavaScriptEnhancements.md)
 
 ## Selenium API Support
 
@@ -178,7 +179,7 @@ You'll probably find that the defaults assigned to most settings will suffice in
 | **`TARGET_HOST`** | `selenium.target.host` | `localhost` |
 | **`TARGET_PATH`** | `selenium.target.path` | `/` |
 
-\* NOTE: By default, HtmlUnit is selected as the browser. For easier override, this is specified through **`BROWSER_CAPS`** instead of **`BROWSER_NAME`**. For details, see [Manipulate Settings with SeleniumConfig](docs/ManipulateSettingsWithSeleniumConfig.md). 
+\* NOTE: By default, HtmlUnit is selected as the browser. For easier override, this is specified through **`BROWSER_CAPS`** instead of **`BROWSER_NAME`**. For details, see [Configuring Project Settings](docs/ConfiguringProjectSettings.md). 
 
 ## Overriding Defaults 
 

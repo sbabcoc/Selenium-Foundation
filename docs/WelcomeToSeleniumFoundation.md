@@ -1,4 +1,17 @@
-# Background
+# WELCOME!
+
+Thank you for taking the time to learn more about **Selenium Foundation**. This framework has been designed to help you make your **Selenium** automation more robust and more rational. It takes care of the fundamental details of **Selenium** web automation so you can focus on your core objective - modeling your application and implementing your tests.
+
+What you'll find on this page:
+
+* A brief overview of [**Selenium WebDriver**](#webdriver-api)
+* An introduction to the [page object design pattern](#page-object-design-pattern)
+  * A short list of page object [design pattern references](#design-pattern-references)
+  * Notes regarding [page object pitfalls](#page-object-pitfalls)
+* [Driver provisioning](#consistent-support-for-local-and-remote-configurations) - traditional approach versus Selenium Foundation
+* Selenium Foundation [test support](#selenium-foundation-test-support)
+* [Building page objects](#building-page-objects-with-selenium-foundation) with Selenium Foundation
+  * Structuring page models with [components](#structuring-page-models-with-components)
 
 ## WebDriver API
 
@@ -31,7 +44,7 @@ In typical **WebDriver** API projects, the process for acquiring driver instance
 
 Another disadvantage to this approach is the difficulty it creates in limiting the number of sessions that are created when running suites of automated tests in parallel. The level of control you get is typically restricted to specifying a maximum number of threads that will be spawned, which doesn't have a strict one-to-one correlation to the number of tests that will be executed at any given moment. Consequently, you're forced to throttle the thread count to prevent the system from becoming over-taxed by running too many concurrent sessions, which can trigger timeout failures and other erratic behavior. The need to specify a conservative thread count ceiling typically results in significant under-utilization of system resources, limiting throughput.
 
-**Selenium Foundation** takes a different approach, using a local Selenium Grid instance to provide browser sessions. This strategy offers several benefits:
+**Selenium Foundation** takes a different approach, using a local **Selenium Grid** instance to provide browser sessions. This strategy offers several benefits:
 
 *   The set of available browser types is determined by configuration, not implementation. To add another browser, install the driver and update the Grid configuration.
 *   Local browser sessions are identical to remote sessions. This eliminates divergent behavior that could otherwise lead to unexpected failures in remote automation.
@@ -43,11 +56,17 @@ To eliminate unnecessary boilerplate code, **Selenium Foundation** performs many
 
 *   By default, each test has a browser session created for it automatically. For scenarios with unique requirements, this behavior can be overridden with a simple annotation.
 *   Test classes and test methods can declare the initial page class that should be loaded prior to the start of the test.
+*   Prior to the start of each test, you have the opportunity to perform [customizable initialization](TargetPlatformFeature.md).
 *   Prior to invoking methods of page objects and page components (see below), the driver is automatically targeted at the associated window, frame, or shadow DOM.
 *   Facilities are provided to automatically synchronize with the page load completion at transitions (more later).
 *   At the end of each test, the browser session is closed automatically.
 *   If a test fails, a screenshot and page source are automatically saved for diagnostic purposes.
-*   If a test fails with a retriable exception (any subclass of WebDriverException) and automatic retry is enabled, the test is executed again.
+*   If a test fails with a retriable exception (any subclass of **WebDriverException**) and automatic retry is enabled, the test is executed again.
+
+Learn more...
+* [TestNG test support](TestNGSupport.md)
+* [JUnit 4 test support](JUnit4Support.md)
+* [Target platform feature](TargetPlatformFeature.md)
 
 ## Building Page Objects with Selenium Foundation
 
@@ -60,6 +79,8 @@ To eliminate unnecessary boilerplate code, **Selenium Foundation** performs many
 *   Element references returned by the foundation API are wrapped to provide automatic recovery from <span style="color:blue">_stale element reference exceptions_</span>. This makes it easy to test applications with dynamic content.
 *   Efficient support is provided for optional elements - controls and content that are present in some scenarios and absent in others.
 
+[Learn more...](BuildingPageObjects.md)
+
 ### Structuring Page Models with Components
 
 **Selenium Foundation** facilitates the implementation of well-structured page models through the use of <span style="color:blue">_page components_</span>, which enable you to model groups of functionally related elements as discrete objects. Page components are provided with a broad range of basic facilities:
@@ -68,5 +89,7 @@ To eliminate unnecessary boilerplate code, **Selenium Foundation** performs many
 *   For frame-based components, driver focus is managed automatically. 
 *   Components can be nested and aggregated to create models that accurately reflect the conceptual structure of the pages being modeled.
 *   For grouping of elements that are repeated (e.g. - item summary tiles on a search results page), components can be collected into indexed lists and keyed maps.
+
+[Learn more...](PageComponents.md)
 
 > Written with [StackEdit](https://stackedit.io/).
