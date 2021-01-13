@@ -18,7 +18,7 @@ Within the script, use **`document`** to refer to the current document. Note tha
 
 # Extended Capabilities from **Selenium Foundation**
 
-**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the **`_com.nordstrom.automation.selenium.core_`** package, and the script files are found in **`_src/main/resources_`**. **JsUtility** and its supporting scripts provide the following capabilities:
+**Selenium Foundation** includes a collection of utility methods and support script files that make it easy to leverage the power of JavaScript in your test suites. **JsUtility** is found in the _`com.nordstrom.automation.selenium.core`_ package, and the script files are found in _`src/main/resources`_. **JsUtility** and its supporting scripts provide the following capabilities:
 
 *   Run JavaScript (with or without result)
 *   Load script files as strings
