@@ -57,7 +57,7 @@ To make your code more maintainable and readable, we recommend the use of locato
 
 # Declaring Web Application Page Path
 
-Typically, each page-model class is associated with a single page of the application under test, located at a fixed path (e.g. - **`_/c/nordstrom_`**). It's also common for the paths of web application pages to conform with a pattern or template (e.g. - **`_/s/&lt;item-description&gt;/&lt;item-identifier&gt;_`**). **Selenium Foundation** provides a **`@PageUrl`** annotation that enables you to associate page-model classes with their corresponding paths.
+Typically, each page-model class is associated with a single page of the application under test, located at a fixed path (e.g. - _`/c/nordstrom`_). It's also common for the paths of web application pages to conform with a pattern or template (e.g. - _`/s/&lt;item-description&gt;/&lt;item-identifier&gt;`_). **Selenium Foundation** provides a **`@PageUrl`** annotation that enables you to associate page-model classes with their corresponding paths.
 
 An example of this annotation is found in the simple page class found above. The specified path ("/") declares that this page-model class is associated with the root of the target web application - in this case, Google. Template-based paths look like this:
 
@@ -81,7 +81,7 @@ ProductPage productPage = someOtherPage.openAnnotatedPage(ProductPage.class, fal
 ...
 ```
 
-In this example, **Selenium Foundation** navigates to the path specified by the <span style="color:yellowgreen">**_value_**</span> attribute of the **`@PageUrl`** annotation of the **`ProductPage`** class. This is the exemplar page for this class.
+In this example, **Selenium Foundation** navigates to the path specified by the _`value`_ attribute of the **`@PageUrl`** annotation of the **`ProductPage`** class. This is the exemplar page for this class.
 
 # Page Transition Synchronization
 
@@ -104,9 +104,9 @@ public class OpctPage extends Page implements DetectsLoadCompletion {
 }
 ```
 
-In this example, the page is done loading when the value of the <span style="color:yellowgreen">**_cursor_**</span> CSS property of the **_<span style="color:yellowgreen">body</span>_** tag no longer equals _"<span style="color:red">wait</span>"_. This method, which is declared by the new container object, will be called every 500 mS until it returns _'true'_ or the page load timeout interval expires. Any type of container class can implement **`DetectsLoadCompletion`** - page, component, or frame.
+In this example, the page is done loading when the value of the _`cursor`_ CSS property of the _`body`_ tag no longer equals _`"wait"`_. This method, which is declared by the new container object, will be called every 500 mS until it returns _'true'_ or the page load timeout interval expires. Any type of container class can implement **`DetectsLoadCompletion`** - page, component, or frame.
 
-Note that automatic page load synchronization is activated by a method that returns a <span style="color:yellowgreen">**new**</span> page object. No synchronization is performed if a method returns the page object it's standing on (i.e. - 'this'). However, the **`DetectsLoadCompletion`** interface includes a static method to invoke the same page-load synchronization logic that **Selenium Foundation** would:
+Note that automatic page load synchronization is activated by a method that returns a **new** page object. No synchronization is performed if a method returns the page object it's standing on (i.e. - 'this'). However, the **`DetectsLoadCompletion`** interface includes a static method to invoke the same page-load synchronization logic that **Selenium Foundation** would:
 
 ###### Explicit synchronization
 ```java
