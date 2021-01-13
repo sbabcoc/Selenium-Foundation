@@ -38,9 +38,9 @@ The search context of a page component encompasses a subset of the elements of t
 
 ## Shadow DOM components and frames define distinct search contexts
 
-The preceding descriptions of search contexts omits one important detail - shadow DOM components and frames define distinct search contexts. Elements within the bounds of a shadow DOM or frame **cannot** be found by searches in encompassing contexts. In the browser, shadow DOM components encapsulate their own styles and states, and frames are handled as separate documents. (From a conceptual standpoint, a frame **IS-A** page, and the <span style="color:blue">Frame</span> class of **Selenium Foundation** models this concept by extending the <span style="color:blue">Page</span> class.)
+The preceding descriptions of search contexts omits one important detail - shadow DOM components and frames define distinct search contexts. Elements within the bounds of a shadow DOM or frame **cannot** be found by searches in encompassing contexts. In the browser, shadow DOM components encapsulate their own styles and states, and frames are handled as separate documents. (From a conceptual standpoint, a frame **IS-A** page, and the **`Frame`** class of **Selenium Foundation** models this concept by extending the **`Page`** class.)
 
-The search context of a shadow DOM component or frame is completely isolated, and the driver needs to be switched to this context to interact with it. Without **Selenium Foundation**, the task of driver targeting can be frustrating and confusing. However, once you've modeled one of these features as a <span style="color:blue">ShadowRoot</span> or <span style="color:blue">Frame</span> object, **Selenium Foundation** handles driver targeting for you automatically. More on this below.
+The search context of a shadow DOM component or frame is completely isolated, and the driver needs to be switched to this context to interact with it. Without **Selenium Foundation**, the task of driver targeting can be frustrating and confusing. However, once you've modeled one of these features as a **`ShadowRoot`** or **`Frame`** object, **Selenium Foundation** handles driver targeting for you automatically. More on this below.
 
 ## A word about XPath locators
 
@@ -102,7 +102,7 @@ public void testFrameByElement() {
 
 When interacting with shadow DOM components in plain-vanilla **Selenium WebDriver**, it's easy to get disoriented. You need to find the element that the shadow DOM is attached to, then acquire the search context from the `shadowRoot` property of that element. Without some sort of logical encasulation, it's easy to forget that this boundary exists and trip over it.
 
-With **Selenium Foundation**, it's easy to create this encapsulation. Just model your shadow DOM component as a subclass of <span style="color:blue">ShadowRoot</span>, and the framework takes care of the details for you. Your model interacts with this component in exactly the same way it does with every other type of component, and all of the implementation within your <span style="color:blue">ShadowRoot</span> component uses the same functions and features available elsewhere.
+With **Selenium Foundation**, it's easy to create this encapsulation. Just model your shadow DOM component as a subclass of **`ShadowRoot`**, and the framework takes care of the details for you. Your model interacts with this component in exactly the same way it does with every other type of component, and all of the implementation within your **`ShadowRoot`** component uses the same functions and features available elsewhere.
 
 > #### A Note about finding elements within shadow DOM components
 > One key difference between shadow DOM components and more familiar search contexts
@@ -223,7 +223,7 @@ Switching the driver focus to a frame context is an expensive process, so **Sele
 ...
 ```
 
-Note that the search context passed into the **`getKey()`** method is, in fact, a <span style="color:blue">RobustWebElement</span> object. This example implementation switches the driver to the frame context, extracts unique text from a heading element, and switches the driver back to the parent frame. This last step is **_critical_**, because leaving the driver focused on the frame context is likely to cause downstream failures. This implementation invokes **`switchToParentFrame()`** instead of using the **WebDriver** API directly. This <span style="color:blue">Frame</span>-class method provides fallback handling for drivers that don't support **`switchTo().parentFrame()`**.
+Note that the search context passed into the **`getKey()`** method is, in fact, a **`RobustWebElement`** object. This example implementation switches the driver to the frame context, extracts unique text from a heading element, and switches the driver back to the parent frame. This last step is **_critical_**, because leaving the driver focused on the frame context is likely to cause downstream failures. This implementation invokes **`switchToParentFrame()`** instead of using the **WebDriver** API directly. This **`Frame`**-class method provides fallback handling for drivers that don't support **`switchTo().parentFrame()`**.
 
 ## Lazy initialization of Component Collections
 
