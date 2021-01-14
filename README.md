@@ -35,6 +35,7 @@
 
 * [Welcome to Selenium Foundation](docs/WelcomeToSeleniumFoundation.md)
 * [Configuring Project Settings](docs/ConfiguringProjectSettings.md)
+* [Local Grid Configuration](docs/LocalGridConfiguration.md)
 * [TestNG Support](docs/TestNGSupport.md)
 * [JUnit 4 Support](docs/JUnit4Support.md)
 * [Target Platform Feature](docs/TargetPlatformFeature.md)
