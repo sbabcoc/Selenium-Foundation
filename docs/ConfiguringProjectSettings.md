@@ -122,23 +122,13 @@ In addition to support for desktop browsers, **Selenium Foundation** provides th
 | Windows | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/WindowsPlugin.java) |
 | XCUITest | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/XCUITestPlugin.java) |
 
-Note that these plug-ins are not version-specific; each will work with either Selenium 2 or Selenium 3 API, and no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](http://appium.io/docs/en/about-appium/getting-started/) on you system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
+Note that these plug-ins are not version-specific; each will work with either Selenium 2 or Selenium 3 API, and no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](http://appium.io/docs/en/about-appium/getting-started/) on your system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
 
 | Item | Setting | Property | Default |
 | --- | --- | --- | --- |
 | **NodeJS** | **`NODE_BINARY_PATH`** | `node.binary.path` | NODE_BINARY_PATH environment variable |
 | **NPM** | **`NPM_BINARY_PATH`** | `npm.binary.path` | _(none)_ |
 | **Appium** | **`APPIUM_BINARY_PATH`** | `appium.binary.path` | APPIUM_BINARY_PATH environment variable |
-
-Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency in your Java projects to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**. Here are the Maven artifact coordinates that correspond to each version of the **Selenium API**:
-
-| Selenium 2 | Selenium 3 |
-|:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;4.1.2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
-
-#### Appium Server Arguments
-
-**Selenium Foundation** gives you the ability to completely control the configuration of the `Appium` Grid node that it uses to provide sessions for your tests, via the **`APPIUM_CLI_ARGS`** setting. This setting can define multiple `Appium` server arguments together, and can be declared multiple times when specified in the _settings.properties_ file. These are presented to **Selenium Foundation** as a collection of values that it processes and passes on to 'Appium` when it launches the Grid node.
 
 ### Browser Capabilities
 
@@ -201,7 +191,5 @@ The following table documents the timeout settings defined by **Selenium Foundat
 | **`HOST_TIMEOUT`** | selenium.timeout.host | 30 | Selenium Foundation HTTP host wait timeout interval. |
 
 Typically, these settings are not accessed directly. Rather, they are proxied through the **`WaitType`** enumeration to streamline the process of reading the timeout intervals and acquiring search context wait objects.
-
-
 
 > Written with [StackEdit](https://stackedit.io/).
