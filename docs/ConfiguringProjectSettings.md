@@ -79,7 +79,7 @@ This setting specifies the URL of the **Selenium Grid** hub server that will sup
 
 > `-Dselenium.hub.host=http://192.168.1.2/wd/hub`
 
-> If this setting is left undefined or specifies an inactive `localhost` URL, **Selenium Foundation** will automatically launch a local Grid instance as specified by the [local Grid configuration](LocalGridConfiguration).
+> If this setting is left undefined or specifies an inactive `localhost` URL, **Selenium Foundation** will automatically launch a local Grid instance as specified by the [local Grid configuration](LocalGridConfiguration.md).
 
 #### Selenium Grid Configuration Methods 
 
