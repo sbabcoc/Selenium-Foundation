@@ -44,7 +44,7 @@ In addition to specifying browser driver plug-ins in the **ServiceLoader** provi
 
 #### Appium-Specific Configuration
 
-In addition to specifying `Appium` driver plug-ins in the **ServiceLoader** provider configuration file, you'll need to [install](http://appium.io/docs/en/about-appium/getting-started) `Appium` and its dependencies. With a conventional installation, **Selenium Foundation** can use your system configuration to locate the components that comprise an `Appium` node. For non-standard installations, **Selenium Foundation** provides [settings](ConfiguringProjectSettings.md#appium-automation-engine-support) that enable you to supply explicit paths to these items.
+In addition to specifying `Appium` driver plug-ins in the **ServiceLoader** provider configuration file, you'll need to [install](http://appium.io/docs/en/about-appium/getting-started) `Appium` and its dependencies. With a conventional installation, **Selenium Foundation** can use your system configuration to locate the components that comprise an `Appium` node. For non-standard installations, **Selenium Foundation** provides [settings](ConfiguringProjectSettings.md#appium-binary-paths) that enable you to supply explicit paths to these items.
 
 #### Appium Server Arguments
 

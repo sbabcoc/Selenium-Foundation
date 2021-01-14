@@ -101,14 +101,14 @@ As of this writing, the unit tests are [configured](LocalGridConfiguration.md) t
 
 | Browser | Selenium 2 | Selenium 3 |
 | --- |:---:|:---:|
-| Chrome | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
-| Edge | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
-| Firefox | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
-| HtmlUnit | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
-| Internet Explorer | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
-| Opera | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
-| PhantomJS | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
-| Safari | [src](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) | [src](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
+| Chrome | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
+| Edge | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
+| Firefox | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
+| HtmlUnit | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
+| Internet Explorer | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
+| Opera | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
+| PhantomJS | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
+| Safari | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
 
 #### Appium Automation Engine Support
 
@@ -116,13 +116,15 @@ In addition to support for desktop browsers, **Selenium Foundation** provides th
 
 | Automation Engine | Plug-In |
 | --- |:---:|
-| Espresso | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/EspressoPlugin.java) |
-| Mac2 | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/Mac2Plugin.java) |
-| UiAutomator2 | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/UiAutomator2Plugin.java) |
-| Windows | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/WindowsPlugin.java) |
-| XCUITest | [src](../src/main/java/com/nordstrom/automation/selenium/plugins/XCUITestPlugin.java) |
+| Espresso | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/EspressoPlugin.java) |
+| Mac2 | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/Mac2Plugin.java) |
+| UiAutomator2 | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/UiAutomator2Plugin.java) |
+| Windows | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/WindowsPlugin.java) |
+| XCUITest | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/XCUITestPlugin.java) |
 
 Note that these plug-ins are not version-specific; each will work with either Selenium 2 or Selenium 3 API, and no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](http://appium.io/docs/en/about-appium/getting-started/) on your system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
+
+###### Appium Binary Paths
 
 | Item | Setting | Property | Default |
 | --- | --- | --- | --- |
@@ -135,7 +137,7 @@ Note that these plug-ins are not version-specific; each will work with either Se
 The `getCurrentCapabilities()` method converts the configured browser settings into a **`Capabilities`** object:
 
 * If **`BROWSER_NAME`** is specified, **Selenium Foundation** uses this name to acquire a **`Capabilities`** object from the active Selenium Grid.
-* Otherwise, the JSON configuration is acquired from **`BROWSER_CAPS`**.
+* Otherwise, the JSON configuration is acquired from **`BROWSER_CAPS`**, which can be either a file path (absolute, relative, or simple filename) or a direct value.
 
 As indicated by the sequence above, the desired browser can be specified solely by name. This name can be associated with a Selenium Grid browser "personality", or it may simply specify the name associated with a particular browser by its corresponding driver. If browser name is omitted, a fully-specified JSON capabilities record is acquired from the settings collection. (By default, the browser capabilities setting specifies the **HtmlUnit** browser.)
 

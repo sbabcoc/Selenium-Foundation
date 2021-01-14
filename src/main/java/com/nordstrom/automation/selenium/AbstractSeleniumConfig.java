@@ -169,7 +169,7 @@ public abstract class AbstractSeleniumConfig extends
         
         /**
          * If {@link #BROWSER_NAME} is undefined, this setting specifies the {@link Capabilities} for new session
-         * requests.
+         * requests. This can be either a file path (absolute, relative, or simple filename) or a direct value.
          * <p>
          * name: <b>selenium.browser.caps</b><br>
          * default: {@link #DEFAULT_CAPS}
@@ -608,7 +608,7 @@ public abstract class AbstractSeleniumConfig extends
     public Capabilities getCurrentCapabilities() {
         Capabilities capabilities = null;
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
-        String browserCaps = getString(SeleniumSettings.BROWSER_CAPS.key());
+        String browserCaps = resolveString(SeleniumSettings.BROWSER_CAPS.key());
         if (browserName != null) {
             capabilities = getSeleniumGrid().getPersonality(getConfig(), browserName);
         } else if (browserCaps != null) {
@@ -659,32 +659,10 @@ public abstract class AbstractSeleniumConfig extends
         }
         
         String propertyName = personality + propertySuffix;
-        String modifications = getString(propertyName);
+        String modsJson = resolveString(propertyName);
         
-        if (modifications == null) {
-            return null;
-        }
-        
-        // assume config'd mods are JSON
-        String modsJson = modifications;
-        // try to resolve config'd mods as file path
-        String modsPath = getConfigPath(modifications);
-        
-        // if mods file found
-        if (modsPath != null) {
-            try {
-                // load contents of mods file
-                Path path = Paths.get(modsPath);
-                URL url = path.toUri().toURL();
-                modsJson = Resources.toString(url, Charsets.UTF_8);
-            } catch (IOException e) {
-                // highly unlikely
-                return null;
-            }
-        }
-        
-        // return mods as [Capabilities] object
-        return getCapabilitiesForJson(modsJson)[0];
+        // return mods as [Capabilities] object; 'null' if none configured
+        return (modsJson != null) ? getCapabilitiesForJson(modsJson)[0] : null;
     }
     
     /**
@@ -822,5 +800,38 @@ public abstract class AbstractSeleniumConfig extends
     @Override
     public String getSettingsPath() {
         return SETTINGS_FILE;
+    }
+
+    /**
+     * Resolve the specified property name to its value.
+     * 
+     * <ul>
+     *     <li>If the property value refers to an existing resource file, the file contents are returned;</li>
+     *     <li>... otherwise, the property value itself is returned (may be {@code null})</li>
+     * </ul>
+     * 
+     * @param propertyName name of the property to resolve
+     * @return resolved property value (see description); may be {@code null}
+     */
+    private String resolveString(String propertyName) {
+        String propertyValue = getString(propertyName);
+        
+        if (propertyValue != null) {
+            // try to resolve property value as file path
+            String valuePath = getConfigPath(propertyValue);
+            
+            // if value file found
+            if (valuePath != null) {
+                try {
+                    // load contents of value file
+                    Path path = Paths.get(valuePath);
+                    URL url = path.toUri().toURL();
+                    propertyValue = Resources.toString(url, Charsets.UTF_8);
+                } catch (IOException e) {
+                    // nothing to do here
+                }
+            }
+        }
+        return propertyValue;
     }
 }
