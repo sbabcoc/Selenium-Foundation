@@ -453,6 +453,39 @@ public abstract class AbstractSeleniumConfig extends
         }
         throw new IllegalStateException("SELENIUM_CONFIG must be populated by subclass static initializer");
     }
+
+    /**
+     * Resolve the specified property name to its value.
+     * 
+     * <ul>
+     *     <li>If the property value refers to an existing resource file, the file contents are returned;</li>
+     *     <li>... otherwise, the property value itself is returned (may be {@code null})</li>
+     * </ul>
+     * 
+     * @param propertyName name of the property to resolve
+     * @return resolved property value (see description); may be {@code null}
+     */
+    public String resolveString(String propertyName) {
+        String propertyValue = getString(propertyName);
+        
+        if (propertyValue != null) {
+            // try to resolve property value as file path
+            String valuePath = getConfigPath(propertyValue);
+            
+            // if value file found
+            if (valuePath != null) {
+                try {
+                    // load contents of value file
+                    Path path = Paths.get(valuePath);
+                    URL url = path.toUri().toURL();
+                    propertyValue = Resources.toString(url, Charsets.UTF_8);
+                } catch (IOException e) {
+                    // nothing to do here
+                }
+            }
+        }
+        return propertyValue;
+    }
     
     /**
      * Get the URL for the configured Selenium Grid hub host.
@@ -603,7 +636,9 @@ public abstract class AbstractSeleniumConfig extends
     /** 
      * Convert the configured browser specification from JSON to {@link Capabilities} object.   
      *  
-     * @return {@link Capabilities} object for the configured browser specification 
+     * @return {@link Capabilities} object for the configured browser specification
+     * @throws IllegalArgumentException if {@code BROWSER_NAME} specifies a "personality"
+     *         that isn't supported by the active Grid 
      */ 
     public Capabilities getCurrentCapabilities() {
         Capabilities capabilities = null;
@@ -800,38 +835,5 @@ public abstract class AbstractSeleniumConfig extends
     @Override
     public String getSettingsPath() {
         return SETTINGS_FILE;
-    }
-
-    /**
-     * Resolve the specified property name to its value.
-     * 
-     * <ul>
-     *     <li>If the property value refers to an existing resource file, the file contents are returned;</li>
-     *     <li>... otherwise, the property value itself is returned (may be {@code null})</li>
-     * </ul>
-     * 
-     * @param propertyName name of the property to resolve
-     * @return resolved property value (see description); may be {@code null}
-     */
-    private String resolveString(String propertyName) {
-        String propertyValue = getString(propertyName);
-        
-        if (propertyValue != null) {
-            // try to resolve property value as file path
-            String valuePath = getConfigPath(propertyValue);
-            
-            // if value file found
-            if (valuePath != null) {
-                try {
-                    // load contents of value file
-                    Path path = Paths.get(valuePath);
-                    URL url = path.toUri().toURL();
-                    propertyValue = Resources.toString(url, Charsets.UTF_8);
-                } catch (IOException e) {
-                    // nothing to do here
-                }
-            }
-        }
-        return propertyValue;
     }
 }
