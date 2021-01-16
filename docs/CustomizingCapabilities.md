@@ -49,7 +49,7 @@ Once the specified `desired capabilities` have been loaded, **Selenium Foundatio
 
 ## Specifying Modifiers for Browser Capabilities and Node Configurations
 
-After resolving browser capabilities or driver plug-in node configurations, **Selenium Foundation** checks for a modifiers associated with the "personality" of each specification. If the corresponding modifier setting is specified, its resolved value is applied to the specification .
+After resolving browser capabilities or driver plug-in node configurations, **Selenium Foundation** checks for a modifiers associated with the "personality" of each capabilities specification. If the corresponding modifier setting is specified, its resolved value is applied to the specification .
 
 Modifiers are specified in the configuration as either JSON strings or file paths (absolute, relative, or simple filename). Property names for modifiers correspond to "personality" values within the capabilities themselves (in order of precedence):
 
@@ -57,7 +57,7 @@ Modifiers are specified in the configuration as either JSON strings or file path
 * `automationName`: 'appium' automation engine name
 * `browserName`: Selenium driver browser name
 
-The first defined value is selected as the "personality" of the specified **Capabilities** object. The full name of the property used to specify modifiers is the "personality" plus a context-specific suffix:
+The first defined value is selected as the "personality" of each capabilities specification. The full name of the property used to specify modifiers is the "personality" plus a context-specific suffix:
 
 * For node configuration capabilities: `<personality>.node.mods`
 * For "desired capabilities" requests: `<personality>.caps.mods`
