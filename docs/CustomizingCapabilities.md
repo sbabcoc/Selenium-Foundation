@@ -7,8 +7,8 @@ In **Selenium Foundation**, we've specified default values that work well in man
 
 There are two settings used to select which browser you want to run your tests on:
 
-* **`BROWSER_NAME`** :: This setting specifies the browser name or "personality" for new session requests.
-* **`BROWSER_CAPS`** :: If **`BROWSER_NAME`** is undefined, this setting specifies the **Capabilities** for new session requests. This can be either a file path (absolute, relative, or simple filename) or a direct value.
+* **`BROWSER_NAME`** - This setting specifies the browser name or "personality" for new session requests.
+* **`BROWSER_CAPS`** - If **`BROWSER_NAME`** is undefined, this setting specifies the **Capabilities** for new session requests. This can be either a file path (absolute, relative, or simple filename) or a direct value.
 * By default, **`BROWSER_NAME`** is unspecified and **`BROWSER_CAPS`** specifies the `HtmlUnit` browser.
 
 ### Selecting Browser Capabilities by Personality
