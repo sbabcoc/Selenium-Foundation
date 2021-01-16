@@ -43,7 +43,7 @@ If the "personalities" defined by the plug-in for your desired browser don't mee
 
 As shown, the value of **`BROWSER_CAPS`** must resolve to a JSON `Capabilities` specification. This can be either a direct value or a file path (absolute, relative, or simple filename).
 
-> **NOTE**: Both of the example shown above are available via "personalities" - the first is `htmlunit` from **`HtmlUnitPlugin`**, and the second is `firefox.headless` from **`FirefoxPlugin`**.
+> **NOTE**: Both of the example shown above are available via "personalities"; the first is `htmlunit` from **`HtmlUnitPlugin`**, and the second is `firefox.headless` from **`FirefoxPlugin`**.
 
 Once the specified `desired capabilities` have been loaded, **Selenium Foundation** determines if an [associated modifier](#specifying-modifiers-for-browser-capabilities-and-node-configurations) has been specified.
 
