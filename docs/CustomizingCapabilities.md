@@ -26,7 +26,7 @@ Once the specified "personality" is resolved to `desired capabilities`, **Seleni
 
 ### Specifying Browser Capabilities Directly
 
-If the "personalities" defined by the plug-in for your desired browser don't meet your needs, you can specify your desired capabilities in **`DRIVER_CAPS`**.
+If the "personalities" defined by the plug-in for your desired browser don't meet your needs, you can specify your desired capabilities in **`BROWSER_CAPS`**.
 
 | Scenario | **`BROWSER_CAPS`** |
 |:---|:---|
