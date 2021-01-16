@@ -60,7 +60,7 @@ public class ExamplePageServlet extends HttpServlet {
         try {
             return Resources.toString(url, Charsets.UTF_8);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to load JavaScript resource '" + resource + "'", e);
+            throw new IllegalArgumentException("Failed to load servlet resource '" + resource + "'", e);
         }
     }
 

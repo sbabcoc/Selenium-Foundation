@@ -242,11 +242,12 @@ public class SeleniumGrid {
      * @param config {@link SeleniumConfig} object
      * @param personality browser personality to retrieve
      * @return {@link Capabilities} object for the specified personality
+     * @throws IllegalArgumentException if specified personality isn't supported by the active Grid
      */
     public Capabilities getPersonality(SeleniumConfig config, String personality) {
         String json = personalities.get(personality);
         if ((json == null) || json.isEmpty()) {
-            String message = String.format("Specified personality '%s' not supported by local Grid", personality);
+            String message = String.format("Specified personality '%s' not supported by active Grid", personality);
             String browserName = personality.split("\\.")[0];
             if ( ! browserName.equals(personality)) {
                 LOGGER.warn("{}; revert to browser name '{}'", message, browserName);
@@ -255,7 +256,7 @@ public class SeleniumGrid {
                     return capsList[0];
                 }
             }
-            throw new RuntimeException(message);
+            throw new IllegalArgumentException(message);
         } else {
             return config.getCapabilitiesForJson(json)[0];
         }

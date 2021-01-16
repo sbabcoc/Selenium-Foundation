@@ -13,12 +13,14 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.gson.Gson;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -204,18 +206,11 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = super.getDefaults();
         defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), DEFAULT_GRID_LAUNCHER);
+        defaults.put(SeleniumSettings.LAUNCHER_DEPS.key(), StringUtils.join(DEPENDENCY_CONTEXTS, ";"));
         defaults.put(SeleniumSettings.HUB_PORT.key(), DEFAULT_HUB_PORT);
         defaults.put(SeleniumSettings.HUB_CONFIG.key(), DEFAULT_HUB_CONFIG);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), DEFAULT_NODE_CONFIG);
         return defaults;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String[] getDependencyContexts() {
-        return DEPENDENCY_CONTEXTS;
     }
     
     /**

@@ -118,10 +118,22 @@ public abstract class AbstractSeleniumConfig extends
          * command-line interface for configuring and launching <b>Selenium Grid</b> servers implemented in Java.
          * <p>
          * name: <b>selenium.grid.launcher</b><br>
-         * Selenium 2: <b>org.openqa.grid.selenium.GridLauncher</b><br>
-         * Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b>
+         * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
+         * <ul>
+         *     <li>Selenium 2: <b>org.openqa.grid.selenium.GridLauncher</b></li>
+         *     <li>Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b></li>
+         * </ul>
          */
         GRID_LAUNCHER("selenium.grid.launcher", null),
+        
+        /**
+         * This setting specifies a semicolon-delimited list of fully-qualified names of context classes for
+         * the dependencies of the {@link #GRID_LAUNCHER} class.
+         * <p>
+         * name: <b>selenium.launcher.deps</b><br>
+         * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
+         */
+        LAUNCHER_DEPS("selenium.launcher.deps", null),
         
         /**
          * This setting specifies the configuration file name/path for the local <b>Selenium Grid</b> hub server.
@@ -169,7 +181,7 @@ public abstract class AbstractSeleniumConfig extends
         
         /**
          * If {@link #BROWSER_NAME} is undefined, this setting specifies the {@link Capabilities} for new session
-         * requests.
+         * requests. This can be either a file path (absolute, relative, or simple filename) or a direct value.
          * <p>
          * name: <b>selenium.browser.caps</b><br>
          * default: {@link #DEFAULT_CAPS}
@@ -453,6 +465,39 @@ public abstract class AbstractSeleniumConfig extends
         }
         throw new IllegalStateException("SELENIUM_CONFIG must be populated by subclass static initializer");
     }
+
+    /**
+     * Resolve the specified property name to its value.
+     * 
+     * <ul>
+     *     <li>If the property value refers to an existing resource file, the file contents are returned;</li>
+     *     <li>... otherwise, the property value itself is returned (may be {@code null})</li>
+     * </ul>
+     * 
+     * @param propertyName name of the property to resolve
+     * @return resolved property value (see description); may be {@code null}
+     */
+    public String resolveString(String propertyName) {
+        String propertyValue = getString(propertyName);
+        
+        if (propertyValue != null) {
+            // try to resolve property value as file path
+            String valuePath = getConfigPath(propertyValue);
+            
+            // if value file found
+            if (valuePath != null) {
+                try {
+                    // load contents of value file
+                    Path path = Paths.get(valuePath);
+                    URL url = path.toUri().toURL();
+                    propertyValue = Resources.toString(url, Charsets.UTF_8);
+                } catch (IOException e) {
+                    // nothing to do here
+                }
+            }
+        }
+        return propertyValue;
+    }
     
     /**
      * Get the URL for the configured Selenium Grid hub host.
@@ -603,12 +648,14 @@ public abstract class AbstractSeleniumConfig extends
     /** 
      * Convert the configured browser specification from JSON to {@link Capabilities} object.   
      *  
-     * @return {@link Capabilities} object for the configured browser specification 
+     * @return {@link Capabilities} object for the configured browser specification
+     * @throws IllegalArgumentException if {@code BROWSER_NAME} specifies a "personality"
+     *         that isn't supported by the active Grid 
      */ 
     public Capabilities getCurrentCapabilities() {
         Capabilities capabilities = null;
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
-        String browserCaps = getString(SeleniumSettings.BROWSER_CAPS.key());
+        String browserCaps = resolveString(SeleniumSettings.BROWSER_CAPS.key());
         if (browserName != null) {
             capabilities = getSeleniumGrid().getPersonality(getConfig(), browserName);
         } else if (browserCaps != null) {
@@ -621,10 +668,10 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
-     * Get configured modifications for the specified <b>Capabilities</b> object.
+     * Get the configured modifier for the specified <b>Capabilities</b> object.
      * <p>
-     * <b>NOTE</b>: Modifications are specified in the configuration as either JSON strings or file paths
-     * (absolute, relative, or simple filename). Property names for modifications correspond to "personality"
+     * <b>NOTE</b>: Modifiers are specified in the configuration as either JSON strings or file paths
+     * (absolute, relative, or simple filename). Property names for modifiers correspond to "personality"
      * values within the capabilities themselves (in order of precedence): 
      * 
      * <ul>
@@ -634,7 +681,7 @@ public abstract class AbstractSeleniumConfig extends
      * </ul>
      * 
      * The first defined value is selected as the "personality" of the specified <b>Capabilities</b> object.
-     * The full name of the property used to specify modifications is the "personality" plus a context-specific
+     * The full name of the property used to specify modifiers is the "personality" plus a context-specific
      * suffix: 
      * 
      * <ul>
@@ -644,7 +691,7 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @param capabilities target capabilities object
      * @param propertySuffix suffix for configuration property name
-     * @return configured modifications; {@code null} if none configured
+     * @return configured modifier; {@code null} if none configured
      */
     protected Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
         String personality = (String) capabilities.getCapability("personality");
@@ -659,32 +706,10 @@ public abstract class AbstractSeleniumConfig extends
         }
         
         String propertyName = personality + propertySuffix;
-        String modifications = getString(propertyName);
+        String modsJson = resolveString(propertyName);
         
-        if (modifications == null) {
-            return null;
-        }
-        
-        // assume config'd mods are JSON
-        String modsJson = modifications;
-        // try to resolve config'd mods as file path
-        String modsPath = getConfigPath(modifications);
-        
-        // if mods file found
-        if (modsPath != null) {
-            try {
-                // load contents of mods file
-                Path path = Paths.get(modsPath);
-                URL url = path.toUri().toURL();
-                modsJson = Resources.toString(url, Charsets.UTF_8);
-            } catch (IOException e) {
-                // highly unlikely
-                return null;
-            }
-        }
-        
-        // return mods as [Capabilities] object
-        return getCapabilitiesForJson(modsJson)[0];
+        // return mods as [Capabilities] object; 'null' if none configured
+        return (modsJson != null) ? getCapabilitiesForJson(modsJson)[0] : null;
     }
     
     /**
@@ -795,7 +820,15 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @return context class names for Selenium Grid dependencies
      */ 
-    public abstract String[] getDependencyContexts();
+    public String[] getDependencyContexts() {
+        String dependencies = getString(SeleniumSettings.LAUNCHER_DEPS.key());
+        if (dependencies != null) {
+            return dependencies.split(";");
+        } else {
+            return new String[] {};
+        }
+    }
+    
     
     /**
      * Create node configuration file from the specified JSON string, to be registered with the indicated hub.
