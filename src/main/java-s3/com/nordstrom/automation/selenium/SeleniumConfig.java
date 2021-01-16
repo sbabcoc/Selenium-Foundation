@@ -158,7 +158,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    null,
                     "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
                     "org.apache.commons.lang3.reflect.FieldUtils",
                     "net.bytebuddy.matcher.ElementMatcher",
@@ -176,7 +175,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     static {
         try {
             seleniumConfig = new SeleniumConfig();
-            DEPENDENCY_CONTEXTS[0] = seleniumConfig.getString(SeleniumSettings.GRID_LAUNCHER.key());
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
         }
