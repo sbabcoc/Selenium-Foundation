@@ -821,9 +821,14 @@ public abstract class AbstractSeleniumConfig extends
      * @return context class names for Selenium Grid dependencies
      */ 
     public String[] getDependencyContexts() {
-        String dependencies = getString(SeleniumSettings.LAUNCHER_DEPS.key());
-        if (dependencies != null) {
-            return dependencies.split(";");
+        String gridLauncher = getString(SeleniumSettings.GRID_LAUNCHER.key());
+        if (gridLauncher != null) {
+            String dependencies = getString(SeleniumSettings.LAUNCHER_DEPS.key());
+            if (dependencies != null) {
+                return (gridLauncher + ";" + dependencies).split(";");
+            } else {
+                return new String[] { gridLauncher };
+            }
         } else {
             return new String[] {};
         }

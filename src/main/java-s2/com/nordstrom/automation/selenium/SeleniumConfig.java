@@ -153,7 +153,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    null,
                     "com.nordstrom.tools.GuavaAgent",           // guava-agent
                     "net.bytebuddy.matcher.ElementMatcher",     // guava-agent
                     "com.nordstrom.automation.selenium.servlet.ExamplePageServlet",
@@ -174,7 +173,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     static {
         try {
             seleniumConfig = new SeleniumConfig();
-            DEPENDENCY_CONTEXTS[0] = seleniumConfig.getString(SeleniumSettings.GRID_LAUNCHER.key());
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
         }
