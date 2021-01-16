@@ -81,7 +81,7 @@ To enable the `Local Grid` feature to support both **Selenium 2** and **Selenium
 
 ### Building Driver-Specific Node Configurations
 
-During the **Local Grid** start-up process, **Selenium Foundation** builds a driver-specific node configuration for each plug-in specified in the [**ServiceLoader** provider configuration file](#serviceloader-provider-configuration-file):
+During the **Local Grid** start-up process, **Selenium Foundation** builds a driver-specific node configuration for each plug-in specified in the **ServiceLoader** [provider configuration file](#serviceloader-provider-configuration-file):
 
 * The **Capabilities** specification for the node is acquired from the driver plug-in.
 * A base node configuration is built from this specification suitable for the target **Selenium API** version.
@@ -100,7 +100,7 @@ Once the configuration of the `Local Grid` is resolved, **Selenium Foundation** 
   * ... specifying the IP address returned by `GridUtility.getLocalHost()`
   * ... listening to the port specified by the **`HUB_PORT`** setting
 * Update the values of **`HUB_HOST`** and **`HUB_PORT`** to reflect the grid hub server configuration.
-* For each plug-in specified in the [**ServiceLoader** provider configuration file](#serviceloader-provider-configuration-file):
+* For each plug-in specified in the **ServiceLoader** [provider configuration file](#serviceloader-provider-configuration-file):
   * Launch the driver-specific **Selenium Grid** node server:
     * `for `**`RemoteWebDriver`**` plug-in`:
       * ... with the grid launcher class used to launch the grid hub server
