@@ -1,3 +1,4 @@
+
 # Introduction
 
 The configuration of **Selenium Foundation** projects is an aggregation of several factors:

@@ -60,11 +60,12 @@ Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to 
 
 ### Additional Local Grid Settings
 
-To enable the `Local Grid` feature for both **Selenium 2** and **Selenium 3**, the core configuration in **`SeleniumConfig`** defines version-specific default values for several settings:
+To enable the `Local Grid` feature to support both **Selenium 2** and **Selenium 3**, the core configuration in **`SeleniumConfig`** defines version-specific default values for several settings:
 
 | Setting | Property Name | `s2` Default | `s3` Default |
 |---|---|---|---|
 | **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncher | org.openqa.grid.selenium.GridLauncherV3 |
+| **`LAUNCHER_DEPS`** | `selenium.launcher.deps` | _(version-dependent)_ | _(version-dependent)_ |
 | **`HUB_PORT`** | `selenium.hub.port` | 4444 | 4445 |
 | **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s2.json | hubConfig-s3.json |
 | **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s2.json | nodeConfig-s3.json |
@@ -72,8 +73,49 @@ To enable the `Local Grid` feature for both **Selenium 2** and **Selenium 3**, t
 #### NOTES
 
 * The **`GRID_LAUNCHER`** setting specifies the fully-qualified name of the main Java class for launching Grid servers.
-* The **`HUB_PORT`** setting specifies the HTTP port assigned to the Grid hub server. This is only used if the [**`HUB_HOST`** setting](ConfiguringProjectSettings.md#selenium-grid-configuration) is undefined. You can direct **Selenium Foundation** to automatically select any available port by overriding this setting with a value of `0`.
+* The **`LAUNCHER_DEPS`** setting specifies a semicolon-delimited list of fully-qualified names of context classes for the dependencies of the **`GRID_LAUNCHER`** class.
+* The **`HUB_PORT`** setting specifies the HTTP port assigned to the Grid hub server. This is only used if the [**`HUB_HOST`** setting](ConfiguringProjectSettings.md#selenium-grid-configuration) is undefined. 
+* Specifying **`HUB_PORT`** as `0` directs **Selenium Foundation** to automatically select any available port.
 * The **`HUB_CONFIG`** setting specifies the configuration file for Grid hub servers.
-* The **`NODE_CONFIG`** setting specifies the base file used to build configurations for Grid node servers. 
+* The **`NODE_CONFIG`** setting specifies the configuration template used to build configurations for Grid node servers. 
+
+### Building Driver-Specific Node Configurations
+
+During the **Local Grid** start-up process, **Selenium Foundation** builds a driver-specific node configuration for each plug-in specified in the [**ServiceLoader** provider configuration file](#serviceloader-provider-configuration-file):
+
+* The **Capabilities** specification for the node is acquired from the driver plug-in.
+* A base node configuration is built from this specification suitable for the target **Selenium API** version.
+* **Selenium Foundation** determines if an [associated modifier](CustomizingCapabilities#specifying-modifiers-for-browser-capabilities-and-node-configurations) has been specified for the base configuration.
+* The base configuration is merged with the configuration template specified by the **`NODE_CONFIG`** setting.
+* The resulting node configuration is written to disk (unless the target file already exists)
+
+## Launching the Local Selenium Grid
+
+Once the configuration of the `Local Grid` is resolved, **Selenium Foundation** commences to launch:
+
+* Launch the **Selenium Grid** hub server:
+  * ... with the grid launcher class specified by the **`GRID_LAUNCHER`** setting
+  * ... with dependency contexts specified by the **`LAUNCHER_DEPS`** setting
+  * ... with the hub configuration specified by the **`HUB_CONFIG`** setting
+  * ... specifying the IP address returned by `GridUtility.getLocalHost()`
+  * ... listening to the port specified by the **`HUB_PORT`** setting
+* Update the values of **`HUB_HOST`** and **`HUB_PORT`** to reflect the grid hub server configuration.
+* For each plug-in specified in the [**ServiceLoader** provider configuration file](#serviceloader-provider-configuration-file):
+  * Launch the driver-specific **Selenium Grid** node server:
+    * `for `**`RemoteWebDriver`**` plug-in`:
+      * ... with the grid launcher class used to launch the grid hub server
+      * ... with additional dependency contexts specified by the plug-in
+      * ... propagating the values of System properties specified by the plug-in
+      * ... with the [assembled driver-specific node configuration](#building-driver-specific-node-configurations)
+      * ... specifying the IP address returned by `GridUtility.getLocalHost()`
+      * ... listening to the port returned by `PortProber.findFreePort()`
+    * `for `[**`Appium`**](ConfiguringProjectSettings.md#appium-binary-paths)`plug-in`:
+      * ... with `Node` executable specified by the **`NODE_BINARY_PATH`** setting
+        * ... searching the System configuration if unspecified
+      * ... with `Appium` main script specified by the **`APPIUM_BINARY_PATH`** setting
+        * ... searching the global `Node` modules repository if unspecified
+      * ... with the [assembled driver-specific node configuration](#building-driver-specific-node-configurations)
+      * ... specifying the IP address returned by `GridUtility.getLocalHost()`
+      * ... listening to the port returned by `PortProber.findFreePort()`
 
 > Written with [StackEdit](https://stackedit.io/).

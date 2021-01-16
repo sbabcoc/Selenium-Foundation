@@ -118,10 +118,22 @@ public abstract class AbstractSeleniumConfig extends
          * command-line interface for configuring and launching <b>Selenium Grid</b> servers implemented in Java.
          * <p>
          * name: <b>selenium.grid.launcher</b><br>
-         * Selenium 2: <b>org.openqa.grid.selenium.GridLauncher</b><br>
-         * Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b>
+         * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
+         * <ul>
+         *     <li>Selenium 2: <b>org.openqa.grid.selenium.GridLauncher</b></li>
+         *     <li>Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b></li>
+         * </ul>
          */
         GRID_LAUNCHER("selenium.grid.launcher", null),
+        
+        /**
+         * This setting specifies a semicolon-delimited list of fully-qualified names of context classes for
+         * the dependencies of the {@link #GRID_LAUNCHER} class.
+         * <p>
+         * name: <b>selenium.launcher.deps</b><br>
+         * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
+         */
+        LAUNCHER_DEPS("selenium.launcher.deps", null),
         
         /**
          * This setting specifies the configuration file name/path for the local <b>Selenium Grid</b> hub server.
@@ -656,10 +668,10 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
-     * Get configured modifications for the specified <b>Capabilities</b> object.
+     * Get the configured modifier for the specified <b>Capabilities</b> object.
      * <p>
-     * <b>NOTE</b>: Modifications are specified in the configuration as either JSON strings or file paths
-     * (absolute, relative, or simple filename). Property names for modifications correspond to "personality"
+     * <b>NOTE</b>: Modifiers are specified in the configuration as either JSON strings or file paths
+     * (absolute, relative, or simple filename). Property names for modifiers correspond to "personality"
      * values within the capabilities themselves (in order of precedence): 
      * 
      * <ul>
@@ -669,7 +681,7 @@ public abstract class AbstractSeleniumConfig extends
      * </ul>
      * 
      * The first defined value is selected as the "personality" of the specified <b>Capabilities</b> object.
-     * The full name of the property used to specify modifications is the "personality" plus a context-specific
+     * The full name of the property used to specify modifiers is the "personality" plus a context-specific
      * suffix: 
      * 
      * <ul>
@@ -679,7 +691,7 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @param capabilities target capabilities object
      * @param propertySuffix suffix for configuration property name
-     * @return configured modifications; {@code null} if none configured
+     * @return configured modifier; {@code null} if none configured
      */
     protected Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
         String personality = (String) capabilities.getCapability("personality");
@@ -808,7 +820,15 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @return context class names for Selenium Grid dependencies
      */ 
-    public abstract String[] getDependencyContexts();
+    public String[] getDependencyContexts() {
+        String dependencies = getString(SeleniumSettings.LAUNCHER_DEPS.key());
+        if (dependencies != null) {
+            return dependencies.split(";");
+        } else {
+            return new String[] {};
+        }
+    }
+    
     
     /**
      * Create node configuration file from the specified JSON string, to be registered with the indicated hub.
