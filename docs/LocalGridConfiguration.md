@@ -114,6 +114,7 @@ Once the configuration of the `Local Grid` is resolved, **Selenium Foundation** 
         * ... searching the System configuration if unspecified
       * ... with `Appium` main script specified by the **`APPIUM_BINARY_PATH`** setting
         * ... searching the global `Node` modules repository if unspecified
+      * ... with command-line arguments specified by the **`APPIUM_CLI_ARGS`** setting
       * ... with the [assembled driver-specific node configuration](#building-driver-specific-node-configurations)
       * ... specifying the IP address returned by `GridUtility.getLocalHost()`
       * ... listening to the port returned by `PortProber.findFreePort()`
