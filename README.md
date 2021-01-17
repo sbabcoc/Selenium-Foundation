@@ -48,7 +48,7 @@
 
 ## Selenium API Support
 
-**Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](https://github.com/sbabcoc/Selenium-Foundation/blob/master/build.gradle).
+**Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](build.gradle).
 
 ### Dependency Artifact Coordinates
 
@@ -98,7 +98,7 @@ Note that the version number in this POM file is merely a placeholder - a token 
 
 ## Getting Started
 
-The [QuickStart](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation), and the [Settings API](https://github.com/sbabcoc/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
+The [QuickStart](src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation), and the [Settings API](https://github.com/sbabcoc/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
 
 ### Required Configuration
 
@@ -119,7 +119,7 @@ In addition to support for all of the standard Java-based browser drivers, the `
 
 ### Automatic Targeted Session Configuration
 
-**Selenium Foundation** provides a [`target platform`](docs/TargetPlatformFeature.md) feature that enables you to define collections of configurations that can be assigned to specific test methods. Prior to the start of each test, you have the chance to "activate" the assigned platform (e.g. - change screen dimensions).
+**Selenium Foundation** provides a [`target platform`](docs/TargetPlatformFeature.md#introduction) feature that enables you to define collections of configurations that can be assigned to specific test methods. Prior to the start of each test, you have the chance to "activate" the assigned platform (e.g. - change screen dimensions).
  
 ### Support for Frame-Based Components and Shadow-DOM Hierarchies
 
@@ -131,13 +131,13 @@ Page classes can be explicitly associated with web application paths through the
 
 ### Customizable Transition Error Detection
 
-In conjunction with automatic landing page verification, **Selenium Foundation** invokes registered custom [transition error detectors](docs/TransitionErrorDetection.md). Implement the [TransitionErrorDetector](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/interfaces/TransitionErrorDetector.java) interface, then register your detectors in the corresponding service loader configuration file (**META-INF/services/com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector**).
+In conjunction with automatic landing page verification, **Selenium Foundation** invokes registered custom [transition error detectors](docs/TransitionErrorDetection.md#introduction). Implement the [TransitionErrorDetector](src/main/java/com/nordstrom/automation/selenium/interfaces/TransitionErrorDetector.java) interface, then register your detectors in the corresponding service loader configuration file (**META-INF/services/com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector**).
 
 Examples of the sorts of conditions you may want to detect include error pages (e.g. - page not found) or non-context error messages (e.g. - communication issues, access token timeout). For recoverable conditions, error detectors can also server as error handler. For example, you could implement a detector that automatically logs back in if your test encounters an access timeout.
 
 ### Component Collection Classes
 
-**Selenium Foundation** also includes collection classes ([ComponentList](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentList.java), [ComponentMap](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ComponentMap.java), [FrameList](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameList.java), [FrameMap](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/FrameMap.java), [ShadowRootList](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ShadowRootList.java), and [ShadowRootMap](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/model/ShadowRootMap.java)) that enable you to define collections of components for your page models. For example, you can define a **SearchResultTile** component and include a map of these tiles keyed by product ID in your **SearchResultsPage** class. **Selenium Foundation** collections are lazy-initialized automatically - the composition of the collection is determined when it's instantiated, but each item in the collection is only populated when it's explicitly referenced.
+**Selenium Foundation** also includes collection classes ([ComponentList](src/main/java/com/nordstrom/automation/selenium/model/ComponentList.java), [ComponentMap](src/main/java/com/nordstrom/automation/selenium/model/ComponentMap.java), [FrameList](src/main/java/com/nordstrom/automation/selenium/model/FrameList.java), [FrameMap](src/main/java/com/nordstrom/automation/selenium/model/FrameMap.java), [ShadowRootList](src/main/java/com/nordstrom/automation/selenium/model/ShadowRootList.java), and [ShadowRootMap](src/main/java/com/nordstrom/automation/selenium/model/ShadowRootMap.java)) that enable you to define collections of components for your page models. For example, you can define a **SearchResultTile** component and include a map of these tiles keyed by product ID in your **SearchResultsPage** class. **Selenium Foundation** collections are lazy-initialized automatically - the composition of the collection is determined when it's instantiated, but each item in the collection is only populated when it's explicitly referenced.
 
 ### Automatic Stale Element Reference Protection
 
@@ -170,11 +170,11 @@ To assist in root-cause analysis, **Selenium Foundation** automatically captures
 
 **Selenium Foundation** includes support for both **TestNG** and **JUnit 4**, enabled by several core abstractions, and through features provided by the **TestNG Foundation** and **JUnit Foundation** libraries.
 
-All of the features of **Selenium Foundation** are available regardless of which testing framework you choose. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from both TestNG (via [ModelTest](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)) and JUnit 4 (via [JUnitModelTest](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)).
+All of the features of **Selenium Foundation** are available regardless of which testing framework you choose. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from both TestNG (via [ModelTest](src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)) and JUnit 4 (via [JUnitModelTest](src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)).
 
 #### Learn more about...
-* [TestNG Support](docs/TestNGSupport.md)
-* [JUnit 4 Support](docs/JUnit4Support.md)
+* [TestNG Support](docs/TestNGSupport.md#introduction)
+* [JUnit 4 Support](docs/JUnit4Support.md#introduction)
 
 ## Essential Settings 
 
@@ -186,7 +186,7 @@ You'll probably find that the defaults assigned to most settings will suffice in
 | **`TARGET_HOST`** | `selenium.target.host` | `localhost` |
 | **`TARGET_PATH`** | `selenium.target.path` | `/` |
 
-\* NOTE: By default, HtmlUnit is selected as the browser. For easier override, this is specified through **`BROWSER_CAPS`** instead of **`BROWSER_NAME`**. For details, see [Configuring Project Settings](docs/ConfiguringProjectSettings.md). 
+\* NOTE: By default, HtmlUnit is selected as the browser. For easier override, this is specified through **`BROWSER_CAPS`** instead of **`BROWSER_NAME`**. For details, see [Configuring Project Settings](docs/ConfiguringProjectSettings.md#introduction). 
 
 ## Overriding Defaults 
 
