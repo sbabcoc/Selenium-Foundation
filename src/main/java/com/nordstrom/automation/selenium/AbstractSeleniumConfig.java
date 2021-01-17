@@ -264,7 +264,7 @@ public abstract class AbstractSeleniumConfig extends
         CONTEXT_PLATFORM("selenium.context.platform", null),
         
         /**
-         * This setting specifies server arguments passes on to {@code Appium} when it's launched as a local
+         * This setting specifies server arguments passed on to {@code Appium} when it's launched as a local
          * <b>Selenium Grid</b> node server.
          * <p>
          * <b>NOTE</b>: This setting can define multiple {@code Appium} server arguments together, and can be
