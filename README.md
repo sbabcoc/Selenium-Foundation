@@ -14,6 +14,7 @@
 * [Getting Started](#getting-started)
   * [Required Configuration](#required-configuration)
 * [Highlights](#highlights)
+  * [Support for Appium Automation Engines](#support-for-appium-automation-engines)
   * [Automatic Driver Targeting](#automatic-driver-targeting)
   * [Automatic Targeted Session Configuration](#automatic-targeted-session-configuration)
   * [Support for Frame-Based Components and Shadow-DOM Hierarchies](#support-for-frame-based-components-and-shadow-dom-hierarchies)
@@ -107,6 +108,10 @@ The [QuickStart](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/
 * [JUnit 4 Required Configuration](docs/JUnit4Support.md#junit-4-required-configuration)
 
 ## Highlights
+
+### Support for Appium Automation Engines
+
+In addition to support for all of the standard Java-based browser drivers, the `Local Grid` feature of **Selenium Foundation** provides the ability to drive mobile and desktop applications via **Appium**. Driver plug-ins are available for all of the major [automation engines](docs/ConfiguringProjectSettings.md#appium-automation-engine-support), with the ability to customize out-of-the-box settings with [configurable modifications](docs/CustomizingCapabilities.md#specifying-modifiers-for-browser-capabilities-and-node-configurations) and [command line options](docs/LocalGridConfiguration.md#appium-server-arguments). 
 
 ### Automatic Driver Targeting
 
