@@ -34,17 +34,18 @@
 
 #### In-Depth Documentation
 
-* [Welcome to Selenium Foundation](docs/WelcomeToSeleniumFoundation.md)
-* [Configuring Project Settings](docs/ConfiguringProjectSettings.md)
-* [Local Grid Configuration](docs/LocalGridConfiguration.md)
-* [Customizing Capabilities](docs/CustomizingCapabilities.md)
-* [TestNG Support](docs/TestNGSupport.md)
-* [JUnit 4 Support](docs/JUnit4Support.md)
-* [Target Platform Feature](docs/TargetPlatformFeature.md)
-* [Building Page Objects](docs/BuildingPageObjects.md)
-* [Page Components](docs/PageComponents.md)
-* [Transition Error Detection](docs/TransitionErrorDetection.md)
-* [JavaScript Enhancements](docs/JavaScriptEnhancements.md)
+* [Welcome to Selenium Foundation](docs/WelcomeToSeleniumFoundation.md#introduction)
+* [Development Environment](docs/DevelopmentEnvironment.md#introduction)
+* [Configuring Project Settings](docs/ConfiguringProjectSettings.md#introduction)
+* [Local Grid Configuration](docs/LocalGridConfiguration.md#introduction)
+* [Customizing Capabilities](docs/CustomizingCapabilities.md#introduction)
+* [TestNG Support](docs/TestNGSupport.md#introduction)
+* [JUnit 4 Support](docs/JUnit4Support.md#introduction)
+* [Target Platform Feature](docs/TargetPlatformFeature.md#introduction)
+* [Building Page Objects](docs/BuildingPageObjects.md#introduction)
+* [Page Components](docs/PageComponents.md#introduction)
+* [Transition Error Detection](docs/TransitionErrorDetection.md#introduction)
+* [JavaScript Enhancements](docs/JavaScriptEnhancements.md#introduction)
 
 ## Selenium API Support
 
@@ -69,11 +70,15 @@ To add a dependency for Gradle:
 
 ### Building Selenium Foundation
 
+In order to build **Selenium Foundation**, start by setting up your [development environment](docs/DevelopmentEnvironment.md#introduction).
+
 #### Building in Eclipse
 
-For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plugin. By default, this project will build its **Selenium 3** configuration. To build the **Selenium 2** configuration, add this program argument to the run configuration for the `build` task:
+For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plug-in. By default, this project will build its **Selenium 3** configuration. To build the **Selenium 2** configuration, add this program argument to the run configuration for the `build` task:
 
 > `-Pprofile=selenium2`
+
+[Learn more...](docs/DevelopmentEnvironment.md#gradle-configuration)
 
 #### Building from Command Line
 
