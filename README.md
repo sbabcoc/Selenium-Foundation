@@ -34,7 +34,7 @@
 
 #### In-Depth Documentation
 
-* [Welcome to Selenium Foundation](docs/WelcomeToSeleniumFoundation.md#introduction)
+* [Welcome to Selenium Foundation](docs/WelcomeToSeleniumFoundation.md#welcome)
 * [Development Environment](docs/DevelopmentEnvironment.md#introduction)
 * [Configuring Project Settings](docs/ConfiguringProjectSettings.md#introduction)
 * [Local Grid Configuration](docs/LocalGridConfiguration.md#introduction)
@@ -45,7 +45,7 @@
 * [Building Page Objects](docs/BuildingPageObjects.md#introduction)
 * [Page Components](docs/PageComponents.md#introduction)
 * [Transition Error Detection](docs/TransitionErrorDetection.md#introduction)
-* [JavaScript Enhancements](docs/JavaScriptEnhancements.md#introduction)
+* [JavaScript Enhancements](docs/JavaScriptEnhancements.md#the-basics-what-webdriver-provides)
 
 ## Selenium API Support
 
@@ -99,7 +99,9 @@ Although Gradle is used to produce official releases, **Selenium Foundation** al
 > **`mvn package -Pselenium3`** `# build Selenium 3 configuration`  
 > **`mvn package -Pselenium2`** `# build Selenium 2 configuration`
 
-Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at `META-INF\maven\com.nordstrom.ui-tools\selenium-foundation\pom.xml`
+Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at:
+
+> **`META-INF\maven\com.nordstrom.ui-tools\selenium-foundation\pom.xml`**
 
 ## Getting Started
 
