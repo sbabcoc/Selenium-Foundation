@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.nordstrom.ui-tools</groupId>
   <artifactId>selenium-foundation</artifactId>
-  <version>@projectVersion@</version>
+  <version>${revision}</version>
   <packaging>jar</packaging>
   
   <name>Selenium Foundation</name>
@@ -35,6 +35,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <revision>@projectVersion@</revision>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
     <java-utils.version>1.11.0</java-utils.version>
