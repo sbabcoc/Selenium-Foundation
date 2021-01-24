@@ -74,7 +74,7 @@ In order to build **Selenium Foundation**, start by setting up your [development
 
 #### Building in Eclipse
 
-For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plug-in. By default, this project will build its **Selenium 3** configuration. To build the **Selenium 2** configuration, add this program argument to the run configuration for the `build` task:
+For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plug-in. By default, this project will build its **Selenium 3** configuration. To build the **Selenium 2** configuration, add this program argument to a run configuration that includes the `clean` and `build` tasks:
 
 > `-Pprofile=selenium2`
 
