@@ -141,11 +141,10 @@ public class Frame extends Page {
     /**
      * Switch focus to the specified frame context.
      * 
-     * @param context frame context
+     * @param element frame context element
      * @return driver focused on specified frame context
      */
-    static WebDriver switchTo(SearchContext context) {
-        RobustWebElement element = (RobustWebElement) context;
+    public static WebDriver switchTo(final RobustWebElement  element) {
         return element.getWrappedDriver().switchTo().frame(element.getWrappedElement());
     }
     
