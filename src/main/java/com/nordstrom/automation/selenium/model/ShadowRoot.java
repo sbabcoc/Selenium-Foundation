@@ -2,8 +2,10 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 /**
@@ -73,6 +75,17 @@ public class ShadowRoot extends PageComponent {
      */
     @Override
     public SearchContext getWrappedContext() {
+        return getShadowRoot(context);
+    }
+    
+    /**
+     * Get the underlying shadow root for the specified context.
+     * 
+     * @param context search context
+     * @return shadow root context
+     */
+    public static SearchContext getShadowRoot(SearchContext context) {
+        WebDriver driver = WebDriverUtils.getDriver(context);
         return JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
     }
     

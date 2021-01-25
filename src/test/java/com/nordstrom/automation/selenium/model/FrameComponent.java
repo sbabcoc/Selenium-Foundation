@@ -46,10 +46,9 @@ public class FrameComponent extends Frame {
     }
 
     public static Object getKey(SearchContext context) {
-        RobustWebElement element = (RobustWebElement) context;
-        WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
+        WebDriver driver = switchTo(context);
         Object key = driver.findElement(Using.HEADING.locator).getText();
-        switchToParentFrame(element);
+        switchToParentFrame((RobustWebElement) context);
         return key;
     }
 

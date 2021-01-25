@@ -86,6 +86,18 @@ public class JUnitModelTest extends JUnitRoot {
     public void testShadowRootByElement() {
         ModelTestCore.testShadowRootByElement(this);
     }
+    
+    @Test
+    @Ignore
+    public void testShadowRootList() {
+        ModelTestCore.testShadowRootList(this);
+    }
+
+    @Test
+    @Ignore
+    public void testShadowRootMap() {
+        ModelTestCore.testShadowRootMap(this);
+    }
 
     /**
      * This test verifies that stale elements are automatically refreshed

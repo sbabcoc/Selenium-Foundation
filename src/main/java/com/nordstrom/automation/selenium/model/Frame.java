@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.model;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.UnsupportedCommandException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import com.google.common.base.Throwables;
@@ -135,6 +136,17 @@ public class Frame extends Page {
                 break;
         }
         return this;
+    }
+    
+    /**
+     * Switch focus to the specified frame context.
+     * 
+     * @param context frame context
+     * @return driver focused on specified frame context
+     */
+    static WebDriver switchTo(SearchContext context) {
+        RobustWebElement element = (RobustWebElement) context;
+        return element.getWrappedDriver().switchTo().frame(element.getWrappedElement());
     }
     
     /**

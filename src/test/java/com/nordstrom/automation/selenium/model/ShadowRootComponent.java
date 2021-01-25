@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 
 public class ShadowRootComponent extends ShadowRoot {
 
@@ -38,10 +37,7 @@ public class ShadowRootComponent extends ShadowRoot {
     }
 
     public static Object getKey(SearchContext context) {
-        RobustWebElement element = (RobustWebElement) context;
-        WebDriver driver = element.getWrappedDriver();
-        Object key = driver.findElement(Using.HEADING.locator).getText();
-        return key;
+        return getShadowRoot(context).findElement(Using.HEADING.locator).getText();
     }
 
 }

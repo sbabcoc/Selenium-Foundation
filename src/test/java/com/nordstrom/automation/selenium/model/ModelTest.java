@@ -72,6 +72,16 @@ public class ModelTest extends TestNgRoot {
     public void testShadowRootByElement() {
         ModelTestCore.testShadowRootByElement(this);
     }
+    
+    @Test
+    public void testShadowRootList() {
+        ModelTestCore.testShadowRootList(this);
+    }
+
+    @Test
+    public void testShadowRootMap() {
+        ModelTestCore.testShadowRootMap(this);
+    }
 
     /**
      * This test verifies that stale elements are automatically refreshed
