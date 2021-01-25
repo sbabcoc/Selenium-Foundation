@@ -33,6 +33,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final ComponentContainer parent) {
         super(locator, parent);
+        // verify shadowRoot
         getWrappedContext();
     }
     
@@ -45,6 +46,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final int index, final ComponentContainer parent) {
         super(locator, index, parent);
+        // verify shadowRoot
         getWrappedContext();
     }
     
@@ -56,6 +58,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final RobustWebElement element, final ComponentContainer parent) {
         super(element, parent);
+        // verify shadowRoot
         getWrappedContext();
     }
     
