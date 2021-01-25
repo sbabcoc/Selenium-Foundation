@@ -38,7 +38,7 @@ public class ModelTest extends TestNgRoot {
         ModelTestCore.testFrameByIndex(this);
     }
 
-    @Test(enabled = false)
+    @Test
     public void testFrameById() {
         ModelTestCore.testFrameById(this);
     }
