@@ -33,7 +33,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final ComponentContainer parent) {
         super(locator, parent);
-        verifyShadowRoot();
+        getWrappedContext();
     }
     
     /**
@@ -45,7 +45,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final int index, final ComponentContainer parent) {
         super(locator, index, parent);
-        verifyShadowRoot();
+        getWrappedContext();
     }
     
     /**
@@ -56,18 +56,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final RobustWebElement element, final ComponentContainer parent) {
         super(element, parent);
-        verifyShadowRoot();
-    }
-    
-    /**
-     * Verify that the specified root element is a shadow host with an 'open' shadow DOM.
-     * <p>
-     * <b>NOTE</b>: This method throws {@link ShadowRootContextException} if verification fails.
-     */
-    private void verifyShadowRoot() {
-        if (null == getWrappedContext()) {
-            throw new ShadowRootContextException();
-        }
+        getWrappedContext();
     }
     
     /**
@@ -83,10 +72,13 @@ public class ShadowRoot extends PageComponent {
      * 
      * @param context search context
      * @return shadow root context
+     * @throws ShadowRootContextException if unable to acquire shadow root
      */
     public static SearchContext getShadowRoot(SearchContext context) {
         WebDriver driver = WebDriverUtils.getDriver(context);
-        return JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
+        SearchContext shadowRoot = JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
+        if (shadowRoot != null) return shadowRoot;
+        throw new ShadowRootContextException();
     }
     
 }
