@@ -30,6 +30,8 @@ public class ExamplePage extends Page {
     private Map<Object, FrameComponent> frameMap;
     private ShadowRootComponent shadowRootByLocator;
     private ShadowRootComponent shadowRootByElement;
+    private List<ShadowRootComponent> shadowRootList;
+    private Map<Object, ShadowRootComponent> shadowRootMap;
     private int refreshCount;
     
     protected static final String FRAME_A_ID = "frame-a";
@@ -48,6 +50,7 @@ public class ExamplePage extends Page {
         FORM(By.tagName("form")),
         INPUT(By.cssSelector("input#input-field")),
         CHECK(By.cssSelector("input#checkbox")),
+        SHADOW_ROOT(By.cssSelector("div[id^='shadow-root-']")),
         SHADOW_ROOT_A(By.cssSelector("div#shadow-root-a")),
         SHADOW_ROOT_B(By.cssSelector("div#shadow-root-b"));
         
@@ -145,6 +148,20 @@ public class ExamplePage extends Page {
             shadowRootByElement = new ShadowRootComponent(element, this);
         }
         return shadowRootByElement;
+    }
+    
+    public List<ShadowRootComponent> getShadowRootList() {
+        if (shadowRootList == null) {
+            shadowRootList = newComponentList(ShadowRootComponent.class, Using.SHADOW_ROOT.locator);
+        }
+        return shadowRootList;
+    }
+    
+    public Map<Object, ShadowRootComponent> getShadowRootMap() {
+        if (shadowRootMap == null) {
+            shadowRootMap = newComponentMap(ShadowRootComponent.class, Using.SHADOW_ROOT.locator);
+        }
+        return shadowRootMap;
     }
     
     @Override

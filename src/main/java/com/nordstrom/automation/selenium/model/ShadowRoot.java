@@ -2,8 +2,10 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 /**
@@ -31,7 +33,8 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final ComponentContainer parent) {
         super(locator, parent);
-        verifyShadowRoot();
+        // verify shadowRoot
+        getWrappedContext();
     }
     
     /**
@@ -43,7 +46,8 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final int index, final ComponentContainer parent) {
         super(locator, index, parent);
-        verifyShadowRoot();
+        // verify shadowRoot
+        getWrappedContext();
     }
     
     /**
@@ -54,18 +58,8 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final RobustWebElement element, final ComponentContainer parent) {
         super(element, parent);
-        verifyShadowRoot();
-    }
-    
-    /**
-     * Verify that the specified root element is a shadow host with an 'open' shadow DOM.
-     * <p>
-     * <b>NOTE</b>: This method throws {@link ShadowRootContextException} if verification fails.
-     */
-    private void verifyShadowRoot() {
-        if (null == getWrappedContext()) {
-            throw new ShadowRootContextException();
-        }
+        // verify shadowRoot
+        getWrappedContext();
     }
     
     /**
@@ -73,7 +67,21 @@ public class ShadowRoot extends PageComponent {
      */
     @Override
     public SearchContext getWrappedContext() {
-        return JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
+        return getShadowRoot(context);
+    }
+    
+    /**
+     * Get the underlying shadow root for the specified context.
+     * 
+     * @param context search context
+     * @return shadow root context
+     * @throws ShadowRootContextException if unable to acquire shadow root
+     */
+    public static SearchContext getShadowRoot(SearchContext context) {
+        WebDriver driver = WebDriverUtils.getDriver(context);
+        SearchContext shadowRoot = JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
+        if (shadowRoot != null) return shadowRoot;
+        throw new ShadowRootContextException();
     }
     
 }

@@ -143,6 +143,30 @@ public class ModelTestCore {
         }
     }
     
+    public static void testShadowRootList(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        try {
+            List<ShadowRootComponent> shadowRootList = page.getShadowRootList();
+            assertEquals(shadowRootList.size(), 2);
+            assertEquals(shadowRootList.get(0).getContent(), SHADOW_DOM_A);
+            assertEquals(shadowRootList.get(1).getContent(), SHADOW_DOM_B);
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
+    }
+    
+    public static void testShadowRootMap(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        try {
+            Map<Object, ShadowRootComponent> shadowRootMap = page.getShadowRootMap();
+            assertEquals(shadowRootMap.size(), 2);
+            assertEquals(shadowRootMap.get(SHADOW_DOM_A).getContent(), SHADOW_DOM_A);
+            assertEquals(shadowRootMap.get(SHADOW_DOM_B).getContent(), SHADOW_DOM_B);
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
+    }
+    
     /**
      * This test verifies that stale elements are automatically refreshed
      * and that the search context chain gets refreshed efficiently.
