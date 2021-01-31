@@ -299,7 +299,6 @@ dependencies {
   apply from: "${profile}Deps.gradle"
   
   testCompile configurations["${profile}Compile"]
-//  implementation 'org.testng:testng:6.9.6'
 }
 
 test {
