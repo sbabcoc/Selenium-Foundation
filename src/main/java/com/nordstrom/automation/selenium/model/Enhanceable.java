@@ -11,6 +11,8 @@ import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.dynamic.loading.ClassInjector;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -124,7 +126,7 @@ public abstract class Enhanceable<T> {
                                 .intercept(MethodDelegation.to(ContainerMethodInterceptor.INSTANCE))
                                 .implement(Enhanced.class)
                                 .make()
-                                .load(containerClass.getClassLoader())
+                                .load(containerClass.getClassLoader(), getClassLoadingStrategy(containerClass))
                                 .getLoaded();
                 
                 proxyMap.put(containerClass, proxyType);
@@ -154,6 +156,34 @@ public abstract class Enhanceable<T> {
             clazz = clazz.getSuperclass();
         }
         return clazz;
+    }
+    
+    /**
+     * Determine <b>Byte Buddy</b> class loading strategy.
+     * 
+     * @param targetClass target class
+     * @return <b>Byte Buddy</b> {@link ClassLoadingStrategy}
+     */
+    public static ClassLoadingStrategy<ClassLoader> getClassLoadingStrategy(Class<?> targetClass) {
+        ClassLoadingStrategy<ClassLoader> strategy;
+        if (ClassInjector.UsingLookup.isAvailable()) {
+            try {
+                Class<?> methodHandles = Class.forName("java.lang.invoke.MethodHandles");
+                Object lookup = methodHandles.getMethod("lookup").invoke(null);
+                Method privateLookupIn = methodHandles.getMethod("privateLookupIn", Class.class,
+                            Class.forName("java.lang.invoke.MethodHandles$Lookup"));
+                Object privateLookup = privateLookupIn.invoke(null, targetClass, lookup);
+                strategy = ClassLoadingStrategy.UsingLookup.of(privateLookup);
+            } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                throw new IllegalStateException("Failed to determine class loading strategy", e);
+            }
+        } else if (ClassInjector.UsingReflection.isAvailable()) {
+            strategy = ClassLoadingStrategy.Default.INJECTION;
+        } else {
+            throw new IllegalStateException("No code generation strategy available");
+        }
+        return strategy;
     }
 
 }
