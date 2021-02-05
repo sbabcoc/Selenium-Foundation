@@ -12,8 +12,9 @@ import java.util.Map;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.openqa.grid.internal.utils.DefaultCapabilityMatcher;
 
+import com.nordstrom.automation.selenium.model.Enhanceable;
+
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.MethodDelegation;
 
 /**
@@ -90,7 +91,7 @@ public class RevisedCapabilityMatcher extends DefaultCapabilityMatcher {
             .method(named("apply"))
             .intercept(MethodDelegation.to(SafariValidator.class))
             .make()
-            .load(validatorClass.getClassLoader(), ClassLoadingStrategy.Default.INJECTION)
+            .load(validatorClass.getClassLoader(), Enhanceable.getClassLoadingStrategy(validatorClass))
             .getLoaded();
     }
     
