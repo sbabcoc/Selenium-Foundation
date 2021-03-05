@@ -16,7 +16,7 @@ public class ScreenshotCaptureTest extends JUnitRoot {
     
     @Test
     public void testScreenshotCapture() {
-        ScreenshotCapture collector = getLinkedRule(ScreenshotCapture.class);
+        ScreenshotCapture collector = screenshotCapture;
         assumeTrue(collector.getArtifactProvider().canGetArtifact(this));
         Optional<Path> optArtifactPath = collector.captureArtifact(null);
         assertTrue(optArtifactPath.isPresent());
