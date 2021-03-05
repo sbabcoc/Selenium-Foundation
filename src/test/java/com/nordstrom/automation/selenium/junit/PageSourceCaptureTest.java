@@ -18,7 +18,7 @@ public class PageSourceCaptureTest extends JUnitRoot {
     @Test
     public void testPageSourceCapture() {
         PageSourceCapture collector = pageSourceCapture;
-        assumeTrue(pageSourceCapture.getArtifactProvider().canGetArtifact(this));
+        assumeTrue(collector.getArtifactProvider().canGetArtifact(this));
         Optional<Path> optArtifactPath = collector.captureArtifact(null);
         assertTrue(optArtifactPath.isPresent());
     }
