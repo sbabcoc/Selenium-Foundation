@@ -10,13 +10,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.WebDriver;
 import com.google.common.base.Optional;
 import com.nordstrom.automation.junit.ArtifactParams;
-import com.nordstrom.automation.junit.RuleChainWalker;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.common.file.PathUtils;
@@ -27,11 +25,14 @@ import com.nordstrom.common.file.PathUtils;
 public abstract class JUnitBase extends TestBase implements ArtifactParams {
     
     /** This method rule manages driver lifetimes and opens initial pages. */
-    @Rule
-    public final RuleChain ruleChain = RuleChain
-            .outerRule(new ScreenshotCapture(this))
-            .around(new PageSourceCapture(this))
-            .around(DriverWatcher.getTestWatcher(this));
+    @Rule(order = 0)
+    public final TestWatcher driverTestWatcher = DriverWatcher.getTestWatcher(this);
+    
+    @Rule(order = 1)
+    public final PageSourceCapture pageSourceCapture = new PageSourceCapture(this);
+    
+    @Rule(order = 2)
+    public final ScreenshotCapture screenshotCapture = new ScreenshotCapture(this);
     
     private WebDriver driver = null;
     private Page initialPage = null;
@@ -122,7 +123,7 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      */
     @Override
     public AtomIdentity getAtomIdentity() {
-        return getLinkedRule(ScreenshotCapture.class).getAtomIdentity();
+        return screenshotCapture.getAtomIdentity();
     }
 
     /**
@@ -130,7 +131,7 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      */
     @Override
     public Description getDescription() {
-        return getLinkedRule(ScreenshotCapture.class).getDescription();
+        return screenshotCapture.getDescription();
     }
     
     /**
@@ -139,20 +140,5 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
     @Override
     public Optional<Map<String, Object>> getParameters() {
         return Optional.absent();
-    }
-
-    /**
-     * Get the test rule of the specified type that's attached to the rule chain.
-     * 
-     * @param <T> test rule type
-     * @param testRuleType test rule type
-     * @return {@link ScreenshotCapture} test rule
-     */
-    public <T extends TestRule> T getLinkedRule(final Class<T> testRuleType) {
-        Optional<T> optional = RuleChainWalker.getAttachedRule(ruleChain, testRuleType);
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        throw new IllegalStateException(testRuleType.getSimpleName() + " test rule wasn't found on the rule chain");
     }
 }
