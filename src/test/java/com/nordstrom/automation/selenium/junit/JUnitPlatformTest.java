@@ -40,8 +40,7 @@ public class JUnitPlatformTest extends JUnitPlatformBase<ExamplePlatform> {
     public void activatePlatform(WebDriver driver, ExamplePlatform platform)
             throws PlatformActivationFailedException {
         
-        Object runner = LifecycleHooks.getRunnerForTarget(this);
-        AtomicTest<FrameworkMethod> test = LifecycleHooks.getAtomicTestOf(runner);
+        AtomicTest test = LifecycleHooks.getAtomicTestOf(this);
         FrameworkMethod method = test.getIdentity();
         
         ExamplePlatform expected = null;
