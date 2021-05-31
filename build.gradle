@@ -281,8 +281,7 @@ nexusStaging {
 repositories {
   mavenLocal()
   mavenCentral()
-  maven { url 'http://public-snapshots' }
-  maven { url 'http://repo.maven.apache.org/maven2' }
+  maven { url 'https://repo.maven.apache.org/maven2' }
   maven { url "${projectDir}/repo" }
 }
 
@@ -295,6 +294,7 @@ dependencies {
   }
   compile 'org.jsoup:jsoup:1.12.1'
   compile('org.hamcrest:hamcrest-core:2.2') { force = true }
+  compile('org.yaml:snakeyaml:1.28') { force = true }
   
   apply from: "${profile}Deps.gradle"
   
