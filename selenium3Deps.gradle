@@ -24,10 +24,5 @@ dependencies {
   }
   selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.50.0'
   selenium3Compile(platform('com.squareup.okhttp3:okhttp-bom:4.9.1'))
-  selenium3Compile('org.bouncycastle:bcpkix-jdk15on:1.68') { force = true }
-  selenium3Compile('org.bouncycastle:bcprov-jdk15on:1.68') { force = true }
-  selenium3Compile('org.apache.httpcomponents:httpmime:4.5.13') { force = true }
-  selenium3Compile('org.apache.httpcomponents:httpclient:4.5.13') { force = true }
-  selenium3Compile('org.eclipse.jetty.websocket:websocket-client:9.4.41.v20210516') { force = true }
   testCompile 'org.mockito:mockito-core:3.1.0'
 }
