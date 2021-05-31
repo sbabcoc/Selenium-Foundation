@@ -23,5 +23,6 @@ dependencies {
     exclude group: 'net.sourceforge.htmlunit', module: 'htmlunit'
   }
   selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.50.0'
+  selenium3Compile(platform('com.squareup.okhttp3:okhttp-bom:4.9.1'))
   testCompile 'org.mockito:mockito-core:3.1.0'
 }

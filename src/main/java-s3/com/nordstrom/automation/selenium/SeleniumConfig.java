@@ -169,7 +169,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     "javax.servlet.Servlet",
                     "okhttp3.ConnectionPool",
                     "okio.BufferedSource",
-                    "ch.qos.logback.classic.spi.ThrowableProxy"
+                    "ch.qos.logback.classic.spi.ThrowableProxy",
+                    "kotlin.jvm.internal.Intrinsics"
                     };
     
     static {
