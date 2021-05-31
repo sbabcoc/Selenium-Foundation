@@ -52,7 +52,7 @@ To build the **Selenium Foundation** project with **Maven**, you'll also need to
   <toolchain>
     <type>jdk</type>
     <provides>
-      <version>1.7</version>
+      <version>7</version>
       <vendor>oracle</vendor>
     </provides>
     <configuration>
@@ -62,7 +62,7 @@ To build the **Selenium Foundation** project with **Maven**, you'll also need to
   <toolchain>
     <type>jdk</type>
     <provides>
-      <version>1.8</version>
+      <version>8</version>
       <vendor>oracle</vendor>
     </provides>
     <configuration>

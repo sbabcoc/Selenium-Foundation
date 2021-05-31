@@ -141,7 +141,7 @@
         </property>
       </activation>
       <properties>
-        <compile-jdk.version>1.7</compile-jdk.version>
+        <release.version>7</release.version>
         <testng-foundation.version>1.13.6</testng-foundation.version>
         <selenium.version>2.53.1</selenium.version>
         <guava-agent.version>30.1</guava-agent.version>
@@ -301,7 +301,7 @@
         </property>
       </activation>
       <properties>
-        <compile-jdk.version>1.8</compile-jdk.version>
+        <release.version>8</release.version>
         <testng-foundation.version>2.0.3</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>30.1-jre</guava.version>
@@ -580,12 +580,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>${compile-jdk.version}</source>
-          <target>${compile-jdk.version}</target>
-          <jdkToolchain>
-            <version>${compile-jdk.version}</version>
-            <vendor>oracle</vendor>
-          </jdkToolchain>
+          <release>${release.version}</release>
         </configuration>
       </plugin>
       <plugin>
@@ -593,7 +588,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <jdkToolchain>
-            <version>${compile-jdk.version}</version>
+            <version>${release.version}</version>
             <vendor>oracle</vendor>
           </jdkToolchain>
           <properties>

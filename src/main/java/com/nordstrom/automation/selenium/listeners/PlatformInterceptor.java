@@ -39,7 +39,7 @@ public class PlatformInterceptor implements IMethodInterceptor {
 
         // iterate over method list
         for (IMethodInstance thisMethod : methods) {
-            PlatformEnum platformConstant = resolveTargetPlatform(thisMethod);
+            PlatformEnum platformConstant = (PlatformEnum) resolveTargetPlatform(thisMethod);
             
             // if this method supports the current target platform
             if (TargetPlatformHandler.shouldRun(contextPlatform, platformConstant)) {
