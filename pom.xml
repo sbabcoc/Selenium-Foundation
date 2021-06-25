@@ -55,6 +55,8 @@
     <hamcrest.version>2.2</hamcrest.version>
     <!-- managed to resolve identified threat -->
     <snakeyaml.version>1.28</snakeyaml.version>
+    <!-- managed to resolve identified threat -->
+    <websocket-client.version>9.4.42.v20210604</websocket-client.version>
   </properties>
   
   <scm>
@@ -100,6 +102,11 @@
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
         <version>${snakeyaml.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.websocket</groupId>
+        <artifactId>websocket-client</artifactId>
+        <version>${websocket-client.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -154,8 +161,6 @@
         <bouncycastle.version>1.68</bouncycastle.version>
         <!-- managed to resolve identified threat -->
         <httpcomponents.version>4.5.13</httpcomponents.version>
-        <!-- managed to resolve identified threat -->
-        <jetty.version>9.4.41.v20210516</jetty.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -223,11 +228,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>${httpcomponents.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-client</artifactId>
-            <version>${jetty.version}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
