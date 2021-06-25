@@ -20,7 +20,6 @@ dependencies {
   selenium2Compile('org.bouncycastle:bcprov-jdk15on:1.68') { force = true }
   selenium2Compile('org.apache.httpcomponents:httpmime:4.5.13') { force = true }
   selenium2Compile('org.apache.httpcomponents:httpclient:4.5.13') { force = true }
-  selenium2Compile('org.eclipse.jetty.websocket:websocket-client:9.4.41.v20210516') { force = true }
   testCompile 'org.seleniumhq.selenium:htmlunit-driver:2.21'
   testCompile 'org.mockito:mockito-core:2.25.0'
 }
