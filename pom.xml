@@ -40,7 +40,7 @@
     <selenium-api>@seleniumApi@</selenium-api>
     <java-utils.version>2.0.0</java-utils.version>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
-    <surefire-plugin.version>2.22.0</surefire-plugin.version>
+    <surefire-plugin.version>2.22.2</surefire-plugin.version>
     <source-plugin.version>3.2.0</source-plugin.version>
     <javadoc-plugin.version>3.1.1</javadoc-plugin.version>
     <settings.version>2.3.5</settings.version>
@@ -150,7 +150,7 @@
       </activation>
       <properties>
         <release.version>7</release.version>
-        <testng-foundation.version>1.13.6</testng-foundation.version>
+        <testng-foundation.version>3.0.1-j7</testng-foundation.version>
         <selenium.version>2.53.1</selenium.version>
         <guava-agent.version>30.1</guava-agent.version>
         <guava.version>30.1-android</guava.version>
@@ -306,7 +306,7 @@
       </activation>
       <properties>
         <release.version>8</release.version>
-        <testng-foundation.version>2.0.3</testng-foundation.version>
+        <testng-foundation.version>3.0.1-j8</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>30.1-jre</guava.version>
         <htmlunit.version>2.50.0</htmlunit.version>
@@ -325,6 +325,12 @@
             <groupId>com.nordstrom.tools</groupId>
             <artifactId>testng-foundation</artifactId>
             <version>${testng-foundation.version}</version>
+          </dependency>
+          <!-- TestNG 7.4.0 is incompatible with current 'surefire-testng' provider -->
+          <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.3.0</version>
           </dependency>
           <dependency>
             <groupId>com.google.guava</groupId>
