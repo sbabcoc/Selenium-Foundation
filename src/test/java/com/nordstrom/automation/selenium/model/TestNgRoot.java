@@ -8,7 +8,7 @@ import com.nordstrom.automation.selenium.support.TestNgBase;
 public class TestNgRoot extends TestNgBase {
     
     @BeforeClass
-    public static void beforeClass() {
+    public void beforeClass() {
         ModelTestCore.setHubAsTarget();
     }
 
