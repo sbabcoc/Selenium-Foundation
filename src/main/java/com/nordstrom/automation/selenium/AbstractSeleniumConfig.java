@@ -105,6 +105,18 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_PATH("selenium.target.path", "/"),
         
         /**
+         * This setting specifies a semicolon-delimited list of fully-qualified names of local <b>Selenium Grid</b>
+         * driver plugin classes.
+         * <p>
+         * <b>NOTE</b>: Defining a value for this setting overrides the <b>ServiceLoader</b> specification defined
+         * by the associated provider configuration file (<i>com.nordstrom.automation.selenium.DriverPlugin</i>).
+         * <p>
+         * name: <b>selenium.grid.plugins</b><br>
+         * default: {@code null}
+         */
+        GRID_PLUGINS("selenium.grid.plugins", null),
+        
+        /**
          * This setting specifies whether the local <b>Selenium Grid</b> instance will be shut down at the end of the
          * test run.
          * <p>

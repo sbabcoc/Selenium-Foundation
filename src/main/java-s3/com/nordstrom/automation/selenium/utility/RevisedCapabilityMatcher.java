@@ -74,7 +74,7 @@ public class RevisedCapabilityMatcher extends DefaultCapabilityMatcher {
         if (safariValidator == null) {
             safariValidator = subclassSafariValidator(validatorClass);
         }
-        return safariValidator.newInstance();
+        return safariValidator.getConstructor().newInstance();
     }
     
     /**
