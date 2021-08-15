@@ -23,7 +23,7 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.40.0&lt;/version&gt;
+     *  &lt;version&gt;2.52.0&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
@@ -41,7 +41,7 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
                     "org.eclipse.jetty.websocket.api.Session",
                     "net.sourceforge.htmlunit.corejs.javascript.Token",
                     "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
-                    "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.parser.CSSParser",
+                    "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.util.LangUtils",
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
                     "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils"};
     
