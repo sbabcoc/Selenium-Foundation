@@ -22,8 +22,7 @@ dependencies {
     exclude module: 'htmlunit-driver'
     exclude group: 'net.sourceforge.htmlunit', module: 'htmlunit'
   }
-  selenium3Compile('net.sourceforge.htmlunit:htmlunit:2.51.0') { force = true }
-  selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.51.0'
+  selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.52.0'
   selenium3Compile('com.squareup.okhttp3:okhttp:4.9.1') { force = true }
   selenium3Compile('com.squareup.okio:okio:2.8.0') { force = true }
   testCompile 'org.mockito:mockito-core:3.1.0'
