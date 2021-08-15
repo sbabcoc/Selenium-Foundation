@@ -295,6 +295,7 @@ dependencies {
   compile 'org.jsoup:jsoup:1.12.1'
   compile('org.hamcrest:hamcrest-core:2.2') { force = true }
   compile('org.yaml:snakeyaml:1.28') { force = true }
+  compile('org.eclipse.jetty.websocket:websocket-client:9.4.43.v20210629') { force = true }
   
   apply from: "${profile}Deps.gradle"
   

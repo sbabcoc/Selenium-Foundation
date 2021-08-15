@@ -55,6 +55,8 @@
     <hamcrest.version>2.2</hamcrest.version>
     <!-- managed to resolve identified threat -->
     <snakeyaml.version>1.28</snakeyaml.version>
+    <!-- managed to resolve identified threat -->
+    <websocket-client.version>9.4.43.v20210629</websocket-client.version>
   </properties>
   
   <scm>
@@ -100,6 +102,11 @@
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
         <version>${snakeyaml.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.websocket</groupId>
+        <artifactId>websocket-client</artifactId>
+        <version>${websocket-client.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
