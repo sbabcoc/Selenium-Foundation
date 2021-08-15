@@ -273,6 +273,13 @@ def deployer = uploadArchives.repositories.mavenDeployer
   }
 }
 
+release {
+  svn {
+    username = githubUsername
+    password = githubPassword
+  }
+}
+
 nexusStaging {
   packageGroup = 'com.nordstrom'
   stagingProfileId = '76d943f622957'
