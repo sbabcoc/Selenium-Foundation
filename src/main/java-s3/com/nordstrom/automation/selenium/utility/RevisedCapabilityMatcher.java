@@ -5,6 +5,7 @@ import static org.openqa.selenium.remote.BrowserType.SAFARI;
 import static org.openqa.selenium.remote.CapabilityType.BROWSER_NAME;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,8 @@ public class RevisedCapabilityMatcher extends DefaultCapabilityMatcher {
                         break;
                     }
                 }
-            } catch (IllegalArgumentException | IllegalAccessException | ClassCastException | InstantiationException e) {
+            } catch (IllegalArgumentException | IllegalAccessException | ClassCastException | InstantiationException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                 // just eat the exception
             }
         }
@@ -69,8 +71,14 @@ public class RevisedCapabilityMatcher extends DefaultCapabilityMatcher {
      *         primitive type, or {@code void}; if the class lacks a no-argument constructor; or if instantiation
      *         fails for some other reason.
      * @throws IllegalAccessException if the class or its no-argument constructor are inaccessible.
+     * @throws SecurityException if not authorized to access target class loader
+     * @throws NoSuchMethodException if no-argument constructor is absent
+     * @throws InvocationTargetException if constructor threw an exception
+     * @throws IllegalArgumentException if (non-existent) constructor arguments don't match
      */
-    private static Object newSafariValidator(Class<?> validatorClass) throws InstantiationException, IllegalAccessException {
+    private static Object newSafariValidator(Class<?> validatorClass)
+            throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, NoSuchMethodException, SecurityException {
         if (safariValidator == null) {
             safariValidator = subclassSafariValidator(validatorClass);
         }
