@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,8 +138,9 @@ public final class RobustElementFactory {
                     .intercept(MethodDelegation.toConstructor(wrapperClass))
                     .make()
                     .load(wrapperClass.getClassLoader())
-                    .getLoaded().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+                    .getLoaded().getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException 
+                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             throw UncheckedThrow.throwUnchecked(e);
         }
         
