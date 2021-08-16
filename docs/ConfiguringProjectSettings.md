@@ -75,12 +75,17 @@ The static `getConfig()` method returns a **`SeleniumConfig`** object that provi
 | Setting | Property Name | Default |
 |---|---|---|
 | **`HUB_HOST`** | `selenium.hub.host` | _(none)_ |
+| **`GRID_PLUGINS`** | `selenium.grid.plugins` | _none_ |
 
-This setting specifies the URL of the **Selenium Grid** hub server that will supply sessions for your tests. No default value is specified for this setting. If you specify a value for this setting, you must provide the full URL of an active hub server, including the base path. For example:
+The **`HUB_HOST`** setting specifies the URL of the **Selenium Grid** hub server that will supply sessions for your tests. No default value is specified for this setting. If you specify a value for this setting, you must provide the full URL of an active hub server, including the base path. For example:
 
 > `-Dselenium.hub.host=http://192.168.1.2/wd/hub`
 
 > If this setting is left undefined or specifies an inactive `localhost` URL, **Selenium Foundation** will automatically launch a local Grid instance as specified by the [local Grid configuration](LocalGridConfiguration.md).
+
+The **`GRID_PLUGINS`** setting specifies a semicolon-delimited list of fully-qualified names of local **Selenium Grid** driver plugin classes.
+
+**NOTE**: Defining a value for this setting overrides the **ServiceLoader** specification defined by the associated provider configuration file (_com.nordstrom.automation.selenium.DriverPlugin_).
 
 #### Selenium Grid Configuration Methods 
 
