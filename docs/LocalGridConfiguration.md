@@ -56,7 +56,7 @@ Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to 
 
 | Selenium 2 | Selenium 3 |
 |:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;4.1.2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;4.1.2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 ### Additional Local Grid Settings
 
