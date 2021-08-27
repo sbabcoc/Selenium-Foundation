@@ -292,6 +292,7 @@
         <release.version>8</release.version>
         <testng-foundation.version>3.0.3-j8</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
+        <guava.version>30.1.1-jre</guava.version>
         <htmlunit.version>2.52.0</htmlunit.version>
         <jcommander.version>1.78</jcommander.version>
         <mockito.version>3.1.0</mockito.version>
@@ -315,6 +316,11 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-server</artifactId>
             <version>${selenium.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
           </dependency>
           <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
