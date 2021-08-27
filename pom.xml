@@ -141,7 +141,7 @@
         <testng-foundation.version>3.0.3-j7</testng-foundation.version>
         <selenium.version>2.53.1</selenium.version>
         <commons-io.version>2.6</commons-io.version>
-        <jsoup.version>1.13.1</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
         <htmlunit.version>2.21</htmlunit.version>
         <mockito.version>2.25.0</mockito.version>
         <!-- managed to resolve identified threat -->
