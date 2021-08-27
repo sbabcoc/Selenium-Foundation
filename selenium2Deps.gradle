@@ -13,6 +13,7 @@ dependencies {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
   }
   selenium2Compile 'org.seleniumhq.selenium:selenium-support:2.53.1'
+  selenium2Compile 'org.jsoup:jsoup:1.13.1'
   selenium2Compile 'net.sourceforge.htmlunit:htmlunit:2.21'
   selenium2Compile('org.bouncycastle:bcpkix-jdk15on:1.68') { force = true }
   selenium2Compile('org.bouncycastle:bcprov-jdk15on:1.68') { force = true }
