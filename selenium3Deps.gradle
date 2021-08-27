@@ -7,8 +7,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
   selenium3Compile configurations.compile
-  selenium3Compile 'com.nordstrom.tools:testng-foundation:3.0.1-j8'
-  selenium3Compile('com.google.guava:guava:30.1.1-jre') { force = true }
+  selenium3Compile 'com.nordstrom.tools:testng-foundation:3.0.3-j8'
   selenium3Compile('com.beust:jcommander:1.78') { force = true }
   selenium3Compile 'commons-io:commons-io:2.6'
   selenium3Compile('org.seleniumhq.selenium:selenium-server:3.141.59') {
@@ -24,6 +23,7 @@ dependencies {
   }
   selenium3Compile 'org.seleniumhq.selenium:htmlunit-driver:2.52.0'
   selenium3Compile('com.squareup.okhttp3:okhttp:4.9.1') { force = true }
-  selenium3Compile('com.squareup.okio:okio:2.8.0') { force = true }
+  selenium3Compile('com.squareup.okio:okio:2.10.0') { force = true }
+  selenium3Compile('org.eclipse.jetty.websocket:websocket-client:9.4.43.v20210629') { force = true }
   testCompile 'org.mockito:mockito-core:3.1.0'
 }
