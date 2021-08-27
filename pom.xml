@@ -38,25 +38,23 @@
     <revision>@projectVersion@</revision>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>2.0.0</java-utils.version>
+    <java-utils.version>2.0.3</java-utils.version>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
-    <surefire-plugin.version>2.22.2</surefire-plugin.version>
-    <source-plugin.version>3.2.0</source-plugin.version>
-    <javadoc-plugin.version>3.1.1</javadoc-plugin.version>
-    <settings.version>2.3.5</settings.version>
-    <junit-foundation.version>15.3.0</junit-foundation.version>
-    <logback-testng.version>1.3.2</logback-testng.version>
+    <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+    <source-plugin.version>3.2.1</source-plugin.version>
+    <javadoc-plugin.version>3.3.0</javadoc-plugin.version>
+    <settings.version>2.3.9</settings.version>
+    <junit-foundation.version>15.3.2</junit-foundation.version>
+    <logback-testng.version>1.3.4</logback-testng.version>
     <sonar.language>java</sonar.language>
-    <jacoco.version>0.8.5</jacoco.version>
-    <jsoup.version>1.12.1</jsoup.version>
-    <build-helper-plugin.version>3.0.0</build-helper-plugin.version>
-    <dependency-plugin.version>3.1.1</dependency-plugin.version>
+    <jacoco.version>0.8.7</jacoco.version>
+    <jsoup.version>1.13.1</jsoup.version>
+    <build-helper-plugin.version>3.2.0</build-helper-plugin.version>
+    <dependency-plugin.version>3.2.0</dependency-plugin.version>
     <clean-plugin.version>3.1.0</clean-plugin.version>
     <hamcrest.version>2.2</hamcrest.version>
     <!-- managed to resolve identified threat -->
     <snakeyaml.version>1.28</snakeyaml.version>
-    <!-- managed to resolve identified threat -->
-    <websocket-client.version>9.4.43.v20210629</websocket-client.version>
   </properties>
   
   <scm>
@@ -150,15 +148,15 @@
       </activation>
       <properties>
         <release.version>7</release.version>
-        <testng-foundation.version>3.0.1-j7</testng-foundation.version>
+        <testng-foundation.version>3.0.3-j7</testng-foundation.version>
         <selenium.version>2.53.1</selenium.version>
-        <guava-agent.version>30.1</guava-agent.version>
-        <guava.version>30.1.1-android</guava.version>
-        <commons-io.version>2.4</commons-io.version>
+        <commons-io.version>2.6</commons-io.version>
         <htmlunit.version>2.21</htmlunit.version>
         <mockito.version>2.25.0</mockito.version>
         <!-- managed to resolve identified threat -->
-        <bouncycastle.version>1.68</bouncycastle.version>
+        <websocket-client.version>9.2.30.v20200428</websocket-client.version>
+        <!-- managed to resolve identified threat -->
+        <bouncycastle.version>1.69</bouncycastle.version>
         <!-- managed to resolve identified threat -->
         <httpcomponents.version>4.5.13</httpcomponents.version>
       </properties>
@@ -169,16 +167,6 @@
             <artifactId>testng-foundation</artifactId>
             <version>${testng-foundation.version}</version>
           </dependency>
-          <dependency>
-            <groupId>com.nordstrom.tools</groupId>
-            <artifactId>guava-agent</artifactId>
-            <version>${guava-agent.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-          </dependency>          
           <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -235,10 +223,6 @@
         <dependency>
           <groupId>com.nordstrom.tools</groupId>
           <artifactId>testng-foundation</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.nordstrom.tools</groupId>
-          <artifactId>guava-agent</artifactId>
         </dependency>
         <dependency>
           <groupId>commons-io</groupId>
@@ -306,18 +290,20 @@
       </activation>
       <properties>
         <release.version>8</release.version>
-        <testng-foundation.version>3.0.1-j8</testng-foundation.version>
+        <testng-foundation.version>3.0.3-j8</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>30.1.1-jre</guava.version>
         <htmlunit.version>2.52.0</htmlunit.version>
         <jcommander.version>1.78</jcommander.version>
         <mockito.version>3.1.0</mockito.version>
         <!-- managed to resolve identified threat -->
+        <websocket-client.version>9.4.43.v20210629</websocket-client.version>
+        <!-- managed to resolve identified threat -->
         <okhttp.version>4.9.1</okhttp.version>
         <!-- override of default conflict resolution -->
-        <okio.version>2.8.0</okio.version>
+        <okio.version>2.10.0</okio.version>
         <!-- override of default conflict resolution -->
-        <kotlin.version>1.4.10</kotlin.version>
+        <kotlin.version>1.5.20</kotlin.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -325,12 +311,6 @@
             <groupId>com.nordstrom.tools</groupId>
             <artifactId>testng-foundation</artifactId>
             <version>${testng-foundation.version}</version>
-          </dependency>
-          <!-- TestNG 7.4.0 is incompatible with current 'surefire-testng' provider -->
-          <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.3.0</version>
           </dependency>
           <dependency>
             <groupId>com.google.guava</groupId>
