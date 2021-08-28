@@ -7,7 +7,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
   selenium2Compile configurations.compile
-  selenium2Compile 'com.nordstrom.tools:testng-foundation:3.0.3-j7'
+  selenium2Compile 'com.nordstrom.tools:testng-foundation:3.0.4-j7'
   selenium2Compile 'commons-io:commons-io:2.4'
   selenium2Compile('org.seleniumhq.selenium:selenium-server:2.53.1') {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
