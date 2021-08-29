@@ -138,7 +138,7 @@
       </activation>
       <properties>
         <release.version>7</release.version>
-        <testng-foundation.version>3.0.4-j7</testng-foundation.version>
+        <testng-foundation.version>3.0.5-j7</testng-foundation.version>
         <selenium.version>2.53.1</selenium.version>
         <commons-io.version>2.6</commons-io.version>
         <jsoup.version>1.13.1</jsoup.version>
@@ -290,7 +290,7 @@
       </activation>
       <properties>
         <release.version>8</release.version>
-        <testng-foundation.version>3.0.4-j8</testng-foundation.version>
+        <testng-foundation.version>3.0.5-j8</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>30.1.1-jre</guava.version>
         <jsoup.version>1.14.2</jsoup.version>
