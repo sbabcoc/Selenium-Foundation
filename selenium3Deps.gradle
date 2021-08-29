@@ -7,7 +7,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
   selenium3Compile configurations.compile
-  selenium3Compile 'com.nordstrom.tools:testng-foundation:3.0.4-j8'
+  selenium3Compile 'com.nordstrom.tools:testng-foundation:3.0.5-j8'
   selenium3Compile('com.google.guava:guava:30.1.1-jre') { force = true }
   selenium3Compile('com.beust:jcommander:1.78') { force = true }
   selenium3Compile 'commons-io:commons-io:2.6'
