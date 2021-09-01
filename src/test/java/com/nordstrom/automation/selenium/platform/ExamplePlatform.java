@@ -1,25 +1,16 @@
 package com.nordstrom.automation.selenium.platform;
 
-public enum ExamplePlatform implements PlatformEnum {
-    PHASE1("green"),
-    PHASE2("amber"),
-    PHASE3("coral");
+public enum ExamplePlatform implements PlatformEnum, PlatformName {
+    PHASE1("green", PHASE1_NAME),
+    PHASE2("amber", PHASE2_NAME),
+    PHASE3("coral", PHASE3_NAME);
     
     private String color;
     private String name;
     
-    ExamplePlatform(String color) {
+    ExamplePlatform(String color, String name) {
         this.color = color;
-    }
-
-    public static final String PHASE1_NAME = "phase-1";
-    public static final String PHASE2_NAME = "phase-2";
-    public static final String PHASE3_NAME = "phase-3";
-    
-    static {
-        PHASE1.name = PHASE1_NAME;
-        PHASE2.name = PHASE2_NAME;
-        PHASE3.name = PHASE3_NAME;
+        this.name = name;
     }
     
     public String getColor() {
