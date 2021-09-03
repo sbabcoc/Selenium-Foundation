@@ -13,43 +13,43 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedException;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.platform.ExamplePlatform;
+import com.nordstrom.automation.selenium.platform.Transition;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 @InitialPage(ExamplePage.class)
-public class TestNgPlatformTest extends TestNgPlatformBase<ExamplePlatform> {
+public class TestNgPlatformTest extends TestNgPlatformBase<Transition> {
 
     public TestNgPlatformTest() {
-        super(ExamplePlatform.class);
+        super(Transition.class);
     }
     
     @Test
     public void testDefaultPlatform() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE1_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE1_NAME));
         assertEquals(getTargetPlatform().getColor(), "green");
     }
     
     @Test
-    @TargetPlatform(ExamplePlatform.PHASE2_NAME)
+    @TargetPlatform(Transition.PHASE2_NAME)
     public void testPlatformTwo() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE2_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE2_NAME));
         assertEquals(getTargetPlatform().getColor(), "amber");
     }
     
     @Override
-    public void activatePlatform(WebDriver driver, ExamplePlatform platform)
+    public void activatePlatform(WebDriver driver, Transition platform)
             throws PlatformActivationFailedException {
         
         ITestResult result = Reporter.getCurrentTestResult();
         ITestNGMethod method = result.getMethod();
         
-        ExamplePlatform expected = null;
+        Transition expected = null;
         switch(method.getMethodName()) {
         case "testDefaultPlatform":
-            expected = ExamplePlatform.PHASE1;
+            expected = Transition.PHASE1;
             break;
         case "testPlatformTwo":
-            expected = ExamplePlatform.PHASE2;
+            expected = Transition.PHASE2;
             break;
         default:
             throw new RuntimeException("Unexpected method: " + method.getMethodName());
@@ -64,7 +64,7 @@ public class TestNgPlatformTest extends TestNgPlatformBase<ExamplePlatform> {
     }
 
     @Override
-    public ExamplePlatform getDefaultPlatform() {
-        return ExamplePlatform.PHASE1;
+    public Transition getDefaultPlatform() {
+        return Transition.PHASE1;
     }
 }

@@ -13,43 +13,43 @@ import com.nordstrom.automation.junit.LifecycleHooks;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedException;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.platform.ExamplePlatform;
+import com.nordstrom.automation.selenium.platform.Transition;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 @InitialPage(ExamplePage.class)
-public class JUnitPlatformTest extends JUnitPlatformBase<ExamplePlatform> {
+public class JUnitPlatformTest extends JUnitPlatformBase<Transition> {
 
     public JUnitPlatformTest() {
-        super(ExamplePlatform.class);
+        super(Transition.class);
     }
     
     @Test
     public void testDefaultPlatform() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE1_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE1_NAME));
         assertEquals("green", getTargetPlatform().getColor());
     }
     
     @Test
-    @TargetPlatform(ExamplePlatform.PHASE2_NAME)
+    @TargetPlatform(Transition.PHASE2_NAME)
     public void testPlatformTwo() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE2_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE2_NAME));
         assertEquals("amber", getTargetPlatform().getColor());
     }
     
     @Override
-    public void activatePlatform(WebDriver driver, ExamplePlatform platform)
+    public void activatePlatform(WebDriver driver, Transition platform)
             throws PlatformActivationFailedException {
         
         AtomicTest test = LifecycleHooks.getAtomicTestOf(this);
         FrameworkMethod method = test.getIdentity();
         
-        ExamplePlatform expected = null;
+        Transition expected = null;
         switch(method.getName()) {
         case "testDefaultPlatform":
-            expected = ExamplePlatform.PHASE1;
+            expected = Transition.PHASE1;
             break;
         case "testPlatformTwo":
-            expected = ExamplePlatform.PHASE2;
+            expected = Transition.PHASE2;
             break;
         default:
             throw new RuntimeException("Unexpected method: " + method.getName());
@@ -64,7 +64,7 @@ public class JUnitPlatformTest extends JUnitPlatformBase<ExamplePlatform> {
     }
 
     @Override
-    public ExamplePlatform getDefaultPlatform() {
-        return ExamplePlatform.PHASE1;
+    public Transition getDefaultPlatform() {
+        return Transition.PHASE1;
     }
 }
