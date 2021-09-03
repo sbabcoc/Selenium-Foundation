@@ -13,31 +13,34 @@ The `Target Platform` feature is supported for both [**TestNG**](#platform-targe
 
 ## Defining Your Platform Enumeration
 
-To define the collection of platforms upon which your tests will run, declare a Java enumeration that implements the **`PlatformEnum`** interface:
+To define the collection of platforms upon which your tests will run, start by extending the **`PlatformEnum`** interface, defining the names of your platforms:
 
 ```java
 package com.nordstrom.automation.selenium.platform;
 
-public enum ExamplePlatform implements PlatformEnum {
-    PHASE1("green"),
-    PHASE2("amber"),
-    PHASE3("coral");
+interface PhaseName extends PlatformEnum {
+    String PHASE1_NAME = "phase-1";
+    String PHASE2_NAME = "phase-2";
+    String PHASE3_NAME = "phase-3";
+}
+```
+
+Next, declare a Java enumeration that implements this interface:
+
+```java
+package com.nordstrom.automation.selenium.platform;
+
+public enum Transition implements PhaseName {
+    PHASE1("green", PHASE1_NAME),
+    PHASE2("amber", PHASE2_NAME),
+    PHASE3("coral", PHASE3_NAME);
     
     private String color;
     private String name;
     
-    ExamplePlatform(String color) {
+    Transition(String color, String name) {
         this.color = color;
-    }
-
-    public static final String PHASE1_NAME = "phase-1";
-    public static final String PHASE2_NAME = "phase-2";
-    public static final String PHASE3_NAME = "phase-3";
-    
-    static {
-        PHASE1.name = PHASE1_NAME;
-        PHASE2.name = PHASE2_NAME;
-        PHASE3.name = PHASE3_NAME;
+        this.name = name;
     }
     
     public String getColor() {
@@ -67,7 +70,7 @@ The only property of each platform constant that you're required to define is it
 * Language codes
 * Account credentials
 
-Add fields to your enumeration for these related items, and methods with which to retrieve them. The values are declared as arguments of each constant, with a constructor to assign these values to their respective fields. Note that the unconventional way in which the names for the constants are declared (static fields and static initializer) allows them to be used in declarations of the `@TargetPlatform` annotation (see examples below). This avoids the need to hardcode platform names in the annotations or declare them twice in the enumeration.
+Add fields to your enumeration for these related items, and methods with which to retrieve them. The values are declared as arguments of each constant, with a constructor to assign these values to their respective fields. Note that declaring the platform names as interface constants allows them to be used to populate the enumeration and in declarations of the `@TargetPlatform` annotation (see examples below). This avoids the need to hardcode platform names in the annotations or declare them twice in the enumeration.
 
 ## Automatic Platform Activation
 
@@ -105,38 +108,38 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedException;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.platform.ExamplePlatform;
+import com.nordstrom.automation.selenium.platform.Transition;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 @InitialPage(ExamplePage.class)
-public class TestNgPlatformTest extends TestNgPlatformBase<ExamplePlatform> {
+public class TestNgPlatformTest extends TestNgPlatformBase<Transition> {
 
     public TestNgPlatformTest() {
-        super(ExamplePlatform.class);
+        super(Transition.class);
     }
     
     @Test
     public void testDefaultPlatform() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE1_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE1_NAME));
         assertEquals(getTargetPlatform().getColor(), "green");
     }
     
     @Test
-    @TargetPlatform(ExamplePlatform.PHASE2_NAME)
+    @TargetPlatform(Transition.PHASE2_NAME)
     public void testPlatformTwo() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE2_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE2_NAME));
         assertEquals(getTargetPlatform().getColor(), "amber");
     }
     
     @Override
-    public void activatePlatform(WebDriver driver, ExamplePlatform platform)
+    public void activatePlatform(WebDriver driver, Transition platform)
             throws PlatformActivationFailedException {
         driver.manage().addCookie(new Cookie("color", platform.getColor()));
     }
 
     @Override
-    public ExamplePlatform getDefaultPlatform() {
-        return ExamplePlatform.PHASE1;
+    public Transition getDefaultPlatform() {
+        return Transition.PHASE1;
     }
 }
 ```
@@ -149,7 +152,7 @@ Given the intentionally generic nature of the `Target Platform` feature, no dire
 ...
 
     @Override
-    public void activatePlatform(WebDriver driver, ExamplePlatform platform)
+    public void activatePlatform(WebDriver driver, Transition platform)
             throws PlatformActivationFailedException {
         ITestResult result = Reporter.getCurrentTestResult();
         if (result != null) {
@@ -191,38 +194,38 @@ import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedException;
 import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.platform.ExamplePlatform;
+import com.nordstrom.automation.selenium.platform.Transition;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 @InitialPage(ExamplePage.class)
-public class JUnitPlatformTest extends JUnitPlatformBase<ExamplePlatform> {
+public class JUnitPlatformTest extends JUnitPlatformBase<Transition> {
 
     public JUnitPlatformTest() {
-        super(ExamplePlatform.class);
+        super(Transition.class);
     }
     
     @Test
     public void testDefaultPlatform() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE1_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE1_NAME));
         assertEquals("green", getTargetPlatform().getColor());
     }
     
     @Test
-    @TargetPlatform(ExamplePlatform.PHASE2_NAME)
+    @TargetPlatform(Transition.PHASE2_NAME)
     public void testPlatformTwo() {
-        assertTrue(getTargetPlatform().matches(ExamplePlatform.PHASE2_NAME));
+        assertTrue(getTargetPlatform().matches(Transition.PHASE2_NAME));
         assertEquals("amber", getTargetPlatform().getColor());
     }
     
     @Override
-    public void activatePlatform(WebDriver driver, ExamplePlatform platform)
+    public void activatePlatform(WebDriver driver, Transition platform)
             throws PlatformActivationFailedException {
         driver.manage().addCookie(new Cookie("color", platform.getColor()));
     }
 
     @Override
-    public ExamplePlatform getDefaultPlatform() {
-        return ExamplePlatform.PHASE1;
+    public Transition getDefaultPlatform() {
+        return Transition.PHASE1;
     }
 }
 ```
@@ -235,7 +238,7 @@ Given the intentionally generic nature of the `Target Platform` feature, no dire
 ...
 
     @Override
-    public void activatePlatform(WebDriver driver, ExamplePlatform platform)
+    public void activatePlatform(WebDriver driver, Transition platform)
             throws PlatformActivationFailedException {
         Object runner = LifecycleHooks.getRunnerForTarget(this);
         AtomicTest<FrameworkMethod> atomicTest = LifecycleHooks.getAtomicTestOf(runner);
