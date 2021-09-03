@@ -76,7 +76,7 @@ Add fields to your enumeration for these related items, and methods with which t
 
 As indicated previously, **Selenium Foundation** provides the opportunity to activate the target platform prior to the start of each test. To enable this automatic activation behavior, specify the initial page that your tests will interact with via the `@InitialPage` annotation. By specifying the initial page, you can be certain that the driver is launched and has opened your target site, ready for action.
 
-The examples shown below for [**TestNG**](#platform-targeting-for-testng) and [**JUnit 4**](#platform-targeting-for-junit-4) both specify the initial page to open at the beginning of each test. Their platform activation methods store the name of the target platform in a session cookie. In your own implementation, perform whatever operation are needed to activate your platform (e.g. - change screen dimensions).
+The examples shown below for [**TestNG**](#platform-targeting-for-testng) and [**JUnit 4**](#platform-targeting-for-junit-4) both specify the initial page to open at the beginning of each test. Their platform activation methods store the name of the target platform in a session cookie. In your own implementation, perform whatever operations are needed to activate your platform (e.g. - change screen dimensions).
 
 ## Platform Targeting for TestNG
 
