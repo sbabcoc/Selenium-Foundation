@@ -240,8 +240,7 @@ Given the intentionally generic nature of the `Target Platform` feature, no dire
     @Override
     public void activatePlatform(WebDriver driver, Transition platform)
             throws PlatformActivationFailedException {
-        Object runner = LifecycleHooks.getRunnerForTarget(this);
-        AtomicTest<FrameworkMethod> atomicTest = LifecycleHooks.getAtomicTestOf(runner);
+        AtomicTest atomicTest = LifecycleHooks.getAtomicTestOf(this);
         FrameworkMethod method = atomicTest.getIdentity();
         ...
     }
