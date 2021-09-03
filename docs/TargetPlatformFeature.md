@@ -146,7 +146,7 @@ public class TestNgPlatformTest extends TestNgPlatformBase<Transition> {
 
 ### Acquiring the Current Test
 
-Given the intentionally generic nature of the `Target Platform` feature, no direct reference to the method for which platform activation is being performed. However, this is easily acquired:
+Given the intentionally generic nature of the `Target Platform` feature, no direct reference is provided to the method for which platform activation is being performed. However, this is easily acquired:
 
 ```java
 ...
@@ -232,7 +232,7 @@ public class JUnitPlatformTest extends JUnitPlatformBase<Transition> {
 
 ### Acquiring the Current Test
 
-Given the intentionally generic nature of the `Target Platform` feature, no direct reference to the method for which platform activation is being performed. However, this is easily acquired:
+Given the intentionally generic nature of the `Target Platform` feature, no direct reference is provided to the method for which platform activation is being performed. However, this is easily acquired:
 
 ```java
 ...
