@@ -118,7 +118,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         if (gridPlugins != null) {
             driverPlugins = new ArrayList<>();
             // iterate specified driver plugin class names
-            for (String driverPlugin : gridPlugins.split(";")) {
+            for (String driverPlugin : gridPlugins.split(File.pathSeparator)) {
                 String className = driverPlugin.trim();
                 try {
                     // load driver plugin class

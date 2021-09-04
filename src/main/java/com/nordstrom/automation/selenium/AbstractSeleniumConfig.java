@@ -105,8 +105,8 @@ public abstract class AbstractSeleniumConfig extends
         TARGET_PATH("selenium.target.path", "/"),
         
         /**
-         * This setting specifies a semicolon-delimited list of fully-qualified names of local <b>Selenium Grid</b>
-         * driver plugin classes.
+         * This setting specifies a path-delimited list of fully-qualified names of local <b>Selenium Grid</b> driver
+         * plugin classes.
          * <p>
          * <b>NOTE</b>: Defining a value for this setting overrides the <b>ServiceLoader</b> specification defined
          * by the associated provider configuration file (<i>com.nordstrom.automation.selenium.DriverPlugin</i>).
@@ -139,8 +139,8 @@ public abstract class AbstractSeleniumConfig extends
         GRID_LAUNCHER("selenium.grid.launcher", null),
         
         /**
-         * This setting specifies a semicolon-delimited list of fully-qualified names of context classes for
-         * the dependencies of the {@link #GRID_LAUNCHER} class.
+         * This setting specifies a path-delimited list of fully-qualified names of context classes for the
+         * dependencies of the {@link #GRID_LAUNCHER} class.
          * <p>
          * name: <b>selenium.launcher.deps</b><br>
          * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
@@ -837,7 +837,7 @@ public abstract class AbstractSeleniumConfig extends
         if (gridLauncher != null) {
             String dependencies = getString(SeleniumSettings.LAUNCHER_DEPS.key());
             if (dependencies != null) {
-                return (gridLauncher + ";" + dependencies).split(";");
+                return (gridLauncher + File.pathSeparator + dependencies).split(File.pathSeparator);
             } else {
                 return new String[] { gridLauncher };
             }
