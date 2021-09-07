@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -207,7 +208,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = super.getDefaults();
         defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), DEFAULT_GRID_LAUNCHER);
-        defaults.put(SeleniumSettings.LAUNCHER_DEPS.key(), StringUtils.join(DEPENDENCY_CONTEXTS, ";"));
+        defaults.put(SeleniumSettings.LAUNCHER_DEPS.key(), StringUtils.join(DEPENDENCY_CONTEXTS, File.pathSeparator));
         defaults.put(SeleniumSettings.HUB_PORT.key(), DEFAULT_HUB_PORT);
         defaults.put(SeleniumSettings.HUB_CONFIG.key(), DEFAULT_HUB_CONFIG);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), DEFAULT_NODE_CONFIG);
