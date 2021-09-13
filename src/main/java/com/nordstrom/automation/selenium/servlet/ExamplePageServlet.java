@@ -11,7 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 
+/**
+ * This class implements a simple HTTP servlet that provides an example page for the <b>Selenium Foundation</b> unit
+ * tests. By default, this servlet is installed on the hub server of the local <b>Selenium Grid</b> instance. This
+ * behavior can be overridden via the {@link SeleniumSettings#GRID_EXAMPLES GRID_EXAMPLES} setting.
+ */
 public class ExamplePageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -2195313096162880627L;

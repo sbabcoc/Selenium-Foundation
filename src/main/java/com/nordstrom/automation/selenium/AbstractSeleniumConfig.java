@@ -11,9 +11,12 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -23,6 +26,7 @@ import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.http.client.utils.URIBuilder;
+import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
@@ -31,6 +35,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
+import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -175,6 +184,15 @@ public abstract class AbstractSeleniumConfig extends
         HUB_PORT("selenuim.hub.port", null),
         
         /**
+         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes to extend the
+         * capabilities of the local <b>Selenium Grid</b> hub server.
+         * <p>
+         * name: <b>selenium.hub.servlets</b><br>
+         * default: {@code null}
+         */
+        HUB_SERVLETS("selenium.hub.servlets", null),
+        
+        /**
          * This setting specifies the configuration template name/path for local <b>Selenium Grid</b> node servers.
          * <p>
          * name: <b>selenium.node.config</b><br>
@@ -182,6 +200,15 @@ public abstract class AbstractSeleniumConfig extends
          * Selenium 3: <b>nodeConfig-s3.json</b>
          */
         NODE_CONFIG("selenium.node.config", null),
+        
+        /**
+         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes to extend the
+         * capabilities of local <b>Selenium Grid</b> node servers.
+         * <p>
+         * name: <b>selenium.node.servlets</b><br>
+         * default: {@code null}
+         */
+        NODE_SERVLETS("selenium.node.servlets", null),
         
         /**
          * This setting specifies the browser name or "personality" for new session requests.
@@ -266,6 +293,25 @@ public abstract class AbstractSeleniumConfig extends
          * default: {@code false}
          */
         GRID_NO_REDIRECT("selenium.grid.no.redirect", "false"),
+        
+        /**
+         * This setting specifies whether the <b>ExamplePageServlet</b> is installed on the hub server of the local
+         * <b>Selenium Grid</b> instance. This servlet provides the example page used by the <b>Selenium Foundation</b>
+         * unit tests.
+         * <p>
+         * name: <b>selenium.grid.examples</b><br>
+         * default: {@code true}
+         */
+        GRID_EXAMPLES("selenium.grid.examples", "true"),
+        
+        /**
+         * This setting specifies whether the <b>LifecycleServlet</b> is installed on the hub and node servers of the
+         * local <b>Selenium Grid</b> instance. This servlet implements a remote shutdown feature for Grid servers.
+         * <p>
+         * name: <b>selenium.grid.lifecycle</b><br>
+         * default: {@code true}
+         */
+        GRID_LIFECYCLE("selenium.grid.lifecycle", "true"),
         
         /**
          * This setting specifies the target platform for the current test context.
@@ -846,6 +892,13 @@ public abstract class AbstractSeleniumConfig extends
         }
     }
     
+    /**
+     * Create hub configuration file.
+     * 
+     * @return {@link Path} object for the created (or previously existing) configuration file
+     * @throws IOException on failure to create configuration file
+     */
+    public abstract Path createHubConfig() throws IOException;
     
     /**
      * Create node configuration file from the specified JSON string, to be registered with the indicated hub.
@@ -856,6 +909,59 @@ public abstract class AbstractSeleniumConfig extends
      * @throws IOException on failure to create configuration file
      */
     public abstract Path createNodeConfig(String capabilities, URL hubUrl) throws IOException;
+    
+    /**
+     * Get the collection of servlets to install on Selenium Grid hub.
+     * 
+     * @return collection of specified hub servlets (may be empty)
+     */
+    public Set<String> getHubServlets() {
+        Set<String> servlets = new HashSet<>();
+        // get specified hub servlet classes
+        String nodeServlets = getString(SeleniumSettings.HUB_SERVLETS.key());
+        // if servlets are spec'd
+        if (nodeServlets != null) {
+            // collect servlet names, minus leading/trailing white space
+            servlets.addAll(Arrays.asList(nodeServlets.trim().split("\\s*,\\s*")));
+        }
+        // if example page feature is specified
+        if (getBoolean(SeleniumSettings.GRID_EXAMPLES.key())) {
+            // add example page servlets to the collection
+            servlets.add(ExamplePageServlet.class.getName());
+            servlets.add(FrameA_Servlet.class.getName());
+            servlets.add(FrameB_Servlet.class.getName());
+            servlets.add(FrameC_Servlet.class.getName());
+            servlets.add(FrameD_Servlet.class.getName());
+        }
+        // if remote shutdown feature is specified
+        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
+            // add lifecycle servlet to the collection
+            servlets.add(LifecycleServlet.class.getName());
+        }
+        return servlets;
+    }
+    
+    /**
+     * Get the collection of servlets to install on Selenium Grid nodes.
+     * 
+     * @return collection of specified node servlets (may be empty)
+     */
+    public Set<String> getNodeServlets() {
+        Set<String> servlets = new HashSet<>();
+        // get specified node servlet classes
+        String nodeServlets = getString(SeleniumSettings.NODE_SERVLETS.key());
+        // if servlets are spec'd
+        if (nodeServlets != null) {
+            // collect servlet names, minus leading/trailing white space
+            servlets.addAll(Arrays.asList(nodeServlets.trim().split("\\s*,\\s*")));
+        }
+        // if remote shutdown feature is specified
+        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
+            // add lifecycle servlet to the collection
+            servlets.add(LifecycleServlet.class.getName());
+        }
+        return servlets;
+    }
     
     /**
      * Get the target platform for the current test context.

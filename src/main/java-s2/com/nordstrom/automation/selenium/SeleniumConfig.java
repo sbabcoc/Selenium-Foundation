@@ -9,18 +9,24 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
+import org.openqa.grid.internal.utils.GridHubConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -30,9 +36,6 @@ import com.nordstrom.automation.settings.SettingsCore;
  */
 @SuppressWarnings({"squid:S1200", "squid:S2972", "squid:MaximumInheritanceDepth"})
 public class SeleniumConfig extends AbstractSeleniumConfig {
-    
-    private static final String HUB_HOST = "hubHost";
-    private static final String HUB_PORT = "hubPort";
     
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "], \"configuration\": {} }";
@@ -215,7 +218,59 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
+    public Path createHubConfig() throws IOException {
+        // get path to hub configuration template
+        String hubConfigPath = getHubConfigPath().toString();
+        // create empty registration request
+        GridHubConfiguration hubConfig = new GridHubConfiguration();
+        // populate request from hub template
+        hubConfig.loadFromJSON(hubConfigPath);
+        
+        // get configured hub servlet collection
+        Set<String> servlets = getHubServlets();
+        // get servlet specification from hub template
+        List<String> _servlets = hubConfig.getServlets();
+        // if hub template specifies servlets
+        if ( ! ((_servlets == null) || _servlets.isEmpty())) {
+            // merge hub template specification with configured servlets
+            servlets.addAll(_servlets);
+        }
+        
+        // strip extension to get template base path
+        String configPathBase = hubConfigPath.substring(0, hubConfigPath.length() - 5);
+        // get hash code of servlets as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", servlets.hashCode());
+        // assemble hub configuration file path with servlets hash code
+        Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
+        
+        // if assembled path does not exist
+        if (filePath.toFile().createNewFile()) {
+            // if servlets are specified
+            if ( ! servlets.isEmpty()) {
+                // set registration request servlet specification
+                hubConfig.setServlets(Arrays.asList(servlets.toArray(new String[0])));
+            }
+          
+            try(OutputStream fos = new FileOutputStream(filePath.toFile());
+                OutputStream out = new BufferedOutputStream(fos)) {
+                out.write(toJSON(hubConfig).getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        return filePath;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
+        // get path to node configuration template
+        String nodeConfigPath = getNodeConfigPath().toString();
+        // create empty registration request
+        RegistrationRequest nodeConfig = new RegistrationRequest();
+        // populate request from node template
+        nodeConfig.loadFromJSON(nodeConfigPath);
+        
         // assemble complete JSON registration request
         String input = JSON_HEAD + capabilities + JSON_TAIL;
         // convert JSON registration request to list of [DesiredCapabilities] objects
@@ -226,23 +281,41 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             theseCaps.merge(getModifications(theseCaps, NODE_MODS_SUFFIX));
         }
         
-        // get path to node configuration template
-        String nodeConfigPath = getNodeConfigPath().toString();
+        // get configured node servlet collection
+        Set<String> nodeServlets = getNodeServlets();
+        // get servlet specification from node template
+        String servlets = nodeConfig.getConfigAsString(RegistrationRequest.SERVLETS);
+        // if node template specifies servlets
+        if ( ! Strings.isNullOrEmpty(servlets)) {
+            // merge node template specification with configured servlets
+            nodeServlets.addAll(Arrays.asList(servlets.trim().split("\\s*,\\s*")));
+        }
+        
         // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        // get hash code of capabilities list and hub URL as 8-digit hexadecimal string
-        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl));
-        // assemble node configuration file path with capabilities hash code
+        // get hash code of capabilities list, hub URL, and servlets as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl, nodeServlets));
+        // assemble node configuration file path with aggregated hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         
         // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
-            RegistrationRequest nodeConfig = new RegistrationRequest();
-            nodeConfig.loadFromJSON(nodeConfigPath);
+            // set registration request capabilities
             nodeConfig.setCapabilities(capabilitiesList);
-            nodeConfig.getConfiguration().put(HUB_HOST, hubUrl.getHost());
-            nodeConfig.getConfiguration().put(HUB_PORT, hubUrl.getPort());
+            
+            // get registration request configuration
+            Map<String, Object> configuration = nodeConfig.getConfiguration();
+            
+            // set registration request hub host and port
+            configuration.put(RegistrationRequest.HUB_HOST, hubUrl.getHost());
+            configuration.put(RegistrationRequest.HUB_PORT, hubUrl.getPort());
 
+            // if servlets are specified
+            if ( ! nodeServlets.isEmpty()) {
+                // set registration request servlet specification
+                configuration.put(RegistrationRequest.SERVLETS, Joiner.on(",").join(nodeServlets));
+            }
+          
             // hack for RegistrationRequest bug
             nodeConfig.setRole(GridRole.NODE);
             
@@ -277,5 +350,51 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public String toJson(Object obj) {
         return new Gson().toJsonTree(obj).toString();
+    }
+    
+    /**
+     * Convert the specified {@link GridHubConfiguration} object to a JSON string.
+     * 
+     * @param hubConfig grid hub configuration object
+     * @return grid hub configuration as a JSON string
+     */
+    public String toJSON(GridHubConfiguration hubConfig) {
+        return new Gson().toJson(getAssociatedJSON(hubConfig));
+    }
+
+    /**
+     * Get the specified {@link GridHubConfiguration} object as a {@link JsonObject}.
+     * 
+     * @param hubConfig grid hub configuration object
+     * @return JsonObject equivalent of grid hub configuration
+     */
+    public JsonObject getAssociatedJSON(GridHubConfiguration hubConfig) {
+        JsonObject res = new JsonObject();
+        Map<String, Object> allParams = hubConfig.getAllParams();
+
+        res.addProperty("class", hubConfig.getClass().getCanonicalName());
+        res.addProperty("role", "hub");
+        res.addProperty("host", hubConfig.getHost());
+        res.addProperty("port", hubConfig.getPort());
+        res.addProperty("newSessionWaitTimeout", hubConfig.getNewSessionWaitTimeout());
+        res.add("servlets", new Gson().toJsonTree(hubConfig.getServlets()));
+        if (hubConfig.getPrioritizer() != null) {
+            res.addProperty("prioritizer", hubConfig.getPrioritizer().getClass().getCanonicalName());
+        }
+        if (hubConfig.getCapabilityMatcher() != null) {
+            res.addProperty("capabilityMatcher", hubConfig.getCapabilityMatcher().getClass().getCanonicalName());
+        }
+        res.addProperty("throwOnCapabilityNotPresent", hubConfig.isThrowOnCapabilityNotPresent());
+        if (allParams.get("nodePolling") != null) {
+            res.addProperty("nodePolling", (Integer) allParams.get("nodePolling"));
+        }
+        res.addProperty("cleanUpCycle", hubConfig.getCleanupCycle());
+        res.addProperty("timeout", hubConfig.getTimeout());
+        res.addProperty("browserTimeout", hubConfig.getBrowserTimeout());
+        res.addProperty("maxSession", (Integer) allParams.get("maxSession"));
+        res.addProperty("jettyMaxThreads", hubConfig.getJettyMaxThreads());
+        res.addProperty("debug", (Boolean) allParams.get("debug"));
+
+        return res;
     }
 }

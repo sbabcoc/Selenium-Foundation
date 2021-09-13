@@ -25,11 +25,6 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.jar.JarUtils;
 
@@ -49,10 +44,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_ROLE = "-role";
     private static final String OPT_HOST = "-host";
     private static final String OPT_PORT = "-port";
-    private static final String OPT_SERVLETS = "-servlets";
-    private static final String SERVLETS = ExamplePageServlet.class.getName() + ',' +
-            FrameA_Servlet.class.getName() + ',' + FrameB_Servlet.class.getName() + ',' +
-            FrameC_Servlet.class.getName() + ',' + FrameD_Servlet.class.getName();
     
     public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         super(config, hubServer, nodeServers);
@@ -235,13 +226,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         // specify server role
         argsList.add(OPT_ROLE);
         argsList.add(gridRole);
-        
-        // if starting a Grid hub
-        if (role == GridRole.HUB) {
-            // add ExamplePage servlets
-            argsList.add(OPT_SERVLETS);
-            argsList.add(SERVLETS);
-        }
         
         String hostUrl = GridUtility.getLocalHost();
         

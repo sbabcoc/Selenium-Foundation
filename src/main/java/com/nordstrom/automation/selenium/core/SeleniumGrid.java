@@ -184,7 +184,7 @@ public class SeleniumGrid {
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
             return new SeleniumGrid(config, hubUrl);
         } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
-            return LocalSeleniumGrid.launch(config, config.getHubConfigPath());
+            return LocalSeleniumGrid.launch(config, config.createHubConfig());
         }
         throw new IllegalStateException("Specified remote hub URL '" + hubUrl + "' isn't active");
     }
