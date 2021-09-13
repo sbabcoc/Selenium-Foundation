@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
@@ -918,11 +919,11 @@ public abstract class AbstractSeleniumConfig extends
     public Set<String> getHubServlets() {
         Set<String> servlets = new HashSet<>();
         // get specified hub servlet classes
-        String nodeServlets = getString(SeleniumSettings.HUB_SERVLETS.key());
-        // if servlets are spec'd
-        if (nodeServlets != null) {
+        String hubServlets = getString(SeleniumSettings.HUB_SERVLETS.key());
+        // if servlets are specified
+        if ( ! Strings.isNullOrEmpty(hubServlets)) {
             // collect servlet names, minus leading/trailing white space
-            servlets.addAll(Arrays.asList(nodeServlets.trim().split("\\s*,\\s*")));
+            servlets.addAll(Arrays.asList(hubServlets.trim().split("\\s*,\\s*")));
         }
         // if example page feature is specified
         if (getBoolean(SeleniumSettings.GRID_EXAMPLES.key())) {
@@ -950,8 +951,8 @@ public abstract class AbstractSeleniumConfig extends
         Set<String> servlets = new HashSet<>();
         // get specified node servlet classes
         String nodeServlets = getString(SeleniumSettings.NODE_SERVLETS.key());
-        // if servlets are spec'd
-        if (nodeServlets != null) {
+        // if servlets are specified
+        if ( ! Strings.isNullOrEmpty(nodeServlets)) {
             // collect servlet names, minus leading/trailing white space
             servlets.addAll(Arrays.asList(nodeServlets.trim().split("\\s*,\\s*")));
         }
