@@ -928,11 +928,11 @@ public abstract class AbstractSeleniumConfig extends
         // if example page feature is specified
         if (getBoolean(SeleniumSettings.GRID_EXAMPLES.key())) {
             // add example page servlets to the collection
-            servlets.add(ExamplePageServlet.class.getName());
-            servlets.add(FrameA_Servlet.class.getName());
-            servlets.add(FrameB_Servlet.class.getName());
-            servlets.add(FrameC_Servlet.class.getName());
-            servlets.add(FrameD_Servlet.class.getName());
+            servlets.add(ExamplePageServlet.class.getCanonicalName());
+            servlets.add(FrameA_Servlet.class.getCanonicalName());
+            servlets.add(FrameB_Servlet.class.getCanonicalName());
+            servlets.add(FrameC_Servlet.class.getCanonicalName());
+            servlets.add(FrameD_Servlet.class.getCanonicalName());
         }
         return servlets;
     }
@@ -954,7 +954,7 @@ public abstract class AbstractSeleniumConfig extends
         // if remote shutdown feature is specified
         if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
             // add lifecycle servlet to the collection
-            servlets.add(LifecycleServlet.class.getName());
+            servlets.add(LifecycleServlet.class.getCanonicalName());
         }
         return servlets;
     }
