@@ -10,12 +10,15 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -214,12 +217,50 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), DEFAULT_NODE_CONFIG);
         return defaults;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Path createHubConfig() throws IOException {
+        // get path to hub configuration template
+        String hubConfigPath = getHubConfigPath().toString();
+        // create hub configuration from template
+        GridHubConfiguration hubConfig = GridHubConfiguration.loadFromJSON(hubConfigPath);
+        
+        // get configured hub servlet collection
+        Set<String> servlets = getHubServlets();
+        // merge with hub template servlets
+        servlets.addAll(hubConfig.servlets);
+        
+        // strip extension to get template base path
+        String configPathBase = hubConfigPath.substring(0, hubConfigPath.length() - 5);
+        // get hash code of servlets as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", servlets.hashCode());
+        // assemble hub configuration file path with servlets hash code
+        Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
+        
+        // if assembled path does not exist
+        if (filePath.toFile().createNewFile()) {
+            hubConfig.servlets = Arrays.asList(servlets.toArray(new String[0]));
+            try(OutputStream fos = new FileOutputStream(filePath.toFile());
+                OutputStream out = new BufferedOutputStream(fos)) {
+                out.write(new Json().toJson(hubConfig).getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        return filePath;
+    }
     
     /**
      * {@inheritDoc}
      */
     @Override
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
+        // get path to node configuration template
+        String nodeConfigPath = getNodeConfigPath().toString();
+        // create node configuration from template
+        GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
+        
         // convert capabilities string to [JsonInput] object
         JsonInput input = new Json().newInput(new StringReader(JSON_HEAD + capabilities + JSON_TAIL));
         // convert [JsonInput] object to list of [MutableCapabilities] objects
@@ -230,22 +271,25 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             theseCaps.merge(getModifications(theseCaps, NODE_MODS_SUFFIX));
         }
         
-        // get path to node configuration template
-        String nodeConfigPath = getNodeConfigPath().toString();
+        // get configured node servlet collection
+        Set<String> servlets = getNodeServlets();
+        // merge with node template servlets
+        servlets.addAll(nodeConfig.servlets);
+        
         // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        // get hash code of capabilities list and hub URL as 8-digit hexadecimal string
-        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl));
-        // assemble node configuration file path with capabilities hash code
+        // get hash code of capabilities list, hub URL, and servlets as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl, servlets));
+        // assemble node configuration file path with aggregated hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         
         // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
-            GridNodeConfiguration nodeConfig = GridNodeConfiguration.loadFromJSON(nodeConfigPath);
             nodeConfig.hub = null;
             nodeConfig.capabilities = capabilitiesList;
             nodeConfig.hubHost = hubUrl.getHost();
             nodeConfig.hubPort = hubUrl.getPort();
+            nodeConfig.servlets = Arrays.asList(servlets.toArray(new String[0]));
             try(OutputStream fos = new FileOutputStream(filePath.toFile());
                 OutputStream out = new BufferedOutputStream(fos)) {
                 out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
