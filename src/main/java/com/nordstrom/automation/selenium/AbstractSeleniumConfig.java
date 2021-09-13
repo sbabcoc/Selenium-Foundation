@@ -934,11 +934,6 @@ public abstract class AbstractSeleniumConfig extends
             servlets.add(FrameC_Servlet.class.getName());
             servlets.add(FrameD_Servlet.class.getName());
         }
-        // if remote shutdown feature is specified
-        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
-            // add lifecycle servlet to the collection
-            servlets.add(LifecycleServlet.class.getName());
-        }
         return servlets;
     }
     
