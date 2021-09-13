@@ -250,7 +250,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                 // set registration request servlet specification
                 hubConfig.setServlets(Arrays.asList(servlets.toArray(new String[0])));
             }
-          
+            
             try(OutputStream fos = new FileOutputStream(filePath.toFile());
                 OutputStream out = new BufferedOutputStream(fos)) {
                 out.write(toJSON(hubConfig).getBytes(StandardCharsets.UTF_8));
