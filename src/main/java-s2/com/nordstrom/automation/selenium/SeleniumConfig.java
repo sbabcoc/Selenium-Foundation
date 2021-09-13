@@ -227,28 +227,28 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         hubConfig.loadFromJSON(hubConfigPath);
         
         // get configured hub servlet collection
-        Set<String> servlets = getHubServlets();
+        Set<String> hubServlets = getHubServlets();
         // get servlet specification from hub template
-        List<String> _servlets = hubConfig.getServlets();
+        List<String> servlets = hubConfig.getServlets();
         // if hub template specifies servlets
-        if ( ! ((_servlets == null) || _servlets.isEmpty())) {
+        if ( ! ((servlets == null) || servlets.isEmpty())) {
             // merge hub template specification with configured servlets
-            servlets.addAll(_servlets);
+            hubServlets.addAll(servlets);
         }
         
         // strip extension to get template base path
         String configPathBase = hubConfigPath.substring(0, hubConfigPath.length() - 5);
         // get hash code of servlets as 8-digit hexadecimal string
-        String hashCode = String.format("%08X", servlets.hashCode());
+        String hashCode = String.format("%08X", hubServlets.hashCode());
         // assemble hub configuration file path with servlets hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         
         // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
             // if servlets are specified
-            if ( ! servlets.isEmpty()) {
+            if ( ! hubServlets.isEmpty()) {
                 // set registration request servlet specification
-                hubConfig.setServlets(Arrays.asList(servlets.toArray(new String[0])));
+                hubConfig.setServlets(Arrays.asList(hubServlets.toArray(new String[0])));
             }
             
             try(OutputStream fos = new FileOutputStream(filePath.toFile());

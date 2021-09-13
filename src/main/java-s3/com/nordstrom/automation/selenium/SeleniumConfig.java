@@ -218,6 +218,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return defaults;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Path createHubConfig() throws IOException {
         // get path to hub configuration template
