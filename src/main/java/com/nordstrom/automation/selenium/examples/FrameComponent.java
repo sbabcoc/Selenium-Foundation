@@ -7,7 +7,6 @@ import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.Frame;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
-import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
 
 public class FrameComponent extends Frame {
     

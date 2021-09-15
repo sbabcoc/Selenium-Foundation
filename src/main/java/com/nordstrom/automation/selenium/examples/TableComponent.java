@@ -10,7 +10,6 @@ import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.PageComponent;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
-import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
 
 public class TableComponent extends PageComponent {
 
