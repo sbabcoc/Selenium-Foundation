@@ -57,12 +57,10 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  *     <b>SeleniumSettings</b> declares the constants, property names, and default values for the settings managed
  *     by <b>SeleniumConfig</b>. Defaults can be overridden via System properties or the <i>settings.propeties</i>
  *     file in your user "home" directory. See <b>ESSENTIAL SETTINGS</b> below for more details.</li>
- *     </li>
  *     <li>{@link ReporterAppender}: <br>
  *     <b>ReporterAppender</b> is a <b>Logback</b> appender for TestNG Reporter. The <b>Selenium Foundation</b> project
  *     ships with a <i>logback.xml</i> file that attaches this appender. See the complete <b>logback-testng</b> README
- *     page <a href="https://github.com/sbabcoc/logback-testng">here</a>.
- *     </li>
+ *     page <a href="https://github.com/sbabcoc/logback-testng">here</a>.</li>
  * </ul>
  * <p>
  * <b>ESSENTIAL SETTINGS</b>
@@ -71,8 +69,9 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * likely that you'll need to override one or more of the following. The <b>Property Name</b> column indicates the name
  * of the System property associated with the setting. To override a setting, you can either add a line for the setting
  * to your <i>settings.properties</i> file or define a System property.
- * <p>
+ * 
  * <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
+ *     <caption>Essential Settings</caption>
  *     <tr>
  *         <th style="text-align: left; border: 1px solid black;">Constant</th>
  *         <th style="text-align: left; border: 1px solid black;">Property Name</th>
@@ -108,8 +107,9 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * be stored in your user "home" folder. Any settings declared in this file will override the defaults assigned in the
  * <b>SeleniumSettings</b> enumeration. Settings that are declared as System properties will override both the defaults
  * assigned by <b>SeleniumSettings</b> and settings declared in <i>settings.properties</i>. For example: 
- * <p>
+ * 
  * <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
+ *     <caption>settings.properties</caption>
  *     <tr style="text-align: left; border: 1px solid black;">
  *         <th><i>settings.properties</i></th>
  *     </tr>
@@ -123,11 +123,11 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * <p>
  * This sample <i>settings.properties</i> file overrides the values of {@link SeleniumSettings#TARGET_HOST TARGET_HOST}
  * and {@link SeleniumSettings#BROWSER_NAME BROWSER_NAME}. The latter can be overridden by System property declaration:
- * <p>
+ * 
  * <blockquote>{@code -Dselenium.browser.name=firefox}</blockquote>
  * <p>
  * The hierarchy of evaluation produces the following results:
- * <p>
+ * 
  * <blockquote>
  *     <b>BROWSER_NAME</b> = <mark>firefox</mark>; 
  *     <b>TARGET_HOST</b> = <mark>my.server.com</mark>; 
