@@ -4,8 +4,8 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
-import com.nordstrom.automation.selenium.example.ExamplePage;
-import com.nordstrom.automation.selenium.example.TestNgRoot;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.TestNgRoot;
 
 @InitialPage(ExamplePage.class)
 public class ModelTest extends TestNgRoot {

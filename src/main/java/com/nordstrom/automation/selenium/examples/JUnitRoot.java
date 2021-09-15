@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.example;
+package com.nordstrom.automation.selenium.examples;
 
 import org.junit.BeforeClass;
 

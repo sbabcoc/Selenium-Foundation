@@ -10,8 +10,8 @@ import org.testng.annotations.Test;
 
 import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.example.ExamplePage;
-import com.nordstrom.automation.selenium.example.TestNgRoot;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.TestNgRoot;
 
 @InitialPage(ExamplePage.class)
 public class ScreenshotCaptureTest extends TestNgRoot {

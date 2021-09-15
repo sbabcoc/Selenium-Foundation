@@ -1,8 +1,8 @@
 package com.nordstrom.automation.selenium.core;
 
 import static org.junit.Assert.assertEquals;
+import static com.nordstrom.automation.selenium.examples.ExamplePage.*;
 import static org.junit.Assert.assertArrayEquals;
-import static com.nordstrom.automation.selenium.example.ExamplePage.*;
 
 import java.util.List;
 import java.util.Map;
@@ -10,10 +10,10 @@ import java.util.Map;
 import org.testng.SkipException;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.example.ExamplePage;
-import com.nordstrom.automation.selenium.example.FrameComponent;
-import com.nordstrom.automation.selenium.example.ShadowRootComponent;
-import com.nordstrom.automation.selenium.example.TableComponent;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.FrameComponent;
+import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
+import com.nordstrom.automation.selenium.examples.TableComponent;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 @InitialPage(ExamplePage.class)

@@ -24,8 +24,8 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
-import com.nordstrom.automation.selenium.example.ExamplePage;
-import com.nordstrom.automation.selenium.example.TestNgRoot;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.TestNgRoot;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
 
 @InitialPage(ExamplePage.class)

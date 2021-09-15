@@ -11,7 +11,7 @@ import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.junit.AtomicTest;
 import com.nordstrom.automation.junit.LifecycleHooks;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.example.ExamplePage;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedException;
 import com.nordstrom.automation.selenium.platform.Transition;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
