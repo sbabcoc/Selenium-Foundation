@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium;
+package com.nordstrom.automation.selenium.examples;
 
 import static org.testng.Assert.assertEquals;
 
@@ -9,12 +9,12 @@ import org.testng.annotations.Test;
 import com.github.sbabcoc.logback.testng.ReporterAppender;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.DriverManager;
-import com.nordstrom.automation.selenium.examples.ExamplePage;
-import com.nordstrom.automation.selenium.examples.TestNgRoot;
 import com.nordstrom.automation.selenium.support.TestNgBase;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.testng.ListenerChain;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig;
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 
 /**
