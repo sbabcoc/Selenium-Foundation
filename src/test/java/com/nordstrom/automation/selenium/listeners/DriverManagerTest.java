@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.model.TestNgRoot;
+import com.nordstrom.automation.selenium.examples.TestNgRoot;
 
 public class DriverManagerTest extends TestNgRoot {
     

@@ -1,8 +1,12 @@
-package com.nordstrom.automation.selenium.model;
+package com.nordstrom.automation.selenium.examples;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+
+import com.nordstrom.automation.selenium.model.ComponentContainer;
+import com.nordstrom.automation.selenium.model.Frame;
+import com.nordstrom.automation.selenium.model.RobustWebElement;
 
 public class FrameComponent extends Frame {
     

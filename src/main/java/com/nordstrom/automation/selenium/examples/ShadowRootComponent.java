@@ -1,7 +1,11 @@
-package com.nordstrom.automation.selenium.model;
+package com.nordstrom.automation.selenium.examples;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+
+import com.nordstrom.automation.selenium.model.ComponentContainer;
+import com.nordstrom.automation.selenium.model.RobustWebElement;
+import com.nordstrom.automation.selenium.model.ShadowRoot;
 
 public class ShadowRootComponent extends ShadowRoot {
 

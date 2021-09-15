@@ -9,7 +9,8 @@ import org.junit.Test;
 
 import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.model.ExamplePage;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.JUnitRoot;
 import com.nordstrom.common.file.PathUtils;
 
 @InitialPage(ExamplePage.class)

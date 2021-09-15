@@ -1,20 +1,39 @@
-package com.nordstrom.automation.selenium.model;
+package com.nordstrom.automation.selenium.examples;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.ByType;
+import com.nordstrom.automation.selenium.model.Page;
+import com.nordstrom.automation.selenium.model.RobustWebElement;
 
 @PageUrl("/grid/admin/ExamplePageServlet")
 public class ExamplePage extends Page {
 
+    public static final String TITLE = "Example Page";
+    public static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
+    public static final String[] HEADINGS = {"Firstname", "Lastname", "Age"};
+    public static final String[][] CONTENT = {{"Jill", "Smith", "50"}, {"Eve", "Jackson", "94"}, {"John", "Doe", "80"}};
+    public static final String FRAME_A = "Frame A";
+    public static final String FRAME_B = "Frame B";
+    public static final String FRAME_C = "Frame C";
+    public static final String FRAME_D = "Frame D";
+    public static final String TABLE_ID = "t1";
+    public static final String SHADOW_DOM_A = "Shadow DOM A";
+    public static final String SHADOW_DOM_B = "Shadow DOM B";
+    
     public ExamplePage(WebDriver driver) {
         super(driver);
     }
@@ -192,6 +211,21 @@ public class ExamplePage extends Page {
     
     public boolean isBoxChecked() {
         return findElement(Using.CHECK).isSelected();
+    }
+    
+    public static void setHubAsTarget() {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
+        try {
+            URI targetUri = new URIBuilder()
+                    .setScheme(hubUrl.getProtocol())
+                    .setHost(hubUrl.getHost())
+                    .setPort(hubUrl.getPort())
+                    .build().normalize();
+            config.setTargetUri(targetUri);
+        } catch (URISyntaxException e) {
+            // nothing to do here
+        }
     }
     
 }

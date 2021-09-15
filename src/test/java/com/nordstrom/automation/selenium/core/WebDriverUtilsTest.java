@@ -24,9 +24,9 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
-import com.nordstrom.automation.selenium.model.ExamplePage;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.TestNgRoot;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
-import com.nordstrom.automation.selenium.model.TestNgRoot;
 
 @InitialPage(ExamplePage.class)
 public class WebDriverUtilsTest extends TestNgRoot {

@@ -1,40 +1,24 @@
 package com.nordstrom.automation.selenium.core;
 
 import static org.junit.Assert.assertEquals;
+import static com.nordstrom.automation.selenium.examples.ExamplePage.*;
 import static org.junit.Assert.assertArrayEquals;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.testng.SkipException;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
+import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.FrameComponent;
+import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
+import com.nordstrom.automation.selenium.examples.TableComponent;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
-import com.nordstrom.automation.selenium.model.ExamplePage;
-import com.nordstrom.automation.selenium.model.FrameComponent;
-import com.nordstrom.automation.selenium.model.ShadowRootComponent;
-import com.nordstrom.automation.selenium.model.TableComponent;
 
 @InitialPage(ExamplePage.class)
 public class ModelTestCore {
 
-    private static final String TITLE = "Example Page";
-    private static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
-    private static final String[] HEADINGS = {"Firstname", "Lastname", "Age"};
-    private static final String[][] CONTENT = {{"Jill", "Smith", "50"}, {"Eve", "Jackson", "94"}, {"John", "Doe", "80"}};
-    private static final String FRAME_A = "Frame A";
-    private static final String FRAME_B = "Frame B";
-    private static final String FRAME_C = "Frame C";
-    private static final String FRAME_D = "Frame D";
-    private static final String TABLE_ID = "t1";
-    private static final String SHADOW_DOM_A = "Shadow DOM A";
-    private static final String SHADOW_DOM_B = "Shadow DOM B";
-    
     public static void testBasicPage(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertEquals(page.getTitle(), TITLE);
@@ -226,20 +210,6 @@ public class ModelTestCore {
         assertEquals(tableRefreshCount, 4);
         assertEquals(headRefreshCount, 1);
         assertArrayEquals(bodyRefreshCounts, new int[] {1, 1, 1});
-    }
-    
-    public static void setHubAsTarget() {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-        URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
-        try {
-            URI targetUri = new URIBuilder()
-                    .setScheme(hubUrl.getProtocol())
-                    .setHost(hubUrl.getHost())
-                    .setPort(hubUrl.getPort())
-                    .build().normalize();
-            config.setTargetUri(targetUri);
-        } catch (URISyntaxException e) {
-        }
     }
     
 }
