@@ -5,7 +5,8 @@ import org.junit.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
-import com.nordstrom.automation.selenium.model.ExamplePage;
+import com.nordstrom.automation.selenium.example.ExamplePage;
+import com.nordstrom.automation.selenium.example.JUnitRoot;
 
 @InitialPage(ExamplePage.class)
 public class JUnitModelTest extends JUnitRoot {

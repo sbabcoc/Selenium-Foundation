@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.model;
+package com.nordstrom.automation.selenium.example;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,11 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+
+import com.nordstrom.automation.selenium.model.ComponentContainer;
+import com.nordstrom.automation.selenium.model.PageComponent;
+import com.nordstrom.automation.selenium.model.RobustWebElement;
+import com.nordstrom.automation.selenium.model.ComponentContainer.ByEnum;
 
 public class TableComponent extends PageComponent {
 
