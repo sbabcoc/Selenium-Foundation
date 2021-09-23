@@ -87,6 +87,7 @@ public class SeleniumGrid {
      * @throws IOException if unable to acquire Grid details
      */
     public SeleniumGrid(SeleniumConfig config, URL hubUrl) throws IOException {
+        LOGGER.debug("Mapping structure of grid at: {}", hubUrl);
         hubServer = new GridServer(hubUrl, GridRole.HUB);
         for (String nodeEndpoint : GridUtility.getGridProxies(hubUrl)) {
             URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
@@ -94,6 +95,7 @@ public class SeleniumGrid {
             addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
         }
         addPluginPersonalities(config);
+        LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
     }
     
     /**
@@ -111,12 +113,14 @@ public class SeleniumGrid {
         if (Objects.requireNonNull(nodeServers).length == 0) {
             throw new IllegalArgumentException("[nodeServers] must be non-empty");
         }
+        LOGGER.debug("Assembling graph of grid at: {}", hubServer.getUrl());
         for (GridServer nodeServer : nodeServers) {
             String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
             this.nodeServers.put(nodeEndpoint, nodeServer);
             addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
         }
         addPluginPersonalities(config);
+        LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
     }
     
     /**
@@ -137,6 +141,7 @@ public class SeleniumGrid {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void addNodePersonalities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
+        LOGGER.debug("{}: Adding personalities of node: {}", hubUrl, nodeEndpoint);
         for (Capabilities capabilities : GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint)) {
             Map<String, Object> req = (Map<String, Object>) capabilities.getCapability("request");
             List<Map> capsList = (List<Map>) req.get("capabilities");

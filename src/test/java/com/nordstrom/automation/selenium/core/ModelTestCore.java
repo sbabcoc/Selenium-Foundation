@@ -7,14 +7,11 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.List;
 import java.util.Map;
 
-import org.testng.SkipException;
-
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.FrameComponent;
 import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
 import com.nordstrom.automation.selenium.examples.TableComponent;
-import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 @InitialPage(ExamplePage.class)
 public class ModelTestCore {
@@ -107,48 +104,56 @@ public class ModelTestCore {
         assertEquals(frameMap.get(FRAME_D).getPageContent(), FRAME_D);
     }
     
-    public static void testShadowRootByLocator(TestBase instance) {
-        ExamplePage page = instance.getInitialPage();
-        try {
-            ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
-            assertEquals(shadowRoot.getContent(), SHADOW_DOM_A);
-        } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
-        }
+    public static Runnable testShadowRootByLocator(final TestBase instance) {
+        return new Runnable() {
+            final ExamplePage page = instance.getInitialPage();
+
+            @Override
+            public void run() {
+                ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
+                assertEquals(shadowRoot.getContent(), SHADOW_DOM_A);
+            }
+        };
     }
     
-    public static void testShadowRootByElement(TestBase instance) {
-        ExamplePage page = instance.getInitialPage();
-        try {
-            ShadowRootComponent shadowRoot = page.getShadowRootByElement();
-            assertEquals(shadowRoot.getContent(), SHADOW_DOM_B);
-        } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
-        }
+    public static Runnable testShadowRootByElement(final TestBase instance) {
+        return new Runnable() {
+            final ExamplePage page = instance.getInitialPage();
+
+            @Override
+            public void run() {
+                ShadowRootComponent shadowRoot = page.getShadowRootByElement();
+                assertEquals(shadowRoot.getContent(), SHADOW_DOM_B);
+            }
+        };
     }
     
-    public static void testShadowRootList(TestBase instance) {
-        ExamplePage page = instance.getInitialPage();
-        try {
-            List<ShadowRootComponent> shadowRootList = page.getShadowRootList();
-            assertEquals(shadowRootList.size(), 2);
-            assertEquals(shadowRootList.get(0).getContent(), SHADOW_DOM_A);
-            assertEquals(shadowRootList.get(1).getContent(), SHADOW_DOM_B);
-        } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
-        }
+    public static Runnable testShadowRootList(final TestBase instance) {
+        return new Runnable() {
+            final ExamplePage page = instance.getInitialPage();
+
+            @Override
+            public void run() {
+                List<ShadowRootComponent> shadowRootList = page.getShadowRootList();
+                assertEquals(shadowRootList.size(), 2);
+                assertEquals(shadowRootList.get(0).getContent(), SHADOW_DOM_A);
+                assertEquals(shadowRootList.get(1).getContent(), SHADOW_DOM_B);
+            }
+        };
     }
     
-    public static void testShadowRootMap(TestBase instance) {
-        ExamplePage page = instance.getInitialPage();
-        try {
-            Map<Object, ShadowRootComponent> shadowRootMap = page.getShadowRootMap();
-            assertEquals(shadowRootMap.size(), 2);
-            assertEquals(shadowRootMap.get(SHADOW_DOM_A).getContent(), SHADOW_DOM_A);
-            assertEquals(shadowRootMap.get(SHADOW_DOM_B).getContent(), SHADOW_DOM_B);
-        } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
-        }
+    public static Runnable testShadowRootMap(final TestBase instance) {
+        return new Runnable() {
+            final ExamplePage page = instance.getInitialPage();
+
+            @Override
+            public void run() {
+                Map<Object, ShadowRootComponent> shadowRootMap = page.getShadowRootMap();
+                assertEquals(shadowRootMap.size(), 2);
+                assertEquals(shadowRootMap.get(SHADOW_DOM_A).getContent(), SHADOW_DOM_A);
+                assertEquals(shadowRootMap.get(SHADOW_DOM_B).getContent(), SHADOW_DOM_B);
+            }
+        };
     }
     
     /**

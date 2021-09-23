@@ -1,11 +1,13 @@
 package com.nordstrom.automation.selenium.model;
 
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.TestNgRoot;
+import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 @InitialPage(ExamplePage.class)
 public class ModelTest extends TestNgRoot {
@@ -67,22 +69,38 @@ public class ModelTest extends TestNgRoot {
     
     @Test
     public void testShadowRootByLocator() {
-        ModelTestCore.testShadowRootByLocator(this);
+        try {
+            ModelTestCore.testShadowRootByLocator(this).run();
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
     }
 
     @Test
     public void testShadowRootByElement() {
-        ModelTestCore.testShadowRootByElement(this);
+        try {
+            ModelTestCore.testShadowRootByElement(this).run();
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
     }
     
     @Test
     public void testShadowRootList() {
-        ModelTestCore.testShadowRootList(this);
+        try {
+            ModelTestCore.testShadowRootList(this).run();
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
     }
 
     @Test
     public void testShadowRootMap() {
-        ModelTestCore.testShadowRootMap(this);
+        try {
+            ModelTestCore.testShadowRootMap(this).run();
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
     }
 
     /**
