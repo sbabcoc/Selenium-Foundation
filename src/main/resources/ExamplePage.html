@@ -2,8 +2,24 @@
 <html>
   <head>
     <style>
-      table, th, td {
+      table[id^="t1"], th[id^="t1"], td[id^="t1"] {
           border: 1px solid black;
+      }
+      .iframe-row {
+        height: 80px;
+      }
+      .iframe-col {
+        position: relative;
+        overflow: hidden;
+        width: 25%;
+      }
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
       }
     </style>
     <title>Example Page</title>
@@ -28,15 +44,44 @@
   </head>
   <body onload="attachShadows();">
   
-    <iframe id="frame-a" src="/grid/admin/FrameA_Servlet"></iframe>
-    <iframe id="frame-b" src="/grid/admin/FrameB_Servlet"></iframe>
-    <iframe id="frame-c" src="/grid/admin/FrameC_Servlet"></iframe>
-    <iframe id="frame-d" src="/grid/admin/FrameD_Servlet"></iframe>
+    <table style="width:100%">
+      <tr class="iframe-row">
+        <td class="iframe-col">
+          <div><iframe id="frame-a" src="/grid/admin/FrameA_Servlet"></iframe>
+        </td>
+        <td class="iframe-col">
+          <div><iframe id="frame-b" src="/grid/admin/FrameB_Servlet"></iframe>
+        </td>
+        <td class="iframe-col">
+          <div><iframe id="frame-c" src="/grid/admin/FrameC_Servlet"></iframe>
+        </td>
+        <td class="iframe-col">
+          <div><iframe id="frame-d" src="/grid/admin/FrameD_Servlet"></iframe>
+        </td>
+      </tr>
+    </table>
   
-    <p id="para-1">This is paragraph one.</p>
-    <p id="para-2">This is paragraph two.</p>
-    <p id="para-3">This is paragraph three.</p>
-    <p id="hidden-para" hidden>This paragraph should be hidden.</p>
+    <table style="width:100%">
+      <tr>
+        <td>
+          <p id="para-1">This is paragraph one.</p>
+          <p id="para-2">This is paragraph two.</p>
+          <p id="para-3">This is paragraph three.</p>
+          <p id="hidden-para" hidden>This paragraph should be hidden.</p>
+        </td>
+        <td>
+          <div id="form-div">
+            <form action="/action_page.php">
+              <label for="input-field">Input: </label>
+              <input type="text" name="input-field" id="input-field"><br>
+              <label for="checkbox">Check: </label>
+              <input type="checkbox" name="checkbox" id="checkbox" value="checkbox"><br>
+              <input type="submit" value="Submit">
+            </form>
+          </div>
+        </td>
+      </tr>
+    </table>
   
     <table id="t1" style="width:100%">
       <tr id="t1-h1">
@@ -61,18 +106,12 @@
       </tr>
     </table>
   
-    <div id="form-div">
-      <form action="/action_page.php">
-        <label for="input-field">Input: </label>
-        <input type="text" name="input-field" id="input-field"><br>
-        <label for="checkbox">Check: </label>
-        <input type="checkbox" name="checkbox" id="checkbox" value="checkbox">
-        <input type="submit" value="Submit">
-      </form>
-    </div>
-  
-    <div id="shadow-root-a"></div>
-    <div id="shadow-root-b"></div>
+    <table style="width:100%">
+      <tr>
+        <td><div id="shadow-root-a"></div></td>
+        <td><div id="shadow-root-b"></div></td>
+      </tr>
+    </table>
   
   </body>
 </html>

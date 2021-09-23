@@ -20,15 +20,10 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
     /**
      * <b>org.openqa.selenium.htmlunit.HtmlUnitDriver</b>
      * 
-     * <pre>&lt;dependency&gt;
-     *  &lt;groupId&gt;net.sourceforge.htmlunit&lt;/groupId&gt;
-     *  &lt;artifactId&gt;htmlunit&lt;/artifactId&gt;
-     *  &lt;version&gt;2.22&lt;/version&gt;
-     *&lt;/dependency&gt;
      *&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.22&lt;/version&gt;
+     *  &lt;version&gt;2.24&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {

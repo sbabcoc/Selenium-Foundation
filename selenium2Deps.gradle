@@ -14,12 +14,11 @@ dependencies {
   }
   selenium2Compile 'org.seleniumhq.selenium:selenium-support:2.53.1'
   selenium2Compile 'org.jsoup:jsoup:1.13.1'
-  selenium2Compile 'net.sourceforge.htmlunit:htmlunit:2.21'
   selenium2Compile('org.bouncycastle:bcpkix-jdk15on:1.68') { force = true }
   selenium2Compile('org.bouncycastle:bcprov-jdk15on:1.68') { force = true }
   selenium2Compile('org.apache.httpcomponents:httpmime:4.5.13') { force = true }
   selenium2Compile('org.apache.httpcomponents:httpclient:4.5.13') { force = true }
   selenium2Compile('org.eclipse.jetty.websocket:websocket-client:9.2.30.v20200428') { force = true }
-  testCompile 'org.seleniumhq.selenium:htmlunit-driver:2.21'
+  testCompile 'org.seleniumhq.selenium:htmlunit-driver:2.24'
   testCompile 'org.mockito:mockito-core:2.25.0'
 }
