@@ -213,11 +213,12 @@ public class ExamplePage extends Page {
         return findElement(Using.CHECK).isSelected();
     }
     
-    public static void setHubAsTarget() {
+    public static URI setHubAsTarget() {
+        URI targetUri = null;
         SeleniumConfig config = SeleniumConfig.getConfig();
         URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
         try {
-            URI targetUri = new URIBuilder()
+            targetUri = new URIBuilder()
                     .setScheme(hubUrl.getProtocol())
                     .setHost(hubUrl.getHost())
                     .setPort(hubUrl.getPort())
@@ -226,6 +227,7 @@ public class ExamplePage extends Page {
         } catch (URISyntaxException e) {
             // nothing to do here
         }
+        return targetUri;
     }
     
 }

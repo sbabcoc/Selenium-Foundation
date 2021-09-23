@@ -98,19 +98,10 @@ public final class DriverManager {
         
         // if getting a driver
         if (getDriver) {
-            SeleniumConfig config = SeleniumConfig.getConfig();
-            
             // if driver not yet acquired
             if (!optDriver.isPresent()) {
                 long prior = System.currentTimeMillis();
-                
-                long timeOutInSeconds = config.getLong(SeleniumSettings.HOST_TIMEOUT.key());
-                DriverSessionWait wait = new DriverSessionWait(instance, timeOutInSeconds);
-                wait.ignoring(WebDriverException.class);
-                WebDriver driver = wait.until(driverIsAcquired(method));
-                
-                setDriverTimeouts(driver, config);
-                instance.setDriver(driver);
+                WebDriver driver = injectDriver(instance, method);
                 optDriver = Optional.of(driver);
                 if (instance.isTest(method)) {
                     long after = System.currentTimeMillis();
@@ -120,6 +111,7 @@ public final class DriverManager {
             
             // if initial page spec'd
             if (initialPage != null) {
+                SeleniumConfig config = SeleniumConfig.getConfig();
                 Page page = Page.openInitialPage(initialPage, optDriver.get(), config.getTargetUri());
                 instance.setInitialPage(instance.prepInitialPage(page));
                 instance.activatePlatform(instance.getDriver());
@@ -159,6 +151,25 @@ public final class DriverManager {
         }
     }
     
+    /**
+     * Inject new driver session into the indicated test context.
+     * 
+     * @param instance test class instance
+     * @param method test method <br>
+     * <b>NOTE</b>: May be {@code null} if the test class isn't a {@link DriverProvider}.
+     * @return new driver session
+     */
+    public static WebDriver injectDriver(TestBase instance, final Method method) {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        long timeOutInSeconds = config.getLong(SeleniumSettings.HOST_TIMEOUT.key());
+        DriverSessionWait wait = new DriverSessionWait(instance, timeOutInSeconds);
+        wait.ignoring(WebDriverException.class);
+        WebDriver driver = wait.until(driverIsAcquired(method));
+        setDriverTimeouts(driver, config);
+        instance.setDriver(driver);
+        return driver;
+    }
+
     /**
      * Set configured timeout intervals in the specified driver.
      * 

@@ -107,7 +107,7 @@ public final class RobustElementFactory {
                 .subclass(refClass)
                 .name(refClass.getPackage().getName() + ".Robust" + refClass.getSimpleName());
 
-        for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+        for (DriverPlugin driverPlugin : ServiceLoader.loadInstalled(DriverPlugin.class)) {
             Implementation ctorImpl = driverPlugin.getWebElementCtor(driver, refClass);
             if (ctorImpl != null) {
                 builder = builder.defineConstructor(Visibility.PUBLIC).intercept(ctorImpl);

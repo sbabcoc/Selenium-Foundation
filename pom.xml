@@ -38,13 +38,13 @@
     <revision>@projectVersion@</revision>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>2.0.3</java-utils.version>
+    <java-utils.version>2.1.0</java-utils.version>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
     <source-plugin.version>3.2.1</source-plugin.version>
     <javadoc-plugin.version>3.3.0</javadoc-plugin.version>
-    <settings.version>2.3.9</settings.version>
-    <junit-foundation.version>15.3.2</junit-foundation.version>
+    <settings.version>2.3.10</settings.version>
+    <junit-foundation.version>15.3.4</junit-foundation.version>
     <logback-testng.version>1.3.4</logback-testng.version>
     <sonar.language>java</sonar.language>
     <jacoco.version>0.8.7</jacoco.version>
@@ -138,7 +138,7 @@
       </activation>
       <properties>
         <release.version>7</release.version>
-        <testng-foundation.version>3.0.5-j7</testng-foundation.version>
+        <testng-foundation.version>3.0.6-j7</testng-foundation.version>
         <selenium.version>2.53.1</selenium.version>
         <commons-io.version>2.6</commons-io.version>
         <jsoup.version>1.13.1</jsoup.version>
@@ -290,11 +290,11 @@
       </activation>
       <properties>
         <release.version>8</release.version>
-        <testng-foundation.version>3.0.5-j8</testng-foundation.version>
+        <testng-foundation.version>3.0.6-j8</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <guava.version>30.1.1-jre</guava.version>
         <jsoup.version>1.14.2</jsoup.version>
-        <htmlunit.version>2.52.0</htmlunit.version>
+        <htmlunit.version>2.53.0</htmlunit.version>
         <jcommander.version>1.78</jcommander.version>
         <mockito.version>3.1.0</mockito.version>
         <!-- managed to resolve identified threat -->

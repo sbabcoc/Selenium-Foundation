@@ -17,10 +17,13 @@ public class FirefoxCaps {
     private static final String CAPABILITIES =
                     "{\"browserName\":\"firefox\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
-    private static final String BASELINE = "{\"browserName\":\"firefox\"}";
+    private static final String BASELINE =
+                    "{\"browserName\":\"firefox\"," +
+                     "\"marionette\":true}";
     
     private static final String HEADLESS =
                     "{\"browserName\":\"firefox\"," +
+                     "\"marionette\":true," +
                      "\"moz:firefoxOptions\":{\"args\":[\"-headless\"]}," +
                      "\"personality\":\"firefox.headless\"" +
                     "}";
