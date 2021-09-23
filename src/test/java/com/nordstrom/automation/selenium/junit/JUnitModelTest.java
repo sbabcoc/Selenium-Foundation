@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.junit;
 
-import org.junit.Assume;
+import static org.junit.Assume.assumeNoException;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -83,7 +84,7 @@ public class JUnitModelTest extends JUnitRoot {
         try {
             ModelTestCore.testShadowRootByLocator(this).run();
         } catch (ShadowRootContextException e) {
-            Assume.assumeNoException(e);
+            assumeNoException(e);
         }
     }
 
@@ -93,7 +94,7 @@ public class JUnitModelTest extends JUnitRoot {
         try {
             ModelTestCore.testShadowRootByElement(this).run();
         } catch (ShadowRootContextException e) {
-            Assume.assumeNoException(e);
+            assumeNoException(e);
         }
     }
     
@@ -103,7 +104,7 @@ public class JUnitModelTest extends JUnitRoot {
         try {
             ModelTestCore.testShadowRootList(this).run();
         } catch (ShadowRootContextException e) {
-            Assume.assumeNoException(e);
+            assumeNoException(e);
         }
     }
 
@@ -113,7 +114,7 @@ public class JUnitModelTest extends JUnitRoot {
         try {
             ModelTestCore.testShadowRootMap(this).run();
         } catch (ShadowRootContextException e) {
-            Assume.assumeNoException(e);
+            assumeNoException(e);
         }
     }
 
