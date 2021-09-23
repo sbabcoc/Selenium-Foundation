@@ -178,11 +178,6 @@
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
           </dependency>
-<!--           <dependency> -->
-<!--             <groupId>net.sourceforge.htmlunit</groupId> -->
-<!--             <artifactId>htmlunit</artifactId> -->
-<!--             <version>${htmlunit.version}</version> -->
-<!--           </dependency> -->
           <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>htmlunit-driver</artifactId>
