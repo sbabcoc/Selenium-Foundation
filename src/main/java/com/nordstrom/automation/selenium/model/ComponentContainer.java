@@ -624,6 +624,8 @@ public abstract class ComponentContainer
         if ("file".equals(scheme)) {
             result = Thread.currentThread().getContextClassLoader().getResource(path).toString();
         } else {
+            Objects.requireNonNull(targetUri, "[targetUri] must be non-null");
+            
             String userInfo = pageUrl.userInfo();
             String host = pageUrl.host();
             String port = pageUrl.port();

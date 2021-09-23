@@ -100,7 +100,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param config {@link SeleniumConfig} object
      * @return list of driver plugin instances
      */
-    private static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
+    static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
         List<DriverPlugin> driverPlugins;
         
         // get grid plugins setting
@@ -259,19 +259,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
         }
         
-        // get assembled classpath string
-        String classPath = JarUtils.getClasspath(dependencyContexts);
-        // split on Java agent list separator
-        String[] pathBits = classPath.split("\n");
-        // if agent(s) specified
-        if (pathBits.length > 1) {
-            // extract classpath
-            classPath = pathBits[0];
-            // for each specified agent...
-            for (String agentPath : pathBits[1].split("\t")) {
-                // ... specify a 'javaagent' argument
-                argsList.add(0, "-javaagent:" + agentPath);
-            }
+        // get dependency context paths
+        List<String> contextPaths = JarUtils.getContextPaths(dependencyContexts);
+        // extract classpath specification
+        String classPath = contextPaths.remove(0);
+        // for each specified Java agent...
+        for (String agentSpec : contextPaths) {
+            // ... specify a 'javaagent' argument
+            argsList.add(0, agentSpec);
         }
         
         // specify Java class path

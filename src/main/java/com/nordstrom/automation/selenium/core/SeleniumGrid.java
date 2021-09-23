@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -33,6 +32,7 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
+import com.nordstrom.automation.selenium.plugins.PluginUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -93,7 +93,7 @@ public class SeleniumGrid {
             nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
             addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
         }
-        addPluginPersonalities();
+        addPluginPersonalities(config);
     }
     
     /**
@@ -116,7 +116,7 @@ public class SeleniumGrid {
             this.nodeServers.put(nodeEndpoint, nodeServer);
             addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
         }
-        addPluginPersonalities();
+        addPluginPersonalities(config);
     }
     
     /**
@@ -145,20 +145,22 @@ public class SeleniumGrid {
                 capsList = (List<Map>) conf.get("capabilities");
             }
             for (Map<String, Object> capsItem : capsList) {
-                String personalityName = (String) capsItem.get("automationName");
-                if (personalityName == null) {
-                    personalityName = (String) capsItem.get("browserName");
+                String browserName = (String) capsItem.get("automationName");
+                if (browserName == null) {
+                    browserName = (String) capsItem.get("browserName");
                 }
-                personalities.put(personalityName, config.toJson(capsItem));
+                personalities.putAll(PluginUtils.getPersonalitiesForBrowser(browserName));
             }
         }
     }
     
     /**
      * Add supported personalities from configured driver plug-ins.
+     * 
+     * @param config {@link SeleniumConfig} object
      */
-    private void addPluginPersonalities() {
-        for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+    private void addPluginPersonalities(SeleniumConfig config) {
+        for (DriverPlugin driverPlugin : LocalSeleniumGrid.getDriverPlugins(config)) {
             if (personalities.containsKey(driverPlugin.getBrowserName())) {
                 personalities.putAll(driverPlugin.getPersonalities());
             }
