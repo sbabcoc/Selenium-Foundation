@@ -19,7 +19,7 @@ public class OperaCaps {
     public static final String BINARY_PATH = "selenium.opera.binary";
     public static final String OPTIONS_KEY = "operaOptions";
     public static final String BINARY_KEY = "binary";
-    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH };
+    private static final String[] PROPERTY_NAMES = { DRIVER_PATH };
     
     private static final String CAPABILITIES = "{\"browserName\":\"opera\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
