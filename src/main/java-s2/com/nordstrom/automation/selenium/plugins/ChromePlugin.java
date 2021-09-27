@@ -39,7 +39,7 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
      */
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        return ChromeCaps.getCapabilities();
+        return ChromeCaps.getCapabilities(config);
     }
 
     /**

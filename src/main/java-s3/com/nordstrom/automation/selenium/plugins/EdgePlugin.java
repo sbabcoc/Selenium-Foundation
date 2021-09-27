@@ -36,7 +36,7 @@ public class EdgePlugin extends RemoteWebDriverPlugin {
      */
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        return EdgeCaps.getCapabilities();
+        return EdgeCaps.getCapabilities(config);
     }
 
     /**
