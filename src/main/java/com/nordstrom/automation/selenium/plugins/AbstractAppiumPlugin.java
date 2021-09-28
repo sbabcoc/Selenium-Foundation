@@ -3,7 +3,6 @@ package com.nordstrom.automation.selenium.plugins;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.WebDriver;
@@ -205,22 +203,26 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         String nodeModulesRoot;
         File npm = findNPM().getAbsoluteFile();
         
+        String executable;
         List<String> argsList = new ArrayList<>();
         
         if (SystemUtils.IS_OS_WINDOWS) {
-            argsList.add("cmd.exe");
+            executable = "cmd.exe";
             argsList.add("/c");
+            argsList.add(npm.getName());
+        } else {
+            executable = npm.getName();
         }
         
-        argsList.add(npm.getName());
         argsList.add("root");
         argsList.add("-g");
         
-        ProcessBuilder builder = new ProcessBuilder(argsList);
-        builder.directory(npm.getParentFile());
+        CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
+        process.setWorkingDirectory(npm.getParentFile().getAbsolutePath());
         
         try {
-            nodeModulesRoot = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8).trim();
+            process.execute();
+            nodeModulesRoot = process.getStdOut().trim();
             File appiumMain = Paths.get(nodeModulesRoot, APPIUM_PATH_TAIL).toFile();
             if (appiumMain.exists()) return appiumMain;
             throw fileNotFound("'appium' main script", SeleniumSettings.APPIUM_BINARY_PATH);

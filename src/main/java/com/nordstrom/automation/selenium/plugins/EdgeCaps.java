@@ -11,8 +11,10 @@ public class EdgeCaps {
     }
 
     public static final String DRIVER_NAME = "MicrosoftEdge";
+    public static final String DRIVER_PATH = "webdriver.edge.driver";
+    public static final String BINARY_PATH = "webdriver.edge.bin";
     public static final String OPTIONS_KEY = "edgeOptions";
-    private static final String[] PROPERTY_NAMES = { "webdriver.edge.driver" };
+    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH };
     
     private static final String CAPABILITIES =
                     "{\"browserName\":\"MicrosoftEdge\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";

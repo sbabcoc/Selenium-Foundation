@@ -11,8 +11,10 @@ public class SafariCaps {
     }
 
     public static final String DRIVER_NAME = "safari";
+    public static final String DRIVER_PATH = "webdriver.safari.driver";
+    public static final String BINARY_PATH = "webdriver.safari.bin";
     public static final String OPTIONS_KEY = "safari.options";
-    private static final String[] PROPERTY_NAMES = { "webdriver.safari.driver", "webdriver.safari.noinstall" };
+    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH, "webdriver.safari.noinstall" };
 
     private static final String CAPABILITIES =
                     "{\"browserName\":\"safari\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";

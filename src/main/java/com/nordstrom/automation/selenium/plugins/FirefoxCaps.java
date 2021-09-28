@@ -11,8 +11,10 @@ public class FirefoxCaps {
     }
 
     public static final String DRIVER_NAME = "firefox";
+    public static final String DRIVER_PATH = "webdriver.gecko.driver";
+    public static final String BINARY_PATH = "webdriver.firefox.bin";
     public static final String OPTIONS_KEY = "moz:firefoxOptions";
-    private static final String[] PROPERTY_NAMES = { "webdriver.gecko.driver" };
+    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH };
     
     private static final String CAPABILITIES =
                     "{\"browserName\":\"firefox\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
