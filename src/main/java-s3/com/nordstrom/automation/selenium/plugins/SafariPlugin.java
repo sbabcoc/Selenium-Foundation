@@ -36,7 +36,7 @@ public class SafariPlugin extends RemoteWebDriverPlugin {
      */
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        return SafariCaps.getCapabilities(config);
+        return SafariCaps.getCapabilities();
     }
 
     /**

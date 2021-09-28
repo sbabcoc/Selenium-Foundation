@@ -65,10 +65,10 @@ public class PluginUtils {
                 return (DriverPlugin) ConstructorUtils.invokeConstructor(clazz);
             }
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
-                InvocationTargetException | InstantiationException e) {
+                InvocationTargetException | InstantiationException eaten) {
             // nothing to do here
         }
         return null;
     }
-
+    
 }

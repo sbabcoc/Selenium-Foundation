@@ -37,7 +37,7 @@ public class FirefoxPlugin extends RemoteWebDriverPlugin {
      */
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        return FirefoxCaps.getCapabilities(config);
+        return FirefoxCaps.getCapabilities();
     }
 
     /**

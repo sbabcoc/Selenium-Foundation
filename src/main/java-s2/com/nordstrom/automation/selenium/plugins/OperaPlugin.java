@@ -43,7 +43,7 @@ public class OperaPlugin extends RemoteWebDriverPlugin {
      */
     @Override
     public String getCapabilities(SeleniumConfig config) {
-        return OperaCaps.getCapabilities(config);
+        return OperaCaps.getCapabilities();
     }
 
     /**
