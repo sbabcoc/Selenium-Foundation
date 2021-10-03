@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -139,23 +138,14 @@ public class SeleniumGrid {
      * @param nodeEndpoint node endpoint
      * @throws IOException if an I/O error occurs
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private void addNodePersonalities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
         LOGGER.debug("{}: Adding personalities of node: {}", hubUrl, nodeEndpoint);
         for (Capabilities capabilities : GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint)) {
-            Map<String, Object> req = (Map<String, Object>) capabilities.getCapability("request");
-            List<Map> capsList = (List<Map>) req.get("capabilities");
-            if (capsList == null) {
-                Map<String, Object> conf = (Map<String, Object>) req.get("configuration");
-                capsList = (List<Map>) conf.get("capabilities");
+            String browserName = (String) capabilities.getCapability("automationName");
+            if (browserName == null) {
+                browserName = capabilities.getBrowserName();
             }
-            for (Map<String, Object> capsItem : capsList) {
-                String browserName = (String) capsItem.get("automationName");
-                if (browserName == null) {
-                    browserName = (String) capsItem.get("browserName");
-                }
-                personalities.putAll(PluginUtils.getPersonalitiesForBrowser(browserName));
-            }
+            personalities.putAll(PluginUtils.getPersonalitiesForBrowser(browserName));
         }
     }
     

@@ -17,7 +17,9 @@ public class EspressoPlugin extends AbstractAppiumPlugin {
     private static final String CAPABILITIES =
             "{\"automationName\":\"Espresso\"," +
              "\"platformName\":\"Android\"," +
-             "\"maxInstances\":1}";
+             "\"browserName\":\"Chrome\"," +
+             "\"maxInstances\":1," + 
+             "\"deviceName\":\"Android Emulator\"}";
     
     private static final String BASELINE =
             "{\"automationName\":\"Espresso\"," + 

@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -179,13 +180,72 @@ public final class GridUtility {
      * @return list of {@link Capabilities} objects for the specified node
      * @throws IOException if an I/O error occurs
      */
+    @SuppressWarnings({ "unchecked" })
     public static Capabilities[] getNodeCapabilities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
+        // get status of specified node
+        Capabilities nodeStatus = getNodeStatus(config, hubUrl, nodeEndpoint);
+        // if node is registered
+        if (nodeStatus.is("success")) {
+            Object capabilities = null;
+            // get request object from status response
+            Map<String, Object> request = (Map<String, Object>) nodeStatus.getCapability("request");
+            // if request found
+            if (request != null) {
+                // get capabilities from request object
+                capabilities = request.get("capabilities");
+                // if no capabilities found
+                if (capabilities == null) {
+                    // get configuration from request object
+                    Map<String, Object> configuration = (Map<String, Object>) request.get("configuration");
+                    // if configuration found
+                    if (configuration != null) {
+                        // get capabilities from configuration
+                        capabilities = configuration.get("capabilities");
+                    }
+                }
+            }
+            // if capabilities found
+            if (capabilities != null) {
+                // convert capabilities to JSON string
+                String json = config.toJson(capabilities);
+                // find outer array brackets
+                int beginIndex = json.indexOf('[') + 1;
+                int endIndex = json.lastIndexOf(']');
+                // convert and return array of capabilities objects
+                return config.getCapabilitiesForJson(json.substring(beginIndex, endIndex));
+            } else {
+                LOGGER.warn("Unsupported status response from node: {}", nodeEndpoint);
+            }
+        } else {
+            LOGGER.warn("Can't get capabilities for unregistered node: {}", nodeEndpoint);
+        }
+        // failed: return no items
+        return new Capabilities[0];
+    }
+    
+    /**
+     * Get the status of the specified node endpoint.
+     * <p>
+     * <b>NOTE</b>: This method leverages the built-in JSON deserialization features of the Selenium API to convert the
+     * status response from the specified node endpoint into a <b>Capabilities</b> object that can be manipulated via
+     * standard interfaces. The value returned by this method is not a node <b>Capabilities</b> object; rather, one of
+     * its capability values contains an array of one or more objects that enumerate the capabilities of the node.
+     * 
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubUrl {@link URL} of Grid hub
+     * @param nodeEndpoint node endpoint
+     * @return node status as a {@link Capabilities} object
+     * @throws IOException if an I/O error occurs
+     * @see #getNodeCapabilities(SeleniumConfig, URL, String)
+     */
+    static Capabilities getNodeStatus(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
         String json;
         String url = hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + GridServer.NODE_CONFIG + "?id=" + nodeEndpoint;
         try (InputStream is = new URL(url).openStream()) {
             json = readAvailable(is);
         }
-        return config.getCapabilitiesForJson(json);
+        return config.getCapabilitiesForJson(json)[0];
     }
 
     /**
