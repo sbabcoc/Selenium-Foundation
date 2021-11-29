@@ -5,7 +5,7 @@ In addition to its TestNG support, **Selenium Foundation** also includes support
 ## JUnit 4 Required Configuration
 
 * Add the [**JUnit Foundation** Java agent](https://github.com/sbabcoc/JUnit-Foundation#how-to-enable-notifications) to your project's test configuration. You'll find more details about this [below](#outline-of-required-elements).
-  * **NOTE**: The `-javaagent` specification you add to you project configuration may not be active in all contexts. For example, you'll probably find that this option must also be added to your [IDE run/debug configurations](https://github.com/sbabcoc/JUnit-Foundation#ide-configuration-for-junit-foundation).
+  * **NOTE**: The `-javaagent` specification you add to your project configuration may not be active in all contexts. For example, you'll probably find that this option must also be added to your [IDE run/debug configurations](https://github.com/sbabcoc/JUnit-Foundation#ide-configuration-for-junit-foundation).
 * Add a service loader run watcher configuration file in your project's **_resources/META-INF/services_** folder:
 
 ###### com.nordstrom.automation.junit.JUnitWatcher
