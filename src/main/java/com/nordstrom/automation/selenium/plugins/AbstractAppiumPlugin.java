@@ -178,7 +178,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * Find the 'node' binary.
      * 
      * @return path to the 'node' binary as a {@link File} object
-     * @throws GridServerLaunchFailedException if 'npm' isn't found
+     * @throws GridServerLaunchFailedException if 'node' isn't found
      */
     private static File findNodeBinary() throws GridServerLaunchFailedException {
         return findBinary("node", SeleniumSettings.NODE_BINARY_PATH, "'node' JavaScript runtime");
