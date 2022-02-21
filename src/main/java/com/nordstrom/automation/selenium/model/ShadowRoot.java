@@ -1,9 +1,12 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.util.Map;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
-
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
@@ -24,6 +27,7 @@ import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 public class ShadowRoot extends PageComponent {
     
     private static final String SHADOW_ROOT = "return arguments[0].shadowRoot;";
+    private static final String ROOT_KEY = "shadow-6066-11e4-a52e-4f735466cecf";
 
     /**
      * Constructor for shadow root by element locator
@@ -77,10 +81,26 @@ public class ShadowRoot extends PageComponent {
      * @return shadow root context
      * @throws ShadowRootContextException if unable to acquire shadow root
      */
+    @SuppressWarnings("unchecked")
     public static SearchContext getShadowRoot(SearchContext context) {
         WebDriver driver = WebDriverUtils.getDriver(context);
-        SearchContext shadowRoot = JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
-        if (shadowRoot != null) return shadowRoot;
+        Object result = JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
+        if (result instanceof SearchContext) {
+            return (SearchContext) result;
+        }
+        // https://github.com/SeleniumHQ/selenium/issues/10050
+        if (result instanceof Map) {
+            try {
+                // build shadow root remote web element
+                RemoteWebElement shadowRoot = new RemoteWebElement();
+                shadowRoot.setParent((RemoteWebDriver) driver);
+                shadowRoot.setId(((Map<String, String>) result).get(ROOT_KEY));
+                shadowRoot.setFileDetector(((RemoteWebDriver) driver).getFileDetector());
+                return shadowRoot;
+            } catch (Exception eaten ) {
+                // nothing to do here
+            }
+        }
         throw new ShadowRootContextException();
     }
     
