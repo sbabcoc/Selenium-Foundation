@@ -5,13 +5,17 @@ tasks.withType(JavaCompile) {
     options.bootstrapClasspath = files("${System.env.JDK8_HOME}/jre/lib/rt.jar")
 }
 
+configurations {
+  selenium3Compile.extendsFrom compile
+  testCompile.extendsFrom selenium3Compile
+}
+
 dependencies {
-  selenium3Compile configurations.compile
   selenium3Compile 'com.nordstrom.tools:testng-foundation:3.0.6-j8'
-  selenium3Compile('org.apache.commons:commons-lang3:3.12.0') { force = true }
-  selenium3Compile('com.google.guava:guava:30.1.1-jre') { force = true }
+  selenium3Compile('org.apache.commons:commons-lang3') { version { strictly '3.12.0' } }
+  selenium3Compile('com.google.guava:guava') { version { strictly '30.1.1-jre' } }
   selenium3Compile 'org.apache.httpcomponents:httpclient:4.5.13'
-  selenium3Compile('com.beust:jcommander:1.78') { force = true }
+  selenium3Compile('com.beust:jcommander') { version { strictly '1.78' } }
   selenium3Compile('org.seleniumhq.selenium:selenium-server:3.141.59') {
     exclude module: 'selenium-chrome-driver'
     exclude module: 'selenium-edge-driver'
@@ -24,9 +28,9 @@ dependencies {
   }
   selenium3Compile 'org.seleniumhq.selenium:selenium-support:3.141.59'
   selenium3Compile 'org.jsoup:jsoup:1.14.2'
-  selenium3Compile('com.squareup.okhttp3:okhttp:4.9.1') { force = true }
-  selenium3Compile('com.squareup.okio:okio:2.10.0') { force = true }
-  selenium3Compile('org.eclipse.jetty.websocket:websocket-client:9.4.43.v20210629') { force = true }
+  selenium3Compile('com.squareup.okhttp3:okhttp') { version { strictly '4.9.1' } }
+  selenium3Compile('com.squareup.okio:okio') { version { strictly '2.10.0' } }
+  selenium3Compile('org.eclipse.jetty.websocket:websocket-client') { version { strictly '9.4.43.v20210629' } }
   testCompile 'org.seleniumhq.selenium:htmlunit-driver:2.53.0'
   testCompile 'org.mockito:mockito-core:3.1.0'
 }

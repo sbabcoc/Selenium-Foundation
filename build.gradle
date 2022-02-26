@@ -5,7 +5,7 @@ plugins {
   id 'net.researchgate.release' version '2.8.1'
 }
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'maven'
 apply plugin: 'jacoco'
 apply plugin: 'signing'
@@ -28,6 +28,8 @@ if (!project.hasProperty('profile')) {
 } else {
   assert ['selenium2', 'selenium3'].contains(profile)
 }
+
+apply from: "${profile}Deps.gradle"
 
 def archiveVer = null
 def verBits = project.version.split('-')
@@ -100,7 +102,7 @@ clean {
 
 jacoco {
   toolVersion = '0.8.5'
-  reportsDir = file("${buildDir}/customJacocoReportDir")
+  reportsDirectory = file("${buildDir}/customJacocoReportDir")
 }
 
 jacocoTestReport {
@@ -139,8 +141,8 @@ task("${profile}Jar", type: Jar) {
     into(destPath)
     filter(ReplaceTokens, tokens: propTokens)
   }
-  archiveName = archiveBase + '.jar'
-  destinationDir = libsDir
+  archiveFileName = archiveBase + '.jar'
+  destinationDirectory = libsDir
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
@@ -154,8 +156,8 @@ task("${profile}SourcesJar", type: Jar) {
   
   classifier = 'sources'
   from sourceSets["${profile}"].allSource
-  archiveName = archiveBase + '-sources.jar'
-  destinationDir = libsDir
+  archiveFileName = archiveBase + '-sources.jar'
+  destinationDirectory = libsDir
 }
 
 task("${profile}JavadocJar", type: Jar, dependsOn: "${profile}Javadoc") {
@@ -164,8 +166,8 @@ task("${profile}JavadocJar", type: Jar, dependsOn: "${profile}Javadoc") {
   
   classifier = 'javadoc'
   from tasks["${profile}Javadoc"].destinationDir
-  archiveName = archiveBase + '-javadoc.jar'
-  destinationDir = libsDir
+  archiveFileName = archiveBase + '-javadoc.jar'
+  destinationDirectory = libsDir
 }
 
 task testNG(type: Test) {
@@ -293,12 +295,8 @@ dependencies {
   compile('com.github.sbabcoc:logback-testng:1.3.4') {
     exclude group: 'org.testng', module: 'testng'
   }
-  compile('org.hamcrest:hamcrest-core:2.2') { force = true }
-  compile('org.yaml:snakeyaml:1.28') { force = true }
-  
-  apply from: "${profile}Deps.gradle"
-  
-  testCompile configurations["${profile}Compile"]
+  compile('org.hamcrest:hamcrest-core') { version { strictly '2.2' } }
+  compile('org.yaml:snakeyaml') { version { strictly '1.28' } }
 }
 
 test {
