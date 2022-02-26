@@ -42,7 +42,6 @@ import net.bytebuddy.implementation.bind.annotation.This;
  * implementations for methods that acquire web element references and recover from StaleElementReferenceException
  * failures.  
  */
-@SuppressWarnings("squid:S1200")
 public class RobustElementWrapper implements ReferenceFetcher {
     
     /** wraps 1st matched reference */
@@ -81,7 +80,6 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * @param locator element locator
      * @param index element index
      */
-    @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity"})
     public RobustElementWrapper(
                     final WebElement element, final WrapsContext context, final By locator, final int index) {
         
@@ -304,7 +302,6 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * @param wrapper robust element wrapper
      * @return wrapped element reference
      */
-    @SuppressWarnings({"squid:S3776", "squid:S134"})
     private static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
         NoSuchElementException thrown = null;
         SearchContext context = wrapper.context.getWrappedContext();
@@ -458,7 +455,6 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings({"squid:S1142", "squid:S1126"})
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;

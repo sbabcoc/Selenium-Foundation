@@ -58,7 +58,6 @@ public final class ReflectUtil {
      * @param longTypeNames 'true' to return long type names; 'false' to return short type names
      * @return parameter type string
      */
-    @SuppressWarnings("squid:S1774")
     public static String parametersAsString(final Method method, final boolean longTypeNames) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 0)

@@ -23,7 +23,6 @@ import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
  * @see RobustWebElement
  * @see WebDriverUtils#getExecutor
  */
-@SuppressWarnings("squid:S923")
 public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver {
     
     private JavascriptExecutor executor;

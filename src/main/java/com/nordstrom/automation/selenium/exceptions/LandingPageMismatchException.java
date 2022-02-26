@@ -7,7 +7,6 @@ import com.nordstrom.automation.selenium.annotations.PageUrl;
 /**
  * This exception is thrown when page load verification detects that the actual landing page differs from expectations.
  */
-@SuppressWarnings("squid:S2166")
 public class LandingPageMismatchException extends WebDriverException {
 
     private static final long serialVersionUID = -2375529252543798864L;

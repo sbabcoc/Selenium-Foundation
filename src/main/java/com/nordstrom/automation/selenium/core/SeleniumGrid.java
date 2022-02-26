@@ -53,7 +53,6 @@ import com.nordstrom.common.base.UncheckedThrow;
  * </a> file, <b>Selenium Foundation</b> acquires local browser sessions from a local Grid instance to avoid divergent
  * behavior and special-case code to support both local and remote operation.
  */
-@SuppressWarnings("squid:S1774")
 public class SeleniumGrid {
     
     static final int CONNECT_TIMEOUT_MS = 500;

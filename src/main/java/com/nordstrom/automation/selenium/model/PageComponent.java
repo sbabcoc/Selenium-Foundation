@@ -191,7 +191,6 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
              * {@inheritDoc}
              */
             @Override
-            @SuppressWarnings("squid:S1774")
             public PageComponent apply(final SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isDisplayed()) ? component : null;
@@ -227,7 +226,6 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
              * {@inheritDoc}
              */
             @Override
-            @SuppressWarnings("squid:S1774")
             public PageComponent apply(final SearchContext context) {
                 PageComponent component = verifyContext(context);
                 return (component.isInvisible()) ? component : null;
@@ -282,7 +280,6 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings({"squid:S1142", "squid:S1126"})
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;

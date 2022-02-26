@@ -84,7 +84,6 @@ public enum ContainerMethodInterceptor {
      * @throws Exception {@code anything} (exception thrown by the intercepted method)
      */
     @RuntimeType
-    @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity", "squid:S1698", "squid:S134"})
     public Object intercept(@This final Object obj, @Origin final Method method, @AllArguments final Object[] args,
                     @SuperCall final Callable<?> proxy) throws Throwable {
         

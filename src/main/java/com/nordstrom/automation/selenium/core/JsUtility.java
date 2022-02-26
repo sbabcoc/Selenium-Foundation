@@ -66,7 +66,6 @@ import com.nordstrom.common.base.UncheckedThrow;
  * }
  * return null;</code></pre>
  */
-@SuppressWarnings("squid:S923")
 public final class JsUtility {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
