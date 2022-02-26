@@ -45,7 +45,6 @@ import com.nordstrom.common.base.UncheckedThrow;
 /**
  * This is a abstract base class for all of the container classes defined by <b>Selenium Foundation</b>.
  */
-@SuppressWarnings({"squid:S1200", "squid:S1774"})
 public abstract class ComponentContainer
                         extends Enhanceable<ComponentContainer> 
                         implements SearchContext, WrapsContext {
@@ -403,7 +402,6 @@ public abstract class ComponentContainer
      * @param value desired value
      * @return 'true' if element value changed; otherwise 'false'
      */
-    @SuppressWarnings("squid:S1142")
     public static boolean updateValue(final WebElement element, final String value) {
         Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
@@ -611,7 +609,6 @@ public abstract class ComponentContainer
      * @param targetUri target URI
      * @return defined page URL as a string (may be 'null')
      */
-    @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity"})
     public static String getPageUrl(final PageUrl pageUrl, final URI targetUri) {
         if (pageUrl == null || PLACEHOLDER.equals(pageUrl.value())) {
             return null;
@@ -722,7 +719,6 @@ public abstract class ComponentContainer
      * 
      * @param pageObj page object whose landing page is to be verified
      */
-    @SuppressWarnings({"squid:S3776", "squid:MethodCyclomaticComplexity", "squid:S134"})
     private static void verifyLandingPage(final Page pageObj) {
         Class<?> pageClass = getContainerClass(pageObj);
         PageUrl pageUrl = pageClass.getAnnotation(PageUrl.class);
@@ -1054,7 +1050,6 @@ public abstract class ComponentContainer
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings({"squid:S3776", "squid:S1142"})
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;

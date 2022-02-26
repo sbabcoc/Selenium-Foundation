@@ -320,7 +320,6 @@ public final class Coordinators {
      * @param element element whose visibility is in question
      * @return specified element reference; 'null' if element is hidden
      */
-    @SuppressWarnings("squid:S1774")
     private static WebElement elementIfVisible(final WebElement element) {
         return element.isDisplayed() ? element : null;
     }

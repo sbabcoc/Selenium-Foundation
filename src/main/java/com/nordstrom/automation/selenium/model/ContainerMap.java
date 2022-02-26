@@ -152,7 +152,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings({"squid:S1142", "squid:S1126"})
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
@@ -180,7 +179,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * 
      * @param <V> the class of container object held by this entry
      */
-    @SuppressWarnings("squid:S2972")
     static class ContainerEntry<V extends ComponentContainer> implements Map.Entry<Object, V> {
 
         private ContainerMap<V> map;
@@ -244,7 +242,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
          * {@inheritDoc}
          */
         @Override
-        @SuppressWarnings("squid:S1774")
         public int hashCode() {
             final int PRIME = 31;
             int result = 1;
@@ -258,7 +255,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
          * {@inheritDoc}
          */
         @Override
-        @SuppressWarnings("squid:S1142")
         public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
@@ -286,7 +282,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * <b>NOTE</b>: This class implements a read-only set; all methods that would alter the composition of the
      * collection (e.g. - {@link #remove}) result in {@link UnsupportOperationException}.
      */
-    @SuppressWarnings("squid:S2972")
     class ContainerEntrySet extends AbstractSet<Map.Entry<Object, V>> {
         
         /**
@@ -350,7 +345,6 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
      * <b>NOTE</b>: This class implements a read-only iterator; all methods that would alter the composition of the
      * collection (e.g. - {@link #remove}) result in {@link UnsupportOperationException}.
      */
-    @SuppressWarnings("squid:S2972")
     class ContainerEntryIterator implements Iterator<Map.Entry<Object, V>> {
         
         private ContainerEntry<V> next;

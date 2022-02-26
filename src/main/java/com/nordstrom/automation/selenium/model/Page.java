@@ -286,7 +286,6 @@ public class Page extends ComponentContainer {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("squid:S1774")
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -302,7 +301,6 @@ public class Page extends ComponentContainer {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("squid:S1142")
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;

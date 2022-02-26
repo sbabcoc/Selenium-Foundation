@@ -32,7 +32,6 @@ import com.nordstrom.automation.settings.SettingsCore;
  * 
  * @see SettingsCore
  */
-@SuppressWarnings({"squid:S1200", "squid:S2972", "squid:MaximumInheritanceDepth"})
 public class SeleniumConfig extends AbstractSeleniumConfig {
     
     private static final String JSON_HEAD = "{ \"capabilities\": [";
