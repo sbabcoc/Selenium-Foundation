@@ -262,7 +262,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/main/java-s2</source>
+                    <source>src/selenium2/java</source>
                   </sources>
                 </configuration>
               </execution>
@@ -450,7 +450,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/main/java-s3</source>
+                    <source>src/selenium3/java</source>
                   </sources>
                 </configuration>
               </execution>
