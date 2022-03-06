@@ -1,28 +1,40 @@
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+ext.buildRoot = file('build-s2')
+ext.libsDir = new File(buildRoot, 'libs')
 
-tasks.withType(JavaCompile) {
-    options.bootstrapClasspath = files("${System.env.JDK7_HOME}/jre/lib/rt.jar")
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(7)
+  }
 }
 
-configurations {
-  selenium2Compile.extendsFrom compile
-  testCompile.extendsFrom selenium2Compile
+sourceSets {
+  main {
+    java {
+      srcDirs = [ 'src/main/java', 'src/selenium2/java' ]
+      outputDir = new File(buildRoot, 'classes')
+    }
+    output.resourcesDir = "${buildRoot}/classes"
+  }
+  test {
+    java {
+      outputDir = new File(buildRoot, 'test-classes')
+    }
+  }
 }
-
+  
 dependencies {
-  selenium2Compile 'com.nordstrom.tools:testng-foundation:3.0.6-j7'
-  selenium2Compile 'commons-io:commons-io:2.4'
-  selenium2Compile('org.seleniumhq.selenium:selenium-server:2.53.1') {
+  api 'com.nordstrom.tools:testng-foundation:3.0.6-j7'
+  api 'commons-io:commons-io:2.4'
+  api('org.seleniumhq.selenium:selenium-server:2.53.1') {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
   }
-  selenium2Compile 'org.seleniumhq.selenium:selenium-support:2.53.1'
-  selenium2Compile 'org.jsoup:jsoup:1.13.1'
-  selenium2Compile('org.bouncycastle:bcpkix-jdk15on') { version { strictly '1.68' } }
-  selenium2Compile('org.bouncycastle:bcprov-jdk15on') { version { strictly '1.68' } }
-  selenium2Compile('org.apache.httpcomponents:httpmime') { version { strictly '4.5.13' } }
-  selenium2Compile('org.apache.httpcomponents:httpclient') { version { strictly '4.5.13' } }
-  selenium2Compile('org.eclipse.jetty.websocket:websocket-client') { version { strictly '9.2.30.v20200428' } }
-  testCompile 'org.seleniumhq.selenium:htmlunit-driver:2.24'
-  testCompile 'org.mockito:mockito-core:2.25.0'
+  api 'org.seleniumhq.selenium:selenium-support:2.53.1'
+  api 'org.jsoup:jsoup:1.13.1'
+  api('org.bouncycastle:bcpkix-jdk15on') { version { strictly '1.68' } }
+  api('org.bouncycastle:bcprov-jdk15on') { version { strictly '1.68' } }
+  api('org.apache.httpcomponents:httpmime') { version { strictly '4.5.13' } }
+  api('org.apache.httpcomponents:httpclient') { version { strictly '4.5.13' } }
+  api('org.eclipse.jetty.websocket:websocket-client') { version { strictly '9.2.30.v20200428' } }
+  testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.24'
+  testImplementation 'org.mockito:mockito-core:2.25.0'
 }

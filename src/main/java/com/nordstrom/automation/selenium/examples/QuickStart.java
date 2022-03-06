@@ -129,9 +129,9 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * The hierarchy of evaluation produces the following results:
  * 
  * <blockquote>
- *     <b>BROWSER_NAME</b> = <mark>firefox</mark>; 
- *     <b>TARGET_HOST</b> = <mark>my.server.com</mark>; 
- *     <b>TARGET_PATH</b> = <mark>/</mark>
+ *     <b>BROWSER_NAME</b> = firefox; 
+ *     <b>TARGET_HOST</b> = my.server.com; 
+ *     <b>TARGET_PATH</b> = /
  * </blockquote>
  * <p>
  * <b>INSTALLING DRIVERS</b>
