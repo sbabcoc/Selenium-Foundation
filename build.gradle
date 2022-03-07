@@ -122,8 +122,8 @@ test {
 
 scmVersion {
   hooks {
-        pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /(<version>)$v(-s[23]<\/version>)/}, replacement: {v, p -> "\$1$v\$2"}]
-        pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /(selenium-foundation:)$v(-s[23])/}, replacement: {v, p -> "\$1$v\$2"}]
+        pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /&lt;version&gt;)\d+\.\d+\.\d+(-s[23]&lt;\/version&gt;)/}, replacement: {v, p -> "\$1$v\$2"}]
+        pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /(selenium-foundation:)\d+\.\d+\.\d+(-s[23])/}, replacement: {v, p -> "\$1$v\$2"}]
         pre 'commit'
         post 'push'
   }
