@@ -43,6 +43,6 @@ dependencies {
   api('com.squareup.okhttp3:okhttp') { version { strictly '4.9.1' } }
   api('com.squareup.okio:okio') { version { strictly '2.10.0' } }
   api('org.eclipse.jetty.websocket:websocket-client') { version { strictly '9.4.43.v20210629' } }
-  testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.53.0'
+  testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.59.0'
   testImplementation 'org.mockito:mockito-core:3.1.0'
 }
