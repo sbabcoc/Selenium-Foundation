@@ -134,10 +134,6 @@ artifacts {
   archives tasks['javadocJar']
 }
 
-signing {
-  sign configurations.archives
-}
-
 publishing {
   publications {
     mavenJava(MavenPublication) {
@@ -177,6 +173,10 @@ publishing {
       }
     }
   }
+}
+
+signing {
+  sign publishing.publications.mavenJava
 }
 
 task install {
