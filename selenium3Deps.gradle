@@ -52,6 +52,12 @@ dependencies {
   api 'org.seleniumhq.selenium:selenium-support'
   api 'org.apache.httpcomponents:httpclient'
   api 'org.jsoup:jsoup'
+  api 'org.apache.commons:commons-lang3'
+  api 'com.google.guava:guava'
+  api 'com.beust:jcommander'
+  api 'com.squareup.okhttp3:okhttp'
+  api 'com.squareup.okio:okio'
+  api 'org.eclipse.jetty.websocket:websocket-client'
   testImplementation 'org.seleniumhq.selenium:htmlunit-driver'
   testImplementation 'org.mockito:mockito-core'
 }

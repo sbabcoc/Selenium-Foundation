@@ -221,6 +221,8 @@ dependencies {
   api('com.github.sbabcoc:logback-testng') {
     exclude group: 'org.testng', module: 'testng'
   }
+  api 'org.hamcrest:hamcrest-core'
+  api 'org.yaml:snakeyaml'
 }
 
 test {
