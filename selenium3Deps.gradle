@@ -23,12 +23,23 @@ sourceSets {
 }
   
 dependencies {
-  api 'com.nordstrom.tools:testng-foundation:3.0.6-j8'
-  api('org.apache.commons:commons-lang3') { version { strictly '3.12.0' } }
-  api('com.google.guava:guava') { version { strictly '30.1.1-jre' } }
-  api 'org.apache.httpcomponents:httpclient:4.5.13'
-  api('com.beust:jcommander') { version { strictly '1.78' } }
-  api('org.seleniumhq.selenium:selenium-server:3.141.59') {
+  constraints {
+    api 'com.nordstrom.tools:testng-foundation:3.0.6-j8'
+    api 'org.seleniumhq.selenium:selenium-server:3.141.59'
+    api 'org.seleniumhq.selenium:selenium-support:3.141.59'
+    api 'org.apache.httpcomponents:httpclient:4.5.13'
+    api 'org.jsoup:jsoup:1.14.2'
+    api 'org.apache.commons:commons-lang3:3.12.0'
+    api 'com.google.guava:guava:30.1.1-jre'
+    api 'com.beust:jcommander:1.78'
+    api 'com.squareup.okhttp3:okhttp:4.9.1'
+    api 'com.squareup.okio:okio:2.10.0'
+    api 'org.eclipse.jetty.websocket:websocket-client:9.4.43.v20210629'
+    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.59.0'
+    testImplementation 'org.mockito:mockito-core:3.1.0'
+  }
+  api 'com.nordstrom.tools:testng-foundation'
+  api('org.seleniumhq.selenium:selenium-server') {
     exclude module: 'selenium-chrome-driver'
     exclude module: 'selenium-edge-driver'
     exclude module: 'selenium-firefox-driver'
@@ -38,11 +49,9 @@ dependencies {
     exclude module: 'selenium-safari-driver'
     exclude module: 'htmlunit-driver'
   }
-  api 'org.seleniumhq.selenium:selenium-support:3.141.59'
-  api 'org.jsoup:jsoup:1.14.2'
-  api('com.squareup.okhttp3:okhttp') { version { strictly '4.9.1' } }
-  api('com.squareup.okio:okio') { version { strictly '2.10.0' } }
-  api('org.eclipse.jetty.websocket:websocket-client') { version { strictly '9.4.43.v20210629' } }
-  testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.59.0'
-  testImplementation 'org.mockito:mockito-core:3.1.0'
+  api 'org.seleniumhq.selenium:selenium-support'
+  api 'org.apache.httpcomponents:httpclient'
+  api 'org.jsoup:jsoup'
+  testImplementation 'org.seleniumhq.selenium:htmlunit-driver'
+  testImplementation 'org.mockito:mockito-core'
 }

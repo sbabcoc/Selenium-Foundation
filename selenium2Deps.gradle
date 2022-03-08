@@ -23,18 +23,27 @@ sourceSets {
 }
   
 dependencies {
-  api 'com.nordstrom.tools:testng-foundation:3.0.6-j7'
-  api 'commons-io:commons-io:2.4'
-  api('org.seleniumhq.selenium:selenium-server:2.53.1') {
+  constraints {
+    api 'com.nordstrom.tools:testng-foundation:3.0.6-j7'
+    api 'commons-io:commons-io:2.4'
+    api 'org.seleniumhq.selenium:selenium-server:2.53.1'
+    api 'org.seleniumhq.selenium:selenium-support:2.53.1'
+    api 'org.jsoup:jsoup:1.13.1'
+    api 'org.bouncycastle:bcpkix-jdk15on:1.68'
+    api 'org.bouncycastle:bcprov-jdk15on:1.68'
+    api 'org.apache.httpcomponents:httpmime:4.5.13'
+    api 'org.apache.httpcomponents:httpclient:4.5.13'
+    api 'org.eclipse.jetty.websocket:websocket-client:9.2.30.v20200428'
+    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.24'
+    testImplementation 'org.mockito:mockito-core:2.25.0'
+  }
+  api 'com.nordstrom.tools:testng-foundation'
+  api 'commons-io:commons-io'
+  api('org.seleniumhq.selenium:selenium-server') {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
   }
-  api 'org.seleniumhq.selenium:selenium-support:2.53.1'
-  api 'org.jsoup:jsoup:1.13.1'
-  api('org.bouncycastle:bcpkix-jdk15on') { version { strictly '1.68' } }
-  api('org.bouncycastle:bcprov-jdk15on') { version { strictly '1.68' } }
-  api('org.apache.httpcomponents:httpmime') { version { strictly '4.5.13' } }
-  api('org.apache.httpcomponents:httpclient') { version { strictly '4.5.13' } }
-  api('org.eclipse.jetty.websocket:websocket-client') { version { strictly '9.2.30.v20200428' } }
-  testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.24'
-  testImplementation 'org.mockito:mockito-core:2.25.0'
+  api 'org.seleniumhq.selenium:selenium-support'
+  api 'org.jsoup:jsoup'
+  testImplementation 'org.seleniumhq.selenium:htmlunit-driver'
+  testImplementation 'org.mockito:mockito-core'
 }
