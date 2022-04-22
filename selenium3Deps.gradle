@@ -24,7 +24,7 @@ sourceSets {
   
 dependencies {
   constraints {
-    api 'com.nordstrom.tools:testng-foundation:3.0.6-j8'
+    api 'com.nordstrom.tools:testng-foundation:3.0.9-j8'
     api 'org.seleniumhq.selenium:selenium-server:3.141.59'
     api 'org.seleniumhq.selenium:selenium-support:3.141.59'
     api 'org.apache.httpcomponents:httpclient:4.5.13'
@@ -35,7 +35,7 @@ dependencies {
     api 'com.squareup.okhttp3:okhttp:4.9.1'
     api 'com.squareup.okio:okio:2.10.0'
     api 'org.eclipse.jetty.websocket:websocket-client:9.4.43.v20210629'
-    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.59.0'
+    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.61.0'
     testImplementation 'org.mockito:mockito-core:3.1.0'
   }
   api 'com.nordstrom.tools:testng-foundation'

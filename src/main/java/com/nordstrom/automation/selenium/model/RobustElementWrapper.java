@@ -52,12 +52,12 @@ public class RobustElementWrapper implements ReferenceFetcher {
     
     private final WebDriver driver;
     private final WrapsContext context;
-    private WebElement wrapped;
-    private By locator;
-    private int index;
+    private final String script;
+    private final By locator;
+    private final int index;
+    private final Strategy strategy;
     
-    private String script;
-    private Strategy strategy = Strategy.LOCATOR;
+    private WebElement wrapped;
     
     private long acquiredAt;
     
@@ -77,12 +77,17 @@ public class RobustElementWrapper implements ReferenceFetcher {
         // if specified element is already robust
         if (element instanceof RobustWebElement) {
             RobustElementWrapper wrapper = ((InterceptionAccessor) element).getInterceptor();
-            this.acquiredAt = wrapper.acquiredAt;
             
-            this.wrapped = wrapper.wrapped;
+            this.driver = wrapper.driver;
             this.context = wrapper.context;
+            
+            this.script = wrapper.script;
             this.locator = wrapper.locator;
             this.index = wrapper.index;
+            this.strategy = wrapper.strategy;
+            
+            this.wrapped = wrapper.wrapped;
+            this.acquiredAt = wrapper.acquiredAt;
         } else {
             Objects.requireNonNull(context, "[context] must be non-null");
             Objects.requireNonNull(locator, "[locator] must be non-null");
@@ -90,17 +95,22 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 throw new IndexOutOfBoundsException("Specified index is invalid");
             }
             
-            this.wrapped = element;
+            this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
             this.context = context;
-            this.locator = locator;
-            this.index = index;
-        }
-        
-        driver = WebDriverUtils.getDriver(this.context.getWrappedContext());
-        
-        if ((this.index == OPTIONAL) || (this.index > 0)) {
-            script = SearchContextUtils.buildScriptToLocateElement(this.context, this.locator, this.index);
-            strategy = Strategy.SCRIPT;
+            
+            if ((index == OPTIONAL) || (index > 0)) {
+                this.script = SearchContextUtils.buildScriptToLocateElement(context, locator, index);
+                this.locator = null;
+                this.index = (index == OPTIONAL) ? OPTIONAL : CARDINAL;
+                this.strategy = Strategy.SCRIPT;
+            } else {
+                this.script = null;
+                this.locator = locator;
+                this.index = index;
+                this.strategy = Strategy.LOCATOR;
+            }
+            
+            this.wrapped = element;
         }
         
         if (this.wrapped == null) {
@@ -124,21 +134,18 @@ public class RobustElementWrapper implements ReferenceFetcher {
     public RobustElementWrapper(
             final WebElement element, final WrapsContext context, final String script) {
         
-        this.wrapped = element;
+        this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
         this.context = context;
-        this.index = CARDINAL;
-        
-        driver = WebDriverUtils.getDriver(this.context.getWrappedContext());
         
         this.script = script;
-        strategy = Strategy.SCRIPT;
+        this.locator = null;
+        this.index = CARDINAL;
+        this.strategy = Strategy.SCRIPT;
+        
+        this.wrapped = element;
         
         if (this.wrapped == null) {
-            if (this.index == OPTIONAL) {
-                acquireReference(this);
-            } else {
-                refreshReference(null);
-            }
+            refreshReference(null);
         } else if (acquiredAt == 0) {
             acquiredAt = System.currentTimeMillis();
         }

@@ -114,7 +114,7 @@ public class ModelTestCore {
             @Override
             public void run() {
                 ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
-                assertEquals(shadowRoot.getContent(), SHADOW_DOM_A);
+                assertEquals(shadowRoot.getHeading(), SHADOW_DOM_A);
             }
         };
     }
@@ -126,7 +126,7 @@ public class ModelTestCore {
             @Override
             public void run() {
                 ShadowRootComponent shadowRoot = page.getShadowRootByElement();
-                assertEquals(shadowRoot.getContent(), SHADOW_DOM_B);
+                assertEquals(shadowRoot.getHeading(), SHADOW_DOM_B);
             }
         };
     }
@@ -139,8 +139,8 @@ public class ModelTestCore {
             public void run() {
                 List<ShadowRootComponent> shadowRootList = page.getShadowRootList();
                 assertEquals(shadowRootList.size(), 2);
-                assertEquals(shadowRootList.get(0).getContent(), SHADOW_DOM_A);
-                assertEquals(shadowRootList.get(1).getContent(), SHADOW_DOM_B);
+                assertEquals(shadowRootList.get(0).getHeading(), SHADOW_DOM_A);
+                assertEquals(shadowRootList.get(1).getHeading(), SHADOW_DOM_B);
             }
         };
     }
@@ -153,8 +153,8 @@ public class ModelTestCore {
             public void run() {
                 Map<Object, ShadowRootComponent> shadowRootMap = page.getShadowRootMap();
                 assertEquals(shadowRootMap.size(), 2);
-                assertEquals(shadowRootMap.get(SHADOW_DOM_A).getContent(), SHADOW_DOM_A);
-                assertEquals(shadowRootMap.get(SHADOW_DOM_B).getContent(), SHADOW_DOM_B);
+                assertEquals(shadowRootMap.get(SHADOW_DOM_A).getHeading(), SHADOW_DOM_A);
+                assertEquals(shadowRootMap.get(SHADOW_DOM_B).getHeading(), SHADOW_DOM_B);
             }
         };
     }
@@ -233,6 +233,27 @@ public class ModelTestCore {
     public static void testBogusOptional(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertFalse(page.hasBogusOptional());
+    }
+    
+    public static Runnable testShadowParagraphs(final TestBase instance) {
+        return new Runnable() {
+            final ExamplePage page = instance.getInitialPage();
+
+            @Override
+            public void run() {
+                ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
+                List<String> paraList = shadowRoot.getParagraphs();
+                assertEquals(paraList.size(), 3);
+                
+                String[] expect = new String[3];
+                String heading = shadowRoot.getHeading();
+                String marker = String.format("[%s] ", heading.substring(11));
+                for (int i = 0; i < 3; i++) {
+                    expect[i] = marker + PARAS[i];
+                }
+                assertArrayEquals(paraList.toArray(), expect);
+            }
+        };
     }
     
 }

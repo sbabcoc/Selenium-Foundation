@@ -42,7 +42,7 @@ class FirefoxShadowRoot extends PageComponent {
     @Override
     public WebElement findElement(final By by) {
         String script = SearchContextUtils.buildScriptToLocateElement(ContextType.SHADOW, by, 0);
-        return JsUtility.runAndReturn(driver, script, context);
+        return RobustElementFactory.makeRobustElement(null, (RobustWebElement) context, script);
     }
     
     /**

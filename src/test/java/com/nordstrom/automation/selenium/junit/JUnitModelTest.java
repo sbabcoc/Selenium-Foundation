@@ -4,6 +4,7 @@ import static org.junit.Assume.assumeNoException;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
@@ -146,4 +147,14 @@ public class JUnitModelTest extends JUnitRoot {
     	ModelTestCore.testBogusOptional(this);
     }
     
+    @Test
+    @Ignore
+    public void testShadowParagraphs() {
+        try {
+            ModelTestCore.testShadowParagraphs(this).run();
+        } catch (ShadowRootContextException e) {
+            assumeNoException(e);
+        }
+    }
+
 }

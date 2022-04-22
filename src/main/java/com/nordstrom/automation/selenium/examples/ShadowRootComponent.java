@@ -1,7 +1,11 @@
 package com.nordstrom.automation.selenium.examples;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
@@ -22,7 +26,8 @@ public class ShadowRootComponent extends ShadowRoot {
     }
     
     private enum Using implements ByEnum {
-        HEADING(By.cssSelector("h1"));
+        HEADING(By.cssSelector("h1")),
+        PARA(By.cssSelector("p[id^='para-']"));
         
         private By locator;
         
@@ -36,10 +41,15 @@ public class ShadowRootComponent extends ShadowRoot {
         }
     }
     
-    public String getContent() {
+    public String getHeading() {
         return findElement(Using.HEADING).getText();
     }
-
+    
+    public List<String> getParagraphs() {
+        List<WebElement> paraList = findElements(Using.PARA);
+        return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
+    }
+    
     public static Object getKey(final SearchContext context) {
         return getShadowRoot(context).findElement(Using.HEADING.locator).getText();
     }

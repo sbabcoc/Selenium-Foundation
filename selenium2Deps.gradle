@@ -24,7 +24,7 @@ sourceSets {
   
 dependencies {
   constraints {
-    api 'com.nordstrom.tools:testng-foundation:3.0.6-j7'
+    api 'com.nordstrom.tools:testng-foundation:3.0.9-j7'
     api 'commons-io:commons-io:2.4'
     api 'org.seleniumhq.selenium:selenium-server:2.53.1'
     api 'org.seleniumhq.selenium:selenium-support:2.53.1'

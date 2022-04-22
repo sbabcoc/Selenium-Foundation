@@ -66,16 +66,17 @@ public class SearchContextUtils {
      */
     public static String buildScriptToLocateElements(final ContextType type, final By locator) {
         String format;
+        String shadow = (type == ContextType.SHADOW) ? CHECK_SHADOW_HOST : "";
         
-        String selector = ByType.cssLocatorFor(locator);
+        String selector = quoteSelector(ByType.cssLocatorFor(locator));
         if (selector != null) {
             format = LOCATE_EVERY_BY_CSS;
         } else {
-            selector = ByType.xpathLocatorFor(locator);
+            selector = quoteSelector(ByType.xpathLocatorFor(locator));
             format = LOCATE_EVERY_BY_XPATH;
         }
         
-        return String.format(format, type.name, selector);
+        return String.format(shadow + format, type.name, selector);
     }
     
     /**
