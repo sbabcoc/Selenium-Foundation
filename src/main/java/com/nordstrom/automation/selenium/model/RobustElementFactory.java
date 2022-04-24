@@ -88,6 +88,24 @@ public final class RobustElementFactory {
     }
     
     /**
+     * Robust web element builder for FirefoxShadowRoot.
+     * 
+     * @param element element reference to be wrapped (may be 'null')
+     * @param context element search context
+     * @param script JavaScript to locate the wrapped element
+     * @return robust web element
+     */
+    public static WebElement makeRobustElement(
+            final WebElement element, final WrapsContext context, final String script) {
+
+        InstanceCreator creator = getCreator(context);
+        RobustElementWrapper interceptor = new RobustElementWrapper(element, context, script);
+        WebElement robust = (WebElement) creator.makeInstance();
+        ((InterceptionAccessor) robust).setInterceptor(interceptor);
+        return robust;
+    }
+
+    /**
      * Get robust web element factory for this context.
      * 
      * @param context target context
