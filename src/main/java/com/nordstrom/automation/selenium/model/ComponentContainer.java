@@ -737,6 +737,7 @@ public abstract class ComponentContainer
      * @param pageUrl {@link PageUrl} annotation for the indicate page class
      * @param targetUri configured target URI
      */
+    @SuppressWarnings("deprecation")
     protected static final void verifyLandingPage(final Page pageObj, Class<?> pageClass, PageUrl pageUrl, URI targetUri) {
         String actual;
         String expect;
@@ -838,6 +839,7 @@ public abstract class ComponentContainer
      * @param expectUri expected landing page URI
      * @return list of expected query parameters
      */
+    @SuppressWarnings("deprecation")
     private static List<NameValuePair> getExpectedParams(final PageUrl pageUrl, final URI expectUri) {
         List<NameValuePair> expectParams = new ArrayList<>();
         String[] params = pageUrl.params();

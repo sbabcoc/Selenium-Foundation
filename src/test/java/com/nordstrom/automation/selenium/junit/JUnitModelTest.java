@@ -128,4 +128,22 @@ public class JUnitModelTest extends JUnitRoot {
         ModelTestCore.testRefresh(this);
     }
 
+    @Test
+    @Ignore
+    public void testCssOptional() {
+    	ModelTestCore.testCssOptional(this);
+    }
+    
+    @Test
+    @Ignore
+    public void testXpathOptional() {
+    	ModelTestCore.testXpathOptional(this);
+    }
+    
+    @Test
+    @Ignore
+    public void testBogusOptional() {
+    	ModelTestCore.testBogusOptional(this);
+    }
+    
 }

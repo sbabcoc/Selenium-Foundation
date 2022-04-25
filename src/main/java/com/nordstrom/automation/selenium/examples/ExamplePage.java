@@ -213,6 +213,18 @@ public class ExamplePage extends Page {
         return findElement(Using.CHECK).isSelected();
     }
     
+    public boolean hasCssOptional() {
+    	return findOptional(By.cssSelector(ByType.cssLocatorFor(Using.FORM))).hasReference();
+    }
+    
+    public boolean hasXpathOptional() {
+    	return findOptional(By.xpath(ByType.xpathLocatorFor(Using.FORM))).hasReference();
+    }
+    
+    public boolean hasBogusOptional() {
+    	return findOptional(By.tagName("BOGUS")).hasReference();
+    }
+    
     public static URI setHubAsTarget() {
         URI targetUri = null;
         SeleniumConfig config = SeleniumConfig.getConfig();

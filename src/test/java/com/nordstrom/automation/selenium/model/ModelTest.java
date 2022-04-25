@@ -112,4 +112,19 @@ public class ModelTest extends TestNgRoot {
         ModelTestCore.testRefresh(this);
     }
 
+    @Test
+    public void testCssOptional() {
+    	ModelTestCore.testCssOptional(this);
+    }
+    
+    @Test
+    public void testXpathOptional() {
+    	ModelTestCore.testXpathOptional(this);
+    }
+    
+    @Test
+    public void testBogusOptional() {
+    	ModelTestCore.testBogusOptional(this);
+    }
+    
 }

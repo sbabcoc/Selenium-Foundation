@@ -236,6 +236,7 @@ public final class JsUtility {
      * @return nothing (this method always throws the specified exception)
      * @since 17.4.0 
      */
+    @SuppressWarnings("deprecation")
     public static RuntimeException propagate(final WebDriver driver, final WebDriverException exception) {
         Throwable thrown = exception;
         // if exception is a WebDriverException (not a sub-class)

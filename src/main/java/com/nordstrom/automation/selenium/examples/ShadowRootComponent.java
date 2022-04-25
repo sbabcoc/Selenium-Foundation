@@ -40,7 +40,7 @@ public class ShadowRootComponent extends ShadowRoot {
         return findElement(Using.HEADING).getText();
     }
 
-    public static Object getKey(SearchContext context) {
+    public static Object getKey(final SearchContext context) {
         return getShadowRoot(context).findElement(Using.HEADING.locator).getText();
     }
 

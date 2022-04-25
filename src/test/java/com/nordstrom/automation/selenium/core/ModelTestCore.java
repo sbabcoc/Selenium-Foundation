@@ -1,8 +1,11 @@
 package com.nordstrom.automation.selenium.core;
 
-import static org.junit.Assert.assertEquals;
 import static com.nordstrom.automation.selenium.examples.ExamplePage.*;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Map;
@@ -215,6 +218,21 @@ public class ModelTestCore {
         assertEquals(tableRefreshCount, 4);
         assertEquals(headRefreshCount, 1);
         assertArrayEquals(bodyRefreshCounts, new int[] {1, 1, 1});
+    }
+    
+    public static void testCssOptional(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertTrue(page.hasCssOptional());
+    }
+    
+    public static void testXpathOptional(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertTrue(page.hasXpathOptional());
+    }
+    
+    public static void testBogusOptional(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertFalse(page.hasBogusOptional());
     }
     
 }

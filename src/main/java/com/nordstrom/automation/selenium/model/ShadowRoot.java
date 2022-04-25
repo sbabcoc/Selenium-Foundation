@@ -10,6 +10,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
+import com.nordstrom.automation.selenium.utility.SearchContextUtils;
 
 /**
  * Extend this class when modeling a shadow root element, which is the attachment point for a shadow DOM.
@@ -37,8 +38,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final ComponentContainer parent) {
         super(locator, parent);
-        // verify shadowRoot
-        getWrappedContext();
+        SearchContextUtils.validateShadowHost(context);
     }
     
     /**
@@ -50,8 +50,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final By locator, final int index, final ComponentContainer parent) {
         super(locator, index, parent);
-        // verify shadowRoot
-        getWrappedContext();
+        SearchContextUtils.validateShadowHost(context);
     }
     
     /**
@@ -62,8 +61,7 @@ public class ShadowRoot extends PageComponent {
      */
     public ShadowRoot(final RobustWebElement element, final ComponentContainer parent) {
         super(element, parent);
-        // verify shadowRoot
-        getWrappedContext();
+        SearchContextUtils.validateShadowHost(context);
     }
     
     /**
@@ -71,7 +69,7 @@ public class ShadowRoot extends PageComponent {
      */
     @Override
     public SearchContext getWrappedContext() {
-        return getShadowRoot(context);
+        return getShadowRoot(this);
     }
     
     /**
@@ -82,12 +80,24 @@ public class ShadowRoot extends PageComponent {
      * @throws ShadowRootContextException if unable to acquire shadow root
      */
     @SuppressWarnings("unchecked")
-    public static SearchContext getShadowRoot(SearchContext context) {
+    public static SearchContext getShadowRoot(final SearchContext context) {
+        try {
+            // invoke special handling for Firefox
+            SearchContext shadowRoot = FirefoxShadowRoot.getShadowRoot(context);
+            // if Firefox shadow root created, use it 
+            if (shadowRoot != null) return shadowRoot;
+        } catch (Exception eaten) {
+            // nothing to do here
+        }
+        
         WebDriver driver = WebDriverUtils.getDriver(context);
         Object result = JsUtility.runAndReturn(driver, SHADOW_ROOT, context);
+        // if shadow DOM context was acquired
         if (result instanceof SearchContext) {
             return (SearchContext) result;
         }
+        
+        // if response is W3C-compliant
         // https://github.com/SeleniumHQ/selenium/issues/10050
         if (result instanceof Map) {
             try {
@@ -97,10 +107,11 @@ public class ShadowRoot extends PageComponent {
                 shadowRoot.setId(((Map<String, String>) result).get(ROOT_KEY));
                 shadowRoot.setFileDetector(((RemoteWebDriver) driver).getFileDetector());
                 return shadowRoot;
-            } catch (Exception eaten ) {
+            } catch (Exception eaten) {
                 // nothing to do here
             }
         }
+        
         throw new ShadowRootContextException();
     }
     

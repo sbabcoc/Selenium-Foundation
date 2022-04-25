@@ -669,7 +669,6 @@
         <configuration>
           <jdkToolchain>
             <version>${release.version}</version>
-            <vendor>oracle</vendor>
           </jdkToolchain>
           <properties>
             <property>

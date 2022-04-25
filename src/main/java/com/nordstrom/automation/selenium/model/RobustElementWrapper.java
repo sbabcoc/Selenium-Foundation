@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -17,11 +16,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver.Timeouts;
-import org.openqa.selenium.internal.FindsByCssSelector;
-import org.openqa.selenium.internal.FindsByXPath;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
-import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
@@ -29,6 +25,7 @@ import com.nordstrom.automation.selenium.exceptions.OptionalElementNotAcquiredEx
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.RobustElementFactory.InterceptionAccessor;
 import com.nordstrom.automation.selenium.support.Coordinator;
+import com.nordstrom.automation.selenium.utility.SearchContextUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
@@ -51,10 +48,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
     /** boolean methods that return 'false' when optional element is absent */
     private static final List<String> BOOLEAN_METHODS = Arrays.asList("isDisplayed", "isEnabled");
     
-    private static final String LOCATE_BY_CSS = JsUtility.getScriptResource("locateByCss.js");
-    private static final String LOCATE_BY_XPATH = JsUtility.getScriptResource("locateByXpath.js");
-    
-    private enum Strategy { LOCATOR, JS_XPATH, JS_CSS }
+    private enum Strategy { LOCATOR, SCRIPT }
     
     private final WebDriver driver;
     private final WrapsContext context;
@@ -62,15 +56,12 @@ public class RobustElementWrapper implements ReferenceFetcher {
     private By locator;
     private int index;
     
-    private String selector;
-    private RobustElementWrapper.Strategy strategy = Strategy.LOCATOR;
+    private String script;
+    private Strategy strategy = Strategy.LOCATOR;
     
     private long acquiredAt;
     
     private NoSuchElementException deferredException;
-    
-    private final boolean findsByCssSelector;
-    private final boolean findsByXPath;
     
     /**
      * Main robust web element constructor
@@ -107,26 +98,40 @@ public class RobustElementWrapper implements ReferenceFetcher {
         
         driver = WebDriverUtils.getDriver(this.context.getWrappedContext());
         
-        findsByCssSelector = (driver instanceof FindsByCssSelector);
-        findsByXPath = (driver instanceof FindsByXPath);
-        
         if ((this.index == OPTIONAL) || (this.index > 0)) {
-            if (findsByXPath && ( ! (this.locator instanceof By.ByCssSelector))) {
-                selector = ByType.xpathLocatorFor(this.locator);
-                if (this.index > 0) {
-                    selector += "[" + (this.index + 1) + "]";
-                    this.locator = By.xpath(this.selector);
-                    this.index = CARDINAL;
-                } else {
-                    strategy = Strategy.JS_XPATH;
-                }
-            } else if (findsByCssSelector) {
-                selector = ByType.cssLocatorFor(this.locator);
-                if (selector != null) {
-                    strategy = Strategy.JS_CSS;
-                }
-            }
+            script = SearchContextUtils.buildScriptToLocateElement(this.context, this.locator, this.index);
+            strategy = Strategy.SCRIPT;
         }
+        
+        if (this.wrapped == null) {
+            if (this.index == OPTIONAL) {
+                acquireReference(this);
+            } else {
+                refreshReference(null);
+            }
+        } else if (acquiredAt == 0) {
+            acquiredAt = System.currentTimeMillis();
+        }
+    }
+    
+    /**
+     * Robust web element constructor for script-based element location.
+     * 
+     * @param element element reference to be wrapped (may be 'null')
+     * @param context element search context
+     * @param script JavaScript to locate the wrapped element
+     */
+    public RobustElementWrapper(
+            final WebElement element, final WrapsContext context, final String script) {
+        
+        this.wrapped = element;
+        this.context = context;
+        this.index = CARDINAL;
+        
+        driver = WebDriverUtils.getDriver(this.context.getWrappedContext());
+        
+        this.script = script;
+        strategy = Strategy.SCRIPT;
         
         if (this.wrapped == null) {
             if (this.index == OPTIONAL) {
@@ -334,32 +339,19 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
             }
         } else {
-            List<Object> args = new ArrayList<>();
-            List<WebElement> contextArg = new ArrayList<>();
             if (context instanceof WebElement) {
-                contextArg.add((WebElement) context);
-            }
-            
-            String js;
-            args.add(contextArg);
-            args.add(wrapper.selector);
-            
-            if (wrapper.strategy == Strategy.JS_XPATH) {
-                js = LOCATE_BY_XPATH;
+                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script, context);
             } else {
-                js = LOCATE_BY_CSS;
-                args.add(wrapper.index);
+                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script);
             }
-            
-            wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, js, args.toArray());
             
             if (wrapper.wrapped == null) {
                 String message;
                 if (wrapper.index > 0) {
                     message = String.format("Cannot locate an element at index %d using %s",
-                            wrapper.index, wrapper.selector);
+                            wrapper.index, wrapper.locator);
                 } else {
-                    message = String.format("Cannot locate an element using %s", wrapper.selector);
+                    message = String.format("Cannot locate an element using %s", wrapper.locator);
                 }
                 thrown = new NoSuchElementException(message);
             }

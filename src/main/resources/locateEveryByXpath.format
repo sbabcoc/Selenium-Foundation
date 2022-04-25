@@ -1,0 +1,1 @@
+return document.evaluate(%2$s, %1$s, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).singleNodeValue;
