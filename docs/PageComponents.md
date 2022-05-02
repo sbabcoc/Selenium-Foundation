@@ -34,7 +34,7 @@ In the preceding sample code, extracted from the **Selenium Foundation** unit te
 
 In the **Selenium WebDriver** API, a search context is defined by the range of elements that will be examined when searching for an element that matches a specified locator. For a page object, the search context is the entire page. For a page component, the search context is all of the elements within the bounds of the component's container element. For a frame, the search context is all of the elements within the bounds of the frame element.
 
-The search context of a page component encompasses a subset of the elements of the context(s) in which it is contained. In other words, elements within the bounds of the component can be found by searches in encompassing contexts. However, the same cannot be said for frames, because...
+The search context of a page component encompasses a subset of the elements of the context(s) in which it is contained. In other words, elements within the bounds of the component can be found by searches in encompassing contexts. However, the same cannot be said for shadow DOM components and frames, because...
 
 ## Shadow DOM components and frames define distinct search contexts
 
