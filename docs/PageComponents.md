@@ -127,7 +127,14 @@ public void testShadowRootByLocator() {
 }
 ...
 
-Take note of the `try` block in this example. If **Selenium Foundation** is unable to acquire the shadow root reference from the selected host element, it throws a **`ShadowRootContextException`**. This indicates either that the context element is not a shadow host, or that the attached shadow DOM is closed. In this code, which was extracted from the **Selenium Foundation** unit tests, the exception is caught and wrapped to harmlessly flag the test as "skipped", because the **HtmlUnit** browser used by the unit tests doesn't provide the shadow DOM feature.
+Take note of the `try` block in this example. If **Selenium Foundation** is
+unable to acquire the shadow root reference from the selected host element,
+it throws a **`ShadowRootContextException`**. This indicates either that
+the context element is not a shadow host, or that the attached shadow DOM is
+closed. In this code, which was extracted from the **Selenium Foundation**
+unit tests, the exception is caught and wrapped to harmlessly flag the test
+as "skipped", because the **HtmlUnit** browser used by the unit tests doesn't
+provide the shadow DOM feature.
 ```
 
 # Component Nesting and Aggregation
