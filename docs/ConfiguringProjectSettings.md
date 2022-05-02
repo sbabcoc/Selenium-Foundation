@@ -107,7 +107,7 @@ As of this writing, the unit tests are [configured](LocalGridConfiguration.md) t
 
 | Browser | Selenium 2 | Selenium 3 |
 | --- |:---:|:---:|
-| Chrome | [source](../src/seleniun2/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
+| Chrome | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
 | Edge | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
 | Firefox | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
 | HtmlUnit | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
