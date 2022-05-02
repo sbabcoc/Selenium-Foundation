@@ -95,6 +95,6 @@ The JUnit support provided by **Selenium Foundation** relies on [event notificat
 
 To run or debug **JUnit 4** tests in **Eclipse**, specify the `-javaagent` option in the `VM arguments` field on the `Arguments` tab of the **JUnit** run configuration:
 
-> -javaagent:&lt;maven-repo&gt;/repository/com/nordstrom/tools/junit-foundation/12.5.0/junit-foundation-12.5.0.jar
+> -javaagent:&lt;maven-repo&gt;/repository/com/nordstrom/tools/junit-foundation/16.0.1/junit-foundation-16.0.1.jar
 
 > Written with [StackEdit](https://stackedit.io/).
