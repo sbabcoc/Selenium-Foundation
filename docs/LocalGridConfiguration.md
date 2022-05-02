@@ -65,7 +65,7 @@ To enable the `Local Grid` feature to support both **Selenium 2** and **Selenium
 | Setting | Property Name | `s2` Default | `s3` Default |
 |---|---|---|---|
 | **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncher | org.openqa.grid.selenium.GridLauncherV3 |
-| **`LAUNCHER_DEPS`** | `selenium.launcher.deps` | [source](/src/selenium2/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L155) | [source](/src/selenium3/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L160) |
+| **`LAUNCHER_DEPS`** | `selenium.launcher.deps` | [source](/src/selenium2/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L157) | [source](/src/selenium3/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L163) |
 | **`HUB_PORT`** | `selenium.hub.port` | 4444 | 4445 |
 | **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s2.json | hubConfig-s3.json |
 | **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s2.json | nodeConfig-s3.json |
