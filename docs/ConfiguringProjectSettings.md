@@ -107,14 +107,14 @@ As of this writing, the unit tests are [configured](LocalGridConfiguration.md) t
 
 | Browser | Selenium 2 | Selenium 3 |
 | --- |:---:|:---:|
-| Chrome | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
-| Edge | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
-| Firefox | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
-| HtmlUnit | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
-| Internet Explorer | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
-| Opera | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
-| PhantomJS | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
-| Safari | [source](../src/main/java-s2/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) | [source](../src/main/java-s3/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
+| Chrome | [source](../src/seleniun2/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
+| Edge | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
+| Firefox | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
+| HtmlUnit | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
+| Internet Explorer | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
+| Opera | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
+| PhantomJS | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
+| Safari | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
 
 #### Appium Automation Engine Support
 
