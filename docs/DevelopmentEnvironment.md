@@ -53,7 +53,6 @@ To build the **Selenium Foundation** project with **Maven**, you'll also need to
     <type>jdk</type>
     <provides>
       <version>7</version>
-      <vendor>oracle</vendor>
     </provides>
     <configuration>
       <jdkHome>C:\Program Files\Java\jdk1.7.0_80</jdkHome>
@@ -63,7 +62,6 @@ To build the **Selenium Foundation** project with **Maven**, you'll also need to
     <type>jdk</type>
     <provides>
       <version>8</version>
-      <vendor>oracle</vendor>
     </provides>
     <configuration>
       <jdkHome>C:\Program Files\Java\jdk1.8.0_251</jdkHome>
