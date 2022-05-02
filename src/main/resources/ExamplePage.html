@@ -32,12 +32,38 @@
           var rootA = elemA.attachShadow({mode: 'open'});
           var h1_a = document.createElement('h1');
           h1_a.textContent = 'Shadow DOM A';
+          h1_a.id = 'shadow-heading-a';
+          var para_1_a = document.createElement('p');
+          para_1_a.textContent = '[A] This is paragraph one.';
+          para_1_a.id = 'para-1-a';
+          var para_2_a = document.createElement('p');
+          para_2_a.textContent = '[A] This is paragraph two.';
+          para_2_a.id = 'para-2-a';
+          var para_3_a = document.createElement('p');
+          para_3_a.textContent = '[A] This is paragraph three.';
+          para_3_a.id = 'para-3-a';
           rootA.appendChild(h1_a);
+          rootA.appendChild(para_1_a);
+          rootA.appendChild(para_2_a);
+          rootA.appendChild(para_3_a);
           
           var rootB = elemB.attachShadow({mode: 'open'});
           var h1_b = document.createElement('h1');
           h1_b.textContent = 'Shadow DOM B';
+          h1_b.id = 'shadow-heading-b';
+          var para_1_b = document.createElement('p');
+          para_1_b.textContent = '[B] This is paragraph one.';
+          para_1_b.id = 'para-1-b';
+          var para_2_b = document.createElement('p');
+          para_2_b.textContent = '[B] This is paragraph two.';
+          para_2_b.id = 'para-2-b';
+          var para_3_b = document.createElement('p');
+          para_3_b.textContent = '[B] This is paragraph three.';
+          para_3_b.id = 'para-3-b';
           rootB.appendChild(h1_b);
+          rootB.appendChild(para_1_b);
+          rootB.appendChild(para_2_b);
+          rootB.appendChild(para_3_b);
         }
       }
     </script>

@@ -127,4 +127,13 @@ public class ModelTest extends TestNgRoot {
     	ModelTestCore.testBogusOptional(this);
     }
     
+    @Test
+    public void testShadowParagraphs() {
+        try {
+            ModelTestCore.testShadowParagraphs(this).run();
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
+    }
+
 }

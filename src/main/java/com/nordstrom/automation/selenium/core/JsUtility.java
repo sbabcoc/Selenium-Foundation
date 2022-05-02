@@ -75,6 +75,7 @@ public final class JsUtility {
     private static final String MESSAGE_KEY = "message";
     
     private static final String DOCUMENT_READY = getScriptResource("documentReady.js");
+    private static final String CREATE_SCRIPT_NODE = getScriptResource("createScriptNode.js");
     
     private static final List<String> JS_EXCEPTIONS = Arrays.asList(
                     "org.openqa.selenium.WebDriverException",
@@ -198,7 +199,7 @@ public final class JsUtility {
     public static void injectGlueLib(final WebDriver driver) {
         JavascriptExecutor executor = WebDriverUtils.getExecutor(driver);
         if ((boolean) executor.executeScript("return (typeof isObject != 'function');")) {
-            executor.executeScript(getScriptResource(JsUtility.JAVA_GLUE_LIB));
+            executor.executeScript(CREATE_SCRIPT_NODE, getScriptResource(JAVA_GLUE_LIB));
         }
     }
     
