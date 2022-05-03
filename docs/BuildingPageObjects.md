@@ -127,7 +127,7 @@ In this scenario, the **`Dialog`** class doesn't implement **`DetectsLoadComplet
 
 # Automatic Driver Targeting
 
-For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing. For more details, see the **Automatic Driver Targeting** section on [Selenium Foundation Test Support](SeleniumFoundationTestSupport.md)
+For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing. For more details, see the **Automatic Driver Targeting** section on [front page](https://github.com/sbabcoc/Selenium-Foundation#automatic-driver-targeting)
 
 # Wrapped Element References
 
