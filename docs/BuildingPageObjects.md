@@ -56,7 +56,7 @@ To make your code more maintainable and readable, we recommend the use of locato
 
 # Declaring Web Application Page Path
 
-Typically, each page-model class is associated with a single page of the application under test, located at a fixed path (e.g. - _`/c/nordstrom`_). It's also common for the paths of web application pages to conform with a pattern or template (e.g. - _`/s/&lt;item-description&gt;/&lt;item-identifier&gt;`_). **Selenium Foundation** provides a **`@PageUrl`** annotation that enables you to associate page-model classes with their corresponding paths.
+Typically, each page-model class is associated with a single page of the application under test, located at a fixed path (e.g. - _`/c/nordstrom`_). It's also common for the paths of web application pages to conform with a pattern or template (e.g. - _`/s/<item-description>/<item-identifier>`_). **Selenium Foundation** provides a **`@PageUrl`** annotation that enables you to associate page-model classes with their corresponding paths.
 
 An example of this annotation is found in the simple page class found above. The specified path ("/") declares that this page-model class is associated with the root of the target web application - in this case, Google. Template-based paths look like this:
 
