@@ -61,7 +61,8 @@ To eliminate unnecessary boilerplate code, **Selenium Foundation** performs many
 *   Facilities are provided to automatically synchronize with the page load completion at transitions (more later).
 *   At the end of each test, the browser session is closed automatically.
 *   If a test fails, a screenshot and page source are automatically saved for diagnostic purposes.
-*   If a test fails with a retriable exception (any subclass of **WebDriverException**) and automatic retry is enabled, the test is executed again.
+*   If a test fails with a retriable exception and automatic retry is enabled, the test is executed again.
+  *   NOTE: The standard retry managers consider any subclass of **WebDriverException** is deemed to be retriable. This can easily be customized.
 
 Learn more...
 * [TestNG test support](TestNGSupport.md)
@@ -86,7 +87,7 @@ Learn more...
 **Selenium Foundation** facilitates the implementation of well-structured page models through the use of _`page components`_, which enable you to model groups of functionally related elements as discrete objects. Page components are provided with a broad range of basic facilities:
 
 *   The search context for a component can be either a standard element, shadow DOM, or a frame.
-*   For frame-based components, driver focus is managed automatically. 
+*   For shadow DOM and frame-based components, driver focus is managed automatically. 
 *   Components can be nested and aggregated to create models that accurately reflect the conceptual structure of the pages being modeled.
 *   For grouping of elements that are repeated (e.g. - item summary tiles on a search results page), components can be collected into indexed lists and keyed maps.
 
