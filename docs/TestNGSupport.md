@@ -51,7 +51,7 @@ The **QuickStart** class demonstrates several important **Selenium Foundation** 
 
 * [InitialPage](../src/main/java/com/nordstrom/automation/selenium/annotations/InitialPage.java):  
 **InitialPage** is a Java annotation that enables you to specify the initial page class and/or URL that should be loaded at the start of the test method. This can be applied to each test individually, or it can be applied at the class level to specify the default page for all tests in the class. It can also be applied to **`@Before...`** configuration methods to provide driver sessions opened to the desired page.
-* [SeleniumConfig](../src/main/java-s3/com/nordstrom/automation/selenium/SeleniumConfig.java):  
+* [SeleniumConfig](../src/selenium3/java/com/nordstrom/automation/selenium/SeleniumConfig.java):  
 **SeleniumConfig** declares settings and methods related to Selenium WebDriver and Grid configuration. This class is built on the **Settings API**, composed of defaults, stored values, and System properties.
 * [SeleniumSettings](../src/main/java/com/nordstrom/automation/selenium/AbstractSeleniumConfig.java#L66):  
 **SeleniumSettings** declares the constants, property names, and default values for the settings managed by SeleniumConfig. Defaults can be overridden via System properties or the _settings.propeties_ file in your user "home" directory. See **ESSENTIAL SETTINGS** below for more details.
