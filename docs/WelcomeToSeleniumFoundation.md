@@ -62,7 +62,7 @@ To eliminate unnecessary boilerplate code, **Selenium Foundation** performs many
 *   At the end of each test, the browser session is closed automatically.
 *   If a test fails, a screenshot and page source are automatically saved for diagnostic purposes.
 *   If a test fails with a retriable exception and automatic retry is enabled, the test is executed again.
-    *   NOTE: The standard retry managers for [TestNG](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/support/RetryAnalyzer.java) and [JUnit 4](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/junit/RetryAnalyzer.java) consider any subclass of **WebDriverException** is deemed to be retriable. This can easily be customized.
+    *   NOTE: The standard retry managers for [TestNG](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/support/RetryAnalyzer.java) and [JUnit 4](https://github.com/sbabcoc/Selenium-Foundation/blob/master/src/main/java/com/nordstrom/automation/selenium/junit/RetryAnalyzer.java) consider any subclass of **WebDriverException** to be retriable. This can easily be customized.
 
 Learn more...
 * [TestNG test support](TestNGSupport.md)
