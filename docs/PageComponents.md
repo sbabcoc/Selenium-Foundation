@@ -44,7 +44,7 @@ The search context of a shadow DOM component or frame is completely isolated, an
 
 ## A word about XPath locators
 
-XPath locators differ from all other locator types in that they can traverse outside the scope of the target search context. For page and frame containers, this is purely academic, as their search contexts automatically encompass the entire document. For page component, however, you need to make sure you write your XPath expressions so they only evaluate element within the bounds of the page component search context.
+XPath locators differ from all other locator types in that they can traverse outside the scope of the target search context. For page and frame containers, this is purely academic, as their search contexts automatically encompass the entire document. For page components, however, you need to make sure you write your XPath expressions so they only evaluate element within the bounds of the page component search context.
 
 Here are some examples of XPath expressions that select elements _within_ the bounds of the page component search context:
 
