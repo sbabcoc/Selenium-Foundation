@@ -13,19 +13,33 @@ public class EdgeCaps {
     public static final String DRIVER_NAME = "MicrosoftEdge";
     public static final String DRIVER_PATH = "webdriver.edge.driver";
     public static final String BINARY_PATH = "webdriver.edge.bin";
-    public static final String OPTIONS_KEY = "edgeOptions";
-    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH };
+    public static final String LOGFILE_PATH = "webdriver.edge.logfile";
+    public static final String VERBOSE_LOG = "webdriver.edge.verboseLogging";
+    public static final String SILENT_MODE = "webdriver.edge.silentOutput";
+    public static final String WHITELISTED = "webdriver.edge.whitelistedIps";
+    public static final String OPTIONS_KEY = "ms:edgeOptions";
+    public static final String USE_CHROMIUM = "ms:edgeChromium";
+    private static final String[] PROPERTY_NAMES = 
+        { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE, WHITELISTED };
     
     private static final String CAPABILITIES =
                     "{\"browserName\":\"MicrosoftEdge\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
-    private static final String BASELINE = "{\"browserName\":\"MicrosoftEdge\"}";
+    private static final String BASELINE = 
+                    "{\"browserName\":\"MicrosoftEdge\",\"ms:edgeChromium\":true}";
     
+    private static final String HEADLESS =
+                    "{\"browserName\":\"MicrosoftEdge\",\"ms:edgeChromium\":true," +
+                     "\"ms:edgeOptions\":{\"args\":[\"--headless\",\"--disable-gpu\"]}," +
+                     "\"personality\":\"MicrosoftEdge.headless\"" +
+                    "}";
+
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
         personalities.put(DRIVER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME + ".headless", HEADLESS);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

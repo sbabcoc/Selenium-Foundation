@@ -11,8 +11,15 @@ public class InternetExplorerCaps {
     }
 
     public static final String DRIVER_NAME = "internet explorer";
+    public static final String DRIVER_PATH = "webdriver.ie.driver";
+    public static final String LOGFILE_PATH = "webdriver.ie.driver.logfile";
+    public static final String LOG_LEVEL = "webdriver.ie.driver.loglevel";
+    public static final String DRIVER_HOST = "webdriver.ie.driver.host";
+    public static final String EXTRACT_PATH = "webdriver.ie.driver.extractpath";
+    public static final String SILENT_MODE = "webdriver.ie.driver.silent";
     public static final String OPTIONS_KEY = "se:ieOptions";
-    private static final String[] PROPERTY_NAMES = { "webdriver.ie.driver" };
+    private static final String[] PROPERTY_NAMES = 
+        { DRIVER_PATH, LOGFILE_PATH, LOG_LEVEL, DRIVER_HOST, EXTRACT_PATH, SILENT_MODE };
     
     private static final String CAPABILITIES =
                     "{\"browserName\":\"internet explorer\",\"maxInstances\":1,\"seleniumProtocol\":\"WebDriver\"}";

@@ -13,8 +13,13 @@ public class ChromeCaps {
     public static final String DRIVER_NAME = "chrome";
     public static final String DRIVER_PATH = "webdriver.chrome.driver";
     public static final String BINARY_PATH = "webdriver.chrome.bin";
+    public static final String LOGFILE_PATH = "webdriver.chrome.logfile";
+    public static final String VERBOSE_LOG = "webdriver.chrome.verboseLogging";
+    public static final String SILENT_MODE = "webdriver.chrome.silentOutput";
+    public static final String WHITELISTED = "webdriver.chrome.whitelistedIps";
     public static final String OPTIONS_KEY = "goog:chromeOptions";
-    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH };
+    private static final String[] PROPERTY_NAMES = 
+        { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE, WHITELISTED };
     
     private static final String CAPABILITIES =
             "{\"browserName\":\"chrome\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
