@@ -13,8 +13,12 @@ public class OperaCaps {
     public static final String DRIVER_NAME = "opera";
     public static final String DRIVER_PATH = "webdriver.opera.driver";
     public static final String BINARY_PATH = "webdriver.opera.bin";
+    public static final String LOGFILE_PATH = "webdriver.opera.logfile";
+    public static final String VERBOSE_LOG = "webdriver.opera.verboseLogging";
+    public static final String SILENT_MODE = "webdriver.opera.silentOutput";
     public static final String OPTIONS_KEY = "operaOptions";
-    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH };
+    private static final String[] PROPERTY_NAMES = 
+        { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE };
     
     private static final String CAPABILITIES = "{\"browserName\":\"opera\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
