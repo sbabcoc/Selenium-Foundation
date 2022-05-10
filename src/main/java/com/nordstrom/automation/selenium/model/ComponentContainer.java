@@ -186,7 +186,9 @@ public abstract class ComponentContainer
             return getWait().until(condition);
         } catch (TimeoutException e) {
             if (e.getClass().equals(TimeoutException.class) && (condition instanceof Coordinator)) {
-                e = ((Coordinator<T>) condition).differentiateTimeout(e);
+                TimeoutException d = ((Coordinator<T>) condition).differentiateTimeout(e);
+                d.setStackTrace(e.getStackTrace());
+                throw d;
             }
             throw e;
         }

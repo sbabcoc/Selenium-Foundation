@@ -234,7 +234,9 @@ public enum ContainerMethodInterceptor {
         if (e.getClass().equals(TimeoutException.class)) {
             String m = e.getMessage();
             if ((m != null) && m.contains(RENDERER_TIMEOUT_MESSAGE)) {
-                return new PageLoadRendererTimeoutException(m, e.getCause());
+                TimeoutException d = new PageLoadRendererTimeoutException(m, e.getCause());
+                d.setStackTrace(e.getStackTrace());
+                return d;
             }
         }
         return e;
