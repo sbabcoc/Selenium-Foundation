@@ -25,45 +25,93 @@
     <title>Example Page</title>
     <script>
       function attachShadows() {
-        var elemA = document.getElementById('shadow-root-a');
-        var elemB = document.getElementById('shadow-root-b');
+        var elem_a = document.getElementById('shadow-root-a');
+        var elem_b = document.getElementById('shadow-root-b');
         
-        if (typeof elemA.attachShadow == 'function') {
-          var rootA = elemA.attachShadow({mode: 'open'});
+        if (typeof elem_a.attachShadow == 'function') {
+          var root_a = elem_a.attachShadow({mode: 'open'});
           var h1_a = document.createElement('h1');
-          h1_a.textContent = 'Shadow DOM A';
           h1_a.id = 'shadow-heading-a';
+          h1_a.textContent = 'Shadow DOM A';
           var para_1_a = document.createElement('p');
-          para_1_a.textContent = '[A] This is paragraph one.';
           para_1_a.id = 'para-1-a';
+          para_1_a.textContent = '[A] This is paragraph one.';
           var para_2_a = document.createElement('p');
-          para_2_a.textContent = '[A] This is paragraph two.';
           para_2_a.id = 'para-2-a';
+          para_2_a.textContent = '[A] This is paragraph two.';
           var para_3_a = document.createElement('p');
-          para_3_a.textContent = '[A] This is paragraph three.';
           para_3_a.id = 'para-3-a';
-          rootA.appendChild(h1_a);
-          rootA.appendChild(para_1_a);
-          rootA.appendChild(para_2_a);
-          rootA.appendChild(para_3_a);
+          para_3_a.textContent = '[A] This is paragraph three.';
+          var div_a = document.createElement('div');
+          div_a.id = 'form-div-a';
+          var form_a = document.createElement('form');
+          var label_1_a = document.createElement('label');
+          label_1_a.for = 'input-field-a';
+          label_1_a.textContent = '[A] Input: ';
+          var input_field_a = document.createElement('input');
+          input_field_a.type = 'text';
+          input_field_a.id = 'input-field-a';
+          input_field_a.name = 'input-field-a';
+          var label_2_a = document.createElement('label');
+          label_2_a.for = 'checkbox-a';
+          label_2_a.textContent = '[A] Check: ';
+          var checkbox_a = document.createElement('input');
+          checkbox_a.type = 'checkbox';
+          checkbox_a.id = 'checkbox-a';
+          checkbox_a.name = 'checkbox-a';
           
-          var rootB = elemB.attachShadow({mode: 'open'});
+          root_a.appendChild(h1_a);
+          root_a.appendChild(para_1_a);
+          root_a.appendChild(para_2_a);
+          root_a.appendChild(para_3_a);
+          root_a.appendChild(div_a);
+          div_a.appendChild(form_a);
+          form_a.appendChild(label_1_a);
+          form_a.appendChild(input_field_a);
+          form_a.appendChild(label_2_a);
+          form_a.appendChild(checkbox_a);
+          
+          var root_b = elem_b.attachShadow({mode: 'open'});
           var h1_b = document.createElement('h1');
-          h1_b.textContent = 'Shadow DOM B';
           h1_b.id = 'shadow-heading-b';
+          h1_b.textContent = 'Shadow DOM B';
           var para_1_b = document.createElement('p');
-          para_1_b.textContent = '[B] This is paragraph one.';
           para_1_b.id = 'para-1-b';
+          para_1_b.textContent = '[B] This is paragraph one.';
           var para_2_b = document.createElement('p');
-          para_2_b.textContent = '[B] This is paragraph two.';
           para_2_b.id = 'para-2-b';
+          para_2_b.textContent = '[B] This is paragraph two.';
           var para_3_b = document.createElement('p');
-          para_3_b.textContent = '[B] This is paragraph three.';
           para_3_b.id = 'para-3-b';
-          rootB.appendChild(h1_b);
-          rootB.appendChild(para_1_b);
-          rootB.appendChild(para_2_b);
-          rootB.appendChild(para_3_b);
+          para_3_b.textContent = '[B] This is paragraph three.';
+          var div_b = document.createElement('div');
+          div_b.id = 'form-div-b';
+          var form_b = document.createElement('form');
+          var label_1_b = document.createElement('label');
+          label_1_b.for = 'input-field-b';
+          label_1_b.textContent = '[B] Input: ';
+          var input_field_b = document.createElement('input');
+          input_field_b.type = 'text';
+          input_field_b.id = 'input-field-b';
+          input_field_b.name = 'input-field-b';
+          var label_2_b = document.createElement('label');
+          label_2_b.for = 'checkbox-b';
+          label_2_b.textContent = '[B] Check: ';
+          var checkbox_b = document.createElement('input');
+          checkbox_b.type = 'checkbox';
+          checkbox_b.id = 'checkbox-b';
+          checkbox_b.name = 'checkbox-b';
+          
+          root_b.appendChild(h1_b);
+          root_b.appendChild(para_1_b);
+          root_b.appendChild(para_2_b);
+          root_b.appendChild(para_3_b);
+          root_b.appendChild(div_b);
+          div_b.appendChild(form_b);
+          form_b.appendChild(label_1_b);
+          form_b.appendChild(input_field_b);
+          form_b.appendChild(label_2_b);
+          form_b.appendChild(checkbox_b);
         }
       }
     </script>

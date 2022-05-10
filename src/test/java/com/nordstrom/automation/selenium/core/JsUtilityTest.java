@@ -13,12 +13,15 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
 import com.nordstrom.automation.selenium.examples.TestNgRoot;
+import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 @InitialPage(ExamplePage.class)
 public class JsUtilityTest extends TestNgRoot {
@@ -78,6 +81,35 @@ public class JsUtilityTest extends TestNgRoot {
             fail("No exception was thrown");
         } catch (NoSuchElementException e) {
             assertTrue(e.getMessage().startsWith("No meta element found with name: "));
+        }
+    }
+    
+    @Test
+    public void testShadowRun() {
+        try {
+            ExamplePage page = getPage();
+            ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
+            String script = "arguments[0].querySelector(arguments[1]).value = arguments[2];";
+            JsUtility.run(
+                    page.getDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator(), "test");
+            assertEquals(shadowRoot.getInputValue(), "test");
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
+        }
+    }
+    
+    @Test
+    public void testShadowRunAndReturn() {
+        try {
+            ExamplePage page = getPage();
+            ShadowRootComponent shadowRoot = page.getShadowRootByElement();
+            shadowRoot.setInputValue("test");
+            String script = "return arguments[0].querySelector(arguments[1]).value;";
+            String value = JsUtility.runAndReturn(
+                    page.getDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator());
+            assertEquals(value, "test");
+        } catch (ShadowRootContextException e) {
+            throw new SkipException(e.getMessage(), e);
         }
     }
     

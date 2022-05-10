@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.exceptions.DocumentNotReadyTimeoutException;
+import com.nordstrom.automation.selenium.model.FirefoxShadowRoot;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -109,7 +110,8 @@ public final class JsUtility {
      * @see JavascriptExecutor#executeScript(String, Object...)
      */
     public static void run(final WebDriver driver, final String js, final Object... args) {
-        Object result = WebDriverUtils.getExecutor(driver).executeScript(js, args);
+        String script = FirefoxShadowRoot.injectShadowArgs(driver, js, args);
+        Object result = WebDriverUtils.getExecutor(driver).executeScript(script, args);
         if (result != null) {
             LOGGER.warn("The specified JavaScript returned a non-null result");
         }
@@ -154,7 +156,8 @@ public final class JsUtility {
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
     public static <T> T runAndReturn(final WebDriver driver, final String js, final Object... args) {
-        return (T) WebDriverUtils.getExecutor(driver).executeScript(js, args);
+        String script = FirefoxShadowRoot.injectShadowArgs(driver, js, args);
+        return (T) WebDriverUtils.getExecutor(driver).executeScript(script, args);
     }
     
     /**
