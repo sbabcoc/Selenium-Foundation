@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
 import com.nordstrom.automation.selenium.model.ShadowRoot;
@@ -27,7 +28,9 @@ public class ShadowRootComponent extends ShadowRoot {
     
     private enum Using implements ByEnum {
         HEADING(By.cssSelector("h1")),
-        PARA(By.cssSelector("p[id^='para-']"));
+        PARA(By.cssSelector("p[id^='para-']")),
+        INPUT(By.cssSelector("input[id^='input-field-']")),
+        CHECK(By.cssSelector("input[id^='checkbox-']"));
         
         private By locator;
         
@@ -48,6 +51,26 @@ public class ShadowRootComponent extends ShadowRoot {
     public List<String> getParagraphs() {
         List<WebElement> paraList = findElements(Using.PARA);
         return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
+    }
+    
+    public String getInputLocator() {
+        return ByType.cssLocatorFor(Using.INPUT);
+    }
+    
+    public boolean setInputValue(String value) {
+        return updateValue(findElement(Using.INPUT), value);
+    }
+    
+    public String getInputValue() {
+        return findElement(Using.INPUT).getAttribute("value");
+    }
+    
+    public String getCheckLocator() {
+        return ByType.cssLocatorFor(Using.CHECK);
+    }
+    
+    public boolean isBoxChecked() {
+        return findElement(Using.CHECK).isSelected();
     }
     
     public static Object getKey(final SearchContext context) {
