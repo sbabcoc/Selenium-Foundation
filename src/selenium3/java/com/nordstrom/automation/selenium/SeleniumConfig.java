@@ -159,6 +159,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;
      *  &lt;version&gt;1.2.3&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
+     *
+     * <b>kotlin.jvm.internal.Intrinsics</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.jetbrains.kotlin&lt;/groupId&gt;
+     *  &lt;artifactId&gt;kotlin-stdlib&lt;/artifactId&gt;
+     *  &lt;version&gt;1.4.10&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
