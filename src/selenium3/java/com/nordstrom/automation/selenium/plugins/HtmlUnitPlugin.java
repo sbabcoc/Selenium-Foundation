@@ -43,7 +43,8 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
                     "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
                     "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.util.LangUtils",
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
-                    "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils"};
+                    "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils",
+                    "org.apache.commons.exec.Executor"};
     
     private static final String WEB_ELEMENT_CLASS_NAME =
             "org.openqa.selenium.htmlunit.HtmlUnitWebElement";
