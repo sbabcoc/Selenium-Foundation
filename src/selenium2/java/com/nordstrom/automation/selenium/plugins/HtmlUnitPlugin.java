@@ -41,7 +41,8 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
                     "org.eclipse.jetty.websocket.client.WebSocketClient",
                     "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint",
                     "org.eclipse.jetty.websocket.common.Parser",
-                    "org.eclipse.jetty.websocket.api.Session"};
+                    "org.eclipse.jetty.websocket.api.Session",
+                    "org.apache.commons.exec.Executor"};
     
     private static final String WEB_ELEMENT_CLASS_NAME =
             "org.openqa.selenium.htmlunit.HtmlUnitWebElement";
