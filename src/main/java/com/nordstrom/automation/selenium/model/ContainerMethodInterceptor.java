@@ -94,13 +94,19 @@ public enum ContainerMethodInterceptor {
         increaseDepth();
         long initialTime = System.currentTimeMillis();
         ComponentContainer container = (ComponentContainer) obj;
+        ContainerVacatedException vacated = container.getVacated();
         
         try {
-            if (container.isVacated()) {
-                throw new ContainerVacatedException(container.getVacater());
+            // if container valid
+            if (vacated == null) {
+                // build exception for potential vacation
+                vacated = new ContainerVacatedException(method);
+            } else {
+                // INVALID!
+                throw vacated;
             }
             
-            WebDriver driver = container.getDriver();
+            WebDriver driver = container.getWrappedDriver();
     
             if (TARGET.get() != container) { 
                 container.switchTo();
@@ -108,6 +114,7 @@ public enum ContainerMethodInterceptor {
             }
             
             WebElement reference = null;
+            
             Class<?> returnType = method.getReturnType();
             Page parentPage = container.getParentPage();
             Set<String> initialHandles = driver.getWindowHandles();
@@ -138,7 +145,7 @@ public enum ContainerMethodInterceptor {
                     driver.switchTo().window(windowHandle);
                     TARGET.set(null);
                 }
-                container.setVacater(method);
+                container.setVacated(vacated);
                 reference = null;
             }
             
@@ -156,7 +163,7 @@ public enum ContainerMethodInterceptor {
                         reference = null;
                     } else {
                         newHandle = driver.getWindowHandle();
-                        container.setVacater(method);
+                        container.setVacated(vacated);
                     }
                 }
                 

@@ -65,10 +65,10 @@ public abstract class TestBase {
      */
     public Page prepInitialPage(Page pageObj) {
         if (pageObj.getWindowHandle() == null) {
-            pageObj.setWindowHandle(pageObj.getDriver().getWindowHandle());
+            pageObj.setWindowHandle(pageObj.getWrappedDriver().getWindowHandle());
         }
         // required when initial page is local file
-        setDriver(pageObj.getDriver());
+        setDriver(pageObj.getWrappedDriver());
         return pageObj.enhanceContainer(pageObj);
     }
     
