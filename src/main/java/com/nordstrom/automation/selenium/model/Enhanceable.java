@@ -29,7 +29,7 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
  */
 public abstract class Enhanceable<T> {
     
-    private static final List<Class<?>> BYPASS = Arrays.<Class<?>>asList(Enhanceable.class);
+    private static final List<Class<?>> BYPASS_CLASSES = Arrays.<Class<?>>asList(Enhanceable.class);
     private static final Map<Class<?>, Class<?>> proxyMap = new HashMap<>();
     
     /**
@@ -52,7 +52,7 @@ public abstract class Enhanceable<T> {
      * @return list of bypass classes
      */
     protected List<Class<?>> getBypassClasses() {
-        return new ArrayList<>(BYPASS);
+        return new ArrayList<>(BYPASS_CLASSES);
     }
     
     /**
@@ -92,7 +92,7 @@ public abstract class Enhanceable<T> {
                 List<Class<?>> bypassClasses = enhanceable.getBypassClasses();
                 List<String> methodNames = enhanceable.getBypassMethods();
                 
-                ElementMatcher.Junction<MethodDescription> matcher = ElementMatchers.none();
+                ElementMatcher.Junction<MethodDescription> matcher = ElementMatchers.isDeclaredBy(Object.class);
                 
                 // iterate over bypass classes/interfaces
                 for (Class<?> bypassClass : bypassClasses) {

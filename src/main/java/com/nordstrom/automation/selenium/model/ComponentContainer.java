@@ -34,9 +34,11 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
+import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
@@ -65,18 +67,17 @@ public abstract class ComponentContainer
     protected WebDriver driver;
     protected SearchContext context;
     protected ComponentContainer parent;
-    protected Method vacater;
+    protected ContainerVacatedException vacated;
     protected SearchContextWait wait;
     private List<Class<?>> bypassClasses;
     private List<String> bypassMethods;
     
     public static final By SELF = By.xpath(".");
     private static final String PLACEHOLDER = "{}";
-    private static final Class<?>[] BYPASS_CLASSES = {Object.class, WrapsContext.class};
-    private static final String[] BYPASS_METHODS = {"validateParent", "getDriver", "getContext", "getParent",
-            "getParentPage", "getWait", "switchTo", "switchToContext", "getVacater", "setVacater", "isVacated",
-            "enhanceContainer", "bypassClassOf", "bypassMethod", "getLogger", "hashCode", "equals", "getArgumentTypes",
-            "getArguments"};
+    private static final Class<?>[] BYPASS_CLASSES = {WrapsDriver.class, WrapsContext.class};
+    private static final String[] BYPASS_METHODS = {"validateParent", "getContext", "getParent", "getParentPage",
+            "getWait", "switchTo", "switchToContext", "getVacated", "setVacated", "getArgumentTypes", "getArguments",
+            "enhanceContainer", "myBypassClasses", "myBypassMethods", "getLogger", "hashCode", "equals"};
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
@@ -105,7 +106,9 @@ public abstract class ComponentContainer
     }
     
     /**
-     * Validate the specified parent object
+     * Validate the specified parent object.
+     * <p>
+     * <b>NOTE</b>: This one-liner exists so the {@link Page} class can override it to eliminate the check. 
      * 
      * @param parent container parent
      */
@@ -113,15 +116,6 @@ public abstract class ComponentContainer
         Objects.requireNonNull(parent, "[parent] must be non-null");
     }
 
-    /**
-     * Get the driver associated with this container
-     * 
-     * @return container driver
-     */
-    public WebDriver getDriver() {
-        return driver;
-    }
-    
     /**
      * Get the container search context
      * 
@@ -263,39 +257,31 @@ public abstract class ComponentContainer
     protected abstract SearchContext switchToContext();
     
     /**
-     * Get the method that caused this container to be vacated.
+     * Get validity indication for this container and its ancestors.
      * 
-     * @return vacating method; 'null' if container is still valid
+     * @return {@link ContainerVacatedException} for vacated container; 'null' if container is still valid
      */
-    Method getVacater() {
-        if (vacater != null) {
-            return vacater;
-        } else if (parent != null) {
-            return parent.getVacater();
-        } else {
-            return null;
+    ContainerVacatedException getVacated() {
+        // if child container looks valid 
+        if ((vacated == null) && (parent != null)) {
+            // propagate ancestor validity
+            vacated = parent.getVacated();
         }
+        return vacated;
     }
     
     /**
      * Set the method that caused this container to be vacated.
      * 
-     * @param vacater vacating method
+     * @param vacated {@link ContainerVacatedException} for vacated container
      */
-    void setVacater(final Method vacater) {
-        this.vacater = vacater;
+    void setVacated(final ContainerVacatedException vacated) {
+        this.vacated = vacated;
+        // if has ancestor
         if (parent != null) {
-            parent.setVacater(vacater);
+            // propagate to ancestor
+            parent.setVacated(vacated);
         }
-    }
-    
-    /**
-     * Determine if this container has been vacated.
-     * 
-     * @return 'true' if container has been vacated; otherwise 'false'
-     */
-    boolean isVacated() {
-        return (null != getVacater());
     }
     
     /**

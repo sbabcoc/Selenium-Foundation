@@ -50,7 +50,7 @@ public class JsUtilityTest extends TestNgRoot {
     public void testRun() {
         ExamplePage page = getPage();
         String script = "document.querySelector(arguments[0]).value = arguments[1];";
-        JsUtility.run(page.getDriver(), script, page.getInputLocator(), "test");
+        JsUtility.run(page.getWrappedDriver(), script, page.getInputLocator(), "test");
         assertEquals(page.getInputValue(), "test");
     }
     
@@ -59,16 +59,16 @@ public class JsUtilityTest extends TestNgRoot {
         ExamplePage page = getPage();
         page.setInputValue("test");
         String script = "return document.querySelector(arguments[0]).value;";
-        String value = JsUtility.runAndReturn(page.getDriver(), script, page.getInputLocator());
+        String value = JsUtility.runAndReturn(page.getWrappedDriver(), script, page.getInputLocator());
         assertEquals(value, "test");
     }
     
     @Test
     public void testInjectGlueLib() {
         ExamplePage page = getPage();
-        WebDriver driver = page.getDriver();
+        WebDriver driver = page.getWrappedDriver();
         JavascriptExecutor executor = (JavascriptExecutor) driver;
-        JsUtility.injectGlueLib(page.getDriver());
+        JsUtility.injectGlueLib(page.getWrappedDriver());
         Boolean hasFunction = (Boolean) executor.executeScript("return (typeof isObject == 'function');");
         assertTrue(hasFunction);
     }
@@ -77,7 +77,7 @@ public class JsUtilityTest extends TestNgRoot {
     public void testPropagate() {
         ExamplePage page = getPage();
         try {
-            getMetaTagNamed(page.getDriver(), "test");
+            getMetaTagNamed(page.getWrappedDriver(), "test");
             fail("No exception was thrown");
         } catch (NoSuchElementException e) {
             assertTrue(e.getMessage().startsWith("No meta element found with name: "));
@@ -91,7 +91,7 @@ public class JsUtilityTest extends TestNgRoot {
             ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
             String script = "arguments[0].querySelector(arguments[1]).value = arguments[2];";
             JsUtility.run(
-                    page.getDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator(), "test");
+                    page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator(), "test");
             assertEquals(shadowRoot.getInputValue(), "test");
         } catch (ShadowRootContextException e) {
             throw new SkipException(e.getMessage(), e);
@@ -106,7 +106,7 @@ public class JsUtilityTest extends TestNgRoot {
             shadowRoot.setInputValue("test");
             String script = "return arguments[0].querySelector(arguments[1]).value;";
             String value = JsUtility.runAndReturn(
-                    page.getDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator());
+                    page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator());
             assertEquals(value, "test");
         } catch (ShadowRootContextException e) {
             throw new SkipException(e.getMessage(), e);
