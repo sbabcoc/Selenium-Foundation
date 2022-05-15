@@ -16,6 +16,7 @@ import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.PageLoadRendererTimeoutException;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.exceptions.TransitionErrorException;
+import com.nordstrom.automation.selenium.exceptions.VacationStackTrace;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.interfaces.TransitionErrorDetector;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
@@ -94,16 +95,10 @@ public enum ContainerMethodInterceptor {
         increaseDepth();
         long initialTime = System.currentTimeMillis();
         ComponentContainer container = (ComponentContainer) obj;
-        ContainerVacatedException vacated = container.getVacated();
         
         try {
-            // if container valid
-            if (vacated == null) {
-                // build exception for potential vacation
-                vacated = new ContainerVacatedException(method);
-            } else {
-                // INVALID!
-                throw vacated;
+            if (container.isVacated()) {
+                throw new ContainerVacatedException(container.getVacated());
             }
             
             WebDriver driver = container.getWrappedDriver();
@@ -145,7 +140,7 @@ public enum ContainerMethodInterceptor {
                     driver.switchTo().window(windowHandle);
                     TARGET.set(null);
                 }
-                container.setVacated(vacated);
+                container.setVacated(new VacationStackTrace(method, "Target window for this container has closed."));
                 reference = null;
             }
             
@@ -163,7 +158,8 @@ public enum ContainerMethodInterceptor {
                         reference = null;
                     } else {
                         newHandle = driver.getWindowHandle();
-                        container.setVacated(vacated);
+                        container.setVacated(
+                                new VacationStackTrace(method, "This page object no longer owns its target window."));
                     }
                 }
                 
