@@ -38,7 +38,6 @@ import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
-import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
@@ -74,10 +73,11 @@ public abstract class ComponentContainer
     
     public static final By SELF = By.xpath(".");
     private static final String PLACEHOLDER = "{}";
-    private static final Class<?>[] BYPASS_CLASSES = {WrapsDriver.class, WrapsContext.class};
-    private static final String[] BYPASS_METHODS = {"validateParent", "getContext", "getParent", "getParentPage",
-            "getWait", "switchTo", "switchToContext", "getVacated", "setVacated", "getArgumentTypes", "getArguments",
-            "enhanceContainer", "myBypassClasses", "myBypassMethods", "getLogger", "hashCode", "equals"};
+    private static final Class<?>[] BYPASS_CLASSES = {WrapsContext.class};
+    private static final String[] BYPASS_METHODS = {"validateParent", "getDriver", "getContext", "getParent",
+            "getParentPage", "getWait", "switchTo", "switchToContext", "getVacated", "setVacated", "getArgumentTypes",
+            "getArguments", "enhanceContainer", "myBypassClasses", "myBypassMethods", "getLogger", "hashCode",
+            "equals"};
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
@@ -116,6 +116,16 @@ public abstract class ComponentContainer
         Objects.requireNonNull(parent, "[parent] must be non-null");
     }
 
+    /**
+     * Get the driver associated with this container.
+     * 
+     * @return container driver
+     * @deprecated This method is redundant and is slated for removal. Use {@link #getWrappedDriver()} instead.
+     */
+    public WebDriver getDriver() {
+        return driver;
+    }
+    
     /**
      * Get the container search context
      * 
