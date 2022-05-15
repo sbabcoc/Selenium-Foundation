@@ -38,7 +38,7 @@
     <revision>@projectVersion@</revision>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>2.1.0</java-utils.version>
+    <java-utils.version>2.2.0</java-utils.version>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
     <source-plugin.version>3.2.1</source-plugin.version>

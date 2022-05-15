@@ -34,9 +34,9 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
-import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
+import com.nordstrom.automation.selenium.exceptions.VacationStackTrace;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
 import com.nordstrom.automation.selenium.support.Coordinator;
@@ -66,7 +66,7 @@ public abstract class ComponentContainer
     protected WebDriver driver;
     protected SearchContext context;
     protected ComponentContainer parent;
-    protected ContainerVacatedException vacated;
+    protected VacationStackTrace vacated;
     protected SearchContextWait wait;
     private List<Class<?>> bypassClasses;
     private List<String> bypassMethods;
@@ -75,9 +75,9 @@ public abstract class ComponentContainer
     private static final String PLACEHOLDER = "{}";
     private static final Class<?>[] BYPASS_CLASSES = {WrapsContext.class};
     private static final String[] BYPASS_METHODS = {"validateParent", "getDriver", "getContext", "getParent",
-            "getParentPage", "getWait", "switchTo", "switchToContext", "getVacated", "setVacated", "getArgumentTypes",
-            "getArguments", "enhanceContainer", "myBypassClasses", "myBypassMethods", "getLogger", "hashCode",
-            "equals"};
+            "getParentPage", "getWait", "switchTo", "switchToContext", "getVacated", "setVacated", "isVacated",
+            "getArgumentTypes", "getArguments", "enhanceContainer", "myBypassClasses", "myBypassMethods",
+            "getLogger", "hashCode", "equals"};
     
     private static final Class<?>[] ARG_TYPES = {SearchContext.class, ComponentContainer.class};
     private static final Class<?>[] COLLECTIBLE_ARGS = {RobustWebElement.class, ComponentContainer.class};
@@ -269,9 +269,9 @@ public abstract class ComponentContainer
     /**
      * Get validity indication for this container and its ancestors.
      * 
-     * @return {@link ContainerVacatedException} for vacated container; 'null' if container is still valid
+     * @return {@link VacationStackTrace} for vacated container; 'null' if container is still valid
      */
-    ContainerVacatedException getVacated() {
+    VacationStackTrace getVacated() {
         // if child container looks valid 
         if ((vacated == null) && (parent != null)) {
             // propagate ancestor validity
@@ -281,17 +281,26 @@ public abstract class ComponentContainer
     }
     
     /**
-     * Set the method that caused this container to be vacated.
+     * Save the flow of execution that caused this container to be vacated.
      * 
-     * @param vacated {@link ContainerVacatedException} for vacated container
+     * @param vacated {@link VacationStackTrace} for vacated container
      */
-    void setVacated(final ContainerVacatedException vacated) {
+    void setVacated(final VacationStackTrace vacated) {
         this.vacated = vacated;
         // if has ancestor
         if (parent != null) {
             // propagate to ancestor
             parent.setVacated(vacated);
         }
+    }
+    
+    /**
+     * Determine if this container has been vacated.
+     * 
+     * @return 'true' if container has been vacated; otherwise 'false'
+     */
+    boolean isVacated() {
+        return (null != getVacated());
     }
     
     /**
