@@ -209,11 +209,11 @@ repositories {
 dependencies {
   constraints {
     api 'com.nordstrom.tools:java-utils:2.2.0'
-    api 'com.nordstrom.tools:settings:2.3.10'
-    api 'com.nordstrom.tools:junit-foundation:16.0.2'
-    api 'com.github.sbabcoc:logback-testng:1.3.4'
+    api 'com.nordstrom.tools:settings:2.3.11'
+    api 'com.nordstrom.tools:junit-foundation:16.0.3'
+    api 'com.github.sbabcoc:logback-testng:1.3.5'
     api 'org.hamcrest:hamcrest-core:2.2'
-    api 'org.yaml:snakeyaml:1.28'
+    api 'org.yaml:snakeyaml:1.30'
   }
   api 'com.nordstrom.tools:java-utils'
   api 'com.nordstrom.tools:settings'

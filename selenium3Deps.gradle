@@ -24,14 +24,14 @@ sourceSets {
   
 dependencies {
   constraints {
-    api 'com.nordstrom.tools:testng-foundation:3.0.9-j8'
+    api 'com.nordstrom.tools:testng-foundation:3.0.10-j8'
     api 'org.seleniumhq.selenium:selenium-server:3.141.59'
     api 'org.seleniumhq.selenium:selenium-support:3.141.59'
     api 'org.apache.httpcomponents:httpclient:4.5.13'
     api 'org.jsoup:jsoup:1.14.2'
     api 'org.apache.commons:commons-lang3:3.12.0'
-    api 'com.google.guava:guava:30.1.1-jre'
-    api 'com.beust:jcommander:1.78'
+    api 'com.google.guava:guava:31.1-jre'
+    api 'com.beust:jcommander:1.82'
     api 'com.squareup.okhttp3:okhttp:4.9.1'
     api 'com.squareup.okio:okio:2.10.0'
     api 'org.eclipse.jetty.websocket:websocket-client:9.4.43.v20210629'
