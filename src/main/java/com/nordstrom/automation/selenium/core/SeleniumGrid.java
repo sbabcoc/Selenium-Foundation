@@ -86,15 +86,20 @@ public class SeleniumGrid {
      * @throws IOException if unable to acquire Grid details
      */
     public SeleniumGrid(SeleniumConfig config, URL hubUrl) throws IOException {
-        LOGGER.debug("Mapping structure of grid at: {}", hubUrl);
         hubServer = new GridServer(hubUrl, GridRole.HUB);
-        for (String nodeEndpoint : GridUtility.getGridProxies(hubUrl)) {
-            URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
-            nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
-            addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
+        List<String> nodeEndpoints = GridUtility.getGridProxies(hubUrl);
+        if (nodeEndpoints.isEmpty()) {
+            LOGGER.debug("Detected servlet container at: {}", hubUrl);
+        } else {
+            LOGGER.debug("Mapping structure of grid at: {}", hubUrl);
+            for (String nodeEndpoint : nodeEndpoints) {
+                URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
+                nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
+                addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
+            }
+            addPluginPersonalities(config);
+            LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
         }
-        addPluginPersonalities(config);
-        LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
     }
     
     /**
@@ -108,18 +113,19 @@ public class SeleniumGrid {
      * @throws IOException if unable to acquire Grid details
      */
     public SeleniumGrid(SeleniumConfig config, GridServer hubServer, GridServer... nodeServers) throws IOException {
-        this.hubServer = Objects.requireNonNull(hubServer);
-        if (Objects.requireNonNull(nodeServers).length == 0) {
-            throw new IllegalArgumentException("[nodeServers] must be non-empty");
+        this.hubServer = Objects.requireNonNull(hubServer, "[hubServer] must be non-null");
+        if (nodeServers.length == 0) {
+            LOGGER.debug("Defined servlet container at: {}", hubServer.getUrl());
+        } else {
+            LOGGER.debug("Assembling graph of grid at: {}", hubServer.getUrl());
+            for (GridServer nodeServer : nodeServers) {
+                String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
+                this.nodeServers.put(nodeEndpoint, nodeServer);
+                addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
+            }
+            addPluginPersonalities(config);
+            LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
         }
-        LOGGER.debug("Assembling graph of grid at: {}", hubServer.getUrl());
-        for (GridServer nodeServer : nodeServers) {
-            String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
-            this.nodeServers.put(nodeEndpoint, nodeServer);
-            addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
-        }
-        addPluginPersonalities(config);
-        LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
     }
     
     /**
