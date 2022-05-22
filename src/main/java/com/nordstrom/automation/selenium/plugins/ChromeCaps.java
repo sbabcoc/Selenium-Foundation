@@ -1,8 +1,11 @@
 package com.nordstrom.automation.selenium.plugins;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import com.nordstrom.automation.selenium.exceptions.DriverExecutableNotFoundException;
+import com.nordstrom.automation.selenium.utility.BinaryFinder;
 
 public class ChromeCaps {
     
@@ -57,6 +60,12 @@ public class ChromeCaps {
     }
     
     public static String[] getPropertyNames() {
+        try {
+            File driverPath = BinaryFinder.findBinary("chromedriver", DRIVER_PATH, null, null);
+            System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
+        } catch (IllegalStateException e) {
+            throw new DriverExecutableNotFoundException(DRIVER_PATH);
+        }
         return PROPERTY_NAMES;
     }
 
