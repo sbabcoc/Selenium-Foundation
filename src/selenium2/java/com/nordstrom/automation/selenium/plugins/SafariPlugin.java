@@ -21,7 +21,6 @@ public class SafariPlugin extends RemoteWebDriverPlugin {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.safari.SafariDriver",
-                    "org.apache.commons.exec.Executor",
                     "org.openqa.selenium.remote.RemoteWebDriver",
                     "com.sun.jna.platform.RasterRangesUtils",
                     "com.sun.jna.Library",

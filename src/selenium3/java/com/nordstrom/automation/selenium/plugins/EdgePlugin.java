@@ -19,9 +19,7 @@ public class EdgePlugin extends RemoteWebDriverPlugin {
      *  &lt;version&gt;3.141.59&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
-    private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.edge.EdgeDriver",
-                    "org.apache.commons.exec.Executor"};
+    private static final String[] DEPENDENCY_CONTEXTS = { "org.openqa.selenium.edge.EdgeDriver" };
     
     /**
      * {@inheritDoc}

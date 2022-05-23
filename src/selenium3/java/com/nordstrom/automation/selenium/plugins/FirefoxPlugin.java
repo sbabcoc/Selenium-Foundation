@@ -21,7 +21,6 @@ public class FirefoxPlugin extends RemoteWebDriverPlugin {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.firefox.FirefoxDriver",
-                    "org.apache.commons.exec.Executor",
                     "net.bytebuddy.matcher.ElementMatcher"};
     
     /**

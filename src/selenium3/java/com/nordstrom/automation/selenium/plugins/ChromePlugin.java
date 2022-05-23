@@ -21,7 +21,6 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.chrome.ChromeDriver",
-                    "org.apache.commons.exec.Executor",
                     "net.bytebuddy.matcher.ElementMatcher"};
     
     /**
