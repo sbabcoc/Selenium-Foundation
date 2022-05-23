@@ -21,7 +21,6 @@ public class OperaPlugin extends RemoteWebDriverPlugin {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.opera.OperaDriver",
-                    "org.apache.commons.exec.Executor",
                     "net.bytebuddy.matcher.ElementMatcher"};
     
     /**

@@ -169,7 +169,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     "javax.servlet.http.HttpServlet",
                     "org.openqa.jetty.util.MultiException",
                     "org.openqa.selenium.support.events.WebDriverEventListener",
-                    "ch.qos.logback.classic.spi.ThrowableProxy"
+                    "ch.qos.logback.classic.spi.ThrowableProxy",
+                    "org.apache.commons.exec.Executor"
                     };
     
     static {

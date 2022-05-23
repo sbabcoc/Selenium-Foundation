@@ -21,7 +21,7 @@ public class PhantomJsPlugin extends RemoteWebDriverPlugin {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.phantomjs.PhantomJSDriver",
-                    "org.apache.commons.exec.Executor", "com.sun.jna.platform.RasterRangesUtils",
+                    "com.sun.jna.platform.RasterRangesUtils",
                     "com.sun.jna.Library"};
     
     /**
