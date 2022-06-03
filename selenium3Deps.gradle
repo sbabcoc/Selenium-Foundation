@@ -35,7 +35,7 @@ dependencies {
     api 'com.squareup.okhttp3:okhttp:4.9.1'
     api 'com.squareup.okio:okio:2.10.0'
     api 'org.eclipse.jetty.websocket:websocket-client:9.4.43.v20210629'
-    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.61.0'
+    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.62.0'
     testImplementation 'org.mockito:mockito-core:3.1.0'
   }
   api 'com.nordstrom.tools:testng-foundation'
