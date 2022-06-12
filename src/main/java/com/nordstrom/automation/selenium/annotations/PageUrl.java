@@ -100,9 +100,9 @@ public @interface PageUrl {
     String port() default "{}";
     
     /**
-     * Get the page URL path.
+     * Get the page URL path or Android application activity.
      * 
-     * @return URL path
+     * @return URL path or Android application activity
      */
     String value() default "{}";
     
@@ -119,4 +119,11 @@ public @interface PageUrl {
      * @return regular expression to validate path/parameters
      */
     String pattern() default "{}";
+    
+    /**
+     * Get the Android application package.
+     * 
+     * @return application package name
+     */
+    String appPackage() default "{}";
 }

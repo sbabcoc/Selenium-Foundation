@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
-
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
@@ -35,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.io.Resources;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
@@ -142,7 +141,6 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.launcher</b><br>
          * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
          * <ul>
-         *     <li>Selenium 2: <b>org.openqa.grid.selenium.GridLauncher</b></li>
          *     <li>Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b></li>
          * </ul>
          */
@@ -161,7 +159,6 @@ public abstract class AbstractSeleniumConfig extends
          * This setting specifies the configuration file name/path for the local <b>Selenium Grid</b> hub server.
          * <p>
          * name: <b>selenium.hub.config</b><br>
-         * Selenium 2: <b>hubConfig-s2.json</b><br>
          * Selenium 3: <b>hubConfig-s3.json</b>
          */
         HUB_CONFIG("selenium.hub.config", null),
@@ -170,7 +167,6 @@ public abstract class AbstractSeleniumConfig extends
          * This is the URL for the <b>Selenium Grid</b> endpoint: [scheme:][//authority]/wd/hub
          * <p>
          * name: <b>selenium.hub.host</b><br>
-         * Selenium 2: <b>http://&lt;{@code localhost}&gt;:4444/wd/hub</b><br>
          * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4445/wd/hub</b>
          */
         HUB_HOST("selenium.hub.host", null),
@@ -179,7 +175,6 @@ public abstract class AbstractSeleniumConfig extends
          * This is the port assigned to the local <b>Selenium Grid</b> hub server.
          * <p>
          * name: <b>selenium.hub.port</b><br>
-         * Selenium 2: <b>4444</b><br>
          * Selenium 3: <b>4445</b>
          */
         HUB_PORT("selenuim.hub.port", null),
@@ -197,7 +192,6 @@ public abstract class AbstractSeleniumConfig extends
          * This setting specifies the configuration template name/path for local <b>Selenium Grid</b> node servers.
          * <p>
          * name: <b>selenium.node.config</b><br>
-         * Selenium 2: <b>nodeConfig-s2.json</b><br>
          * Selenium 3: <b>nodeConfig-s3.json</b>
          */
         NODE_CONFIG("selenium.node.config", null),
@@ -587,9 +581,7 @@ public abstract class AbstractSeleniumConfig extends
             if (seleniumGrid == null) {
                 try {
                     seleniumGrid = SeleniumGrid.create(getConfig(), getHubUrl());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                } catch (IOException | TimeoutException e) {
+                } catch (IOException e) {
                     throw UncheckedThrow.throwUnchecked(e);
                 }
             }
@@ -753,22 +745,16 @@ public abstract class AbstractSeleniumConfig extends
      * @return configured modifier; {@code null} if none configured
      */
     protected Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
-        String personality = (String) capabilities.getCapability("personality");
-        if (personality == null) {
-            personality = (String) capabilities.getCapability("automationName");
-            if (personality == null) {
-                personality = (String) capabilities.getCapability("browserName");
-                if (personality == null) {
-                    return null;
-                }
-            }
-        }
+        String personality = GridUtility.getPersonality(capabilities.asMap());
+        if (personality == null) return null;
         
         String propertyName = personality + propertySuffix;
         String modsJson = resolveString(propertyName);
         
-        // return mods as [Capabilities] object; 'null' if none configured
-        return (modsJson != null) ? getCapabilitiesForJson(modsJson)[0] : null;
+        // minimum modifications to ensure inclusion of 'personality'
+        Capabilities minimum = getCapabilitiesForJson("{\"personality\":\"" + personality + "\"}")[0];
+        // return mods as [Capabilities] object, ensuring 'personality' even if no mods configured
+        return (modsJson != null) ? mergeCapabilities(minimum, getCapabilitiesForJson(modsJson)[0]) : minimum;
     }
     
     /**

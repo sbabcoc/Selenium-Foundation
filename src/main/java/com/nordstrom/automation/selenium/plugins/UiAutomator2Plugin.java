@@ -15,17 +15,22 @@ public class UiAutomator2Plugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"automationName\":\"UiAutomator2\"," + 
+            "{\"appium:automationName\":\"UiAutomator2\"," + 
              "\"platformName\":\"Android\"," +
              "\"browserName\":\"Chrome\"," +
              "\"maxInstances\":1," + 
              "\"deviceName\":\"Android Emulator\"}";
     
     private static final String BASELINE =
-            "{\"automationName\":\"UiAutomator2\"," + 
-             "\"platformName\":\"Android\"}";
+            "{\"appium:automationName\":\"UiAutomator2\"," + 
+             "\"platformName\":\"Android\"," +
+             "\"personality\":\"UiAutomator2\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin\"" +
+            "}";
     
     private static final Map<String, String> PERSONALITIES;
+    
+    private static final String DRIVER_CLASS_NAME = "io.appium.java_client.android.AndroidDriver";
     
     static {
         Map<String, String> personalities = new HashMap<>();
@@ -41,6 +46,11 @@ public class UiAutomator2Plugin extends AbstractAppiumPlugin {
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    @Override
+    public String getDriverClassName() {
+        return DRIVER_CLASS_NAME;
     }
 
 }

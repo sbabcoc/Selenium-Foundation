@@ -6,6 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.testng.ITestNGListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -211,6 +212,15 @@ public abstract class TestNgBase extends TestBase {
     @Override
     public boolean isAfterClass(final Method method) {
         return null != method.getAnnotation(AfterClass.class);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <b>NOTE</b>: This method throws a {@link SkipException} with the specified message.
+     */
+    public void skipTest(final String message) throws Exception {
+        throw new SkipException(message);
     }
     
     /**

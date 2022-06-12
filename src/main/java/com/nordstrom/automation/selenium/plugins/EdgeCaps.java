@@ -30,12 +30,18 @@ public class EdgeCaps {
                     "{\"browserName\":\"MicrosoftEdge\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE = 
-                    "{\"browserName\":\"MicrosoftEdge\",\"ms:edgeChromium\":true}";
+                    "{\"browserName\":\"MicrosoftEdge\"," +
+                     "\"ms:edgeChromium\":true" +
+                     "\"personality\":\"MicrosoftEdge\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EdgePlugin\"" +
+                    "}";
     
     private static final String HEADLESS =
-                    "{\"browserName\":\"MicrosoftEdge\",\"ms:edgeChromium\":true," +
+                    "{\"browserName\":\"MicrosoftEdge\"," +
+                     "\"ms:edgeChromium\":true," +
                      "\"ms:edgeOptions\":{\"args\":[\"--headless\",\"--disable-gpu\"]}," +
-                     "\"personality\":\"MicrosoftEdge.headless\"" +
+                     "\"personality\":\"MicrosoftEdge.headless\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EdgePlugin\"" +
                     "}";
 
     private static final Map<String, String> PERSONALITIES;

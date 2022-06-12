@@ -31,7 +31,9 @@ public class ChromeCaps {
                     "{\"browserName\":\"chrome\"," +
                      "\"goog:chromeOptions\":{" +
                          "\"args\":[\"--disable-infobars\"]," +
-                         "\"prefs\":{\"credentials_enable_service\":false}}" +
+                         "\"prefs\":{\"credentials_enable_service\":false}}," +
+                     "\"personality\":\"chrome\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"" +
                     "}";
     
     private static final String HEADLESS =
@@ -39,7 +41,8 @@ public class ChromeCaps {
                      "\"goog:chromeOptions\":{" +
                          "\"args\":[\"--disable-infobars\",\"--headless\",\"--disable-gpu\"]," +
                          "\"prefs\":{\"credentials_enable_service\":false}}," +
-                     "\"personality\":\"chrome.headless\"" +
+                     "\"personality\":\"chrome.headless\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"" +
                     "}";
     
     private static final Map<String, String> PERSONALITIES;

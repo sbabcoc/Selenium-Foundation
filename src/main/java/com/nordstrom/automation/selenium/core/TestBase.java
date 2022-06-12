@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
+
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 
 import com.google.common.base.Optional;
@@ -65,7 +67,9 @@ public abstract class TestBase {
      */
     public Page prepInitialPage(Page pageObj) {
         if (pageObj.getWindowHandle() == null) {
-            pageObj.setWindowHandle(pageObj.getWrappedDriver().getWindowHandle());
+            try {
+                pageObj.setWindowHandle(pageObj.getWrappedDriver().getWindowHandle());
+            } catch (UnsupportedCommandException e) { }
         }
         // required when initial page is local file
         setDriver(pageObj.getWrappedDriver());
@@ -133,7 +137,7 @@ public abstract class TestBase {
     /**
      * Activate the resolved target platform.
      * 
-     * @param driver WebDriver object
+     * @param driver WebDriver object (may be {@code null})
      */
     public void activatePlatform(WebDriver driver) {
         // by default, do nothing
@@ -193,4 +197,12 @@ public abstract class TestBase {
      * @return 'true' if specified method has {@code AfterClass} annotation; otherwise 'false'
      */
     public abstract boolean isAfterClass(Method method);
+    
+    /**
+     * Skip the test that's about to executed.
+     * 
+     * @param message message for the framework-specific test-skip exception
+     * @throws Exception framework-specific exception throw to skip the test
+     */
+    public abstract void skipTest(String message) throws Exception;
 }

@@ -15,15 +15,20 @@ public class Mac2Plugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"automationName\":\"Mac2\"," +
+            "{\"appium:automationName\":\"Mac2\"," +
              "\"platformName\":\"Mac\"," +
              "\"maxInstances\":5}";
     
     private static final String BASELINE =
-            "{\"automationName\":\"Mac2\"," + 
-             "\"platformName\":\"Mac\"}";
+            "{\"appium:automationName\":\"Mac2\"," + 
+             "\"platformName\":\"Mac\"," +
+             "\"personality\":\"Mac2\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.Mac2Plugin\"" +
+            "}";
     
     private static final Map<String, String> PERSONALITIES;
+    
+    private static final String DRIVER_CLASS_NAME = "io.appium.java_client.mac.Mac2Driver";
     
     static {
         Map<String, String> personalities = new HashMap<>();
@@ -39,6 +44,11 @@ public class Mac2Plugin extends AbstractAppiumPlugin {
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    @Override
+    public String getDriverClassName() {
+        return DRIVER_CLASS_NAME;
     }
 
 }

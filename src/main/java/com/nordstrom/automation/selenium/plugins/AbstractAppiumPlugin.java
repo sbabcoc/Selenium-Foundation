@@ -3,6 +3,8 @@ package com.nordstrom.automation.selenium.plugins;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,10 +14,12 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.grid.common.GridRole;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
@@ -36,6 +40,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     private static final String[] DEPENDENCY_CONTEXTS = {};
     private static final String[] APPIUM_PATH_TAIL = { "appium", "build", "lib", "main.js" };
     private static final String[] PROPERTY_NAMES = {};
+    private static final Class<?>[] ARG_TYPES = {URL.class, Capabilities.class};
     
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
     
@@ -73,7 +78,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+    public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
         
         String capabilities = getCapabilities(config);
@@ -165,6 +170,33 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     }
     
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends RemoteWebDriver> Constructor<T> getRemoteWebDriverCtor(Capabilities desiredCapabilities) {
+        String automationName = (String) desiredCapabilities.getCapability("appium:automationName");
+        if (automationName == null) {
+            automationName = (String) desiredCapabilities.getCapability("automationName");
+        }
+        if (getBrowserName().equalsIgnoreCase(automationName)) {
+            try {
+                return (Constructor<T>) Class.forName(getDriverClassName()).getConstructor(ARG_TYPES);
+            } catch (SecurityException | ClassNotFoundException | NoSuchMethodException | ClassCastException e) {
+                // nothing to do here
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the name of the {@link WebDriver} implementation for this plug-in.
+     * 
+     * @return driver-specific {@link WebDriver} class name
+     */
+    public abstract String getDriverClassName();
+    
+    /**
      * Find the 'npm' (Node Package Manager) binary.
      * 
      * @return path to the 'npm' binary as a {@link File} object
@@ -223,6 +255,8 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         try {
             process.execute();
             nodeModulesRoot = process.getStdOut().trim();
+            int index = nodeModulesRoot.lastIndexOf('\n');
+            if (index > 0) nodeModulesRoot = nodeModulesRoot.substring(index).trim();
             File appiumMain = Paths.get(nodeModulesRoot, APPIUM_PATH_TAIL).toFile();
             if (appiumMain.exists()) return appiumMain;
             throw fileNotFound("'appium' main script", SeleniumSettings.APPIUM_BINARY_PATH);

@@ -224,17 +224,6 @@ public final class JsUtility {
     /**
      * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
      * 
-     * @param exception web driver exception to propagate
-     * @return nothing (this method always throws the specified exception)
-     * @deprecated at 17.3.0 
-     */
-    public static RuntimeException propagate(final WebDriverException exception) {
-        throw propagate(null, exception);
-    }
-    
-    /**
-     * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
-     * 
      * @param driver A handle to the currently running Selenium test window.
      * @param exception web driver exception to propagate
      * @return nothing (this method always throws the specified exception)

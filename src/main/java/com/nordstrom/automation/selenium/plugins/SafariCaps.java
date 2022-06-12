@@ -23,7 +23,11 @@ public class SafariCaps {
     private static final String CAPABILITIES =
                     "{\"browserName\":\"safari\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
-    private static final String BASELINE = "{\"browserName\":\"safari\"}";
+    private static final String BASELINE = 
+                    "{\"browserName\":\"safari\"," +
+                     "\"personality\":\"safari\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.SafariPlugin\"" +
+                    "}";
     
     private static final Map<String, String> PERSONALITIES;
     

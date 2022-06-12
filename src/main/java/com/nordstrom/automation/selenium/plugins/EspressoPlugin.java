@@ -15,15 +15,20 @@ public class EspressoPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"automationName\":\"Espresso\"," +
+            "{\"appium:automationName\":\"Espresso\"," +
              "\"platformName\":\"Android\"," +
              "\"maxInstances\":1}";
     
     private static final String BASELINE =
-            "{\"automationName\":\"Espresso\"," + 
-             "\"platformName\":\"Android\"}";
+            "{\"appium:automationName\":\"Espresso\"," + 
+             "\"platformName\":\"Android\"," +
+             "\"personality\":\"Espresso\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EspressoPlugin\"" +
+            "}";
     
     private static final Map<String, String> PERSONALITIES;
+    
+    private static final String DRIVER_CLASS_NAME = "io.appium.java_client.android.AndroidDriver";
     
     static {
         Map<String, String> personalities = new HashMap<>();
@@ -39,6 +44,11 @@ public class EspressoPlugin extends AbstractAppiumPlugin {
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+    
+    @Override
+    public String getDriverClassName() {
+        return DRIVER_CLASS_NAME;
     }
 
 }

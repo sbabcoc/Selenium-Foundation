@@ -38,7 +38,7 @@ public final class DataUtils {
         try {
             return new Json().toType(json, type);
         } catch (JsonException e) {
-            LOGGER.debug("Failed to deserialize JSON object string: " + json, e);
+            LOGGER.debug("Failed to deserialize JSON object string: {}" + json, e.getMessage());
             return null;
         }
     }

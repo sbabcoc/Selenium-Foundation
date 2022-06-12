@@ -39,37 +39,40 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
      */
     @Override
     public String[] getSubPath() {
-        return new String[] { getTargetPlatform().getName() };
+        P platform = getTargetPlatform();
+        return (platform != null) ? new String[] { platform.getName() } : new String[0];
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "serial" })
     public P getTargetPlatform() {
+        P platform = null;
         ITestResult testResult = Reporter.getCurrentTestResult();
         if (testResult != null) {
-            return (P) testResult.getAttribute(PLATFORM);
+            platform = (P) testResult.getAttribute(PLATFORM);
+            if (platform == null) {
+                String description = testResult.getMethod().getDescription();
+                PlatformIdentity<P> identity = DataUtils.fromString(description, new TypeToken<PlatformIdentity<P>>(){}.getType());
+                if (identity != null) {
+                    platform = identity.deserialize();
+                    testResult.setAttribute(PLATFORM, platform);
+                }                
+            }
         }
-        return null;
+        return platform;
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("serial")
     public void activatePlatform(WebDriver driver) {
-        ITestResult testResult = Reporter.getCurrentTestResult();
-        if (testResult != null) {
-            String description = testResult.getMethod().getDescription();
-            PlatformIdentity<P> identity = DataUtils.fromString(description, new TypeToken<PlatformIdentity<P>>(){}.getType());
-            if (identity != null) {
-                P platform = identity.deserialize();
-                testResult.setAttribute(PLATFORM, platform);
-                activatePlatform(driver, platform);
-            }
+        P platform = getTargetPlatform();
+        if (platform != null) {
+            activatePlatform(driver, platform);
         }
     }
     

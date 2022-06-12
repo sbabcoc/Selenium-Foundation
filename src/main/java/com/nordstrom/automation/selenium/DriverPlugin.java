@@ -1,11 +1,14 @@
 package com.nordstrom.automation.selenium;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
@@ -62,8 +65,19 @@ public interface DriverPlugin {
      * @return {@link LocalGridServer} object for specified node
      * @throws IOException if an I/O error occurs
      */
-    LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+    LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException;
+    
+    /**
+     * Get constructor for this driver's {@link RemoteWebDriver} implementation.
+     * <p>
+     * <b>NOTE</b>: This is only needed for implementations that require driver-specific implementation.
+     * 
+     * @param <T> constructor type parameter
+     * @param desiredCapabilities desired capabilities for the driver
+     * @return constructor for driver-specific {@link RemoteWebDriver} implementation
+     */
+    <T extends RemoteWebDriver> Constructor<T> getRemoteWebDriverCtor(Capabilities desiredCapabilities);
     
     /**
      * Get default constructor for this driver's {@link WebElement} implementation.

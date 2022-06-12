@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.core;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -20,11 +21,12 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
-import com.nordstrom.automation.selenium.examples.TestNgRoot;
+import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
+import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 @InitialPage(ExamplePage.class)
-public class JsUtilityTest extends TestNgRoot {
+public class JsUtilityTest extends TestNgTargetRoot {
 
     @NoDriver
     @Test(expectedExceptions = {AssertionError.class},
@@ -47,6 +49,7 @@ public class JsUtilityTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testRun() {
         ExamplePage page = getPage();
         String script = "document.querySelector(arguments[0]).value = arguments[1];";
@@ -55,6 +58,7 @@ public class JsUtilityTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testRunAndReturn() {
         ExamplePage page = getPage();
         page.setInputValue("test");
@@ -64,6 +68,7 @@ public class JsUtilityTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testInjectGlueLib() {
         ExamplePage page = getPage();
         WebDriver driver = page.getWrappedDriver();
@@ -74,6 +79,7 @@ public class JsUtilityTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testPropagate() {
         ExamplePage page = getPage();
         try {
@@ -85,6 +91,7 @@ public class JsUtilityTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testShadowRun() {
         try {
             ExamplePage page = getPage();
@@ -99,6 +106,7 @@ public class JsUtilityTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testShadowRunAndReturn() {
         try {
             ExamplePage page = getPage();

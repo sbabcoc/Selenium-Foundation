@@ -86,6 +86,31 @@ public abstract class ComponentContainer
     private static final int NAME_WITH_VALUE = 2;
     private static final String LOOPBACK = "http://127.0.0.1/";
     
+    private static final Class<?> ACTIVITY_CLASS;
+    private static final Constructor<?> ACTIVITY_CTOR;
+    private static final Method START_ACTIVITY;
+    
+    static {
+        Class<?> activityClass;
+        Constructor<?> activityCtor;
+        Method startActivity;
+        
+        try {
+            Class<?> androidDriver = Class.forName("io.appium.java_client.android.AndroidDriver");
+            activityClass = Class.forName("io.appium.java_client.android.Activity");
+            activityCtor = activityClass.getConstructor(String.class, String.class);
+            startActivity = androidDriver.getMethod("startActivity", activityClass);
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+            activityClass = null;
+            activityCtor = null;
+            startActivity = null;
+        }
+        
+        ACTIVITY_CLASS = activityClass;
+        ACTIVITY_CTOR = activityCtor;
+        START_ACTIVITY = startActivity;
+    }
+    
     private final Logger logger;
     
     /**
@@ -116,16 +141,6 @@ public abstract class ComponentContainer
         Objects.requireNonNull(parent, "[parent] must be non-null");
     }
 
-    /**
-     * Get the driver associated with this container.
-     * 
-     * @return container driver
-     * @deprecated This method is redundant and is slated for removal. Use {@link #getWrappedDriver()} instead.
-     */
-    public WebDriver getDriver() {
-        return driver;
-    }
-    
     /**
      * Get the container search context
      * 
@@ -573,9 +588,33 @@ public abstract class ComponentContainer
             pageObj.setWindowState(WindowState.WILL_OPEN);
             WebDriverUtils.getExecutor(driver).executeScript("window.open('" + url + "','_blank');");
         } else {
-            driver.get(url);
+            getUrl(url, driver);
         }
         return pageObj;
+    }
+    
+    /**
+     * Navigate to the specified URL or activity.
+     * 
+     * @param url target URL or activity
+     * @param driver driver object
+     */
+    public static void getUrl(final String url, final WebDriver driver) {
+        Objects.requireNonNull(url, "[url] must be non-null");
+        Objects.requireNonNull(driver, "[driver] must be non-null");
+        
+        if (url.startsWith("activity://")) {
+            Objects.requireNonNull(ACTIVITY_CLASS, "AndroidDriver is required to launch activities");
+            try {
+                String[] components = url.split("/");
+                START_ACTIVITY.invoke(driver, ACTIVITY_CTOR.newInstance(components[2], components[3]));
+            } catch (SecurityException | InstantiationException | IllegalAccessException
+                    | IllegalArgumentException | InvocationTargetException e) {
+                throw new RuntimeException("Unable to launch specified activity", e);
+            }
+        } else {
+            driver.get(url);
+        }
     }
     
     /**
@@ -624,25 +663,35 @@ public abstract class ComponentContainer
         String result = null;
         String scheme = pageUrl.scheme();
         String path = pageUrl.value();
+        String appPackage = pageUrl.appPackage();
         
-        if ("file".equals(scheme)) {
+        // if Android activity is specified
+        if ( ! PLACEHOLDER.equals(appPackage)) {
+            // assemble Android activity URL
+            result = "activity://" + appPackage + "/" + path;
+        // otherwise, if file is specified
+        } else if ("file".equals(scheme)) {
+            // resolve file path using context class loader
             result = Thread.currentThread().getContextClassLoader().getResource(path).toString();
+        // otherwise
         } else {
-            Objects.requireNonNull(targetUri, "[targetUri] must be non-null");
-            
-            String userInfo = pageUrl.userInfo();
-            String host = pageUrl.host();
-            String port = pageUrl.port();
-            
-            URIBuilder builder = new URIBuilder(targetUri);
-            
             if (!path.isEmpty()) {
                 URI pathUri = URI.create(path);
                 if (pathUri.isAbsolute()) {
                     return pathUri.toString();
-                } else {
-                    builder.setPath(URI.create(LOOPBACK + targetUri.getPath() + "/").resolve("./" + path).getPath());
                 }
+            }
+            
+            URIBuilder builder;
+            String userInfo = pageUrl.userInfo();
+            String host = pageUrl.host();
+            String port = pageUrl.port();
+            
+            if (undefined(scheme) || undefined(host)) {
+                builder = new URIBuilder(Objects.requireNonNull(targetUri, "[targetUri] must be non-null"));
+                builder.setPath(URI.create(LOOPBACK + targetUri.getPath() + "/").resolve("./" + path).getPath());
+            } else {
+                builder = new URIBuilder().setPath(path);
             }
             
             if (!PLACEHOLDER.equals(scheme)) {
@@ -1039,6 +1088,16 @@ public abstract class ComponentContainer
      */
     public <T extends Frame> Map<Object, T> newFrameMap(final Class<T> frameType, final By locator) {
         return new FrameMap<>(this, frameType, locator);
+    }
+    
+    /**
+     * Determine is the specified URI component is undefined.
+     * 
+     * @param component URI component
+     * @return {@code true} if component is undefined; otherwise {@code false}
+     */
+    private static boolean undefined(String component) {
+        return component.isEmpty() || PLACEHOLDER.equals(component);
     }
     
     /**

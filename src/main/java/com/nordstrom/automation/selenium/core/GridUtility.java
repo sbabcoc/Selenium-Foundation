@@ -3,6 +3,8 @@ package com.nordstrom.automation.selenium.core;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -15,7 +17,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -29,11 +35,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -95,7 +103,7 @@ public final class GridUtility {
         Objects.requireNonNull(hostUrl, "[hostUrl] must be non-null");
         Objects.requireNonNull(request, "[request] must be non-null");
         HttpClient client = HttpClientBuilder.create().build();
-        URL sessionURL = new URL(hostUrl.getProtocol(), hostUrl.getAuthority(), request);
+        URL sessionURL = new URL(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), request);
         BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
                 new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
         return client.execute(extractHost(hostUrl), basicHttpEntityEnclosingRequest);
@@ -124,10 +132,41 @@ public final class GridUtility {
      */
     public static WebDriver getDriver(URL remoteAddress, Capabilities desiredCapabilities) {
         Objects.requireNonNull(remoteAddress, "[remoteAddress] must be non-null");
-        if (isHubActive(remoteAddress)) {
-            return new RemoteWebDriver(remoteAddress, desiredCapabilities);
-        } else {
-            throw new IllegalStateException("No Selenium Grid instance was found at " + remoteAddress);
+        
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        
+        // if specified hub is inactive
+        if (!isHubActive(remoteAddress)) {
+            // if hub URL is on local host
+            if (isLocalHost(remoteAddress)) {
+                LocalSeleniumGrid localGrid = (LocalSeleniumGrid) config.getSeleniumGrid();
+                try {
+                    // activate grid
+                    localGrid.activate();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (IOException | TimeoutException e) {
+                    throw new IllegalStateException("Failed activating local grid instance", e);
+                }
+            } else {
+                throw new IllegalStateException("No Selenium Grid instance was found at " + remoteAddress);
+            }
+        }
+        
+        // get constructor for RemoteWebDriver class corresponding to desired capabilities
+        Constructor<RemoteWebDriver> ctor = getRemoteWebDriverCtor(desiredCapabilities);
+        
+        // create mutable copy of desired capabilities
+        MutableCapabilities filteredCapabilities = new MutableCapabilities(desiredCapabilities);
+        // remove 'personality' and plug-in class from capabilities
+        filteredCapabilities.setCapability("personality", (Object) null);
+        filteredCapabilities.setCapability("pluginClass", (Object) null);
+        
+        try {
+            // instantiate desired driver via configured grid
+            return ctor.newInstance(remoteAddress, filteredCapabilities);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw UncheckedThrow.throwUnchecked(e);
         }
     }
     
@@ -187,6 +226,27 @@ public final class GridUtility {
         }
         return config.getCapabilitiesForJson(json);
     }
+    
+    /**
+     * Get the 'personality' value from the specified capabilities map.
+     * <p>
+     * <b>NOTE</b>: The 'personality' value is derived from the following capabilities (in precedence order):
+     * <ul>
+     *     <li>personality</li>
+     *     <li>appium:automationName</li>
+     *     <li>automationName</li>
+     *     <li>browserName</li>
+     * </ul>
+     * 
+     * @param capabilities map of capabilities
+     * @return 'personality' value; {@code null} if no 'personality' value is found
+     */
+    public static String getPersonality(Map<String, Object> capabilities) {
+        if (capabilities.containsKey("personality")) return (String) capabilities.get("personality");
+        if (capabilities.containsKey("appium:automationName")) return (String) capabilities.get("appium:automationName");
+        if (capabilities.containsKey("automationName")) return (String) capabilities.get("automationName");
+        return (String) capabilities.get("browserName");
+    }
 
     /**
      * Determine if the specified server is the local host.
@@ -197,7 +257,7 @@ public final class GridUtility {
     public static boolean isLocalHost(URL host) {
         try {
             InetAddress addr = InetAddress.getByName(host.getHost());
-            return (GridUtility.isThisMyIpAddress(addr));
+            return (isThisMyIpAddress(addr));
         } catch (UnknownHostException e) {
             LOGGER.warn("Unable to get IP address for '{}'", host.getHost(), e);
             return false;
@@ -285,4 +345,27 @@ public final class GridUtility {
         
         return outputPath;
     }
+    
+    /**
+     * Get constructor for the desired driver's {@link RemoteWebDriver} implementation.
+     * 
+     * @param <T> constructor type parameter
+     * @param desiredCapabilities desired capabilities for the driver
+     * @return constructor for desired {@link RemoteWebDriver} implementation
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends RemoteWebDriver> Constructor<T> getRemoteWebDriverCtor(Capabilities desiredCapabilities) {
+        for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+            Constructor<T> ctor = driverPlugin.getRemoteWebDriverCtor(desiredCapabilities);
+            if (ctor != null) {
+                return ctor;
+            }
+        }
+        try {
+            return (Constructor<T>) RemoteWebDriver.class.getConstructor(URL.class, Capabilities.class);
+        } catch (NoSuchMethodException | SecurityException e) {
+            throw UncheckedThrow.throwUnchecked(e);
+        }
+    }
+    
 }

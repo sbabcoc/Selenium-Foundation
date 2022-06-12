@@ -34,7 +34,8 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
      */
     @Override
     public String[] getSubPath() {
-        return new String[] { getTargetPlatform().getName() };
+        P platform = getTargetPlatform();
+        return (platform != null) ? new String[] { platform.getName() } : new String[0];
     }
 
     /**
@@ -50,7 +51,7 @@ public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extend
      */
     @Override
     public void activatePlatform(WebDriver driver) {
-        P platform = targetPlatformRule.getPlatform();
+        P platform = getTargetPlatform();
         if (platform != null) {
             activatePlatform(driver, platform);
         }
