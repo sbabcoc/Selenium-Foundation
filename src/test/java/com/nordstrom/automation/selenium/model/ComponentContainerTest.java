@@ -189,7 +189,7 @@ public class ComponentContainerTest {
     private static WebDriver mockDriver() {
         WebDriver driver = mock(WebDriver.class, withSettings().extraInterfaces(JavascriptExecutor.class));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
-        when(executor.executeScript(any(String.class), anyVararg())).thenReturn(null);
+        when(executor.executeScript(any(String.class), any())).thenReturn(null);
         return driver;
     }
     
