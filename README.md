@@ -49,24 +49,21 @@
 
 ## Selenium API Support
 
-**Selenium Foundation** includes support for both **Selenium 2** and **Selenium 3**. This project has transitioned from Maven to Gradle so that both configurations can be handled by a single [project definition file](build.gradle).
+Since version _24.0.0_, **Selenium Foundation** exclusively supports the **Selenium 3** API. Prior releases support both **Selenium 2** (Java 7) and **Selenium 3** (Java 8).
 
 ### Dependency Artifact Coordinates
 
-The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Artifacts whose versions have the `s2` suffix support the **Selenium 2** API. Artifacts whose versions have the `s3` suffix support the **Selenium 3** API.
+The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Artifacts version numbers have the `s3` suffix to indicate support for the **Selenium 3** API.
 
-To add a dependency on **Selenium Foundation** for Maven, use the following:
+To add a dependency on **Selenium Foundation**, use the following:
 
-| Selenium 2 | Selenium 3 |
-|:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;24.0.0-s2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;24.0.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| Maven |
+|:---|
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;24.0.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
-To add a dependency for Gradle:
-
-| Platform | Dependency |
-|:---:|:---|
-| **Selenium 2** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:24.0.0-s2'<br/>}</pre> |
-| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:24.0.0-s3'<br/>}</pre> |
+| Gradle |
+|:---|
+| <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:24.0.0-s3'<br/>}</pre> |
 
 ### Building Selenium Foundation
 
@@ -74,30 +71,25 @@ In order to build **Selenium Foundation**, start by setting up your [development
 
 #### Building in Eclipse
 
-For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plug-in. By default, this project will build its **Selenium 3** configuration. To build the **Selenium 2** configuration, add this program argument to a run configuration that includes the `clean` and `build` tasks:
-
-> `-Pprofile=selenium2`
+For Eclipse, we recommend enabling Gradle integration through the official [BuildShip](https://marketplace.eclipse.org/content/buildship-gradle-integration) plug-in.
 
 [Learn more...](docs/DevelopmentEnvironment.md#gradle-configuration)
 
 #### Building from Command Line
 
-Both configurations of **Selenium Foundation** can by built from the command line. 
+To build **Selenium Foundation** from the command line: 
 
-> **`gradle build`** `# build Selenium 3 configuration`  
-> **`gradle build -Pprofile=selenium2`** `# build Selenium 2 configuration`  
+> **`gradle build`**  
 
 Use the `install` task to install SNAPSHOT builds in your local Maven repository:
 
-> **`gradle install`** `# build Selenium 3 configuration`  
-> **`gradle install -Pprofile=selenium2`** `# build Selenium 2 configuration`  
+> **`gradle install`**  
 
 #### Maven Support
 
 Although Gradle is used to produce official releases, **Selenium Foundation** also includes a fully-functional Maven POM file.
 
-> **`mvn package -Pselenium3`** `# build Selenium 3 configuration`  
-> **`mvn package -Pselenium2`** `# build Selenium 2 configuration`
+> **`mvn package`**  
 
 Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at:
 
