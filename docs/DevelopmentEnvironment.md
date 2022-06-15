@@ -21,24 +21,19 @@ The majority of the environment needed to build **Selenium Foundation** is compr
 
 ## Java Versions
 
-To build both versions of **Selenium Foundation** requires two Java development kits:
+To build **Selenium Foundation**, you'll need a Java 8 software development kits:
 
-* Java 7: version 1.7.0_80
-* Java 8: version 1.8.0_251
+* Java 8: version 1.8.0_311
 
 ## Gradle Configuration:
 
-The Gradle project file for **Selenium Foundation** is configured to build the **selenium3** variant by default. If you want to build the **selenium2** variant, create a run configuration that includes the `clean` and `build` tasks, and add the following program argument on the `Project Settings` tab:
-
-> `-Pprofile=selenium2`
+The Gradle project file for **Selenium Foundation** includes a **selenium3Deps** sub-file. This reflects the past (and probable future) support for multiple versions of the Selenium API. 
 
 ## Maven Configuration:
 
 ### Project Profiles
 
-The Maven POM for **Selenium Foundation** defined two mutually-exclusive profiles (**selenium2** and **selenium3**), neither of which is active by default. Select one or the other to finalize the source set. For example:
-
-> Project > Properties > Maven > Active Maven Profiles: [selenium3]
+The Maven POM for **Selenium Foundation** defines an active-by-default **selenium3** profile. This reflects the past (and probable future) support for multiple versions of the Selenium API.
 
 ### JDK Toolchains
 
@@ -49,15 +44,6 @@ To build the **Selenium Foundation** project with **Maven**, you'll also need to
 <?xml version="1.0" encoding="UTF8"?>
 <toolchains>
   <!-- JDK toolchains -->
-  <toolchain>
-    <type>jdk</type>
-    <provides>
-      <version>7</version>
-    </provides>
-    <configuration>
-      <jdkHome>C:\Program Files\Java\jdk1.7.0_80</jdkHome>
-    </configuration>
-  </toolchain>
   <toolchain>
     <type>jdk</type>
     <provides>
@@ -78,7 +64,6 @@ To build the **Selenium Foundation** project with **Maven**, you'll also need to
 | **`M2`** | Path to Maven `bin` folder
 | **`M2_HOME`** | Root folder of Maven installation |
 | **`M2_REPO`** | Root folder of Maven repository |
-| **`JDK7_HOME`** | Root folder of JDK 7 installation |
 | **`JDK8_HOME`** | Root folder of JDK 8 installation |
 
 ## TestNG Eclipse Configuration
