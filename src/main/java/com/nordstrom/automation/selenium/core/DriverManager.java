@@ -1,9 +1,11 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
@@ -64,6 +66,7 @@ public final class DriverManager {
             return;
         }
         
+        WebDriver driver = null;
         boolean getDriver = false;
         TestBase instance = (TestBase) obj;
         
@@ -100,7 +103,7 @@ public final class DriverManager {
             // if driver not yet acquired
             if (!optDriver.isPresent()) {
                 long prior = System.currentTimeMillis();
-                WebDriver driver = injectDriver(instance, method);
+                driver = injectDriver(instance, method);
                 optDriver = Optional.of(driver);
                 if (instance.isTest(method)) {
                     long after = System.currentTimeMillis();
@@ -113,9 +116,10 @@ public final class DriverManager {
                 SeleniumConfig config = SeleniumConfig.getConfig();
                 Page page = Page.openInitialPage(initialPage, optDriver.get(), config.getTargetUri());
                 instance.setInitialPage(instance.prepInitialPage(page));
-                instance.activatePlatform(instance.getDriver());
             }
         }
+        
+        instance.activatePlatform(driver);
     }
 
     /**
@@ -177,9 +181,13 @@ public final class DriverManager {
      */
     public static void setDriverTimeouts(final WebDriver driver, final SeleniumConfig config) {
         Timeouts timeouts = driver.manage().timeouts();
-        timeouts.setScriptTimeout(WaitType.SCRIPT.getInterval(config), TimeUnit.SECONDS);
         timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);
-        timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
+        
+        try {
+            timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
+        } catch (UnsupportedCommandException e) {
+            // unsupported feature: nothing to do here
+        }
     }
     
     /**
@@ -302,7 +310,7 @@ public final class DriverManager {
          */
         public DriverSessionWait(final TestBase context, final long timeOutInSeconds) {
             super(context);
-            withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
+            withTimeout(Duration.ofSeconds(timeOutInSeconds));
         }
     }
 }

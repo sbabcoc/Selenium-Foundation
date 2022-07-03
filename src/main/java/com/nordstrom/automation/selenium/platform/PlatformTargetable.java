@@ -23,7 +23,7 @@ public interface PlatformTargetable<P extends Enum<?> & PlatformEnum> extends Pa
     /**
      * Activate the specified target platform.
      * 
-     * @param driver WebDriver object
+     * @param driver WebDriver object (may be {@code null})
      * @param platform platform to be activated
      * @throws PlatformActivationFailedException if platform activation fails
      */

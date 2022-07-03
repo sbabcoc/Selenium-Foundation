@@ -15,17 +15,22 @@ public class XCUITestPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"automationName\":\"XCUITest\"," +
+            "{\"appium:automationName\":\"XCUITest\"," +
              "\"platformName\":\"iOS\"," +
              "\"browserName\":\"Safari\"," +
              "\"maxInstances\":1," +
              "\"deviceName\":\"iPhone Simulator\"}";
     
     private static final String BASELINE =
-            "{\"automationName\":\"XCUITest\"," + 
-             "\"platformName\":\"iOS\"}";
+            "{\"appium:automationName\":\"XCUITest\"," + 
+             "\"platformName\":\"iOS\"," +
+             "\"personality\":\"XCUITest\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.XCUITestPlugin\"" +
+            "}";
     
     private static final Map<String, String> PERSONALITIES;
+    
+    private static final String DRIVER_CLASS_NAME = "io.appium.java_client.ios.IOSDriver";
     
     static {
         Map<String, String> personalities = new HashMap<>();
@@ -41,6 +46,11 @@ public class XCUITestPlugin extends AbstractAppiumPlugin {
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    @Override
+    public String getDriverClassName() {
+        return DRIVER_CLASS_NAME;
     }
 
 }

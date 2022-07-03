@@ -26,7 +26,11 @@ public class OperaCaps {
     
     private static final String CAPABILITIES = "{\"browserName\":\"opera\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
-    private static final String BASELINE = "{\"browserName\":\"opera\"}";
+    private static final String BASELINE = 
+            "{\"browserName\":\"opera\"," +
+             "\"personality\":\"opera\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.OperaPlugin\"" +
+            "}";
     
     private static final Map<String, String> PERSONALITIES;
     

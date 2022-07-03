@@ -87,7 +87,9 @@ public class Page extends ComponentContainer {
      */
     @Override
     protected SearchContext switchToContext() {
-        driver.switchTo().window(windowHandle);
+        if (windowHandle != null) {
+            driver.switchTo().window(windowHandle);
+        }
         return this;
     }
     
@@ -174,7 +176,7 @@ public class Page extends ComponentContainer {
             throw new InitialPageNotSpecifiedException();
         }
         
-        driver.get(url);
+        getUrl(url, driver);
         return newPage((Class<T>) initialPage.value(), driver);
     }
     

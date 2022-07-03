@@ -15,15 +15,20 @@ public class WindowsPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"automationName\":\"Windows\"," +
+            "{\"appium:automationName\":\"Windows\"," +
              "\"platformName\":\"Windows\"," +
              "\"maxInstances\":5}";
     
     private static final String BASELINE =
-            "{\"automationName\":\"Windows\"," + 
-             "\"platformName\":\"Windows\"}";
+            "{\"appium:automationName\":\"Windows\"," + 
+             "\"platformName\":\"Windows\"," +
+             "\"personality\":\"Windows\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.WindowsPlugin\"" +
+            "}";
     
     private static final Map<String, String> PERSONALITIES;
+    
+    private static final String DRIVER_CLASS_NAME = "io.appium.java_client.windows.WindowsDriver";
     
     static {
         Map<String, String> personalities = new HashMap<>();
@@ -39,6 +44,11 @@ public class WindowsPlugin extends AbstractAppiumPlugin {
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
+    }
+
+    @Override
+    public String getDriverClassName() {
+        return DRIVER_CLASS_NAME;
     }
 
 }

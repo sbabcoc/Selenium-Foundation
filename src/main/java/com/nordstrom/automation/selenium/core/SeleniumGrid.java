@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
-import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.plugins.PluginUtils;
@@ -97,7 +96,6 @@ public class SeleniumGrid {
                 nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
                 addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
             }
-            addPluginPersonalities(config);
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
         }
     }
@@ -105,25 +103,28 @@ public class SeleniumGrid {
     /**
      * Constructor for Selenium Grid from server objects.
      * <p>
-     * This is used to create an interface for a newly-created local Grid.
+     * This is used to create an interface for a newly-created local Grid.<br>
+     * <b>NOTE</b>: The represented local Grid instance is <b>NOT</b> immediately activated. Activation is performed
+     * by {@link GridUtility#getDriver()} the first time a supported driver is requested.
      * 
      * @param config {@link SeleniumConfig} object
-     * @param hubServer {@link GridServer} object for hub host
-     * @param nodeServers array of {@link GridServer} objects for node hosts
+     * @param hubServer {@link LocalGridServer} object for hub host
+     * @param nodeServers array of {@link LocalGridServer} objects for node hosts
      * @throws IOException if unable to acquire Grid details
+     * @see GridUtility#getDriver()
+     * @see LocalSeleniumGrid#activate()
      */
-    public SeleniumGrid(SeleniumConfig config, GridServer hubServer, GridServer... nodeServers) throws IOException {
+    public SeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         this.hubServer = Objects.requireNonNull(hubServer, "[hubServer] must be non-null");
         if (nodeServers.length == 0) {
             LOGGER.debug("Defined servlet container at: {}", hubServer.getUrl());
         } else {
             LOGGER.debug("Assembling graph of grid at: {}", hubServer.getUrl());
-            for (GridServer nodeServer : nodeServers) {
-                String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
+            for (LocalGridServer nodeServer : nodeServers) {
+                String nodeEndpoint = nodeServer.getUrl().getProtocol() + "://" + nodeServer.getUrl().getAuthority();
                 this.nodeServers.put(nodeEndpoint, nodeServer);
-                addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
+                this.personalities.putAll(nodeServer.getPersonalities());
             }
-            addPluginPersonalities(config);
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
         }
     }
@@ -155,24 +156,7 @@ public class SeleniumGrid {
                 capsList = (List<Map>) conf.get("capabilities");
             }
             for (Map<String, Object> capsItem : capsList) {
-                String browserName = (String) capsItem.get("automationName");
-                if (browserName == null) {
-                    browserName = (String) capsItem.get("browserName");
-                }
-                personalities.putAll(PluginUtils.getPersonalitiesForBrowser(browserName));
-            }
-        }
-    }
-    
-    /**
-     * Add supported personalities from configured driver plug-ins.
-     * 
-     * @param config {@link SeleniumConfig} object
-     */
-    private void addPluginPersonalities(SeleniumConfig config) {
-        for (DriverPlugin driverPlugin : LocalSeleniumGrid.getDriverPlugins(config)) {
-            if (personalities.containsKey(driverPlugin.getBrowserName())) {
-                personalities.putAll(driverPlugin.getPersonalities());
+                personalities.putAll(PluginUtils.getPersonalitiesForBrowser(GridUtility.getPersonality(capsItem)));
             }
         }
     }
@@ -187,16 +171,14 @@ public class SeleniumGrid {
      * @param hubUrl {@link URL} of hub host
      * @return {@link SeleniumGrid} object for the specified hub endpoint
      * @throws IOException if an I/O error occurs
-     * @throws InterruptedException if this thread was interrupted
-     * @throws TimeoutException if host timeout interval exceeded
      */
-    public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException, InterruptedException, TimeoutException {
+    public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException {
         if ((hubUrl != null) && GridUtility.isHubActive(hubUrl)) {
             // ensure that hub port is available as a discrete setting
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
             return new SeleniumGrid(config, hubUrl);
         } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
-            return LocalSeleniumGrid.launch(config, config.createHubConfig());
+            return LocalSeleniumGrid.create(config, config.createHubConfig());
         }
         throw new IllegalStateException("Specified remote hub URL '" + hubUrl + "' isn't active");
     }

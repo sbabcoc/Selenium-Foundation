@@ -17,24 +17,36 @@ public class HtmlUnitCaps {
                     "{\"browserName\":\"htmlunit\"," +
                      "\"browserVersion\":\"chrome\"," +
                      "\"maxInstances\":5," +
-                     "\"seleniumProtocol\":\"WebDriver\"}";
+                     "\"seleniumProtocol\":\"WebDriver\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}";
     
-    private static final String BASELINE = "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\"}";
+    private static final String BASELINE = 
+                     "{\"browserName\":\"htmlunit\"," +
+                      "\"browserVersion\":\"chrome\"," +
+                      "\"personality\":\"htmlunit\"," +
+                      "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
+                     "}";
     
     private static final String CHROME = 
                     "{\"browserName\":\"htmlunit\"," +
                      "\"browserVersion\":\"chrome\"," +
-                     "\"personality\":\"htmlunit.chrome\"}";
+                     "\"personality\":\"htmlunit.chrome\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
+                    "}";
     
     private static final String FIREFOX = 
                     "{\"browserName\":\"htmlunit\"," +
                      "\"browserVersion\":\"firefox\"," +
-                     "\"personality\":\"htmlunit.firefox\"}";
+                     "\"personality\":\"htmlunit.firefox\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
+                    "}";
     
     private static final String INT_EXP = 
                     "{\"browserName\":\"htmlunit\"," +
                      "\"browserVersion\":\"ie\"," +
-                     "\"personality\":\"htmlunit.ie\"}";
+                     "\"personality\":\"htmlunit.ie\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
+                    "}";
     
     private static final Map<String, String> PERSONALITIES;
     

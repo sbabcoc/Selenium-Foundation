@@ -17,12 +17,17 @@ public class PhantomJsCaps {
     private static final String CAPABILITIES =
                     "{\"browserName\":\"phantomjs\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
-    private static final String BASELINE = "{\"browserName\":\"phantomjs\"}";
+    private static final String BASELINE =
+            "{\"browserName\":\"phantomjs\"," +
+             "\"personality\":\"phantomjs\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.PhantomJsPlugin\"" +
+            "}";
     
     private static final String LOGGING = 
             "{\"browserName\":\"phantomjs\"," +
              "\"loggingPrefs\":{\"browser\":\"WARNING\"}," +
-             "\"personality\":\"phantomjs.logging\"" +
+             "\"personality\":\"phantomjs.logging\"," +
+             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.PhantomJsPlugin\"" +
             "}";
     
     private static final Map<String, String> PERSONALITIES;

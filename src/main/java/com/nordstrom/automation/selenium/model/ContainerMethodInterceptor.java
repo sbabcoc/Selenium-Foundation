@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -112,7 +113,10 @@ public enum ContainerMethodInterceptor {
             
             Class<?> returnType = method.getReturnType();
             Page parentPage = container.getParentPage();
-            Set<String> initialHandles = driver.getWindowHandles();
+            Set<String> initialHandles = null;
+            try {
+                initialHandles = driver.getWindowHandles();
+            } catch (UnsupportedCommandException e) { }
             
             boolean returnsContainer = ComponentContainer.class.isAssignableFrom(returnType);
             boolean returnsPage = Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType);
@@ -157,9 +161,11 @@ public enum ContainerMethodInterceptor {
                         newPage.setSpawningPage(parentPage);
                         reference = null;
                     } else {
-                        newHandle = driver.getWindowHandle();
                         container.setVacated(
                                 new VacationStackTrace(method, "This page object no longer owns its target window."));
+                        try {
+                            newHandle = driver.getWindowHandle();
+                        } catch (UnsupportedCommandException e) { }
                     }
                 }
                 

@@ -27,13 +27,17 @@ public class FirefoxCaps {
     
     private static final String BASELINE =
                     "{\"browserName\":\"firefox\"," +
-                     "\"marionette\":true}";
+                     "\"marionette\":true," +
+                     "\"personality\":\"firefox\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"" +
+                    "}";
     
     private static final String HEADLESS =
                     "{\"browserName\":\"firefox\"," +
                      "\"marionette\":true," +
                      "\"moz:firefoxOptions\":{\"args\":[\"-headless\"]}," +
-                     "\"personality\":\"firefox.headless\"" +
+                     "\"personality\":\"firefox.headless\"," +
+                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"" +
                     "}";
     
     private static final Map<String, String> PERSONALITIES;

@@ -8,6 +8,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -25,15 +26,17 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
-import com.nordstrom.automation.selenium.examples.TestNgRoot;
+import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
+import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 @InitialPage(ExamplePage.class)
-public class WebDriverUtilsTest extends TestNgRoot {
+public class WebDriverUtilsTest extends TestNgTargetRoot {
 
     @NoDriver
     @Test(expectedExceptions = {AssertionError.class},
             expectedExceptionsMessageRegExp = "WebDriverUtils is a static utility class that cannot be instantiated")
+    @TargetPlatform(WEB_APP_NAME)
     public void testPrivateConstructor() throws Throwable {
         
         Constructor<?>[] ctors;
@@ -52,6 +55,7 @@ public class WebDriverUtilsTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testGetDriver() {
         WebDriver driver = getDriver();
         ExamplePage page = getPage();
@@ -70,6 +74,7 @@ public class WebDriverUtilsTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testGetExecutor() {
         WebDriver driver = getDriver();
         ExamplePage page = getPage();
@@ -88,6 +93,7 @@ public class WebDriverUtilsTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testBrowserName() {
         WebDriver driver = getDriver();
         ExamplePage page = getPage();
@@ -108,6 +114,7 @@ public class WebDriverUtilsTest extends TestNgRoot {
     }
     
     @Test
+    @TargetPlatform(WEB_APP_NAME)
     public void testFilterHidden() {
         ExamplePage page = getPage();
         

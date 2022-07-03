@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.support;
 
-import java.util.concurrent.TimeUnit;
-
+import java.time.Duration;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
@@ -54,8 +53,8 @@ public class SearchContextWait extends FluentWait<SearchContext> {
      */
     public SearchContextWait(final SearchContext context, final long timeOutInSeconds, final long sleepInMillis) {
         super(context);
-        withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
-        pollingEvery(sleepInMillis, TimeUnit.MILLISECONDS);
+        withTimeout(Duration.ofSeconds(timeOutInSeconds));
+        pollingEvery(Duration.ofMillis(sleepInMillis));
         ignoring(NotFoundException.class);
         this.context = context;
     }

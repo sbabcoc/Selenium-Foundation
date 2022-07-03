@@ -11,7 +11,9 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
@@ -50,8 +52,26 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
     
     /**
-     * Launch local Selenium Grid instance.
+     * Activate this <b>LocalSeleniumGrid</b> instance.
      * <p>
+     * This method ensures that the hub and node servers associated with this local grid are launched and active,
+     * and it also ensures that grid node servers are registered with the hub. 
+     * 
+     * @throws IOException if an I/O error occurs
+     * @throws InterruptedException if this thread was interrupted
+     * @throws TimeoutException if host timeout interval exceeded
+     */
+    public void activate() throws IOException, InterruptedException, TimeoutException {
+        ((LocalGridServer) getHubServer()).start();
+        for (GridServer server : getNodeServers().values()) {
+            ((LocalGridServer) server).start();
+        }
+    }
+    
+    /**
+     * Create an object that represents the local Selenium Grid instance.
+     * <p>
+     * <b>NOTE</b>: This method does <b>NOT</b> activate the represented local Grid instance.
      * <b>NOTE</b>: This method stores the hub host URL in the {@link SeleniumSettings#HUB_HOST HUB_HOST} property for
      * subsequent retrieval.
      * 
@@ -59,23 +79,19 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param hubConfigPath Selenium Grid hub configuration path
      * @return {@link SeleniumGrid} object for local Grid
      * @throws IOException if an I/O error occurs
-     * @throws InterruptedException if this thread was interrupted
-     * @throws TimeoutException if host timeout interval exceeded
      * @throws ServiceConfigurationError if unable to instantiate all configured driver plugins
+     * @see #activate()
      */
-    public static SeleniumGrid launch(SeleniumConfig config, final Path hubConfigPath)
-                    throws IOException, InterruptedException, TimeoutException {
+    public static SeleniumGrid create(SeleniumConfig config, final Path hubConfigPath) throws IOException {
         
         String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
         String[] dependencyContexts = config.getDependencyContexts();
-        long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
         Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(0));
         String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
         Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
         Path outputPath = GridUtility.getOutputPath(config, GridRole.HUB);
-        LocalGridServer hubServer = start(launcherClassName, dependencyContexts, GridRole.HUB,
+        LocalGridServer hubServer = create(launcherClassName, dependencyContexts, GridRole.HUB,
                         hubPort, hubConfigPath, workingPath, outputPath);
-        waitUntilReady(hubServer, hostTimeout);
         
         // store hub host and hub port in system properties for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
@@ -84,10 +100,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : getDriverPlugins(config)) {
             outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
-            LocalGridServer nodeServer = driverPlugin.start(config, launcherClassName, dependencyContexts, hubServer,
+            LocalGridServer nodeServer = driverPlugin.create(config, launcherClassName, dependencyContexts, hubServer,
                     workingPath, outputPath);
-            waitUntilReady(nodeServer, hostTimeout);
-            waitUntilRegistered(config, nodeServer, hostTimeout);
+            nodeServer.personalities.putAll(driverPlugin.getPersonalities());
             nodeServers.add(nodeServer);
         }
         
@@ -150,11 +165,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param server {@link LocalGridServer} object to wait for.
      * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
      * @throws InterruptedException if this thread was interrupted
-     * @throws IOException if an I/O error occurs
      * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
      */
     protected static void waitUntilReady(LocalGridServer server, long maxWait)
-                    throws IOException, InterruptedException, TimeoutException {
+                    throws InterruptedException, TimeoutException {
         long maxTime = System.currentTimeMillis() + maxWait;
         while (!server.isActive()) {
             if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
@@ -176,7 +190,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      */
     protected static void waitUntilRegistered(SeleniumConfig config, LocalGridServer nodeServer, long maxWait)
             throws IOException, InterruptedException, TimeoutException {
-        String nodeEndpoint = "http://" + nodeServer.getUrl().getAuthority();
+        String nodeEndpoint = nodeServer.getUrl().getProtocol() + "://" + nodeServer.getUrl().getAuthority();
         long maxTime = System.currentTimeMillis() + maxWait;
         while (!isNodeRegistered(config, nodeEndpoint)) {
             if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
@@ -201,7 +215,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
 
     /**
-     * Start a Selenium Grid server with the specified arguments in a separate process.
+     * Create an object that represents a Selenium Grid server with the specified arguments.
+     * <p>
+     * <b>NOTE</b>: The created object defines a separate process for managing the local server, but does <b>NOT</b>
+     * start this process.
      * 
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
@@ -213,10 +230,12 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param propertyNames optional array of property names to propagate to server process
      * @return {@link LocalGridServer} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
+     * @see #activate()
+     * @see LocalGridServer#start()
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help</a>
      */
-    public static LocalGridServer start(final String launcherClassName, final String[] dependencyContexts,
+    public static LocalGridServer create(final String launcherClassName, final String[] dependencyContexts,
             final GridRole role, final Integer port, final Path configPath, final Path workingPath,
             final Path outputPath, final String... propertyNames) {
         
@@ -281,6 +300,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     public static class LocalGridServer extends GridServer {
 
         private CommandLine process;
+        private Map<String, String> personalities = new HashMap<>();
         
         /**
          * Constructor for local Grid server object.
@@ -308,7 +328,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
             
             this.process = process;
-            this.process.executeAsync();
         }
         
         /**
@@ -321,9 +340,42 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         }
         
         /**
+         * Get the driver 'personalities' for this local Grid server.
+         * 
+         * @return map: "personality" &rarr; desired capabilities (JSON)
+         */
+        public Map<String, String> getPersonalities() {
+            return personalities;
+        }
+        
+        /**
+         * Start the process associated with this local Grid server object.
+         * <p>
+         * This method ensures that this local Grid server (hub or node) is launched and active, and it also ensures
+         * that Grid node servers are registered with their configured hub. 
+         * 
+         * @throws IOException if an I/O error occurs
+         * @throws InterruptedException if this thread was interrupted
+         * @throws TimeoutException if host timeout interval exceeded
+         */
+        public void start() throws IOException, InterruptedException, TimeoutException {
+            if (!isActive()) {
+                SeleniumConfig config = SeleniumConfig.getConfig();
+                long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
+                
+                process.executeAsync();
+                waitUntilReady(this, hostTimeout);
+                
+                if (!isHub()) {
+                    waitUntilRegistered(config, this, hostTimeout);
+                }
+            }
+        }
+        
+        /**
          * Get {@code localhost} URL for Selenium Grid server at the specified port.
          * <p>
-         * <b>NOTE</b>: The assembled URL will include the Grid web service base path.
+         * <b>NOTE</b>: The assembled URL includes the Grid web service base path.
          * 
          * @param host IP address of local Grid server
          * @param port port of local Grid server

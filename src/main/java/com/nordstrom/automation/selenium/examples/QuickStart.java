@@ -20,7 +20,7 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * <b>INTRODUCTION</b>
  * <p>
  * <b>Selenium Foundation</b> is an automation framework designed to extend and enhance the capabilities provided
- * by <b>Selenium WebDriver</b>. Support is provided for both <b>Selenium 2</b> and <b>Selenium 3</b>.
+ * by <b>Selenium WebDriver</b>.
  * <p>
  * This <b>QuickStart</b> class provides a fully-functional example of a test class built around <b>Selenium
  * Foundation</b>, <b>TestNG Foundation</b>, and the <b>Settings API</b>. It demonstrates how to set up required 

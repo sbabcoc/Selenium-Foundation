@@ -29,7 +29,7 @@ public class PlatformInterceptor implements IMethodInterceptor {
    /**
      * Assemble a list of methods that support the current target platform
      *
-     * @param methods list of methods that are about the be run
+     * @param methods list of methods that are about to be run
      * @param context test context
      */
     @Override

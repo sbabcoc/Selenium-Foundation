@@ -1,10 +1,13 @@
 package com.nordstrom.automation.selenium.plugins;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import org.openqa.grid.common.GridRole;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.google.common.collect.ObjectArrays;
 import com.nordstrom.automation.selenium.DriverPlugin;
@@ -39,17 +42,25 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public LocalGridServer start(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+    public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException {
         
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, this);
         String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
         String[] propertyNames = getPropertyNames();
-        return LocalSeleniumGrid.start(launcherClassName, combinedContexts, GridRole.NODE,
+        return LocalSeleniumGrid.create(launcherClassName, combinedContexts, GridRole.NODE,
                 Integer.valueOf(0), nodeConfigPath, workingPath, outputPath, propertyNames);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends RemoteWebDriver> Constructor<T> getRemoteWebDriverCtor(Capabilities desiredCapabilities) {
+        return null;
+    }
+    
     /**
      * {@inheritDoc}
      */

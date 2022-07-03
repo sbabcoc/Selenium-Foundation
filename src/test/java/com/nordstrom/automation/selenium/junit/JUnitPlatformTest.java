@@ -5,18 +5,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
-import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.junit.AtomicTest;
 import com.nordstrom.automation.junit.LifecycleHooks;
-import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.exceptions.PlatformActivationFailedException;
 import com.nordstrom.automation.selenium.platform.Transition;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
-@InitialPage(ExamplePage.class)
 public class JUnitPlatformTest extends JUnitPlatformBase<Transition> {
 
     public JUnitPlatformTest() {
@@ -24,12 +21,14 @@ public class JUnitPlatformTest extends JUnitPlatformBase<Transition> {
     }
     
     @Test
+    @NoDriver
     public void testDefaultPlatform() {
         assertTrue(getTargetPlatform().matches(Transition.PHASE1_NAME));
         assertEquals("green", getTargetPlatform().getColor());
     }
     
     @Test
+    @NoDriver
     @TargetPlatform(Transition.PHASE2_NAME)
     public void testPlatformTwo() {
         assertTrue(getTargetPlatform().matches(Transition.PHASE2_NAME));
@@ -60,7 +59,7 @@ public class JUnitPlatformTest extends JUnitPlatformBase<Transition> {
         }
         
         // perform some platform-related activation
-        driver.manage().addCookie(new Cookie("color", platform.getColor()));
+        System.setProperty("platform.phase.color", platform.getColor());
     }
 
     @Override

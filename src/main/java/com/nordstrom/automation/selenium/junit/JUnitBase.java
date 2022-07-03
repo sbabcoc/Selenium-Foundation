@@ -6,6 +6,7 @@ import java.util.Map;
 import com.nordstrom.automation.junit.AtomIdentity;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -118,6 +119,15 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
         return null != method.getAnnotation(AfterClass.class);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <b>NOTE</b>: This method throws an {@link AssumptionViolatedException} with the specified message.
+     */
+    public void skipTest(final String message) throws Exception {
+        throw new AssumptionViolatedException(message);
+    }
+    
     /**
      * {@inheritDoc}
      */
