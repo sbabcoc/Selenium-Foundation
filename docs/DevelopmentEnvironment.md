@@ -21,7 +21,7 @@ The majority of the environment needed to build **Selenium Foundation** is compr
 
 ## Java Versions
 
-To build **Selenium Foundation**, you'll need a Java 8 software development kits:
+To build **Selenium Foundation**, you'll need a Java 8 software development kit:
 
 * Java 8: version 1.8.0_311
 
