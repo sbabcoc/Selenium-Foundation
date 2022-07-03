@@ -1,11 +1,12 @@
 .settings
-target*
+target/
+target-*/
 .classpath
 .project
 *~
 *.tmproj
 *.iml
-.idea
+.idea/
 *.md.html
 logs/
 logs-*/
