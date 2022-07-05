@@ -317,43 +317,23 @@ public class SeleniumGrid {
          * @throws InterruptedException if this thread was interrupted
          */
         public boolean shutdown(final boolean localOnly) throws InterruptedException {
-            return shutdown(this, shutdownRequest, localOnly);
-        }
-
-        /**
-         * Stop the specified Selenium Grid server.
-         * 
-         * @param gridServer {@link GridServer} object for hub or node
-         * @param shutdownRequest Selenium server shutdown request
-         * @param localOnly {@code true} to target only local Grid server
-         * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
-         * @throws InterruptedException if this thread was interrupted
-         */
-        public static boolean shutdown(final GridServer gridServer, final String shutdownRequest,
-                final boolean localOnly) throws InterruptedException {
-            
-            URL serverUrl = gridServer.getUrl();
-            
             if (localOnly && !GridUtility.isLocalHost(serverUrl)) {
                 return false;
             }
             
-            if (gridServer.isActive()) {
-                if ( ! gridServer.isHub() && (gridServer instanceof LocalGridServer)) {
-                    ((LocalGridServer) gridServer).getProcess().destroy();
-                } else {
-                    try {
-                        GridUtility.getHttpResponse(serverUrl, shutdownRequest);
-                        waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
-                    } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
-                        throw UncheckedThrow.throwUnchecked(e);
-                    }
+            if (isActive()) {
+                try {
+                    GridUtility.getHttpResponse(serverUrl, shutdownRequest);
+                    waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
+                    Thread.sleep(1000);
+                } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
+                    throw UncheckedThrow.throwUnchecked(e);
                 }
             }
             
-            Thread.sleep(1000);
             return true;
         }
+
     }
 
     /**

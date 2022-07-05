@@ -76,7 +76,7 @@ public final class PageSourceUtils {
                 return sourceBuilder.toString();
             } catch (WebDriverException e) {
                 if (logger != null) {
-                    logger.warn("The driver is capable of producing page source, but failed.", e);
+                    logger.warn("The driver is capable of producing page source, but failed: {}", e.getMessage());
                 }
             }
         }
