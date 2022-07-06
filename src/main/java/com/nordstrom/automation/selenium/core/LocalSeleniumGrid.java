@@ -373,6 +373,20 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         }
         
         /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean shutdown(final boolean localOnly) throws InterruptedException {
+            if (isHub()) {
+                return super.shutdown(localOnly);
+            } else if (isActive()) {
+                getProcess().destroy();
+            }
+            
+            return true;
+        }
+        
+        /**
          * Get {@code localhost} URL for Selenium Grid server at the specified port.
          * <p>
          * <b>NOTE</b>: The assembled URL includes the Grid web service base path.

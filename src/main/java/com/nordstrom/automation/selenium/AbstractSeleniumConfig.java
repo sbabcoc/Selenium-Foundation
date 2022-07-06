@@ -359,7 +359,31 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>npm.binary.path</b><br>
          * default: {@code null}
          */
-        NPM_BINARY_PATH("npm.binary.path", null);
+        NPM_BINARY_PATH("npm.binary.path", null),
+        
+        /**
+         * This setting specifies the path to the {@code PM2} (Process Manager) utility.
+         * <p>
+         * <b>NOTE</b>: If this setting is unspecified, <b>Selenium Foundation</b> will search for {@code PM2} on the
+         * System path.
+         * <p>
+         * name: <b>pm2.binary.path</b><br>
+         * default: {@code null}
+         */
+        PM2_BINARY_PATH("pm2.binary.path", null),
+        
+        /**
+         * This setting specifies that the {@code Appium} server should be managed by the {@code PM2} utility.
+         * <p>
+         * <b>NOTE</b>: {@code Appium} requires an active execution context. To run {@code Appium} as a stand-alone
+         * <b>Selenium Grid</b> node, the server must to executed as a daemon process. Starting the server via the
+         * {@code PM2} utility provides the required persistent execution context.
+         * 
+         * <p>
+         * name: <b>appium.with.pm2</b><br>
+         * default: {@code false}
+         */
+        APPIUM_WITH_PM2("appium.with.pm2", "false");
         
         private String propertyName;
         private String defaultValue;

@@ -81,15 +81,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
         
-        String capabilities = getCapabilities(config);
-        Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
-        
         List<String> argsList = new ArrayList<>();
-
-        argsList.add(findMainScript().getAbsolutePath());
-        
         String hostUrl = GridUtility.getLocalHost();
         Integer portNum = Integer.valueOf(PortProber.findFreePort());
+        Path nodeConfigPath = config.createNodeConfig(getCapabilities(config), hubServer.getUrl());
         
         // specify server host
         argsList.add("--address");
@@ -156,9 +151,37 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add("--nodeconfig");
         argsList.add(nodeConfigPath.toString());
         
-        String executable = findNodeBinary().getAbsolutePath();
-        CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        return new LocalGridServer(hostUrl, portNum, GridRole.NODE, process, workingPath, outputPath);
+        CommandLine process;
+        String appiumBinaryPath = findMainScript().getAbsolutePath();
+        
+        // if using 'pm2' for stand-alone execution of 'appium'
+        if (config.getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key())) {
+            File pm2Binary = findPM2Binary().getAbsoluteFile();
+
+            argsList.add(0, "--");
+            argsList.add(0, "appium-" + portNum);
+            argsList.add(0, "--name");
+            argsList.add(0, appiumBinaryPath);
+            argsList.add(0, "start");
+            
+            String executable;
+            if (SystemUtils.IS_OS_WINDOWS) {
+                executable = "cmd.exe";
+                argsList.add(0, pm2Binary.getName());
+                argsList.add(0, "/c");
+            } else {
+                executable = pm2Binary.getName();
+            }
+            
+            process = new CommandLine(executable, argsList.toArray(new String[0]));
+            process.setWorkingDirectory(pm2Binary.getParentFile().getAbsolutePath());
+        // otherwise
+        } else { // (using 'node' for child-process execution of 'appium')
+            argsList.add(0, appiumBinaryPath);
+            process = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
+        }
+        
+        return new AppiumGridServer(hostUrl, portNum, GridRole.NODE, process, workingPath, outputPath);
     }
 
     /**
@@ -202,7 +225,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * @return path to the 'npm' binary as a {@link File} object
      * @throws GridServerLaunchFailedException if 'npm' isn't found
      */
-    private static File findNPM() throws GridServerLaunchFailedException {
+    private static File findNPMBinary() throws GridServerLaunchFailedException {
         return findBinary("npm", SeleniumSettings.NPM_BINARY_PATH, "'npm' package manager");
     }
     
@@ -214,6 +237,16 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      */
     private static File findNodeBinary() throws GridServerLaunchFailedException {
         return findBinary("node", SeleniumSettings.NODE_BINARY_PATH, "'node' JavaScript runtime");
+    }
+    
+    /**
+     * Find the 'pm2' binary.
+     * 
+     * @return path to the 'pm2' binary as a {@link File} object
+     * @throws GridServerLaunchFailedException if 'node' isn't found
+     */
+    private static File findPM2Binary() throws GridServerLaunchFailedException {
+        return findBinary("pm2", SeleniumSettings.PM2_BINARY_PATH, "'pm2' process manager");
     }
     
     /**
@@ -233,7 +266,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         // check for 'appium' main script in global 'node' modules repository
         
         String nodeModulesRoot;
-        File npm = findNPM().getAbsoluteFile();
+        File npm = findNPMBinary().getAbsoluteFile();
         
         String executable;
         List<String> argsList = new ArrayList<>();
@@ -296,4 +329,47 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         return new FileNotFoundException(String.format(template, what, setting.name(), setting.key()));
     }
 
+    public static class AppiumGridServer extends LocalGridServer {
+
+        public AppiumGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
+            super(host, port, role, process, workingPath, outputPath);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean shutdown(final boolean localOnly) throws InterruptedException {
+            if (isActive()) {
+                // if using 'pm2' for stand-alone execution of 'appium'
+                if (SeleniumConfig.getConfig().getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key())) {
+                    String executable;
+                    CommandLine process;
+                    List<String> argsList = new ArrayList<>();
+                    File pm2Binary = findPM2Binary().getAbsoluteFile();
+
+                    argsList.add("delete");
+                    argsList.add("appium-" + getUrl().getPort());
+                    
+                    if (SystemUtils.IS_OS_WINDOWS) {
+                        executable = "cmd.exe";
+                        argsList.add(0, pm2Binary.getName());
+                        argsList.add(0, "/c");
+                    } else {
+                        executable = pm2Binary.getName();
+                    }
+                    
+                    process = new CommandLine(executable, argsList.toArray(new String[0]));
+                    process.setWorkingDirectory(pm2Binary.getParentFile().getAbsolutePath());
+                    process.execute();
+                }
+                
+                getProcess().destroy();
+            }
+            
+            return true;
+        }
+        
+    }
+    
 }
