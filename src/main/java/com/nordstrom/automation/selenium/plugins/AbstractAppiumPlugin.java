@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +44,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     private static final Class<?>[] ARG_TYPES = {URL.class, Capabilities.class};
     
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
+    private static final String APPIUM_WITH_PM2 = "{\"nord:options\":{\"appiumWithPM2\":true}}";
     
     private String browserName;
     
@@ -84,7 +86,21 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         List<String> argsList = new ArrayList<>();
         String hostUrl = GridUtility.getLocalHost();
         Integer portNum = Integer.valueOf(PortProber.findFreePort());
-        Path nodeConfigPath = config.createNodeConfig(getCapabilities(config), hubServer.getUrl());
+        
+        // get node capabilities for this plug-in
+        String nodeCapabilities = getCapabilities(config);
+        // determine if using 'pm2' for stand-alone execution of 'appium'
+        boolean appiumWithPM2 = config.getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key()); 
+        
+        // if running with 'pm2'
+        if (appiumWithPM2) {
+            // add indication of stand-alone execution of 'appium' with 'pm2'
+            Capabilities capabilities = config.getCapabilitiesForJson(nodeCapabilities)[0];
+            Capabilities nordOptions = config.getCapabilitiesForJson(APPIUM_WITH_PM2)[0];
+            nodeCapabilities = config.toJson(config.mergeCapabilities(capabilities, nordOptions));
+        }
+        
+        Path nodeConfigPath = config.createNodeConfig(nodeCapabilities, hubServer.getUrl());
         
         // specify server host
         argsList.add("--address");
@@ -154,8 +170,8 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         CommandLine process;
         String appiumBinaryPath = findMainScript().getAbsolutePath();
         
-        // if using 'pm2' for stand-alone execution of 'appium'
-        if (config.getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key())) {
+        // if running with 'pm2'
+        if (appiumWithPM2) {
             File pm2Binary = findPM2Binary().getAbsoluteFile();
 
             argsList.add(0, "--");
@@ -176,7 +192,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             process = new CommandLine(executable, argsList.toArray(new String[0]));
             process.setWorkingDirectory(pm2Binary.getParentFile().getAbsolutePath());
         // otherwise
-        } else { // (using 'node' for child-process execution of 'appium')
+        } else { // (running with 'node')
             argsList.add(0, appiumBinaryPath);
             process = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
         }
@@ -341,33 +357,70 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         @Override
         public boolean shutdown(final boolean localOnly) throws InterruptedException {
             if (isActive()) {
-                // if using 'pm2' for stand-alone execution of 'appium'
-                if (SeleniumConfig.getConfig().getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key())) {
-                    String executable;
-                    CommandLine process;
-                    List<String> argsList = new ArrayList<>();
-                    File pm2Binary = findPM2Binary().getAbsoluteFile();
-
-                    argsList.add("delete");
-                    argsList.add("appium-" + getUrl().getPort());
-                    
-                    if (SystemUtils.IS_OS_WINDOWS) {
-                        executable = "cmd.exe";
-                        argsList.add(0, pm2Binary.getName());
-                        argsList.add(0, "/c");
-                    } else {
-                        executable = pm2Binary.getName();
-                    }
-                    
-                    process = new CommandLine(executable, argsList.toArray(new String[0]));
-                    process.setWorkingDirectory(pm2Binary.getParentFile().getAbsolutePath());
-                    process.execute();
+                if ( ! shutdownAppiumWithPM2(getUrl())) {
+                    getProcess().destroy();
                 }
-                
-                getProcess().destroy();
+            }
+            return true;
+        }
+
+        /**
+         * If the specified URL is a local 'appium' node running with 'pm2', delete the process.
+         * 
+         * @param nodeUrl {@link URL} object for target node server
+         * @return {@code true} node was shut down'; otherwise {@code false}
+         */
+        public static boolean shutdownAppiumWithPM2(URL nodeUrl) {
+            if ( ! GridUtility.isLocalHost(nodeUrl)) return false;
+            if ( ! isAppiumWithPM2(nodeUrl)) return false;
+            
+            String executable;
+            CommandLine process;
+            List<String> argsList = new ArrayList<>();
+            File pm2Binary = findPM2Binary().getAbsoluteFile();
+
+            argsList.add("delete");
+            argsList.add("appium-" + nodeUrl.getPort());
+            
+            if (SystemUtils.IS_OS_WINDOWS) {
+                executable = "cmd.exe";
+                argsList.add(0, pm2Binary.getName());
+                argsList.add(0, "/c");
+            } else {
+                executable = pm2Binary.getName();
             }
             
+            process = new CommandLine(executable, argsList.toArray(new String[0]));
+            process.setWorkingDirectory(pm2Binary.getParentFile().getAbsolutePath());
+            process.execute();
             return true;
+        }
+
+        /**
+         * Determine if using 'pm2' for stand-alone execution of 'appium'.
+         * 
+         * @param nodeUrl {@link URL} object for target node server
+         * @return {@code true} if using 'pm2'; otherwise {@code false}
+         */
+        public static boolean isAppiumWithPM2(URL nodeUrl) {
+            SeleniumConfig config = SeleniumConfig.getConfig();
+            // check settings to determine if 'pm2' used for stand-alone execution of 'appium'
+            boolean appiumWithPM2 = config.getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key());
+            // if undetermined
+            if (!appiumWithPM2) {
+                try {
+                    // get capabilities of 'appium' node
+                    Capabilities nodeCapabilities = GridUtility.getNodeCapabilities(
+                            config, config.getHubUrl(), nodeUrl.toExternalForm());
+                    // extract driver capabilities from node capabilities
+                    Capabilities capabilities = GridUtility.getNodeDriverCaps(config, nodeCapabilities)[0];
+                    // get map of custom options from capabilities
+                    Map<String, Object> options = GridUtility.getNordOptions(capabilities);
+                    // determine is running 'appium' with 'pm2'
+                    appiumWithPM2 = options.containsKey("appiumWithPM2");
+                } catch (IndexOutOfBoundsException | IOException e) { }
+            }
+            return appiumWithPM2;
         }
         
     }

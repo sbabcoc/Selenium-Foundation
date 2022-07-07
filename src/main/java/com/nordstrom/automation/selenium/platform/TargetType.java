@@ -1,9 +1,12 @@
 package com.nordstrom.automation.selenium.platform;
 
+import java.util.Map;
+
 import org.openqa.selenium.Capabilities;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.plugins.EspressoPlugin;
 import com.nordstrom.automation.selenium.plugins.Mac2Plugin;
@@ -46,16 +49,20 @@ public enum TargetType implements TargetTypeName {
             // get active Selenium Grid object
             SeleniumGrid grid = config.getSeleniumGrid();
             try {
+                // get map of custom options from capabilities
+                Map<String, Object> options = GridUtility.getNordOptions(caps);
                 // get fully-populated [Capabilities] object for the specified driver 'personality'
-                Capabilities personality = grid.getPersonality(config, (String) caps.getCapability("personality"));
+                Capabilities personality = grid.getPersonality(config, (String) options.get("personality"));
+                // get map of custom options from personality
+                options = GridUtility.getNordOptions(personality);
                 // extract plug-in class specification from 'personality' object
-                Class<?> pluginClass = Class.forName((String) personality.getCapability("pluginClass"));
+                Class<?> pluginClass = Class.forName((String) options.get("pluginClass"));
                 // iterate over target plug-in classes
                 for (Class<?> thisClass : this.classes) {
                     // if 'personality' is supported by target, run this test
                     if (thisClass.isAssignableFrom(pluginClass)) return true;
                 }
-            } catch (IllegalArgumentException | ClassNotFoundException e) {
+            } catch (NullPointerException | IllegalArgumentException | ClassNotFoundException e) {
                 // nothing to do here
             }
         }

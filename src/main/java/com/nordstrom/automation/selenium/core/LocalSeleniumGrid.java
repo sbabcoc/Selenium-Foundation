@@ -210,7 +210,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @throws IOException if an I/O error occurs
      */
     private static boolean isNodeRegistered(SeleniumConfig config, String nodeEndpoint) throws IOException {
-        Capabilities capabilities = GridUtility.getNodeCapabilities(config, config.getHubUrl(), nodeEndpoint)[0];
+        Capabilities capabilities = GridUtility.getNodeCapabilities(config, config.getHubUrl(), nodeEndpoint);
         return capabilities.is("success");
     }
 

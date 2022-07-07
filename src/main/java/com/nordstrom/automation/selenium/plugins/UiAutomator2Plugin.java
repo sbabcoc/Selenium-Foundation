@@ -15,18 +15,13 @@ public class UiAutomator2Plugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"UiAutomator2\"," + 
-             "\"platformName\":\"Android\"," +
-             "\"browserName\":\"Chrome\"," +
-             "\"maxInstances\":1," + 
-             "\"deviceName\":\"Android Emulator\"}";
+            "{\"appium:automationName\":\"UiAutomator2\",\"platformName\":\"Android\"," +
+             "\"browserName\":\"Chrome\",\"maxInstances\":1,\"deviceName\":\"Android Emulator\"}";
     
     private static final String BASELINE =
-            "{\"appium:automationName\":\"UiAutomator2\"," + 
-             "\"platformName\":\"Android\"," +
-             "\"personality\":\"UiAutomator2\"," +
-             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin\"" +
-            "}";
+            "{\"appium:automationName\":\"UiAutomator2\",\"platformName\":\"Android\"," +
+             "\"nord:options\":{\"personality\":\"UiAutomator2\"," +
+                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

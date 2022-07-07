@@ -14,39 +14,27 @@ public class HtmlUnitCaps {
     private static final String[] PROPERTY_NAMES = {  };
     
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"htmlunit\"," +
-                     "\"browserVersion\":\"chrome\"," +
-                     "\"maxInstances\":5," +
-                     "\"seleniumProtocol\":\"WebDriver\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}";
+            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE = 
-                     "{\"browserName\":\"htmlunit\"," +
-                      "\"browserVersion\":\"chrome\"," +
-                      "\"personality\":\"htmlunit\"," +
-                      "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
-                     "}";
+             "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\"," +
+              "\"nord:options\":{\"personality\":\"htmlunit\"," +
+                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
     private static final String CHROME = 
-                    "{\"browserName\":\"htmlunit\"," +
-                     "\"browserVersion\":\"chrome\"," +
-                     "\"personality\":\"htmlunit.chrome\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
-                    "}";
+            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\"," +
+             "\"nord:options\":{\"personality\":\"htmlunit.chrome\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
     private static final String FIREFOX = 
-                    "{\"browserName\":\"htmlunit\"," +
-                     "\"browserVersion\":\"firefox\"," +
-                     "\"personality\":\"htmlunit.firefox\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
-                    "}";
+            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"firefox\"," +
+             "\"nord:options\":{\"personality\":\"htmlunit.firefox\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
     private static final String INT_EXP = 
-                    "{\"browserName\":\"htmlunit\"," +
-                     "\"browserVersion\":\"ie\"," +
-                     "\"personality\":\"htmlunit.ie\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"" +
-                    "}";
+            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"ie\"," +
+             "\"nord:options\":{\"personality\":\"htmlunit.ie\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

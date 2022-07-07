@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
+import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
 import com.nordstrom.automation.selenium.plugins.PluginUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -145,19 +146,11 @@ public class SeleniumGrid {
      * @param nodeEndpoint node endpoint
      * @throws IOException if an I/O error occurs
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private void addNodePersonalities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
         LOGGER.debug("{}: Adding personalities of node: {}", hubUrl, nodeEndpoint);
-        for (Capabilities capabilities : GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint)) {
-            Map<String, Object> req = (Map<String, Object>) capabilities.getCapability("request");
-            List<Map> capsList = (List<Map>) req.get("capabilities");
-            if (capsList == null) {
-                Map<String, Object> conf = (Map<String, Object>) req.get("configuration");
-                capsList = (List<Map>) conf.get("capabilities");
-            }
-            for (Map<String, Object> capsItem : capsList) {
-                personalities.putAll(PluginUtils.getPersonalitiesForBrowser(GridUtility.getPersonality(capsItem)));
-            }
+        Capabilities nodeCapabilities = GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint);
+        for (Capabilities capabilities : GridUtility.getNodeDriverCaps(config, nodeCapabilities)) {
+            personalities.putAll(PluginUtils.getPersonalitiesForBrowser(GridUtility.getPersonality(capabilities)));
         }
     }
     
@@ -239,6 +232,7 @@ public class SeleniumGrid {
      * @throws IllegalArgumentException if specified personality isn't supported by the active Grid
      */
     public Capabilities getPersonality(SeleniumConfig config, String personality) {
+        if (personality == null) throw new IllegalArgumentException("[personality] must be non-null");
         String json = personalities.get(personality);
         if ((json == null) || json.isEmpty()) {
             String message = String.format("Specified personality '%s' not supported by active Grid", personality);
@@ -317,11 +311,17 @@ public class SeleniumGrid {
          * @throws InterruptedException if this thread was interrupted
          */
         public boolean shutdown(final boolean localOnly) throws InterruptedException {
-            if (localOnly && !GridUtility.isLocalHost(serverUrl)) {
+            boolean isLocal = GridUtility.isLocalHost(serverUrl);
+            if (localOnly && !isLocal) {
                 return false;
             }
             
             if (isActive()) {
+                if (isLocal && !isHub()) {
+                    if (AppiumGridServer.shutdownAppiumWithPM2(serverUrl)) {
+                        return true;
+                    }
+                }
                 try {
                     GridUtility.getHttpResponse(serverUrl, shutdownRequest);
                     waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);

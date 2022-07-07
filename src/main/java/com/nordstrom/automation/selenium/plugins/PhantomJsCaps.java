@@ -15,20 +15,17 @@ public class PhantomJsCaps {
         { "phantomjs.binary.path", "phantomjs.ghostdriver.path", "phantomjs.logfile.path" };
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"phantomjs\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"phantomjs\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE =
             "{\"browserName\":\"phantomjs\"," +
-             "\"personality\":\"phantomjs\"," +
-             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.PhantomJsPlugin\"" +
-            "}";
+             "\"nord:options\":{\"personality\":\"phantomjs\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.PhantomJsPlugin\"}}";
     
     private static final String LOGGING = 
-            "{\"browserName\":\"phantomjs\"," +
-             "\"loggingPrefs\":{\"browser\":\"WARNING\"}," +
-             "\"personality\":\"phantomjs.logging\"," +
-             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.PhantomJsPlugin\"" +
-            "}";
+            "{\"browserName\":\"phantomjs\",\"loggingPrefs\":{\"browser\":\"WARNING\"}," +
+             "\"nord:options\":{\"personality\":\"phantomjs.logging\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.PhantomJsPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

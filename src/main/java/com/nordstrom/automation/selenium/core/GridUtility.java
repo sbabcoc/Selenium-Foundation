@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +36,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -156,15 +156,9 @@ public final class GridUtility {
         // get constructor for RemoteWebDriver class corresponding to desired capabilities
         Constructor<RemoteWebDriver> ctor = getRemoteWebDriverCtor(desiredCapabilities);
         
-        // create mutable copy of desired capabilities
-        MutableCapabilities filteredCapabilities = new MutableCapabilities(desiredCapabilities);
-        // remove 'personality' and plug-in class from capabilities
-        filteredCapabilities.setCapability("personality", (Object) null);
-        filteredCapabilities.setCapability("pluginClass", (Object) null);
-        
         try {
             // instantiate desired driver via configured grid
-            return ctor.newInstance(remoteAddress, filteredCapabilities);
+            return ctor.newInstance(remoteAddress, desiredCapabilities);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw UncheckedThrow.throwUnchecked(e);
         }
@@ -215,16 +209,44 @@ public final class GridUtility {
      * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of Grid hub
      * @param nodeEndpoint node endpoint
-     * @return list of {@link Capabilities} objects for the specified node
+     * @return {@link Capabilities} object for the specified node
      * @throws IOException if an I/O error occurs
      */
-    public static Capabilities[] getNodeCapabilities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
+    public static Capabilities getNodeCapabilities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
         String json;
         String url = hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + GridServer.NODE_CONFIG + "?id=" + nodeEndpoint;
         try (InputStream is = new URL(url).openStream()) {
             json = readAvailable(is);
         }
-        return config.getCapabilitiesForJson(json);
+        return config.getCapabilitiesForJson(json)[0];
+    }
+    
+    /**
+     * Extract driver capabilities from the specified node capabilities object.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param nodeCapabilities Grid node capabilities
+     * @return list of {@link Capabilities} objects for the drivers supported by the node.
+     */
+    @SuppressWarnings("unchecked")
+    public static Capabilities[] getNodeDriverCaps(SeleniumConfig config, Capabilities nodeCapabilities) {
+        try {
+            if (nodeCapabilities.is("success")) {
+                // extract request from node capabilities
+                Map<String, Object> request = (Map<String, Object>) nodeCapabilities.getCapability("request");
+                // extract configuration from request
+                Map<String, Object> configuration = (Map<String, Object>) request.get("configuration");
+                // extract capabilities list from configuration, converted to JSON
+                String capabilities = config.toJson(configuration.get("capabilities"));
+                // NOTE: array delimiters must be stripped
+                int beginIndex = capabilities.indexOf('[') + 1;
+                int endIndex = capabilities.lastIndexOf(']');
+                // return array of driver capabilities objects
+                return config.getCapabilitiesForJson(capabilities.substring(beginIndex, endIndex));
+            }
+        } catch (NullPointerException | ClassCastException e) { }
+        
+        return new Capabilities[0];
     }
     
     /**
@@ -241,11 +263,30 @@ public final class GridUtility {
      * @param capabilities map of capabilities
      * @return 'personality' value; {@code null} if no 'personality' value is found
      */
-    public static String getPersonality(Map<String, Object> capabilities) {
-        if (capabilities.containsKey("personality")) return (String) capabilities.get("personality");
-        if (capabilities.containsKey("appium:automationName")) return (String) capabilities.get("appium:automationName");
-        if (capabilities.containsKey("automationName")) return (String) capabilities.get("automationName");
-        return (String) capabilities.get("browserName");
+    public static String getPersonality(Capabilities capabilities) {
+        Map<String, Object> options = getNordOptions(capabilities);
+        if (options.containsKey("personality")) return (String) options.get("personality");
+        String personality = (String) capabilities.getCapability("appium:automationName");
+        if (personality != null) return personality;
+        personality = (String) capabilities.getCapability("automationName");
+        if (personality != null) return personality;
+        return (String) capabilities.getCapability("browserName");
+    }
+    
+    /**
+     * Get map of <b>Selenium Foundation</b> custom options.
+     * 
+     * @param capabilities Selenium {@link Capabilities} object
+     * @return mutable map of custom options (may be empty)
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> getNordOptions(Capabilities capabilities) {
+        Object nordOptions = capabilities.getCapability("nord:options");
+        if (nordOptions != null) {
+            return new HashMap<>((Map<String, Object>) nordOptions);
+        } else {
+            return new HashMap<>();
+        }
     }
 
     /**

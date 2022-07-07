@@ -22,13 +22,12 @@ public class InternetExplorerCaps {
         { DRIVER_PATH, LOGFILE_PATH, LOG_LEVEL, DRIVER_HOST, EXTRACT_PATH, SILENT_MODE };
     
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"internet explorer\",\"maxInstances\":1,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"internet explorer\",\"maxInstances\":1,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE =
-                    "{\"browserName\":\"internet explorer\"," +
-                     "\"personality\":\"internet explorer\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.InternetExplorerPlugin\"" +
-                    "}";
+            "{\"browserName\":\"internet explorer\"," +
+             "\"nord:options\":{\"personality\":\"internet explorer\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.InternetExplorerPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

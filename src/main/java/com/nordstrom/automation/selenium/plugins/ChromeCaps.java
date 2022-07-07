@@ -28,22 +28,18 @@ public class ChromeCaps {
             "{\"browserName\":\"chrome\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
 
     private static final String BASELINE =
-                    "{\"browserName\":\"chrome\"," +
-                     "\"goog:chromeOptions\":{" +
-                         "\"args\":[\"--disable-infobars\"]," +
-                         "\"prefs\":{\"credentials_enable_service\":false}}," +
-                     "\"personality\":\"chrome\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"" +
-                    "}";
+            "{\"browserName\":\"chrome\"," +
+             "\"goog:chromeOptions\":{\"args\":[\"--disable-infobars\"]," +
+                                     "\"prefs\":{\"credentials_enable_service\":false}}," +
+             "\"nord:options\":{\"personality\":\"chrome\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"}}";
     
     private static final String HEADLESS =
-                    "{\"browserName\":\"chrome\"," +
-                     "\"goog:chromeOptions\":{" +
-                         "\"args\":[\"--disable-infobars\",\"--headless\",\"--disable-gpu\"]," +
-                         "\"prefs\":{\"credentials_enable_service\":false}}," +
-                     "\"personality\":\"chrome.headless\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"" +
-                    "}";
+            "{\"browserName\":\"chrome\"," +
+             "\"goog:chromeOptions\":{\"args\":[\"--disable-infobars\",\"--headless\",\"--disable-gpu\"]," +
+                                     "\"prefs\":{\"credentials_enable_service\":false}}," +
+             "\"nord:options\":{\"personality\":\"chrome.headless\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     
