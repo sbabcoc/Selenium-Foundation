@@ -21,13 +21,12 @@ public class SafariCaps {
     private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH, "webdriver.safari.noinstall" };
 
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"safari\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"safari\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE = 
-                    "{\"browserName\":\"safari\"," +
-                     "\"personality\":\"safari\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.SafariPlugin\"" +
-                    "}";
+            "{\"browserName\":\"safari\"," +
+             "\"nord:options\":{\"personality\":\"safari\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.SafariPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

@@ -15,18 +15,13 @@ public class XCUITestPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"XCUITest\"," +
-             "\"platformName\":\"iOS\"," +
-             "\"browserName\":\"Safari\"," +
-             "\"maxInstances\":1," +
-             "\"deviceName\":\"iPhone Simulator\"}";
+            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\",\"browserName\":\"Safari\"," +
+             "\"maxInstances\":1,\"deviceName\":\"iPhone Simulator\"}";
     
     private static final String BASELINE =
-            "{\"appium:automationName\":\"XCUITest\"," + 
-             "\"platformName\":\"iOS\"," +
-             "\"personality\":\"XCUITest\"," +
-             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.XCUITestPlugin\"" +
-            "}";
+            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\"," +
+             "\"nord:options\":{\"personality\":\"XCUITest\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.XCUITestPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

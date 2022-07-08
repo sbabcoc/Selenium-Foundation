@@ -15,16 +15,12 @@ public class Mac2Plugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"Mac2\"," +
-             "\"platformName\":\"Mac\"," +
-             "\"maxInstances\":5}";
+            "{\"appium:automationName\":\"Mac2\",\"platformName\":\"Mac\",\"maxInstances\":5}";
     
     private static final String BASELINE =
-            "{\"appium:automationName\":\"Mac2\"," + 
-             "\"platformName\":\"Mac\"," +
-             "\"personality\":\"Mac2\"," +
-             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.Mac2Plugin\"" +
-            "}";
+            "{\"appium:automationName\":\"Mac2\",\"platformName\":\"Mac\"," +
+             "\"nord:options\":{\"personality\":\"Mac2\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.Mac2Plugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

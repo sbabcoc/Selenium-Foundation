@@ -24,13 +24,13 @@ public class OperaCaps {
     private static final String[] PROPERTY_NAMES = 
         { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE };
     
-    private static final String CAPABILITIES = "{\"browserName\":\"opera\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+    private static final String CAPABILITIES = 
+            "{\"browserName\":\"opera\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE = 
             "{\"browserName\":\"opera\"," +
-             "\"personality\":\"opera\"," +
-             "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.OperaPlugin\"" +
-            "}";
+             "\"nord:options\":{\"personality\":\"opera\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.OperaPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

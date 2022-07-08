@@ -769,14 +769,14 @@ public abstract class AbstractSeleniumConfig extends
      * @return configured modifier; {@code null} if none configured
      */
     protected Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
-        String personality = GridUtility.getPersonality(capabilities.asMap());
+        String personality = GridUtility.getPersonality(capabilities);
         if (personality == null) return null;
         
         String propertyName = personality + propertySuffix;
         String modsJson = resolveString(propertyName);
         
         // minimum modifications to ensure inclusion of 'personality'
-        Capabilities minimum = getCapabilitiesForJson("{\"personality\":\"" + personality + "\"}")[0];
+        Capabilities minimum = getCapabilitiesForJson("{\"nord:options\":{\"personality\":\"" + personality + "\"}}")[0];
         // return mods as [Capabilities] object, ensuring 'personality' even if no mods configured
         return (modsJson != null) ? mergeCapabilities(minimum, getCapabilitiesForJson(modsJson)[0]) : minimum;
     }

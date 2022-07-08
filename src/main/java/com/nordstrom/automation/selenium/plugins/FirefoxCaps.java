@@ -20,25 +20,22 @@ public class FirefoxCaps {
     public static final String LOGFILE_PATH = "webdriver.firefox.logfile";
     public static final String PROFILE_PATH = "webdriver.firefox.profile";
     public static final String OPTIONS_KEY = "moz:firefoxOptions";
-    private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, PROFILE_PATH };
+    private static final String[] PROPERTY_NAMES =
+        { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, PROFILE_PATH };
     
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"firefox\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"firefox\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE =
-                    "{\"browserName\":\"firefox\"," +
-                     "\"marionette\":true," +
-                     "\"personality\":\"firefox\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"" +
-                    "}";
+            "{\"browserName\":\"firefox\",\"marionette\":true," +
+             "\"nord:options\":{\"personality\":\"firefox\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"}}";
     
     private static final String HEADLESS =
-                    "{\"browserName\":\"firefox\"," +
-                     "\"marionette\":true," +
-                     "\"moz:firefoxOptions\":{\"args\":[\"-headless\"]}," +
-                     "\"personality\":\"firefox.headless\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"" +
-                    "}";
+            "{\"browserName\":\"firefox\",\"marionette\":true," +
+             "\"moz:firefoxOptions\":{\"args\":[\"-headless\"]}," +
+             "\"nord:options\":{\"personality\":\"firefox.headless\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     

@@ -27,22 +27,18 @@ public class EdgeCaps {
         { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE, WHITELISTED };
     
     private static final String CAPABILITIES =
-                    "{\"browserName\":\"MicrosoftEdge\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"MicrosoftEdge\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE = 
-                    "{\"browserName\":\"MicrosoftEdge\"," +
-                     "\"ms:edgeChromium\":true" +
-                     "\"personality\":\"MicrosoftEdge\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EdgePlugin\"" +
-                    "}";
+            "{\"browserName\":\"MicrosoftEdge\",\"ms:edgeChromium\":true" +
+             "\"nord:options\":{\"personality\":\"MicrosoftEdge\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EdgePlugin\"}}";
     
     private static final String HEADLESS =
-                    "{\"browserName\":\"MicrosoftEdge\"," +
-                     "\"ms:edgeChromium\":true," +
-                     "\"ms:edgeOptions\":{\"args\":[\"--headless\",\"--disable-gpu\"]}," +
-                     "\"personality\":\"MicrosoftEdge.headless\"," +
-                     "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EdgePlugin\"" +
-                    "}";
+            "{\"browserName\":\"MicrosoftEdge\",\"ms:edgeChromium\":true," +
+             "\"ms:edgeOptions\":{\"args\":[\"--headless\",\"--disable-gpu\"]}," +
+             "\"nord:options\":{\"personality\":\"MicrosoftEdge.headless\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EdgePlugin\"}}";
 
     private static final Map<String, String> PERSONALITIES;
     
