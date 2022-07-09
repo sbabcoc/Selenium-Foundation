@@ -1,3 +1,4 @@
+
 [![Maven Central](https://img.shields.io/maven-central/v/com.nordstrom.ui-tools/selenium-foundation.svg)](https://search.maven.org/search?q=g:com.nordstrom.ui-tools%20AND%20a:selenium-foundation&core=gav)
 
 # INTRODUCTION
@@ -111,6 +112,21 @@ The [QuickStart](src/test/java/com/nordstrom/automation/selenium/QuickStart.java
 ### Support for Appium Automation Engines
 
 In addition to support for all of the standard Java-based browser drivers, the `Local Grid` feature of **Selenium Foundation** provides the ability to drive mobile and desktop applications via **Appium**. Driver plug-ins are available for all of the major [automation engines](docs/ConfiguringProjectSettings.md#appium-automation-engine-support), with the ability to customize out-of-the-box settings with [configurable modifications](docs/CustomizingCapabilities.md#specifying-modifiers-for-browser-capabilities-and-node-configurations) and [command line options](docs/LocalGridConfiguration.md#appium-server-arguments). 
+
+### Requirements for Appium
+
+Unlike the other drivers supported by **Selenium Foundation** which are implemented in Java, the "engines" provided by [Appium](https://appium.io) are implemented in NodeJS. To launch a **Selenium Grid** collection that includes Appium nodes, you'll need the following additional tools:
+* Platform-specific Node Version Manager: The installation page for `npm` (below) provides links to recommended version managers.
+* [NodeJS (node)](https://nodejs.org): Currently, I'm running version 17.5.0
+* [Node Package Manager (npm)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm): Currently, I'm running version 8.13.2
+* [Node Process Manager (pm2)](https://pm2.io/): Currently, I'm running version 5.2.0
+* [Appium](https://appium.io): Currently, I'm running version 1.22.3
+
+Typically, these tools must be on the system file path. However, you can provide specific paths for each of these via **Selenium Foundation** settings:
+* **NPM_BINARY_PATH**: If unspecified, the `PATH` is searched
+* **NODE_BINARY_PATH**: If unspecified, the `NODE_BINARY_PATH` environment variable is checked; if this is undefined, the `PATH` is searched
+* **PM2_BINARY_PATH**: If unspecified, the `PATH` is searched
+* **APPIUM_BINARY_PATH**: If unspecified, the `APPIUM_BINARY_PATH` environment variable is checked; if this is undefined, the `PATH` is searched
 
 ### Automatic Driver Targeting
 
