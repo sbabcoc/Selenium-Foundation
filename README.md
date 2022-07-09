@@ -16,6 +16,7 @@
   * [Required Configuration](#required-configuration)
 * [Highlights](#highlights)
   * [Support for Appium Automation Engines](#support-for-appium-automation-engines)
+  * [Requirements for Appium](#requirements-for-appium)
   * [Automatic Driver Targeting](#automatic-driver-targeting)
   * [Automatic Targeted Session Configuration](#automatic-targeted-session-configuration)
   * [Support for Frame-Based Components and Shadow-DOM Hierarchies](#support-for-frame-based-components-and-shadow-dom-hierarchies)
