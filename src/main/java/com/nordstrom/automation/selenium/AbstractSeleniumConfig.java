@@ -53,6 +53,7 @@ public abstract class AbstractSeleniumConfig extends
 
     private static final String SETTINGS_FILE = "settings.properties";
     private static final String CAPS_PATTERN = "{\"browserName\":\"%s\"}";
+
     /** value: <b>{"browserName":"htmlunit"}</b> */
     private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
     
@@ -64,6 +65,9 @@ public abstract class AbstractSeleniumConfig extends
     
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
+    private static final String APPIUM_HOST = "\"appium:host\":\"0.0.0.0\",";
+    private static final String PERSONALITY = "\"nord:options\":{\"personality\":\"%s\"}";
+        
     /**
      * This enumeration declares the settings that enable you to control the parameters used by
      * <b>Selenium Foundation</b>.
@@ -738,8 +742,17 @@ public abstract class AbstractSeleniumConfig extends
         } else {
             throw new IllegalStateException("Neither browser name nor capabilities are specified");
         }
-        Capabilities modifications = getModifications(capabilities, CAPS_MODS_SUFFIX);
-        return mergeCapabilities(capabilities, modifications);
+        
+        capabilities = mergeCapabilities(capabilities, getModifications(capabilities, CAPS_MODS_SUFFIX));
+        
+        String personality = GridUtility.getPersonality(capabilities);
+        String defaultCaps = String.format(PERSONALITY, personality);
+        
+        if ("Espresso".equals(personality)) {
+            defaultCaps = APPIUM_HOST +  defaultCaps;
+        }
+        
+        return mergeCapabilities(getCapabilitiesForJson("{" + defaultCaps + "}")[0], capabilities);
     }
     
     /**
@@ -775,10 +788,8 @@ public abstract class AbstractSeleniumConfig extends
         String propertyName = personality + propertySuffix;
         String modsJson = resolveString(propertyName);
         
-        // minimum modifications to ensure inclusion of 'personality'
-        Capabilities minimum = getCapabilitiesForJson("{\"nord:options\":{\"personality\":\"" + personality + "\"}}")[0];
-        // return mods as [Capabilities] object, ensuring 'personality' even if no mods configured
-        return (modsJson != null) ? mergeCapabilities(minimum, getCapabilitiesForJson(modsJson)[0]) : minimum;
+        // return mods as [Capabilities] object, or 'null' if none configured
+        return (modsJson != null) ? getCapabilitiesForJson(modsJson)[0] : null;
     }
     
     /**

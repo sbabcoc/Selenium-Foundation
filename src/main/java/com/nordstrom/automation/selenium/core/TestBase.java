@@ -2,8 +2,8 @@ package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
 
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
@@ -69,7 +69,7 @@ public abstract class TestBase {
         if (pageObj.getWindowHandle() == null) {
             try {
                 pageObj.setWindowHandle(pageObj.getWrappedDriver().getWindowHandle());
-            } catch (UnsupportedCommandException e) { }
+            } catch (WebDriverException e) { }
         }
         // required when initial page is local file
         setDriver(pageObj.getWrappedDriver());
