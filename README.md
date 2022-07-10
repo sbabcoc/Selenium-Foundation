@@ -6,7 +6,7 @@
 
 ### * BREAKING NEWS *
 
-With the release of **Selenium Foundation** version _26.1.0_, automation of Android native applications via both UiAutomator2 and Espresso engines of Appium is complete. The latest release of the [local-grid-parent]([https://github.com/sbabcoc/local-grid-parent](https://github.com/sbabcoc/local-grid-parent#local-grid-parent) project (_1.3.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include UiAutomator2 and Espresso nodes.
+With the release of **Selenium Foundation** version _26.1.0_, automation of Android native applications via both UiAutomator2 and Espresso engines of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent#local-grid-parent) project (_1.3.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include UiAutomator2 and Espresso nodes.
 
 #### Table of Contents
 
