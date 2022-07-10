@@ -9,6 +9,7 @@ import java.util.ServiceLoader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
@@ -112,13 +113,19 @@ public final class RobustElementFactory {
      * @return robust web element factory
      */
     private static synchronized InstanceCreator getCreator(final WrapsContext context) {
+        WebElement reference;
         WebDriver driver = context.getWrappedDriver();
         String driverName = driver.getClass().getName();
         if (creatorMap.containsKey(driverName)) {
             return creatorMap.get(driverName);
         }
         
-        WebElement reference = driver.findElement(By.cssSelector("*"));
+        try {
+            reference = driver.findElement(By.cssSelector("*"));
+        } catch (WebDriverException e) {
+            reference = driver.findElement(By.xpath("/*"));
+        }
+        
         Class<? extends WebElement> refClass = reference.getClass();
         
         Builder<? extends WebElement> builder = new ByteBuddy()
