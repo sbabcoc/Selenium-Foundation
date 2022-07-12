@@ -148,7 +148,7 @@
         <guava.version>31.1-jre</guava.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
         <jsoup.version>1.15.1</jsoup.version>
-        <htmlunit.version>2.62.0</htmlunit.version>
+        <htmlunit.version>2.63.0</htmlunit.version>
         <jcommander.version>1.82</jcommander.version>
         <mockito.version>4.6.1</mockito.version>
         <!-- managed to resolve identified threat -->
