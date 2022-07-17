@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.model;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
@@ -9,7 +10,6 @@ import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 
 /**
  * Extend this class when modeling a browser page.
@@ -171,12 +171,11 @@ public class Page extends ComponentContainer {
     public static <T extends Page> T openInitialPage(
                     final InitialPage initialPage, final WebDriver driver, final URI targetUri) {
         
+        Objects.requireNonNull(initialPage, "[initialPage] must be non-null");
         String url = getInitialUrl(initialPage, targetUri);
-        if (url == null) {
-            throw new InitialPageNotSpecifiedException();
+        if (url != null) {
+            getUrl(url, driver);
         }
-        
-        getUrl(url, driver);
         return newPage((Class<T>) initialPage.value(), driver);
     }
     

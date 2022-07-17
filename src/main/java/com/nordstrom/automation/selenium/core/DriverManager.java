@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
@@ -185,7 +184,7 @@ public final class DriverManager {
         
         try {
             timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
-        } catch (UnsupportedCommandException e) {
+        } catch (WebDriverException e) {
             // unsupported feature: nothing to do here
         }
     }
