@@ -25,7 +25,7 @@ A popular strategy to reduce duplication and accelerate development of automated
 
 * [Getting started (including complete examples) from Kim Schiller](https://www.pluralsight.com/guides/getting-started-with-page-object-pattern-for-your-selenium-tests)
 * [Pattern overview from Martin Fowler](https://martinfowler.com/bliki/PageObject.html)
-* [Pattern explanation with examples from SeleniumHQ](https://www.selenium.dev/documentation/test_practices/encouraged/page_object_models)
+* [Pattern explanation with examples from Selenium Dev](https://www.selenium.dev/documentation/test_practices/encouraged/page_object_models)
 * [In-depth pattern description from Guru99](https://www.guru99.com/page-object-model-pom-page-factory-in-selenium-ultimate-guide.html)
 
 ### Page Object Pitfalls
