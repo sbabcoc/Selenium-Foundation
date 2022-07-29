@@ -119,9 +119,12 @@ public abstract class Enhanceable<T> {
                     matcher = matcher.or(hasMethodName(methodName));
                 }
                 
+                // get 8-digit hexadecimal hash code for the fully-qualified class name
+                String hashCode = String.format("%08X", containerClass.getName().hashCode());
+                
                 proxyType = (Class<C>) new ByteBuddy()
                                 .subclass(containerClass)
-                                .name(containerClass.getPackage().getName() + ".Enhanced" + containerClass.getSimpleName())
+                                .name(containerClass.getName() + "$$FoundationSynergy$$" + hashCode)
                                 .method(not(matcher))
                                 .intercept(MethodDelegation.to(ContainerMethodInterceptor.INSTANCE))
                                 .implement(Enhanced.class)
