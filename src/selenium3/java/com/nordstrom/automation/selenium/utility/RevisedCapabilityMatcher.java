@@ -104,7 +104,7 @@ public class RevisedCapabilityMatcher extends DefaultCapabilityMatcher {
     }
     
     /**
-     * This class implements to {@code apply()} method declared by the {@code Validator} interface. It also implements
+     * This class implements the {@code apply()} method declared by the {@code Validator} interface. It also implements
      * methods to extract Safari-specific settings from specified capabilities maps.
      */
     public static class SafariValidator {
