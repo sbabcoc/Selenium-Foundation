@@ -48,7 +48,7 @@ public final class ScreenshotUtils {
                 return true; // for remote drivers, this may be bogus
             }
             if (logger != null) {
-                logger.warn("This driver is not able to take screenshots."); //NOSONAR
+                logger.warn("This driver is not able to take screenshots.");
             }
         }
         return false;
@@ -63,7 +63,7 @@ public final class ScreenshotUtils {
      * @return screenshot artifact; if capture fails, an empty byte array is returned
      */
     public static byte[] getArtifact(
-                    final Optional<WebDriver> optDriver, final Throwable reason, final Logger logger) { //NOSONAR
+                    final Optional<WebDriver> optDriver, final Throwable reason, final Logger logger) {
         
         if (canGetArtifact(optDriver, logger)) {
             try {

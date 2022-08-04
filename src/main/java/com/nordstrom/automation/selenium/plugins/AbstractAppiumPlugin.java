@@ -35,6 +35,31 @@ import net.bytebuddy.implementation.Implementation;
 
 /**
  * This class provides the base plugin implementation for drivers provided by {@code appium}.
+ * <p>
+ * All of the Java driver classes associated with this plugin are contained in a single dependency:
+ * 
+ * <ul>
+ *     <li><b>io.appium.java_client.android.AndroidDriver</b></li>
+ *     <li><b>io.appium.java_client.android.IOSDriver</b></li>
+ *     <li><b>io.appium.java_client.android.Mac2Driver</b></li>
+ *     <li><b>io.appium.java_client.android.WindowsDriver</b></li>
+ * </ul>
+ * 
+ * <pre>&lt;dependency&gt;
+ *  &lt;groupId&gt;io.appium&lt;/groupId&gt;
+ *  &lt;artifactId&gt;java-client&lt;/artifactId&gt;
+ *  &lt;version&gt;7.6.0&lt;/version&gt;
+ *  &lt;exclusions&gt;
+ *    &lt;exclusion&gt;
+ *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+ *      &lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+ *    &lt;/exclusion&gt;
+ *    &lt;exclusion&gt;
+ *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+ *      &lt;artifactId&gt;selenium-support&lt;/artifactId&gt;
+ *    &lt;/exclusion&gt;
+ *  &lt;/exclusions&gt;
+ *&lt;/dependency&gt;</pre>
  */
 public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
@@ -46,7 +71,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
     private static final String APPIUM_WITH_PM2 = "{\"nord:options\":{\"appiumWithPM2\":true}}";
     
-    private String browserName;
+    private final String browserName;
     
     protected AbstractAppiumPlugin(String browserName) {
         this.browserName = browserName;
@@ -85,7 +110,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         
         List<String> argsList = new ArrayList<>();
         String hostUrl = GridUtility.getLocalHost();
-        Integer portNum = Integer.valueOf(PortProber.findFreePort());
+        Integer portNum = PortProber.findFreePort();
         
         // get node capabilities for this plug-in
         String nodeCapabilities = getCapabilities(config);
@@ -221,7 +246,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         if (getBrowserName().equalsIgnoreCase(automationName)) {
             try {
                 return (Constructor<T>) Class.forName(getDriverClassName()).getConstructor(ARG_TYPES);
-            } catch (SecurityException | ClassNotFoundException | NoSuchMethodException | ClassCastException e) {
+            } catch (SecurityException | ClassNotFoundException | NoSuchMethodException | ClassCastException eaten) {
                 // nothing to do here
             }
         }
@@ -418,7 +443,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
                     Map<String, Object> options = GridUtility.getNordOptions(capabilities);
                     // determine is running 'appium' with 'pm2'
                     appiumWithPM2 = options.containsKey("appiumWithPM2");
-                } catch (IndexOutOfBoundsException | IOException e) { }
+                } catch (IndexOutOfBoundsException | IOException eaten) { }
             }
             return appiumWithPM2;
         }

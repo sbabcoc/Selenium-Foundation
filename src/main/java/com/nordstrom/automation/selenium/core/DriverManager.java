@@ -184,7 +184,7 @@ public final class DriverManager {
         
         try {
             timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
-        } catch (WebDriverException e) {
+        } catch (WebDriverException eaten) {
             // unsupported feature: nothing to do here
         }
     }
@@ -242,13 +242,13 @@ public final class DriverManager {
             
             try {
                 ((JavascriptExecutor) driver).executeScript("return window.stop");
-            } catch (WebDriverException | UnsupportedOperationException e) { //NOSONAR
+            } catch (WebDriverException | UnsupportedOperationException eaten) {
                 // Let's make sure our graceful shutdown process doesn't cause failures.
             }
             
             try {
                 driver.switchTo().alert().dismiss();
-            } catch (WebDriverException e) { //NOSONAR
+            } catch (WebDriverException eaten) {
                 // The driver throws an exception if no alert is present. This is normal and unavoidable.
             }
             

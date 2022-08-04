@@ -85,7 +85,7 @@ public final class GridUtility {
         try {
             HttpResponse response = getHttpResponse(hostUrl, request);
             return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
-        } catch (IOException e) { //NOSONAR
+        } catch (IOException eaten) {
             // nothing to do here
         }
         return false;
@@ -320,7 +320,7 @@ public final class GridUtility {
         // Check if the address is defined on any interface
         try {
             return NetworkInterface.getByInetAddress(addr) != null;
-        } catch (SocketException e) { //NOSONAR
+        } catch (SocketException e) {
             LOGGER.warn("Attempt to associate IP address with adapter triggered I/O exception: {}", e.getMessage());
             return false;
         }

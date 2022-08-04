@@ -65,7 +65,7 @@ public enum ContainerMethodInterceptor {
          */
         @Override
         protected Integer initialValue() {
-            return Integer.valueOf(0);
+            return 0;
         }
     };
     
@@ -189,7 +189,7 @@ public enum ContainerMethodInterceptor {
             }
             
             return result;
-        } catch (Throwable t) { //NOSONAR
+        } catch (Throwable t) {
             Throwable thrown = ExceptionUnwrapper.unwrap(t);
             if (thrown instanceof TimeoutException) {
                 thrown = differentiateTimeout((TimeoutException) thrown);
@@ -232,8 +232,8 @@ public enum ContainerMethodInterceptor {
      * @return updated depth count
      */
     private static int adjustDepth(final int delta) {
-        int i = DEPTH.get().intValue() + delta;
-        DEPTH.set(Integer.valueOf(i));
+        int i = DEPTH.get() + delta;
+        DEPTH.set(i);
         return i;
     }
     
@@ -266,7 +266,7 @@ public enum ContainerMethodInterceptor {
             @Override
             public Boolean apply(final SearchContext context) {
                 scanForErrors(context);
-                return Boolean.valueOf(((DetectsLoadCompletion) context).isLoadComplete());
+                return ((DetectsLoadCompletion) context).isLoadComplete();
             }
             
             @Override

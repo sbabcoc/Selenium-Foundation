@@ -63,9 +63,9 @@ public abstract class ComponentContainer
         By locator();
     }
 
-    protected WebDriver driver;
-    protected SearchContext context;
-    protected ComponentContainer parent;
+    protected final WebDriver driver;
+    protected final SearchContext context;
+    protected final ComponentContainer parent;
     protected VacationStackTrace vacated;
     protected SearchContextWait wait;
     private List<Class<?>> bypassClasses;
@@ -256,7 +256,7 @@ public abstract class ComponentContainer
                 
                 try {
                     return context.switchToContext();
-                } catch (StaleElementReferenceException e) { //NOSONAR
+                } catch (StaleElementReferenceException e) {
                     return context.refreshContext(context.acquiredAt());
                 }
             }
@@ -969,7 +969,7 @@ public abstract class ComponentContainer
             if (Modifier.isStatic(method.getModifiers())) {
                 return method;
             }
-        } catch (NoSuchMethodException e) { //NOSONAR
+        } catch (NoSuchMethodException eaten) {
             // fall through to 'throw' statement below
         }
         throw new UnsupportedOperationException(
@@ -986,7 +986,7 @@ public abstract class ComponentContainer
     static <T extends ComponentContainer> void verifyCollectible(final Class<T> containerType) {
         try {
             containerType.getConstructor(COLLECTIBLE_ARGS);
-        } catch (NoSuchMethodException | SecurityException e) { //NOSONAR
+        } catch (NoSuchMethodException | SecurityException e) {
             String format = 
                     "Container class must declare constructor: public %s(RobustWebElement, ComponentContainer)";
             throw new UnsupportedOperationException(String.format(format, containerType.getSimpleName()));
@@ -1016,7 +1016,7 @@ public abstract class ComponentContainer
         try {
             Constructor<T> ctor = containerType.getConstructor(argumentTypes);
             return ctor.newInstance(arguments);
-        } catch (InvocationTargetException e) { //NOSONAR
+        } catch (InvocationTargetException e) {
             throw UncheckedThrow.throwUnchecked(e.getCause());
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException |
                 NoSuchMethodException | InstantiationException e) {

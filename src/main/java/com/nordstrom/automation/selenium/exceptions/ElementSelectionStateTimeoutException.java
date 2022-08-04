@@ -9,7 +9,7 @@ import com.nordstrom.automation.selenium.support.Coordinators;
  * {@link Coordinators#elementSelectionStateToBe(org.openqa.selenium.By, boolean)} condition and indicates that the
  * specified element failed to attain the indicated selection state within the timeout interval.
  */
-public class ElementSelectionStateTimeoutException extends TimeoutException { //NOSONAR
+public class ElementSelectionStateTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = 2150778933322672061L;
 

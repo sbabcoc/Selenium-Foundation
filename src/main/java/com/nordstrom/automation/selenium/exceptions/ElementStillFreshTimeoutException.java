@@ -8,7 +8,7 @@ import com.nordstrom.automation.selenium.support.Coordinators;
  * This exception is associated with the {@link Coordinators#stalenessOf(org.openqa.selenium.WebElement)} condition
  * and indicates that the specified element reference failed to go "stale" within the timeout interval.
  */
-public class ElementStillFreshTimeoutException extends TimeoutException { //NOSONAR
+public class ElementStillFreshTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = -3082528281757446744L;
 

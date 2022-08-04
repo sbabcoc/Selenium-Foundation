@@ -138,7 +138,7 @@ public abstract class Enhanceable<T> {
         
         try {
             return proxyType.getConstructor(argumentTypes).newInstance(arguments);
-        } catch (InvocationTargetException e) { //NOSONAR
+        } catch (InvocationTargetException e) {
             throw UncheckedThrow.throwUnchecked(e.getCause());
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException
                         | NoSuchMethodException | InstantiationException e)

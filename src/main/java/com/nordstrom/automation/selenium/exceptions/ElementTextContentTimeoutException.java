@@ -10,7 +10,7 @@ import com.nordstrom.automation.selenium.support.Coordinators;
  * {@link Coordinators#textToNotBeEmptyInElementLocated(org.openqa.selenium.By)} conditions and indicates that the
  * specified element failed to attain the indicated text content within the timeout interval.
  */
-public class ElementTextContentTimeoutException extends TimeoutException { //NOSONAR
+public class ElementTextContentTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = -2893297898946904937L;
 

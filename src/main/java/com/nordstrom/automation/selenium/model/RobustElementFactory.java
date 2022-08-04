@@ -219,7 +219,7 @@ public final class RobustElementFactory {
             for (int index = 0; index < elements.size(); index++) {
                 elements.set(index, makeRobustElement(elements.get(index), context, locator, index));
             }
-        } catch (StaleElementReferenceException e) { //NOSONAR
+        } catch (StaleElementReferenceException e) {
             elements = context.refreshContext(context.acquiredAt()).findElements(locator);
         }
         return elements;
