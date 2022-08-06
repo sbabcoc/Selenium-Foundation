@@ -10,7 +10,7 @@ import com.nordstrom.automation.selenium.support.Coordinators;
  * {@link Coordinators#visibilityOfAnyElementLocated(org.openqa.selenium.By)} conditions and indicates that the
  * specified element was still absent or hidden when the timeout interval expired.
  */
-public class ElementAbsentOrHiddenTimeoutException extends TimeoutException { //NOSONAR
+public class ElementAbsentOrHiddenTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = -2295630523192380636L;
 

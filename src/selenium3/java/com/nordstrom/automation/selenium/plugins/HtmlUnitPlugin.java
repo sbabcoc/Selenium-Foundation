@@ -88,8 +88,8 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
         if (refClass.getName().equals(WEB_ELEMENT_CLASS_NAME)) {
             try {
                 Constructor<?> ctor = refClass.getConstructors()[0];
-                return MethodCall.invoke(ctor).onSuper().with(driver).with(Integer.valueOf(0)).with((Object) null);
-            } catch (SecurityException e) {
+                return MethodCall.invoke(ctor).onSuper().with(driver).with(0).with((Object) null);
+            } catch (SecurityException eaten) {
                 // nothing to do here
             }
         }

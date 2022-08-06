@@ -9,7 +9,7 @@ import com.nordstrom.automation.selenium.model.RobustElementWrapper;
  * {@link RobustElementWrapper#refreshReference(org.openqa.selenium.StaleElementReferenceException)}
  * and indicates that the attempt to refresh a stale element reference was unsuccessful.
  */
-public class ElementReferenceRefreshFailureException extends StaleElementReferenceException { //NOSONAR
+public class ElementReferenceRefreshFailureException extends StaleElementReferenceException {
 
     private static final long serialVersionUID = 417132799562814181L;
 

@@ -9,7 +9,7 @@ import com.nordstrom.automation.selenium.support.Coordinators;
  * {@link Coordinators#elementToBeClickable(org.openqa.selenium.WebElement)} conditions and indicates that the
  * specified element failed to become click-able within the timeout interval.
  */
-public class ElementNotClickableTimeoutException extends TimeoutException { //NOSONAR
+public class ElementNotClickableTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = -8475358618203763123L;
 

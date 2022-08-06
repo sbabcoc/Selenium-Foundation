@@ -189,7 +189,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         try {
             seleniumConfig = new SeleniumConfig();
         } catch (ConfigurationException | IOException e) {
-            throw new RuntimeException("Failed to instantiate settings", e); //NOSONAR
+            throw new RuntimeException("Failed to instantiate settings", e);
         }
     }
     

@@ -41,14 +41,14 @@ public final class PageSourceUtils {
                 // if driver explicitly reports that it cannot produce page source
                 if (Boolean.FALSE.equals(caps.getCapability(TAKES_ELEMENT_SCREENSHOT))) {
                     if (logger != null) {
-                        logger.warn("This driver is not capable of producing page source."); //NOSONAR
+                        logger.warn("This driver is not capable of producing page source.");
                     }
                 } else {
                     return true;
                 }
             } else {
                 if (logger != null) {
-                    logger.warn("Unable to determine if this driver can capture page source."); //NOSONAR
+                    logger.warn("Unable to determine if this driver can capture page source.");
                 }
             }
         }

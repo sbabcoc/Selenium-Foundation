@@ -572,7 +572,7 @@ public abstract class AbstractSeleniumConfig extends
                     Path path = Paths.get(valuePath);
                     URL url = path.toUri().toURL();
                     propertyValue = Resources.toString(url, Charsets.UTF_8);
-                } catch (IOException e) {
+                } catch (IOException eaten) {
                     // nothing to do here
                 }
             }
@@ -665,7 +665,7 @@ public abstract class AbstractSeleniumConfig extends
             
             try {
                 targetUri = builder.build().normalize();
-            } catch (URISyntaxException eaten) { //NOSONAR
+            } catch (URISyntaxException eaten) {
                 LOGGER.error("Specified target URI '{}' could not be parsed: {}", builder, eaten.getMessage());
             }
         }
@@ -857,9 +857,9 @@ public abstract class AbstractSeleniumConfig extends
                 URI uri = getConfigUri(path, url);
                 File file = new File(uri);
                 return file.getAbsolutePath();
-            } catch (URISyntaxException eaten) { //NOSONAR
+            } catch (URISyntaxException eaten) {
                 LOGGER.warn("Invalid URL returned by file locator: {}", eaten.getMessage());
-            } catch (IOException eaten) { //NOSONAR
+            } catch (IOException eaten) {
                 LOGGER.warn("Failed to construct file system or extract configuration file: {}", eaten.getMessage());
             }
         }
@@ -880,7 +880,7 @@ public abstract class AbstractSeleniumConfig extends
         if ("jar".equals(uri.getScheme())) {
             try {
                 FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
-            } catch (FileSystemAlreadyExistsException eaten) { //NOSONAR
+            } catch (FileSystemAlreadyExistsException eaten) {
                 LOGGER.warn("Specified file system already exists: {}", eaten.getMessage());
             } 
             

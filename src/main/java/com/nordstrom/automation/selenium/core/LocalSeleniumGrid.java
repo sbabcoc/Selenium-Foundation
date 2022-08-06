@@ -86,7 +86,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
         String[] dependencyContexts = config.getDependencyContexts();
-        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), Integer.valueOf(0));
+        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), 0);
         String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
         Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
         Path outputPath = GridUtility.getOutputPath(config, GridRole.HUB);
@@ -254,9 +254,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         Integer portNum = port;
         // if port auto-select spec'd
-        if (portNum.intValue() == 0) {
+        if (portNum == 0) {
             // acquire available port
-            portNum = Integer.valueOf(PortProber.findFreePort());
+            portNum = PortProber.findFreePort();
         }
         
         // specify server port
@@ -299,8 +299,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
 
     public static class LocalGridServer extends GridServer {
 
-        private CommandLine process;
-        private Map<String, String> personalities = new HashMap<>();
+        private final CommandLine process;
+        private final Map<String, String> personalities = new HashMap<>();
         
         /**
          * Constructor for local Grid server object.

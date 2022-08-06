@@ -163,7 +163,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
     @RuntimeType
     @BindingPriority(Integer.MAX_VALUE)
     public Object intercept(@This final Object obj, @Origin final Method method,
-                    @AllArguments final Object[] args) throws Exception { //NOSONAR
+                    @AllArguments final Object[] args) throws Exception {
         try {
             return invoke(method, args);
         } catch (StaleElementReferenceException sere) {
@@ -180,7 +180,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * @return {@code anything} (the result of invoking the specified method)
      * @throws Exception {@code anything} (exception thrown by the specified method)
      */
-    private Object invoke(Method method, Object... args) throws Exception { // NOSONAR
+    private Object invoke(Method method, Object... args) throws Exception {
         WebElement target = getWrappedElement();
         
         if (target == null) {
@@ -263,7 +263,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
         try {
             WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
             return this;
-        } catch (TimeoutException e) { //NOSONAR
+        } catch (TimeoutException e) {
             if (refreshTrigger == null) {
                 throw new ElementReferenceRefreshFailureException(e.getMessage(), e.getCause());
             }
@@ -291,7 +291,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             public RobustElementWrapper apply(final SearchContext context) {
                 try {
                     return acquireReference(wrapper);
-                } catch (StaleElementReferenceException e) { //NOSONAR
+                } catch (StaleElementReferenceException e) {
                     ((WrapsContext) context).refreshContext(((WrapsContext) context).acquiredAt());
                     return acquireReference(wrapper);
                 }
@@ -459,7 +459,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof RobustWebElement)) //NOSONAR
+        if (!(obj instanceof RobustWebElement))
             return false;
         RobustElementWrapper other = ((InterceptionAccessor) obj).getInterceptor();
         if (!context.equals(other.context))

@@ -8,7 +8,7 @@ import com.nordstrom.automation.selenium.model.PageComponent;
  * This exception is associated with the {@link PageComponent#componentIsHidden()} condition and indicates that the
  * indicated page component was still displayed when the timeout interval expired.
  */
-public class ComponentStillDisplayedTimeoutException extends TimeoutException { //NOSONAR
+public class ComponentStillDisplayedTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = 5397614393701035129L;
 

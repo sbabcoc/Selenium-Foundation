@@ -236,7 +236,7 @@ public class ExamplePage extends Page {
                     .setPort(hubUrl.getPort())
                     .build().normalize();
             config.setTargetUri(targetUri);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException eaten) {
             // nothing to do here
         }
         return targetUri;

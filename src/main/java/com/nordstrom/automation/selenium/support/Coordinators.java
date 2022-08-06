@@ -170,7 +170,7 @@ public final class Coordinators {
             public WebElement apply(final SearchContext context) {
                 try {
                     return elementIfVisible(context.findElement(locator));
-                } catch (StaleElementReferenceException e) { //NOSONAR
+                } catch (StaleElementReferenceException e) {
                     return null;
                 }
             }
@@ -213,7 +213,7 @@ public final class Coordinators {
                         return null;
                     }
                     return visible.get(0);
-                } catch (StaleElementReferenceException e) { //NOSONAR
+                } catch (StaleElementReferenceException e) {
                     return null;
                 }
             }
@@ -252,7 +252,7 @@ public final class Coordinators {
             public Boolean apply(final SearchContext context) {
                 try {
                     return !(context.findElement(locator).isDisplayed());
-                } catch (NoSuchElementException | StaleElementReferenceException e) { //NOSONAR
+                } catch (NoSuchElementException | StaleElementReferenceException e) {
                     // NoSuchElementException: The element is not present in DOM.
                     // StaleElementReferenceException: Implies that element no longer exists in the DOM.
                     return true;
@@ -485,7 +485,7 @@ public final class Coordinators {
                     WebElement element = context.findElement(locator);
                     return (element.isSelected() == selected);
                 } catch (StaleElementReferenceException | NoSuchElementException e) {
-                    return null; //NOSONAR
+                    return null;
                 }
             }
 
@@ -527,7 +527,7 @@ public final class Coordinators {
                     String elementText = context.findElement(locator).getText();
                     return elementText.contains(text);
                 } catch (StaleElementReferenceException | NoSuchElementException e) {
-                    return null; //NOSONAR
+                    return null;
                 }
             }
 
@@ -567,7 +567,7 @@ public final class Coordinators {
                     String elementText = context.findElement(locator).getText();
                     return ! ((elementText == null) || elementText.isEmpty());
                 } catch (StaleElementReferenceException | NoSuchElementException e) {
-                    return null; //NOSONAR
+                    return null;
                 }
             }
 
@@ -610,7 +610,7 @@ public final class Coordinators {
                     String elementText = context.findElement(locator).getAttribute("value");
                     return elementText != null && elementText.contains(text);
                 } catch (StaleElementReferenceException | NoSuchElementException e) {
-                    return null; //NOSONAR
+                    return null;
                 }
             }
 
@@ -660,7 +660,7 @@ public final class Coordinators {
                         return (value == null);
                     }
                 } catch (StaleElementReferenceException | NoSuchElementException e) {
-                    return null; //NOSONAR
+                    return null;
                 }
             }
 

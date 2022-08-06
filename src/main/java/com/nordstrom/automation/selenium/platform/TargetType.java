@@ -62,7 +62,7 @@ public enum TargetType implements TargetTypeName {
                     // if 'personality' is supported by target, run this test
                     if (thisClass.isAssignableFrom(pluginClass)) return true;
                 }
-            } catch (NullPointerException | IllegalArgumentException | ClassNotFoundException e) {
+            } catch (NullPointerException | IllegalArgumentException | ClassNotFoundException eaten) {
                 // nothing to do here
             }
         }

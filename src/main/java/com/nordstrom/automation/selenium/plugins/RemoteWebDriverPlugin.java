@@ -23,7 +23,7 @@ import net.bytebuddy.implementation.Implementation;
  */
 public abstract class RemoteWebDriverPlugin implements DriverPlugin {
     
-    private String browserName;
+    private final String browserName;
     
     protected RemoteWebDriverPlugin(String browserName) {
         this.browserName = browserName;
@@ -50,7 +50,7 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
         String[] propertyNames = getPropertyNames();
         return LocalSeleniumGrid.create(launcherClassName, combinedContexts, GridRole.NODE,
-                Integer.valueOf(0), nodeConfigPath, workingPath, outputPath, propertyNames);
+                0, nodeConfigPath, workingPath, outputPath, propertyNames);
     }
 
     /**

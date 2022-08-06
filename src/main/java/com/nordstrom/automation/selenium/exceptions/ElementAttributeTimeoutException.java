@@ -11,7 +11,7 @@ import com.nordstrom.automation.selenium.support.Coordinators;
  * that the indicated attribute of the specified element failed to attain the specified value within the timeout
  * interval.
  */
-public class ElementAttributeTimeoutException extends TimeoutException { //NOSONAR
+public class ElementAttributeTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = 7422856432865870480L;
 

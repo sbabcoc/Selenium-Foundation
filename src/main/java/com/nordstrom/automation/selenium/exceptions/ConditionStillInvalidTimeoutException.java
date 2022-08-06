@@ -8,7 +8,7 @@ import com.nordstrom.automation.selenium.support.Coordinators;
  * This exception is associated with the {@link Coordinators#has(com.google.common.base.Function)} wrapper method
  * and indicates that the wrapped condition was still returning a 'negative' result when the timeout interval expired. 
  */
-public class ConditionStillInvalidTimeoutException extends TimeoutException { //NOSONAR
+public class ConditionStillInvalidTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = -5012103332012897882L;
 
