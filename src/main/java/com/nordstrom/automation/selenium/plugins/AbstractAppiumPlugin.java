@@ -65,7 +65,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     private static final String[] DEPENDENCY_CONTEXTS = {};
     private static final String[] APPIUM_PATH_TAIL = { "appium", "build", "lib", "main.js" };
-    private static final String[] PROPERTY_NAMES = {};
+    private static final String[] PROPERTY_NAMES = 
+        { SeleniumSettings.APPIUM_WITH_PM2.key(), SeleniumSettings.APPIUM_CLI_ARGS.key(), SeleniumSettings.NPM_BINARY_PATH.key(),
+          SeleniumSettings.NODE_BINARY_PATH.key(), SeleniumSettings.PM2_BINARY_PATH.key(), SeleniumSettings.APPIUM_BINARY_PATH.key() };
+    
     private static final Class<?>[] ARG_TYPES = {URL.class, Capabilities.class};
     
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
