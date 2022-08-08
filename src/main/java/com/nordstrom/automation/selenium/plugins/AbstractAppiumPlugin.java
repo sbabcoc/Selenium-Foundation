@@ -211,14 +211,13 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             String executable;
             if (SystemUtils.IS_OS_WINDOWS) {
                 executable = "cmd.exe";
-                argsList.add(0, pm2Binary.getName());
+                argsList.add(0, pm2Binary.getAbsolutePath());
                 argsList.add(0, "/c");
             } else {
-                executable = pm2Binary.getName();
+                executable = pm2Binary.getAbsolutePath();
             }
             
             process = new CommandLine(executable, argsList.toArray(new String[0]));
-            process.setWorkingDirectory(pm2Binary.getParentFile().getAbsolutePath());
         // otherwise
         } else { // (running with 'node')
             argsList.add(0, appiumBinaryPath);
@@ -318,16 +317,15 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         if (SystemUtils.IS_OS_WINDOWS) {
             executable = "cmd.exe";
             argsList.add("/c");
-            argsList.add(npm.getName());
+            argsList.add(npm.getAbsolutePath());
         } else {
-            executable = npm.getName();
+            executable = npm.getAbsolutePath();
         }
         
         argsList.add("root");
         argsList.add("-g");
         
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        process.setWorkingDirectory(npm.getParentFile().getAbsolutePath());
         
         try {
             process.execute();
@@ -412,14 +410,13 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             
             if (SystemUtils.IS_OS_WINDOWS) {
                 executable = "cmd.exe";
-                argsList.add(0, pm2Binary.getName());
+                argsList.add(0, pm2Binary.getAbsolutePath());
                 argsList.add(0, "/c");
             } else {
-                executable = pm2Binary.getName();
+                executable = pm2Binary.getAbsolutePath();
             }
             
             process = new CommandLine(executable, argsList.toArray(new String[0]));
-            process.setWorkingDirectory(pm2Binary.getParentFile().getAbsolutePath());
             process.execute();
             return true;
         }
