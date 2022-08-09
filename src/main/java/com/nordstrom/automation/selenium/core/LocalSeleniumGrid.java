@@ -28,6 +28,7 @@ import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.base.UncheckedThrow;
+import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.jar.JarUtils;
 
 /**
@@ -294,6 +295,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         String executable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
+        process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
         return new LocalGridServer(hostUrl, portNum, role, process, workingPath, outputPath);
     }
 

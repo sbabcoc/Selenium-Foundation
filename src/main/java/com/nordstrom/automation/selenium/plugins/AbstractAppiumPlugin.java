@@ -30,6 +30,7 @@ import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.utility.BinaryFinder;
+import com.nordstrom.common.file.PathUtils;
 
 import net.bytebuddy.implementation.Implementation;
 
@@ -326,6 +327,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add("-g");
         
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
+        process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
         
         try {
             process.execute();
@@ -417,6 +419,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             }
             
             process = new CommandLine(executable, argsList.toArray(new String[0]));
+            process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
             process.execute();
             return true;
         }

@@ -38,13 +38,13 @@
     <revision>@projectVersion@</revision>
     <timestamp>@projectTimestamp@</timestamp>
     <selenium-api>@seleniumApi@</selenium-api>
-    <java-utils.version>3.0.0</java-utils.version>
+    <java-utils.version>3.1.1</java-utils.version>
     <compiler-plugin.version>3.10.1</compiler-plugin.version>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
     <source-plugin.version>3.2.1</source-plugin.version>
     <javadoc-plugin.version>3.4.0</javadoc-plugin.version>
-    <settings.version>3.0.1</settings.version>
-    <junit-foundation.version>17.0.1</junit-foundation.version>
+    <settings.version>3.0.2</settings.version>
+    <junit-foundation.version>17.0.2</junit-foundation.version>
     <logback-testng.version>2.0.0</logback-testng.version>
     <sonar.language>java</sonar.language>
     <jacoco.version>0.8.8</jacoco.version>
@@ -142,7 +142,7 @@
       </activation>
       <properties>
         <release.version>8</release.version>
-        <testng-foundation.version>4.0.1-j8</testng-foundation.version>
+        <testng-foundation.version>4.0.2-j8</testng-foundation.version>
         <selenium.version>3.141.59</selenium.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <guava.version>31.1-jre</guava.version>
