@@ -170,6 +170,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
+                    "com.nordstrom.common.file.PathUtils",
                     "org.apache.commons.lang3.reflect.FieldUtils",
                     "net.bytebuddy.matcher.ElementMatcher",
                     "org.openqa.selenium.BuildInfo",
