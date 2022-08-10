@@ -6,7 +6,7 @@
 
 ### * BREAKING NEWS *
 
-With the release of **Selenium Foundation** version _26.2.0_, automation of Windows native applications via the WinAppDriver engine of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent) project (_1.4.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include Windows nodes.
+With the release of **Selenium Foundation** version _26.3.4_, automation of Macintosh native applications via the Mac2 engine of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent) project (_1.5.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include Mac2 nodes.
 
 #### Table of Contents
 
