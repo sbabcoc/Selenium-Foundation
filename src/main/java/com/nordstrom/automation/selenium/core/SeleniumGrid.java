@@ -167,7 +167,8 @@ public class SeleniumGrid {
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException {
         if ((hubUrl != null) && GridUtility.isHubActive(hubUrl)) {
-            // ensure that hub port is available as a discrete setting
+            // store hub host and hub port in system properties for subsequent retrieval
+            System.setProperty(SeleniumSettings.HUB_HOST.key(), hubUrl.toExternalForm());
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
             return new SeleniumGrid(config, hubUrl);
         } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
