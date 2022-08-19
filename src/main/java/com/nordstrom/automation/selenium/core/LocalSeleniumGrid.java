@@ -11,6 +11,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
 import org.openqa.grid.common.GridRole;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
 
@@ -67,6 +67,32 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         for (GridServer server : getNodeServers().values()) {
             ((LocalGridServer) server).start();
         }
+        
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        long maxWait = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
+        long maxTime = System.currentTimeMillis() + maxWait;
+        while (!isGridReady(config, getHubServer(), getNodeServers().values())) {
+            if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
+                throw new TimeoutException("Timed out waiting for Grid collection to be ready");
+            }
+            Thread.sleep(100);
+        }
+    }
+    
+    /**
+     * Determine if the indicated Grid collection is entirely ready.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubServer Grid hub server
+     * @param nodeServers collection of Grid node servers
+     * @return {@code true} if the entire Grid collection is ready; otherwise {@code false}
+     */
+    static boolean isGridReady(SeleniumConfig config, GridServer hubServer, Collection<GridServer> nodeServers) {
+        if (!GridUtility.isHubActive(hubServer.getUrl())) return false;
+        for (GridServer nodeServer : nodeServers) {
+            if (!GridUtility.isNodeRegistered(config, hubServer.getUrl(), nodeServer.getUrl())) return false;
+        }
+        return true;
     }
     
     /**
@@ -161,61 +187,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     }
 
     /**
-     * Wait for the specified Grid server to indicate that it's ready.
-     * 
-     * @param server {@link LocalGridServer} object to wait for.
-     * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
-     * @throws InterruptedException if this thread was interrupted
-     * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
-     */
-    protected static void waitUntilReady(LocalGridServer server, long maxWait)
-                    throws InterruptedException, TimeoutException {
-        long maxTime = System.currentTimeMillis() + maxWait;
-        while (!server.isActive()) {
-            if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
-                throw new TimeoutException("Timed out waiting for Grid server to be ready");
-            }
-            Thread.sleep(100);
-        }
-    }
-    
-    /**
-     * Wait for the specified node server to be registered with the active Grid hub.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param nodeServer {@link LocalGridServer node server} to wait for
-     * @param maxWait maximum interval in milliseconds to wait; negative interval to wait indefinitely
-     * @throws InterruptedException if this thread was interrupted
-     * @throws IOException if an I/O error occurs
-     * @throws TimeoutException if not waiting indefinitely and exceeded maximum wait
-     */
-    protected static void waitUntilRegistered(SeleniumConfig config, LocalGridServer nodeServer, long maxWait)
-            throws IOException, InterruptedException, TimeoutException {
-        String nodeEndpoint = nodeServer.getUrl().getProtocol() + "://" + nodeServer.getUrl().getAuthority();
-        long maxTime = System.currentTimeMillis() + maxWait;
-        while (!isNodeRegistered(config, nodeEndpoint)) {
-            if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
-                throw new TimeoutException("Timed out waiting for Grid node to be registered");
-            }
-            Thread.sleep(100);
-        }
-        
-    }
-    
-    /**
-     * Determine if the specified node server is registered with the active Grid hub.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param nodeEndpoint node endpoint
-     * @return {@code true} if the node is registered; otherwise {@code false}
-     * @throws IOException if an I/O error occurs
-     */
-    private static boolean isNodeRegistered(SeleniumConfig config, String nodeEndpoint) throws IOException {
-        Capabilities capabilities = GridUtility.getNodeCapabilities(config, config.getHubUrl(), nodeEndpoint);
-        return capabilities.is("success");
-    }
-
-    /**
      * Create an object that represents a Selenium Grid server with the specified arguments.
      * <p>
      * <b>NOTE</b>: The created object defines a separate process for managing the local server, but does <b>NOT</b>
@@ -302,6 +273,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     public static class LocalGridServer extends GridServer {
 
         private final CommandLine process;
+        private boolean hasStarted = false;
+        private boolean isActive = false;
         private final Map<String, String> personalities = new HashMap<>();
         
         /**
@@ -361,17 +334,21 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @throws TimeoutException if host timeout interval exceeded
          */
         public void start() throws IOException, InterruptedException, TimeoutException {
-            if (!isActive()) {
-                SeleniumConfig config = SeleniumConfig.getConfig();
-                long hostTimeout = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
-                
+            if (!hasStarted) {
                 process.executeAsync();
-                waitUntilReady(this, hostTimeout);
-                
-                if (!isHub()) {
-                    waitUntilRegistered(config, this, hostTimeout);
-                }
+                hasStarted = true;
             }
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isActive() {
+            if (!isActive) {
+                isActive = super.isActive();
+            }
+            return isActive;
         }
         
         /**
@@ -383,6 +360,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                 return super.shutdown(localOnly);
             } else if (isActive()) {
                 getProcess().destroy();
+                hasStarted = false;
+                isActive = false;
             }
             
             return true;

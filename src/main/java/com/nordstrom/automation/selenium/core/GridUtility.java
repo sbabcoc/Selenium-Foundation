@@ -65,13 +65,32 @@ public final class GridUtility {
     }
     
     /**
-     * Determine if the configured Selenium Grid hub is active.
+     * Determine if the specified Selenium Grid hub is active.
      * 
      * @param hubUrl {@link URL} to be checked
-     * @return 'true' if configured hub is active; otherwise 'false'
+     * @return 'true' if specified hub is active; otherwise 'false'
      */
     public static boolean isHubActive(URL hubUrl) {
         return isHostActive(hubUrl, GridServer.HUB_CONFIG);
+    }
+    
+    /**
+     * Determine if the indicated Selenium Grid node is registered with the specified hub.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubUrl {@link URL} of hub to query
+     * @param nodeUrl {@link URL} of node in question
+     * @return 'true' if indicated node is registered; otherwise 'false'
+     */
+    public static boolean isNodeRegistered(SeleniumConfig config, URL hubUrl, URL nodeUrl) {
+        try {
+            String nodeEndpoint = nodeUrl.getProtocol() + "://" + nodeUrl.getAuthority();
+            Capabilities capabilities = getNodeCapabilities(config, hubUrl, nodeEndpoint);
+            return capabilities.is("success");
+        } catch (IOException eaten) {
+            // nothing to do here
+        }
+        return false;
     }
 
     /**

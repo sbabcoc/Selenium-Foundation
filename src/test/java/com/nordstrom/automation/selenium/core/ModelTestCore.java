@@ -15,6 +15,7 @@ import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.FrameComponent;
 import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
 import com.nordstrom.automation.selenium.examples.TableComponent;
+import com.nordstrom.automation.selenium.model.Enhanced;
 
 @InitialPage(ExamplePage.class)
 public class ModelTestCore {
@@ -22,6 +23,7 @@ public class ModelTestCore {
     public static void testBasicPage(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertEquals(page.getTitle(), TITLE);
+        assertTrue(page instanceof Enhanced);
     }
     
     public static void testParagraphs(TestBase instance) {
@@ -49,30 +51,35 @@ public class ModelTestCore {
         assertArrayEquals(content.get(0).toArray(), CONTENT[0]);
         assertArrayEquals(content.get(1).toArray(), CONTENT[1]);
         assertArrayEquals(content.get(2).toArray(), CONTENT[2]);
+        assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameByLocator(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameByLocator();
         assertEquals(component.getPageContent(), FRAME_A);
+        assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameByElement(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameByElement();
         assertEquals(component.getPageContent(), FRAME_B);
+        assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameByIndex(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameByIndex();
         assertEquals(component.getPageContent(), FRAME_C);
+        assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameById(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameById();
         assertEquals(component.getPageContent(), FRAME_D);
+        assertTrue(component instanceof Enhanced);
     }
     
     public static void testComponentList(TestBase instance) {
@@ -92,9 +99,13 @@ public class ModelTestCore {
         List<FrameComponent> frameList = page.getFrameList();
         assertEquals(frameList.size(), 4);
         assertEquals(frameList.get(0).getPageContent(), FRAME_A);
+        assertTrue(frameList.get(0) instanceof Enhanced);
         assertEquals(frameList.get(1).getPageContent(), FRAME_B);
+        assertTrue(frameList.get(1) instanceof Enhanced);
         assertEquals(frameList.get(2).getPageContent(), FRAME_C);
+        assertTrue(frameList.get(2) instanceof Enhanced);
         assertEquals(frameList.get(3).getPageContent(), FRAME_D);
+        assertTrue(frameList.get(3) instanceof Enhanced);
     }
     
     public static void testFrameMap(TestBase instance) {
@@ -102,9 +113,13 @@ public class ModelTestCore {
         Map<Object, FrameComponent> frameMap = page.getFrameMap();
         assertEquals(frameMap.size(), 4);
         assertEquals(frameMap.get(FRAME_A).getPageContent(), FRAME_A);
+        assertTrue(frameMap.get(FRAME_A) instanceof Enhanced);
         assertEquals(frameMap.get(FRAME_B).getPageContent(), FRAME_B);
+        assertTrue(frameMap.get(FRAME_B) instanceof Enhanced);
         assertEquals(frameMap.get(FRAME_C).getPageContent(), FRAME_C);
+        assertTrue(frameMap.get(FRAME_C) instanceof Enhanced);
         assertEquals(frameMap.get(FRAME_D).getPageContent(), FRAME_D);
+        assertTrue(frameMap.get(FRAME_D) instanceof Enhanced);
     }
     
     public static Runnable testShadowRootByLocator(final TestBase instance) {
@@ -115,6 +130,7 @@ public class ModelTestCore {
             public void run() {
                 ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
                 assertEquals(shadowRoot.getHeading(), SHADOW_DOM_A);
+                assertTrue(shadowRoot instanceof Enhanced);
             }
         };
     }
@@ -127,6 +143,7 @@ public class ModelTestCore {
             public void run() {
                 ShadowRootComponent shadowRoot = page.getShadowRootByElement();
                 assertEquals(shadowRoot.getHeading(), SHADOW_DOM_B);
+                assertTrue(shadowRoot instanceof Enhanced);
             }
         };
     }
@@ -140,7 +157,9 @@ public class ModelTestCore {
                 List<ShadowRootComponent> shadowRootList = page.getShadowRootList();
                 assertEquals(shadowRootList.size(), 2);
                 assertEquals(shadowRootList.get(0).getHeading(), SHADOW_DOM_A);
+                assertTrue(shadowRootList.get(0) instanceof Enhanced);
                 assertEquals(shadowRootList.get(1).getHeading(), SHADOW_DOM_B);
+                assertTrue(shadowRootList.get(1) instanceof Enhanced);
             }
         };
     }
@@ -154,7 +173,9 @@ public class ModelTestCore {
                 Map<Object, ShadowRootComponent> shadowRootMap = page.getShadowRootMap();
                 assertEquals(shadowRootMap.size(), 2);
                 assertEquals(shadowRootMap.get(SHADOW_DOM_A).getHeading(), SHADOW_DOM_A);
+                assertTrue(shadowRootMap.get(SHADOW_DOM_A) instanceof Enhanced);
                 assertEquals(shadowRootMap.get(SHADOW_DOM_B).getHeading(), SHADOW_DOM_B);
+                assertTrue(shadowRootMap.get(SHADOW_DOM_B) instanceof Enhanced);
             }
         };
     }

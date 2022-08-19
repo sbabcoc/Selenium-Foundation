@@ -18,8 +18,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import static net.bytebuddy.matcher.ElementMatchers.hasMethodName;
-import static net.bytebuddy.matcher.ElementMatchers.hasSignature;
-import static net.bytebuddy.matcher.ElementMatchers.is;
+import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.not;
 
 /**
@@ -100,18 +99,13 @@ public abstract class Enhanceable<T> {
                     if (bypassClass.isInterface()) {
                         // iterate over interface methods
                         for (Method method : bypassClass.getMethods()) {
-                            // match this method's signature
-                            matcher = matcher.or(
-                                    hasSignature(new MethodDescription.ForLoadedMethod(method)
-                                            .asSignatureToken()));
+                            // match this method's name
+                            matcher = matcher.or(hasMethodName(method.getName()));
                         }
                     // otherwise (bypassing a class)
                     } else {
-                        // iterate over class methods
-                        for (Method method : bypassClass.getMethods()) {
-                            // match this method exactly
-                            matcher = matcher.or(is(method));
-                        }
+                        // match any method declared by this class
+                        matcher = matcher.or(isDeclaredBy(bypassClass));
                     }
                 }
                 
