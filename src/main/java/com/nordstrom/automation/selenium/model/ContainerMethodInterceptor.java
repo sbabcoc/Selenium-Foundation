@@ -115,75 +115,113 @@ public enum ContainerMethodInterceptor {
             Page parentPage = container.getParentPage();
             Set<String> initialHandles = null;
             try {
+                // get initial set of window handles
                 initialHandles = driver.getWindowHandles();
-            } catch (WebDriverException e) { }
+            } catch (WebDriverException eaten) {
+                // framework errors are forbidden
+            }
             
             boolean returnsContainer = ComponentContainer.class.isAssignableFrom(returnType);
             boolean returnsPage = Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType);
             boolean detectsCompletion = returnsContainer && DetectsLoadCompletion.class.isAssignableFrom(returnType);
             
+            // if expecting page without load logic
             if (returnsPage && !detectsCompletion) {
                 try {
+                    // get stale wait reference element by CSS selector
                     reference = driver.findElement(By.cssSelector("*"));
                 } catch (WebDriverException e) {
+                    // get stale wait reference element by XPath
                     reference = driver.findElement(By.xpath("/*"));
                 }
             }
             
+            // invoke intercepted method
             Object result = proxy.call();
             
             // if result is container, we're done
-            if (result == container) {
-                return result;
-            }
+            if (result == container) return result;
             
+            // if expecting parent page window to close
             if (parentPage.getWindowState() == WindowState.WILL_CLOSE) {
+                // wait until parent page window closes
                 WaitType.WAIT.getWait(driver).until(Coordinators.windowIsClosed(parentPage.getWindowHandle()));
+                // get grandparent page
                 parentPage = parentPage.getSpawningPage();
+                // if grandparent found
                 if (parentPage != null) {
+                    // switch page context
                     parentPage.switchTo();
+                    // record page context
                     TARGET.set(parentPage);
+                // otherwise (parent is a root page)
                 } else {
+                    // get first available window handle
                     String windowHandle = driver.getWindowHandles().iterator().next();
+                    // switch driver context to this window
                     driver.switchTo().window(windowHandle);
+                    // clear context
                     TARGET.set(null);
                 }
+                // vacate container, recording associated method, stack trace, and reason
                 container.setVacated(new VacationStackTrace(method, "Target window for this container has closed."));
+                // no stale wait
                 reference = null;
             }
             
+            // if container spec'd
             if (returnsContainer) {
+                // ensure that a non-null result was returned
                 Objects.requireNonNull(result, "A method that returns container objects cannot produce a null result");
                 
                 String newHandle = null;
                 ComponentContainer newChild = (ComponentContainer) result;
                 
+                // if page spec'd
                 if (returnsPage) {
                     Page newPage = (Page) result;
+                    // if expecting window to open for new page 
                     if (newPage.getWindowState() == WindowState.WILL_OPEN) {
+                        // wait until new window opens
                         newHandle = WaitType.WAIT.getWait(driver).until(Coordinators.newWindowIsOpened(initialHandles));
+                        // record parent of new page
                         newPage.setSpawningPage(parentPage);
+                        // no stale wait
                         reference = null;
+                    // otherwise (new page for existing window)
                     } else {
+                        // vacate container, recording associated method, stack trace, and reason
                         container.setVacated(
                                 new VacationStackTrace(method, "This page object no longer owns its target window."));
                         try {
+                            // get current driver context
                             newHandle = driver.getWindowHandle();
-                        } catch (WebDriverException e) { }
+                        } catch (WebDriverException eaten) {
+                            // framework errors are forbidden
+                        }
                     }
                 }
                 
+                // enhance new container
                 result = newChild.enhanceContainer(newChild);
+                
+                // if context acquired
                 if (newHandle != null) {
+                    // associate page with target window
                     ((Page) result).setWindowHandle(newHandle);
+                    // wait for expected landing page to appear
                     ComponentContainer.waitForLandingPage((Page) result);
                 }
                 
+                // if load logic spec'd
                 if (detectsCompletion) {
+                    // wait until load logic indicates completion
                     ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD)
                                     .ignoring(PageNotLoadedException.class)
                                     .until(loadIsComplete());
+                // otherwise, if stale wait
                 } else if (reference != null) {
+                    // wait until reference element goes stale
                     WaitType.PAGE_LOAD.getWait((ComponentContainer) result).until(loadIsComplete(reference));
                 }
             }
