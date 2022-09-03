@@ -3,13 +3,17 @@ package com.nordstrom.automation.selenium;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
+import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 
@@ -53,6 +57,43 @@ public interface DriverPlugin {
      */
     String[] getPropertyNames();
     
+    /**
+     * Start local Selenium Grid node for this driver.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubServer Grid hub server with which node should register
+     * @return {@link LocalGridServer} object for specified node
+     * @throws IOException if an I/O error occurs
+     */
+    default LocalGridServer create(SeleniumConfig config, GridServer hubServer) throws IOException {
+        String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
+        String[] dependencyContexts = config.getDependencyContexts();
+        String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
+        Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
+        return create(config, launcherClassName, dependencyContexts, hubServer, workingPath);
+    }
+
+    /**
+     * Start local Selenium Grid node for this driver.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param launcherClassName fully-qualified name of {@code GridLauncher} class
+     * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
+     * @param hubServer Grid hub server with which node should register
+     * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+     * @return {@link LocalGridServer} object for specified node
+     * @throws IOException if an I/O error occurs
+     */
+    default LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+            GridServer hubServer, Path workingPath) throws IOException {
+        
+        Path outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
+        LocalGridServer nodeServer = 
+                create(config, launcherClassName, dependencyContexts, hubServer, workingPath, outputPath);
+        nodeServer.getPersonalities().putAll(getPersonalities());
+        return nodeServer;
+    }
+
     /**
      * Start local Selenium Grid node for this driver.
      * 
