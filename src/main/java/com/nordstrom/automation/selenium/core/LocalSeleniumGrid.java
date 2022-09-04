@@ -63,15 +63,32 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @throws TimeoutException if host timeout interval exceeded
      */
     public void activate() throws IOException, InterruptedException, TimeoutException {
-        ((LocalGridServer) getHubServer()).start();
-        for (GridServer server : getNodeServers().values()) {
-            ((LocalGridServer) server).start();
+        GridServer hubServer = getHubServer();
+        Collection<GridServer> nodeServers = getNodeServers().values();
+        
+        ((LocalGridServer) hubServer).start();
+        for (GridServer nodeServer : nodeServers) {
+            ((LocalGridServer) nodeServer).start();
         }
+        
+        awaitGridReady(hubServer, nodeServers);
+    }
+
+    /**
+     * Wait until the indicated Grid collection is entirely ready.
+     * 
+     * @param hubServer Grid hub server
+     * @param nodeServers collection of Grid node servers
+     * @throws InterruptedException if this thread was interrupted
+     * @throws TimeoutException if host timeout interval exceeded
+     */
+    public static void awaitGridReady(GridServer hubServer, Collection<GridServer> nodeServers)
+            throws TimeoutException, InterruptedException {
         
         SeleniumConfig config = SeleniumConfig.getConfig();
         long maxWait = config.getLong(SeleniumSettings.HOST_TIMEOUT.key()) * 1000;
         long maxTime = System.currentTimeMillis() + maxWait;
-        while (!isGridReady(config, getHubServer(), getNodeServers().values())) {
+        while (!isGridReady(config, hubServer, nodeServers)) {
             if ((maxWait > 0) && (System.currentTimeMillis() > maxTime)) {
                 throw new TimeoutException("Timed out waiting for Grid collection to be ready");
             }
@@ -126,64 +143,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         List<LocalGridServer> nodeServers = new ArrayList<>();
         for (DriverPlugin driverPlugin : getDriverPlugins(config)) {
-            outputPath = GridUtility.getOutputPath(config, GridRole.NODE);
-            LocalGridServer nodeServer = driverPlugin.create(config, launcherClassName, dependencyContexts, hubServer,
-                    workingPath, outputPath);
-            nodeServer.personalities.putAll(driverPlugin.getPersonalities());
-            nodeServers.add(nodeServer);
+            nodeServers.add(driverPlugin.create(config, launcherClassName, dependencyContexts, hubServer, workingPath));
         }
         
         return new LocalSeleniumGrid(config, hubServer, nodeServers.toArray(new LocalGridServer[0]));
-    }
-
-    /**
-     * Get instances of all configured driver plugins.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @return list of driver plugin instances
-     */
-    static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
-        List<DriverPlugin> driverPlugins;
-        
-        // get grid plugins setting
-        String gridPlugins = config.getString(SeleniumSettings.GRID_PLUGINS.key());
-        // if setting is defined
-        if (gridPlugins != null) {
-            driverPlugins = new ArrayList<>();
-            // iterate specified driver plugin class names
-            for (String driverPlugin : gridPlugins.split(File.pathSeparator)) {
-                String className = driverPlugin.trim();
-                try {
-                    // load driver plugin class
-                    Class<?> pluginClass = Class.forName(className);
-                    // get no-argument constructor
-                    Constructor<?> ctor = pluginClass.getConstructor();
-                    // add instance to plugins list
-                    driverPlugins.add((DriverPlugin) ctor.newInstance());
-                } catch (ClassNotFoundException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className + "' not found", e);
-                } catch (ClassCastException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
-                            + "' is not a subclass of DriverPlugin", e);
-                } catch (NoSuchMethodException | SecurityException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
-                            + "' lacks an accessible no-argument constructor", e);
-                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
-                            + "' could not be instantiated", e);
-                } catch (InvocationTargetException e) {
-                    throw new ServiceConfigurationError("Constructor for driver plugin '" + className
-                            + "' threw an exception", e.getTargetException());
-                }
-            }
-        } else {
-            // get service loader for driver plugins
-            ServiceLoader<DriverPlugin> serviceLoader = ServiceLoader.load(DriverPlugin.class);
-            // collect list of configured plugins
-            driverPlugins = ImmutableList.copyOf(serviceLoader.iterator());
-        }
-        
-        return driverPlugins;
     }
 
     /**
@@ -207,9 +170,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help</a>
      */
-    public static LocalGridServer create(final String launcherClassName, final String[] dependencyContexts,
-            final GridRole role, final Integer port, final Path configPath, final Path workingPath,
-            final Path outputPath, final String... propertyNames) {
+    public static LocalGridServer create(final String launcherClassName, final String[] dependencyContexts, final GridRole role,
+            final Integer port, final Path configPath, final Path workingPath, final Path outputPath, final String... propertyNames) {
         
         String gridRole = role.toString().toLowerCase();
         List<String> argsList = new ArrayList<>();
@@ -270,6 +232,59 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         return new LocalGridServer(hostUrl, portNum, role, process, workingPath, outputPath);
     }
 
+    /**
+     * Get instances of all configured driver plugins.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @return list of driver plugin instances
+     */
+    static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
+        List<DriverPlugin> driverPlugins;
+        
+        // get grid plugins setting
+        String gridPlugins = config.getString(SeleniumSettings.GRID_PLUGINS.key());
+        // if setting is defined
+        if (gridPlugins != null) {
+            driverPlugins = new ArrayList<>();
+            // iterate specified driver plugin class names
+            for (String driverPlugin : gridPlugins.split(File.pathSeparator)) {
+                String className = driverPlugin.trim();
+                try {
+                    // load driver plugin class
+                    Class<?> pluginClass = Class.forName(className);
+                    // get no-argument constructor
+                    Constructor<?> ctor = pluginClass.getConstructor();
+                    // add instance to plugins list
+                    driverPlugins.add((DriverPlugin) ctor.newInstance());
+                } catch (ClassNotFoundException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className + "' not found", e);
+                } catch (ClassCastException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                            + "' is not a subclass of DriverPlugin", e);
+                } catch (NoSuchMethodException | SecurityException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                            + "' lacks an accessible no-argument constructor", e);
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                            + "' could not be instantiated", e);
+                } catch (InvocationTargetException e) {
+                    throw new ServiceConfigurationError("Constructor for driver plugin '" + className
+                            + "' threw an exception", e.getTargetException());
+                }
+            }
+        } else {
+            // get service loader for driver plugins
+            ServiceLoader<DriverPlugin> serviceLoader = ServiceLoader.load(DriverPlugin.class);
+            // collect list of configured plugins
+            driverPlugins = ImmutableList.copyOf(serviceLoader.iterator());
+        }
+        
+        return driverPlugins;
+    }
+
+    /**
+     * This class represents a single Selenium server (hub or node) belonging to a local Grid collection.
+     */
     public static class LocalGridServer extends GridServer {
 
         private final CommandLine process;
