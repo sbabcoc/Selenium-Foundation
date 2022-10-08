@@ -105,7 +105,7 @@ public class OpctPage extends Page implements DetectsLoadCompletion {
 
 In this example, the page is done loading when the value of the _`cursor`_ CSS property of the _`body`_ tag no longer equals _`"wait"`_. This method, which is declared by the new container object, will be called every 500 mS until it returns _'true'_ or the page load timeout interval expires. Any type of container class can implement **`DetectsLoadCompletion`** - page, component, or frame.
 
-Note that automatic page load synchronization is activated by a method that returns a **new** page object. No synchronization is performed if a method returns the page object it's standing on (i.e. - 'this'). However, the **`DetectsLoadCompletion`** interface includes a static method to invoke the same page-load synchronization logic that **Selenium Foundation** would:
+Note that automatic page load synchronization is activated by a method that returns a **new** page object. No synchronization is performed if a method returns the page object it's standing on (i.e. - 'this'). However, the **`ContainerMethodInterceptor`** class includes a static method to invoke the same page-load synchronization logic that **Selenium Foundation** would:
 
 ###### Explicit synchronization
 ```java
@@ -118,12 +118,12 @@ public class SkuDescriptionSearchDialog extends Dialog {
      */
     public void resetSearch() {
         findElement(Using.RESET_BUTTON.locator).click();
-        getParentPage().getWait(WaitType.PAGE_LOAD).until(ContainerMethodInterceptor.pageLoadIsComplete());
+        getParentPage().getWait(WaitType.PAGE_LOAD).until(ContainerMethodInterceptor.loadIsComplete());
     }
 }
 ```
 
-In this scenario, the **`Dialog`** class doesn't implement **`DetectsLoadCompletion`**, but the parent page does. The 'wait' object is acquired in the context of the parent page, so the **`pageLoadIsComplete()`** 'wait' proxy will invoke the **`isLoadComplete()`** method of the parent page class.
+In this scenario, the **`Dialog`** class doesn't implement **`DetectsLoadCompletion`**, but its parent page does. The 'wait' object is acquired in the context of the parent page, so the **`loadIsComplete()`** 'wait' proxy will invoke the **`isLoadComplete()`** method of the parent page class.
 
 # Automatic Driver Targeting
 
