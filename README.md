@@ -103,7 +103,7 @@ Note that the version number in this POM file is merely a placeholder - a token 
 
 ## Getting Started
 
-The [QuickStart](src/test/java/com/nordstrom/automation/selenium/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation), and the [Settings API](https://github.com/sbabcoc/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
+The [QuickStart](src/main/java/com/nordstrom/automation/selenium/examples/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation), and the [Settings API](https://github.com/sbabcoc/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
 
 ### Required Configuration
 
