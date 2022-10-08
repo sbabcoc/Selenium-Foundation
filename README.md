@@ -135,7 +135,7 @@ Typically, these tools must be on the system file path. However, you can provide
 
 ### Automatic Driver Targeting
 
-**Selenium Foundation** provides a complete set of base classes for building well-factored page models. This includes page components and frames. **Selenium Foundation** allows you to focus on modeling your application (instead of managing which window or frame the driver is addressing) by handling all driver targeting for you. You'll never see `driver.switchTo(...)` in page model automation built with **Selenium Foundation**, because the framework automatically ensures that the driver is addressing the window or frame associated with each page model method before it's invoked.
+**Selenium Foundation** provides a complete set of base classes for building well-factored page models. This includes page components, frames and shadow hierarchies. **Selenium Foundation** allows you to focus on modeling your application (instead of managing which window or frame the driver is addressing) by handling all driver targeting for you. You'll never see `driver.switchTo(...)` in page model automation built with **Selenium Foundation**, because the framework automatically ensures that the driver is addressing the window or frame associated with each page model method before it's invoked.
 
 ### Automatic Targeted Session Configuration
 
