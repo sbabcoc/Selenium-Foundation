@@ -78,7 +78,7 @@ Avoid expressions that start with either `/` or `//`, as these always traverse t
 
 # Driver Focus with Frame-Based Components
 
-In traditional **Selenium WebDriver** automation, the task of working with frames is often difficult and confusing. You're forced to include ubiquitous boilerplate code to switch driver focus between the frames you need to interact with and the contexts that contains them.
+In traditional **Selenium WebDriver** automation, the task of working with frames is often difficult and confusing. You're forced to include ubiquitous boilerplate code to switch driver focus between the frames you need to interact with and the contexts that contain them.
 
 With **Selenium Foundation**, the task of managing driver focus is handled for you automatically. The boilerplate code is entirely eliminated, allowing you to focus on modeling the behaviors of your application instead of the plumbing that connects your code to the browser.
 
