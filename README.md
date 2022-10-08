@@ -99,7 +99,7 @@ Although Gradle is used to produce official releases, **Selenium Foundation** al
 
 Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at:
 
-> **`META-INF\maven\com.nordstrom.ui-tools\selenium-foundation\pom.xml`**
+> **`META-INF/maven/com.nordstrom.ui-tools/selenium-foundation/pom.xml`**
 
 ## Getting Started
 
