@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -16,13 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
 import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
 
-import com.google.common.collect.ImmutableList;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -142,7 +138,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubServer.getUrl().getPort()));
         
         List<LocalGridServer> nodeServers = new ArrayList<>();
-        for (DriverPlugin driverPlugin : getDriverPlugins(config)) {
+        for (DriverPlugin driverPlugin : GridUtility.getDriverPlugins(config)) {
             nodeServers.add(driverPlugin.create(config, launcherClassName, dependencyContexts, hubServer, workingPath));
         }
         
@@ -230,56 +226,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
         process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
         return new LocalGridServer(hostUrl, portNum, role, process, workingPath, outputPath);
-    }
-
-    /**
-     * Get instances of all configured driver plugins.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @return list of driver plugin instances
-     */
-    static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
-        List<DriverPlugin> driverPlugins;
-        
-        // get grid plugins setting
-        String gridPlugins = config.getString(SeleniumSettings.GRID_PLUGINS.key());
-        // if setting is defined
-        if (gridPlugins != null) {
-            driverPlugins = new ArrayList<>();
-            // iterate specified driver plugin class names
-            for (String driverPlugin : gridPlugins.split(File.pathSeparator)) {
-                String className = driverPlugin.trim();
-                try {
-                    // load driver plugin class
-                    Class<?> pluginClass = Class.forName(className);
-                    // get no-argument constructor
-                    Constructor<?> ctor = pluginClass.getConstructor();
-                    // add instance to plugins list
-                    driverPlugins.add((DriverPlugin) ctor.newInstance());
-                } catch (ClassNotFoundException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className + "' not found", e);
-                } catch (ClassCastException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
-                            + "' is not a subclass of DriverPlugin", e);
-                } catch (NoSuchMethodException | SecurityException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
-                            + "' lacks an accessible no-argument constructor", e);
-                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
-                            + "' could not be instantiated", e);
-                } catch (InvocationTargetException e) {
-                    throw new ServiceConfigurationError("Constructor for driver plugin '" + className
-                            + "' threw an exception", e.getTargetException());
-                }
-            }
-        } else {
-            // get service loader for driver plugins
-            ServiceLoader<DriverPlugin> serviceLoader = ServiceLoader.load(DriverPlugin.class);
-            // collect list of configured plugins
-            driverPlugins = ImmutableList.copyOf(serviceLoader.iterator());
-        }
-        
-        return driverPlugins;
     }
 
     /**

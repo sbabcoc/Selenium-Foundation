@@ -35,6 +35,7 @@ public final class DataUtils {
      * @return new instance of the specified type
      */
     public static <T> T fromString(final String json, final Type type) {
+        if ((json == null) || json.trim().isEmpty()) return null;
         try {
             return new Json().toType(json, type);
         } catch (JsonException e) {

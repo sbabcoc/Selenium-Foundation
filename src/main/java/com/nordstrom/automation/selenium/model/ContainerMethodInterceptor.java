@@ -11,6 +11,8 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
@@ -304,7 +306,13 @@ public enum ContainerMethodInterceptor {
             @Override
             public Boolean apply(final SearchContext context) {
                 scanForErrors(context);
-                return ((DetectsLoadCompletion) context).isLoadComplete();
+                if (context instanceof DetectsLoadCompletion) {
+                    return ((DetectsLoadCompletion) context).isLoadComplete();
+                } else {
+                    Logger logger = LoggerFactory.getLogger(Enhanceable.getContainerClass(context));
+                    logger.warn("This context doesn't provide load completion status");
+                    return true;
+                }
             }
             
             @Override

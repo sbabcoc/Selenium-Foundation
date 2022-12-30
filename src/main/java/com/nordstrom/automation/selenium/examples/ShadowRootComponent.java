@@ -73,6 +73,10 @@ public class ShadowRootComponent extends ShadowRoot {
         return findElement(Using.CHECK).isSelected();
     }
     
+    public boolean setCheckValue(boolean value) {
+        return updateValue(findElement(Using.CHECK), value);
+    }
+    
     public static Object getKey(final SearchContext context) {
         return getShadowRoot(context).findElement(Using.HEADING.locator).getText();
     }

@@ -23,13 +23,12 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.53.0&lt;/version&gt;
+     *  &lt;version&gt;2.67.0&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
                     "org.openqa.selenium.htmlunit.HtmlUnitDriver", "org.openqa.selenium.By",
                     "org.openqa.selenium.support.FindBy", "com.gargoylesoftware.htmlunit.Version",
-                    "org.apache.xalan.Version", "org.apache.xml.serializer.Version",
                     "org.apache.commons.lang3.CharSet", "org.apache.commons.text.WordUtils",
                     "org.apache.http.client.HttpClient", "org.apache.http.HttpHost",
                     "org.apache.http.entity.mime.MIME", "org.apache.commons.codec.Encoder",
@@ -39,6 +38,7 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
                     "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint",
                     "org.eclipse.jetty.websocket.common.Parser",
                     "org.eclipse.jetty.websocket.api.Session",
+                    "net.sourceforge.htmlunit.xpath.XPath",
                     "net.sourceforge.htmlunit.corejs.javascript.Token",
                     "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
                     "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.util.LangUtils",

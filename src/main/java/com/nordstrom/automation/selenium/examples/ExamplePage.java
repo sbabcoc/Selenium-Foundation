@@ -213,6 +213,10 @@ public class ExamplePage extends Page {
         return findElement(Using.CHECK).isSelected();
     }
     
+    public boolean setCheckValue(boolean value) {
+        return updateValue(findElement(Using.CHECK), value);
+    }
+    
     public boolean hasCssOptional() {
     	return findOptional(By.cssSelector(ByType.cssLocatorFor(Using.FORM))).hasReference();
     }

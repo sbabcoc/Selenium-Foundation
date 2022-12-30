@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
 
@@ -40,6 +42,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -173,7 +177,7 @@ public final class GridUtility {
         }
         
         // get constructor for RemoteWebDriver class corresponding to desired capabilities
-        Constructor<RemoteWebDriver> ctor = getRemoteWebDriverCtor(desiredCapabilities);
+        Constructor<RemoteWebDriver> ctor = getRemoteWebDriverCtor(config, desiredCapabilities);
         
         try {
             // instantiate desired driver via configured grid
@@ -414,8 +418,10 @@ public final class GridUtility {
      * @return constructor for desired {@link RemoteWebDriver} implementation
      */
     @SuppressWarnings("unchecked")
-    private static <T extends RemoteWebDriver> Constructor<T> getRemoteWebDriverCtor(Capabilities desiredCapabilities) {
-        for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+    private static <T extends RemoteWebDriver> Constructor<T> getRemoteWebDriverCtor(
+            SeleniumConfig config, Capabilities desiredCapabilities) {
+        
+        for (DriverPlugin driverPlugin : getDriverPlugins(config)) {
             Constructor<T> ctor = driverPlugin.getRemoteWebDriverCtor(desiredCapabilities);
             if (ctor != null) {
                 return ctor;
@@ -426,6 +432,56 @@ public final class GridUtility {
         } catch (NoSuchMethodException | SecurityException e) {
             throw UncheckedThrow.throwUnchecked(e);
         }
+    }
+
+    /**
+     * Get instances of all configured driver plugins.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @return list of driver plugin instances
+     */
+    public static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
+        List<DriverPlugin> driverPlugins;
+        
+        // get grid plugins setting
+        String gridPlugins = config.getString(SeleniumSettings.GRID_PLUGINS.key());
+        // if setting is defined and not empty
+        if ( ! (gridPlugins == null || gridPlugins.trim().isEmpty())) {
+            driverPlugins = new ArrayList<>();
+            // iterate specified driver plugin class names
+            for (String driverPlugin : gridPlugins.split(File.pathSeparator)) {
+                String className = driverPlugin.trim();
+                try {
+                    // load driver plugin class
+                    Class<?> pluginClass = Class.forName(className);
+                    // get no-argument constructor
+                    Constructor<?> ctor = pluginClass.getConstructor();
+                    // add instance to plugins list
+                    driverPlugins.add((DriverPlugin) ctor.newInstance());
+                } catch (ClassNotFoundException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className + "' not found", e);
+                } catch (ClassCastException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                            + "' is not a subclass of DriverPlugin", e);
+                } catch (NoSuchMethodException | SecurityException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                            + "' lacks an accessible no-argument constructor", e);
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
+                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                            + "' could not be instantiated", e);
+                } catch (InvocationTargetException e) {
+                    throw new ServiceConfigurationError("Constructor for driver plugin '" + className
+                            + "' threw an exception", e.getTargetException());
+                }
+            }
+        } else {
+            // get service loader for driver plugins
+            ServiceLoader<DriverPlugin> serviceLoader = ServiceLoader.load(DriverPlugin.class);
+            // collect list of configured plugins
+            driverPlugins = ImmutableList.copyOf(serviceLoader.iterator());
+        }
+        
+        return driverPlugins;
     }
     
 }
