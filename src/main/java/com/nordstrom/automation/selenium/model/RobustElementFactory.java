@@ -4,8 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -13,6 +11,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
+import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -132,7 +132,7 @@ public final class RobustElementFactory {
                 .subclass(refClass)
                 .name(refClass.getPackage().getName() + ".Robust" + refClass.getSimpleName());
 
-        for (DriverPlugin driverPlugin : ServiceLoader.load(DriverPlugin.class)) {
+        for (DriverPlugin driverPlugin : GridUtility.getDriverPlugins(SeleniumConfig.getConfig())) {
             Implementation ctorImpl = driverPlugin.getWebElementCtor(driver, refClass);
             if (ctorImpl != null) {
                 builder = builder.defineConstructor(Visibility.PUBLIC).intercept(ctorImpl);

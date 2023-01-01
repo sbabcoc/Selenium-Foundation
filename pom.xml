@@ -53,7 +53,20 @@
     <clean-plugin.version>3.2.0</clean-plugin.version>
     <hamcrest.version>2.2</hamcrest.version>
     <!-- managed to resolve identified threat -->
-    <snakeyaml.version>1.30</snakeyaml.version>
+    <snakeyaml.version>1.32</snakeyaml.version>
+    <chromePlugin />
+    <edgePlugin />
+    <espressoPlugin />
+    <firefoxPlugin />
+    <htmlunitPlugin />
+    <mac2Plugin />
+    <operaPlugin />
+    <phantomjsPlugin />
+    <safariPlugin />
+    <uiautomator2Plugin />
+    <windowsPlugin />
+    <xcuitestPlugin />
+    <appiumWithPM2>false</appiumWithPM2>
   </properties>
   
   <scm>
@@ -148,7 +161,6 @@
         <guava.version>31.1-jre</guava.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
         <jsoup.version>1.15.1</jsoup.version>
-        <htmlunit.version>2.64.0</htmlunit.version>
         <jcommander.version>1.82</jcommander.version>
         <mockito.version>4.6.1</mockito.version>
         <!-- managed to resolve identified threat -->
@@ -159,6 +171,9 @@
         <okio.version>2.10.0</okio.version>
         <!-- override of default conflict resolution -->
         <kotlin.version>1.7.0</kotlin.version>
+        <appium-client.version>7.6.0</appium-client.version>
+        <htmlunit.version>2.67.0</htmlunit.version>
+        <phantomjsdriver.version>1.4.4</phantomjsdriver.version>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -198,11 +213,6 @@
             <version>${jsoup.version}</version>
           </dependency>
           <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>htmlunit-driver</artifactId>
-            <version>${htmlunit.version}</version>
-          </dependency>
-          <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>${jcommander.version}</version>
@@ -238,6 +248,46 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-common</artifactId>
             <version>${kotlin.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <version>${selenium.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-edge-driver</artifactId>
+            <version>${selenium.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>${appium-client.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <version>${selenium.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>htmlunit-driver</artifactId>
+            <version>${htmlunit.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-opera-driver</artifactId>
+            <version>${selenium.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.codeborne</groupId>
+            <artifactId>phantomjsdriver</artifactId>
+            <version>${phantomjsdriver.version}</version>
+          </dependency>
+           <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-safari-driver</artifactId>
+            <version>${selenium.version}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -321,11 +371,6 @@
           <artifactId>websocket-client</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>htmlunit-driver</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
           <groupId>org.mockito</groupId>
           <artifactId>mockito-core</artifactId>
           <scope>test</scope>
@@ -353,6 +398,250 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>chrome</id>
+      <properties>
+        <chromePlugin>com.nordstrom.automation.selenium.plugins.ChromePlugin${path.separator}</chromePlugin>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-chrome-driver</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>edge</id>
+      <properties>
+        <edgePlugin>com.nordstrom.automation.selenium.plugins.EdgePlugin${path.separator}</edgePlugin>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-edge-driver</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-remote-driver</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>espresso</id>
+      <properties>
+        <espressoPlugin>com.nordstrom.automation.selenium.plugins.EspressoPlugin${path.separator}</espressoPlugin>
+        <appiumWithPM2>true</appiumWithPM2>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.appium</groupId>
+          <artifactId>java-client</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-java</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-support</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>firefox</id>
+      <properties>
+        <firefoxPlugin>com.nordstrom.automation.selenium.plugins.FirefoxPlugin${path.separator}</firefoxPlugin>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-firefox-driver</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-remote-driver</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>htmlunit</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <htmlunitPlugin>com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin${path.separator}</htmlunitPlugin>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>htmlunit-driver</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-support</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>mac2</id>
+      <properties>
+        <mac2Plugin>com.nordstrom.automation.selenium.plugins.Mac2Plugin${path.separator}</mac2Plugin>
+        <appiumWithPM2>true</appiumWithPM2>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.appium</groupId>
+          <artifactId>java-client</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-java</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-support</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>opera</id>
+      <properties>
+        <operaPlugin>com.nordstrom.automation.selenium.plugins.OperaPlugin${path.separator}</operaPlugin>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-opera-driver</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-remote-driver</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>phantomjs</id>
+      <properties>
+        <phantomjsPlugin>com.nordstrom.automation.selenium.plugins.PhantomJsPlugin${path.separator}</phantomjsPlugin>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.codeborne</groupId>
+          <artifactId>phantomjsdriver</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-remote-driver</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>safari</id>
+      <properties>
+        <safariPlugin>com.nordstrom.automation.selenium.plugins.SafariPlugin${path.separator}</safariPlugin>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-safari-driver</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-remote-driver</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>uiautomator2</id>
+      <properties>
+        <uiautomator2Plugin>com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin${path.separator}</uiautomator2Plugin>
+        <appiumWithPM2>true</appiumWithPM2>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.appium</groupId>
+          <artifactId>java-client</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-java</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-support</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>windows</id>
+      <properties>
+        <windowsPlugin>com.nordstrom.automation.selenium.plugins.WindowsPlugin${path.separator}</windowsPlugin>
+        <appiumWithPM2>true</appiumWithPM2>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.appium</groupId>
+          <artifactId>java-client</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-java</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-support</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>xcuitest</id>
+      <properties>
+        <xcuitestPlugin>com.nordstrom.automation.selenium.plugins.XCUITestPlugin${path.separator}</xcuitestPlugin>
+        <appiumWithPM2>true</appiumWithPM2>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.appium</groupId>
+          <artifactId>java-client</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-java</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-support</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
   
@@ -504,6 +793,10 @@
               <value>false</value>
             </property>
           </properties>
+          <systemPropertyVariables>
+            <appium.with.pm2>${appiumWithPM2}</appium.with.pm2>
+            <selenium.grid.plugins>${chromePlugin}${edgePlugin}${espressoPlugin}${firefoxPlugin}${htmlunitPlugin}${mac2Plugin}${operaPlugin}${phantomjsPlugin}${safariPlugin}${uiautomator2Plugin}${windowsPlugin}${xcuitestPlugin}</selenium.grid.plugins>
+          </systemPropertyVariables>
           <threadCount>1</threadCount>
           <argLine>-javaagent:${com.nordstrom.tools:junit-foundation:jar}</argLine>
         </configuration>

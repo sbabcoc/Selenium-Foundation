@@ -100,6 +100,7 @@ public class WebDriverUtilsTest extends TestNgTargetRoot {
         WebElement element = page.findElement(By.tagName("html"));
         SeleniumConfig config = SeleniumConfig.getConfig();
         String browserName = config.getCurrentCapabilities().getBrowserName();
+        if ("MicrosoftEdge".equals(browserName)) browserName = "msedge";
         
         assertThat(WebDriverUtils.getBrowserName((SearchContext) driver), equalToIgnoringCase(browserName));
         assertThat(WebDriverUtils.getBrowserName(page), equalToIgnoringCase(browserName));

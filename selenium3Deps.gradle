@@ -37,7 +37,7 @@ dependencies {
     api 'org.eclipse.jetty.websocket:websocket-client:9.4.46.v20220331'
     api 'org.jetbrains.kotlin:kotlin-stdlib:1.7.0'
     api 'org.jetbrains.kotlin:kotlin-stdlib-common:1.7.0'
-    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.64.0'
+    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.67.0'
     testImplementation 'org.mockito:mockito-core:4.6.1'
   }
   api 'com.nordstrom.tools:testng-foundation'

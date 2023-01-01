@@ -17,4 +17,7 @@
         <appender-ref ref="STDOUT" />
         <appender-ref ref="TestNG" />
     </root>
+
+    <logger name="org.apache" level="ERROR" />
+    <logger name="httpclient" level="ERROR" />
 </configuration>
