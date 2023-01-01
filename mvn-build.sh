@@ -81,7 +81,7 @@ case "${browser}" in
   mac2)
     targetPlatform=mac-app
     browserProfile=-Pmac2
-    seleniumSettings=(-Dselenium.browser.caps='{"platformName":"Mac","appium:automationName":"Mac2","appium:app":"/Applications/TextEdit"}' -Dselenium.grid.examples=false)
+    seleniumSettings=(-Dselenium.browser.caps='{"platformName":"Mac","appium:automationName":"Mac2","appium:bundleId":"com.apple.TextEdit"}' -Dselenium.grid.examples=false)
     ;;
 
   windows)
