@@ -5,11 +5,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
+import static com.nordstrom.automation.selenium.platform.TargetTypeName.SUPPORT_NAME;
 
 import java.net.URI;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
@@ -59,6 +61,11 @@ public class SeleniumConfigTest {
     @Test
     public void testBrowserCaps() {
         SeleniumConfig config = SeleniumConfig.getConfig();
+        String contextPlatform = config.getContextPlatform();
+        if ((contextPlatform == null) || contextPlatform.equals(SUPPORT_NAME)) {
+            throw new SkipException("Current target platform doesn't provide browser capabilities");
+        }
+        
         Capabilities browserCaps = config.getCurrentCapabilities();
         assertNotNull(browserCaps.getBrowserName());
     }

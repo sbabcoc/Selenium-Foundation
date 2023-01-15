@@ -1,0 +1,12 @@
+def driverPlugins = System.getProperty('selenium.grid.plugins', '')
+System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.Mac2Plugin' + File.pathSeparator)
+System.setProperty('selenium.browser.caps', '{"platformName":"Mac","appium:automationName":"Mac2","appium:bundleId":"com.apple.TextEdit"}')
+System.setProperty('selenium.context.platform', 'mac-app')
+System.setProperty('selenium.grid.examples', 'false')
+System.setProperty('appium.with.pm2', 'true')
+dependencies {
+  testImplementation('io.appium:java-client') {
+    exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
+    exclude group: 'org.seleniumhq.selenium', module: 'selenium-support'
+  }
+}

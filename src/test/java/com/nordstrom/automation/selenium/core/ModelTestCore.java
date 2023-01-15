@@ -26,11 +26,53 @@ public class ModelTestCore {
         assertTrue(page instanceof Enhanced);
     }
     
+    public static void updateTextInputSameValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertFalse(page.setInputValue("Nordstrom"));
+    }
+
+    public static void updateTextInputNewValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertTrue(page.setInputValue("HauteLook"));
+    }
+
+    public static void updateTextInputBoolValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertTrue(page.setInputValue(true));
+        assertEquals("true", page.getInputValue());
+    }
+
+    public static void updateTextInputNullValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertTrue(page.setInputValue(null));
+        assertEquals("", page.getInputValue());
+    }
+
+    public static void updateCheckboxSameValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertFalse(page.setCheckValue(false));
+    }
+
+    public static void updateCheckboxNewValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertTrue(page.setCheckValue(true));
+    }
+
+    public static void updateCheckboxStringValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertTrue(page.setCheckValue("true"));
+    }
+
+    public static void updateCheckboxNullValue(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        assertFalse(page.setCheckValue(null));
+    }
+
     public static void testParagraphs(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         List<String> paraList = page.getParagraphs();
         assertEquals(paraList.size(), 3);
-        assertArrayEquals(paraList.toArray(), PARAS);
+        assertArrayEquals(PARAS, paraList.toArray());
     }
     
     public static void testTable(TestBase instance) {
@@ -45,40 +87,40 @@ public class ModelTestCore {
      * @param component table component to be verified
      */
     private static void verifyTable(TableComponent component) {
-        assertArrayEquals(component.getHeadings().toArray(), HEADINGS);
+        assertArrayEquals(HEADINGS, component.getHeadings().toArray());
         List<List<String>> content = component.getContent();
         assertEquals(content.size(), 3);
-        assertArrayEquals(content.get(0).toArray(), CONTENT[0]);
-        assertArrayEquals(content.get(1).toArray(), CONTENT[1]);
-        assertArrayEquals(content.get(2).toArray(), CONTENT[2]);
+        assertArrayEquals(CONTENT[0], content.get(0).toArray());
+        assertArrayEquals(CONTENT[1], content.get(1).toArray());
+        assertArrayEquals(CONTENT[2], content.get(2).toArray());
         assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameByLocator(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameByLocator();
-        assertEquals(component.getPageContent(), FRAME_A);
+        assertEquals(FRAME_A, component.getPageContent());
         assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameByElement(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameByElement();
-        assertEquals(component.getPageContent(), FRAME_B);
+        assertEquals(FRAME_B, component.getPageContent());
         assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameByIndex(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameByIndex();
-        assertEquals(component.getPageContent(), FRAME_C);
+        assertEquals(FRAME_C, component.getPageContent());
         assertTrue(component instanceof Enhanced);
     }
     
     public static void testFrameById(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         FrameComponent component = page.getFrameById();
-        assertEquals(component.getPageContent(), FRAME_D);
+        assertEquals(FRAME_D, component.getPageContent());
         assertTrue(component instanceof Enhanced);
     }
     
@@ -97,28 +139,28 @@ public class ModelTestCore {
     public static void testFrameList(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         List<FrameComponent> frameList = page.getFrameList();
-        assertEquals(frameList.size(), 4);
-        assertEquals(frameList.get(0).getPageContent(), FRAME_A);
+        assertEquals(4, frameList.size());
+        assertEquals(FRAME_A, frameList.get(0).getPageContent());
         assertTrue(frameList.get(0) instanceof Enhanced);
-        assertEquals(frameList.get(1).getPageContent(), FRAME_B);
+        assertEquals(FRAME_B, frameList.get(1).getPageContent());
         assertTrue(frameList.get(1) instanceof Enhanced);
-        assertEquals(frameList.get(2).getPageContent(), FRAME_C);
+        assertEquals(FRAME_C, frameList.get(2).getPageContent());
         assertTrue(frameList.get(2) instanceof Enhanced);
-        assertEquals(frameList.get(3).getPageContent(), FRAME_D);
+        assertEquals(FRAME_D, frameList.get(3).getPageContent());
         assertTrue(frameList.get(3) instanceof Enhanced);
     }
     
     public static void testFrameMap(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         Map<Object, FrameComponent> frameMap = page.getFrameMap();
-        assertEquals(frameMap.size(), 4);
-        assertEquals(frameMap.get(FRAME_A).getPageContent(), FRAME_A);
+        assertEquals(4, frameMap.size());
+        assertEquals(FRAME_A, frameMap.get(FRAME_A).getPageContent());
         assertTrue(frameMap.get(FRAME_A) instanceof Enhanced);
-        assertEquals(frameMap.get(FRAME_B).getPageContent(), FRAME_B);
+        assertEquals(FRAME_B, frameMap.get(FRAME_B).getPageContent());
         assertTrue(frameMap.get(FRAME_B) instanceof Enhanced);
-        assertEquals(frameMap.get(FRAME_C).getPageContent(), FRAME_C);
+        assertEquals(FRAME_C, frameMap.get(FRAME_C).getPageContent());
         assertTrue(frameMap.get(FRAME_C) instanceof Enhanced);
-        assertEquals(frameMap.get(FRAME_D).getPageContent(), FRAME_D);
+        assertEquals(FRAME_D, frameMap.get(FRAME_D).getPageContent());
         assertTrue(frameMap.get(FRAME_D) instanceof Enhanced);
     }
     
@@ -129,7 +171,7 @@ public class ModelTestCore {
             @Override
             public void run() {
                 ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
-                assertEquals(shadowRoot.getHeading(), SHADOW_DOM_A);
+                assertEquals(SHADOW_DOM_A, shadowRoot.getHeading());
                 assertTrue(shadowRoot instanceof Enhanced);
             }
         };
@@ -142,7 +184,7 @@ public class ModelTestCore {
             @Override
             public void run() {
                 ShadowRootComponent shadowRoot = page.getShadowRootByElement();
-                assertEquals(shadowRoot.getHeading(), SHADOW_DOM_B);
+                assertEquals(SHADOW_DOM_B, shadowRoot.getHeading());
                 assertTrue(shadowRoot instanceof Enhanced);
             }
         };
@@ -156,9 +198,9 @@ public class ModelTestCore {
             public void run() {
                 List<ShadowRootComponent> shadowRootList = page.getShadowRootList();
                 assertEquals(shadowRootList.size(), 2);
-                assertEquals(shadowRootList.get(0).getHeading(), SHADOW_DOM_A);
+                assertEquals(SHADOW_DOM_A, shadowRootList.get(0).getHeading());
                 assertTrue(shadowRootList.get(0) instanceof Enhanced);
-                assertEquals(shadowRootList.get(1).getHeading(), SHADOW_DOM_B);
+                assertEquals(SHADOW_DOM_B, shadowRootList.get(1).getHeading());
                 assertTrue(shadowRootList.get(1) instanceof Enhanced);
             }
         };
@@ -172,9 +214,9 @@ public class ModelTestCore {
             public void run() {
                 Map<Object, ShadowRootComponent> shadowRootMap = page.getShadowRootMap();
                 assertEquals(shadowRootMap.size(), 2);
-                assertEquals(shadowRootMap.get(SHADOW_DOM_A).getHeading(), SHADOW_DOM_A);
+                assertEquals(SHADOW_DOM_A, shadowRootMap.get(SHADOW_DOM_A).getHeading());
                 assertTrue(shadowRootMap.get(SHADOW_DOM_A) instanceof Enhanced);
-                assertEquals(shadowRootMap.get(SHADOW_DOM_B).getHeading(), SHADOW_DOM_B);
+                assertEquals(SHADOW_DOM_B, shadowRootMap.get(SHADOW_DOM_B).getHeading());
                 assertTrue(shadowRootMap.get(SHADOW_DOM_B) instanceof Enhanced);
             }
         };
@@ -198,10 +240,10 @@ public class ModelTestCore {
         int[] bodyRefreshCounts = component.getBodyRefreshCounts();
         
         // verify no initial refresh requests
-        assertEquals(pageRefreshCount, 0);
-        assertEquals(tableRefreshCount, 0);
-        assertEquals(headRefreshCount, 0);
-        assertArrayEquals(bodyRefreshCounts, new int[] {0, 0, 0});
+        assertEquals(0, pageRefreshCount);
+        assertEquals(0, tableRefreshCount);
+        assertEquals(0, headRefreshCount);
+        assertArrayEquals(new int[] {0, 0, 0}, bodyRefreshCounts);
         
         // refresh page to force DOM rebuild
         page.getWrappedDriver().navigate().refresh();
@@ -216,13 +258,13 @@ public class ModelTestCore {
         bodyRefreshCounts = component.getBodyRefreshCounts();
         
         // 1 page refresh request from its table context
-        assertEquals(pageRefreshCount, 1);
+        assertEquals(1, pageRefreshCount);
         // 1 table refresh request from each of its four row contexts
-        assertEquals(tableRefreshCount, 4);
+        assertEquals(4, tableRefreshCount);
         // 1 head row refresh request from one of its web element contexts
-        assertEquals(headRefreshCount, 1);
+        assertEquals(1, headRefreshCount);
         // 1 refresh request per body row from one of its web element contexts
-        assertArrayEquals(bodyRefreshCounts, new int[] {1, 1, 1});
+        assertArrayEquals(new int[] {1, 1, 1}, bodyRefreshCounts);
         
         // verify table contents again
         // NOTE: No additional refresh requests are expected
@@ -235,10 +277,10 @@ public class ModelTestCore {
         bodyRefreshCounts = component.getBodyRefreshCounts();
         
         // verify no additional refresh requests
-        assertEquals(pageRefreshCount, 1);
-        assertEquals(tableRefreshCount, 4);
-        assertEquals(headRefreshCount, 1);
-        assertArrayEquals(bodyRefreshCounts, new int[] {1, 1, 1});
+        assertEquals(1, pageRefreshCount);
+        assertEquals(4, tableRefreshCount);
+        assertEquals(1, headRefreshCount);
+        assertArrayEquals(new int[] {1, 1, 1}, bodyRefreshCounts);
     }
     
     public static void testCssOptional(TestBase instance) {
@@ -264,7 +306,7 @@ public class ModelTestCore {
             public void run() {
                 ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
                 List<String> paraList = shadowRoot.getParagraphs();
-                assertEquals(paraList.size(), 3);
+                assertEquals(3, paraList.size());
                 
                 String[] expect = new String[3];
                 String heading = shadowRoot.getHeading();
@@ -272,7 +314,7 @@ public class ModelTestCore {
                 for (int i = 0; i < 3; i++) {
                     expect[i] = marker + PARAS[i];
                 }
-                assertArrayEquals(paraList.toArray(), expect);
+                assertArrayEquals(expect, paraList.toArray());
             }
         };
     }

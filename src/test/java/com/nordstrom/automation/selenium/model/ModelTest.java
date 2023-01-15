@@ -1,9 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
-import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
-
 import org.testng.SkipException;
 import org.testng.annotations.Test;
+import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
@@ -21,6 +20,54 @@ public class ModelTest extends TestNgTargetRoot {
         ModelTestCore.testBasicPage(this);
     }
     
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputSameValue() {
+        ModelTestCore.updateTextInputSameValue(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputNewValue() {
+        ModelTestCore.updateTextInputNewValue(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputBoolValue() {
+        ModelTestCore.updateTextInputBoolValue(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputNullValue() {
+        ModelTestCore.updateTextInputNullValue(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxSameValue() {
+        ModelTestCore.updateCheckboxSameValue(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxNewValue() {
+        ModelTestCore.updateCheckboxNewValue(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxStringValue() {
+        ModelTestCore.updateCheckboxStringValue(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxNullValue() {
+        ModelTestCore.updateCheckboxNullValue(this);
+    }
+
     @Test
     @TargetPlatform(WEB_APP_NAME)
     public void testParagraphs() {

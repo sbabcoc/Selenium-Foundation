@@ -432,10 +432,8 @@ public abstract class ComponentContainer
             if ("checkbox".equals(element.getAttribute("type"))) {
                 return updateValue(element, Boolean.parseBoolean(value));
             } else if (!valueEquals(element, value)) {
-                if (value == null) {
-                    element.clear();
-                } else {
-                    WebDriverUtils.getExecutor(element).executeScript("arguments[0].select();", element);
+                element.clear();
+                if (value != null) {
                     element.sendKeys(value);
                 }
                 return true;

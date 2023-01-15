@@ -1,3 +1,4 @@
+import org.gradle.internal.os.OperatingSystem
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
@@ -19,6 +20,15 @@ if (!project.hasProperty('profile')) {
 }
 
 apply from: "${profile}Deps.gradle"
+
+if (project.hasProperty('browsers')) {
+  ext.browsers.split(',').each {
+    def browser = it.trim()
+    if (browser) {
+      apply from: "${browser}Deps.gradle"
+    }
+  }
+}
 
 def archiveVer = null
 def verBits = scmVersion.version.split('-')
@@ -112,12 +122,26 @@ task testNG(type: Test) {
   useTestNG()
   reports.html.destination = file("${buildDir}/reports/testng")
   testLogging.showStandardStreams = true
+  
+  systemProperty 'selenium.grid.plugins', System.getProperty('selenium.grid.plugins')
+  systemProperty 'selenium.browser.name', System.getProperty('selenium.browser.name')
+  systemProperty 'selenium.browser.caps', getBrowserCaps()
+  systemProperty 'selenium.context.platform', System.getProperty('selenium.context.platform', 'support')
+  systemProperty 'selenium.grid.examples', System.getProperty('selenium.grid.examples', 'true')
+  systemProperty 'appium.with.pm2', System.getProperty('appium.with.pm2', 'false')
 }
 
 test {
   dependsOn testNG
   reports.html.destination = file("${buildDir}/reports/junit")
   testLogging.showStandardStreams = true
+  
+  systemProperty 'selenium.grid.plugins', System.getProperty('selenium.grid.plugins')
+  systemProperty 'selenium.browser.name', System.getProperty('selenium.browser.name')
+  systemProperty 'selenium.browser.caps', getBrowserCaps()
+  systemProperty 'selenium.context.platform', System.getProperty('selenium.context.platform', 'support')
+  systemProperty 'selenium.grid.examples', System.getProperty('selenium.grid.examples', 'true')
+  systemProperty 'appium.with.pm2', System.getProperty('appium.with.pm2', 'false')
 }
 
 scmVersion {
@@ -213,7 +237,7 @@ dependencies {
     api 'com.nordstrom.tools:junit-foundation:17.0.2'
     api 'com.github.sbabcoc:logback-testng:2.0.0'
     api 'org.hamcrest:hamcrest-core:2.2'
-    api 'org.yaml:snakeyaml:1.32'
+    api 'org.yaml:snakeyaml:1.33'
   }
   api 'com.nordstrom.tools:java-utils'
   api 'com.nordstrom.tools:settings'
@@ -227,4 +251,12 @@ dependencies {
 
 test {
     jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
+}
+
+def getBrowserCaps() {
+  def browserCaps = System.getProperty('selenium.browser.caps')
+  if (browserCaps && OperatingSystem.current().isWindows()) {
+    return browserCaps.replaceAll('"', '\\\\"')
+  }
+  return browserCaps
 }
