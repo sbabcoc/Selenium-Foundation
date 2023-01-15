@@ -36,13 +36,13 @@ import com.nordstrom.automation.selenium.plugins.PluginUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
- * <h1>The {@code SeleniumGrid} Object</h1>
+ * <b>The {@code SeleniumGrid} Object</b>
  * <p>
  * The <b>{@code SeleniumGrid}</b> object provides an interface to 
  * <a href='https://github.com/SeleniumHQ/selenium/wiki/Grid2'>Selenium Grid</a> collections - both local and remote.
  * A standard grid object is available through the configuration, and independent instances can be created as needed.
- * 
- * <h2>Using the standard {@code SeleniumGrid} object</h2>
+ * <p>
+ * <b>Using the standard {@code SeleniumGrid} object</b>
  * <p>
  * By default, <b>Selenium Foundation</b> acquires its browser sessions from an instance of the 
  * <a href='https://seleniumhq.github.io/docs/grid.html'>Selenium Grid</a>. If no remote Grid instance is specified in

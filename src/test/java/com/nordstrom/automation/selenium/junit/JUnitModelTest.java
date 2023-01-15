@@ -25,6 +25,62 @@ public class JUnitModelTest extends JUnitTargetRoot {
     @Test
     @Ignore
     @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputSameValue() {
+        ModelTestCore.updateTextInputSameValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputNewValue() {
+        ModelTestCore.updateTextInputNewValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputBoolValue() {
+        ModelTestCore.updateTextInputBoolValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateTextInputNullValue() {
+        ModelTestCore.updateTextInputNullValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxSameValue() {
+        ModelTestCore.updateCheckboxSameValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxNewValue() {
+        ModelTestCore.updateCheckboxNewValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxStringValue() {
+        ModelTestCore.updateCheckboxStringValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void updateCheckboxNullValue() {
+        ModelTestCore.updateCheckboxNullValue(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
     public void testParagraphs() {
         ModelTestCore.testParagraphs(this);
     }

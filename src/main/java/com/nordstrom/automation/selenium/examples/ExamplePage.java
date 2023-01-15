@@ -16,6 +16,7 @@ import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.ByType;
+import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
 
@@ -201,6 +202,10 @@ public class ExamplePage extends Page {
         return updateValue(findElement(Using.INPUT), value);
     }
     
+    public boolean setInputValue(boolean value) {
+        return updateValue(findElement(Using.INPUT), value);
+    }
+    
     public String getInputValue() {
         return findElement(Using.INPUT).getAttribute("value");
     }
@@ -215,6 +220,14 @@ public class ExamplePage extends Page {
     
     public boolean setCheckValue(boolean value) {
         return updateValue(findElement(Using.CHECK), value);
+    }
+    
+    public boolean setCheckValue(String value) {
+        return updateValue(findElement(Using.CHECK), value);
+    }
+    
+    public void resetForm() {
+        JsUtility.run(driver, "document.getElementById('form').reset()");
     }
     
     public boolean hasCssOptional() {

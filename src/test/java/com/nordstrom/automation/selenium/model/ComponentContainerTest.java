@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium.model;
 
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -16,60 +15,11 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.PageUrl;
-import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 
 public class ComponentContainerTest {
 
     private static final URI targetUri = URI.create("http://target.com/basepath/");
     
-    @Test
-    public void updateTextInputSameValue() {
-        WebElement elementWithValue = mockElement("input", "Nordstrom", false);
-        assertFalse(ComponentContainer.updateValue(elementWithValue, "Nordstrom"));
-    }
-
-    @Test
-    public void updateTextInputNewValue() {
-        WebElement elementWithValue = mockElement("input", "Nordstrom", false);
-        assertTrue(ComponentContainer.updateValue(elementWithValue, "HauteLook"));
-    }
-
-    @Test
-    public void updateTextInputBoolValue() {
-        WebElement elementWithValue = mockElement("input", "Nordstrom", false);
-        assertTrue(ComponentContainer.updateValue(elementWithValue, true));
-    }
-
-    @Test
-    public void updateTextInputNullValue() {
-        WebElement elementWithValue = mockElement("input", "Nordstrom", false);
-        assertTrue(ComponentContainer.updateValue(elementWithValue, null));
-    }
-
-    @Test
-    public void updateCheckboxSameValue() {
-        WebElement elementWithValue = mockElement("input", "false", true);
-        assertFalse(ComponentContainer.updateValue(elementWithValue, false));
-    }
-
-    @Test
-    public void updateCheckboxNewValue() {
-        WebElement elementWithValue = mockElement("input", "false", true);
-        assertTrue(ComponentContainer.updateValue(elementWithValue, true));
-    }
-
-    @Test
-    public void updateCheckboxStringValue() {
-        WebElement elementWithValue = mockElement("input", "false", true);
-        assertTrue(ComponentContainer.updateValue(elementWithValue, "true"));
-    }
-
-    @Test
-    public void updateCheckboxNullValue() {
-        WebElement elementWithValue = mockElement("input", "false", true);
-        assertFalse(ComponentContainer.updateValue(elementWithValue, null));
-    }
-
     @Test(expectedExceptions = {NullPointerException.class},
                     expectedExceptionsMessageRegExp = "\\[element\\] must be non-null")
     public void updateElementNullWithString() {
@@ -153,32 +103,6 @@ public class ComponentContainerTest {
         PageUrlExample page = new PageUrlExample(mockDriver());
         PageUrl pageUrl = PageUrlExample.class.getAnnotation(PageUrl.class);
         ComponentContainer.verifyLandingPage(page, PageUrlExample.class, pageUrl, targetUri);
-    }
-
-    /**
-     * Create mocked {@link WebElement} object.
-     * 
-     * @param type element type
-     * @param value element value
-     * @param isCheckbox 'true' is checkbox is desired; otherwise 'false'
-     * @return mocked WebElement object
-     */
-    private static WebElement mockElement(String type, String value, boolean isCheckbox) {
-        WebElement element = mock(WebElement.class, withSettings().extraInterfaces(WrapsDriver.TYPE));
-        when(element.getTagName()).thenReturn(type);
-        if (isCheckbox) {
-            when(element.getAttribute("type")).thenReturn("checkbox");
-            when(element.getAttribute("value")).thenReturn("isSelected: " + value);
-            when(element.isSelected()).thenReturn(Boolean.parseBoolean(value));
-        } else {
-            when(element.getAttribute("type")).thenReturn("text");
-            when(element.getAttribute("value")).thenReturn(value);
-            when(element.isSelected()).thenReturn(false);
-        }
-
-        WebDriver driver = mockDriver();
-        when(WrapsDriver.getWrappedDriver.apply(element)).thenReturn(driver);
-        return element;
     }
 
     /**

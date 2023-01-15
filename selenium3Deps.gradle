@@ -37,6 +37,13 @@ dependencies {
     api 'org.eclipse.jetty.websocket:websocket-client:9.4.46.v20220331'
     api 'org.jetbrains.kotlin:kotlin-stdlib:1.7.0'
     api 'org.jetbrains.kotlin:kotlin-stdlib-common:1.7.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-chrome-driver:3.141.59'
+    testImplementation 'org.seleniumhq.selenium:selenium-edge-driver:3.141.59'
+    testImplementation 'io.appium:java-client:7.6.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-firefox-driver:3.141.59'
+    testImplementation 'org.seleniumhq.selenium:selenium-opera-driver:3.141.59'
+    testImplementation 'com.codeborne:phantomjsdriver:1.4.4'
+    testImplementation 'org.seleniumhq.selenium:selenium-safari-driver:3.141.59'
     testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.67.0'
     testImplementation 'org.mockito:mockito-core:4.6.1'
   }

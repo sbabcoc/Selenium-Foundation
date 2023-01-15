@@ -45,6 +45,7 @@
           var div_a = document.createElement('div');
           div_a.id = 'form-div-a';
           var form_a = document.createElement('form');
+          form_a.id = 'form_a';
           var label_1_a = document.createElement('label');
           label_1_a.for = 'input-field-a';
           label_1_a.textContent = '[A] Input: ';
@@ -52,6 +53,7 @@
           input_field_a.type = 'text';
           input_field_a.id = 'input-field-a';
           input_field_a.name = 'input-field-a';
+          input_field_a.value = 'Poshmark';
           var label_2_a = document.createElement('label');
           label_2_a.for = 'checkbox-a';
           label_2_a.textContent = '[A] Check: ';
@@ -87,6 +89,7 @@
           var div_b = document.createElement('div');
           div_b.id = 'form-div-b';
           var form_b = document.createElement('form');
+          form_b.id = 'form_b';
           var label_1_b = document.createElement('label');
           label_1_b.for = 'input-field-b';
           label_1_b.textContent = '[B] Input: ';
@@ -94,6 +97,7 @@
           input_field_b.type = 'text';
           input_field_b.id = 'input-field-b';
           input_field_b.name = 'input-field-b';
+          input_field_b.value = 'RealReal';
           var label_2_b = document.createElement('label');
           label_2_b.for = 'checkbox-b';
           label_2_b.textContent = '[B] Check: ';
@@ -145,9 +149,9 @@
         </td>
         <td>
           <div id="form-div">
-            <form action="/action_page.php">
+            <form id="form" action="/action_page.php">
               <label for="input-field">Input: </label>
-              <input type="text" name="input-field" id="input-field"><br>
+              <input type="text" name="input-field" id="input-field" value="Nordstrom"><br>
               <label for="checkbox">Check: </label>
               <input type="checkbox" name="checkbox" id="checkbox" value="checkbox"><br>
               <input type="submit" value="Submit">

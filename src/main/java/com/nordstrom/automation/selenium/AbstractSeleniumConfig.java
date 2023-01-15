@@ -52,11 +52,7 @@ public abstract class AbstractSeleniumConfig extends
                 SettingsCore<AbstractSeleniumConfig.SeleniumSettings> {
 
     private static final String SETTINGS_FILE = "settings.properties";
-    private static final String CAPS_PATTERN = "{\"browserName\":\"%s\"}";
 
-    /** value: <b>{"browserName":"htmlunit"}</b> */
-    private static final String DEFAULT_CAPS = String.format(CAPS_PATTERN, "htmlunit");
-    
     protected static final String NODE_MODS_SUFFIX = ".node.mods";
     private static final String CAPS_MODS_SUFFIX = ".caps.mods";
     
@@ -222,9 +218,9 @@ public abstract class AbstractSeleniumConfig extends
          * requests. This can be either a file path (absolute, relative, or simple filename) or a direct value.
          * <p>
          * name: <b>selenium.browser.caps</b><br>
-         * default: {@link #DEFAULT_CAPS}
+         * default: {@code null}
          */
-        BROWSER_CAPS("selenium.browser.caps", DEFAULT_CAPS),
+        BROWSER_CAPS("selenium.browser.caps", null),
         
         /**
          * This setting specifies the maximum allowed interval for a page to finish loading.
@@ -735,9 +731,9 @@ public abstract class AbstractSeleniumConfig extends
         Capabilities capabilities = null;
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
         String browserCaps = resolveString(SeleniumSettings.BROWSER_CAPS.key());
-        if (browserName != null) {
+        if (!Strings.isNullOrEmpty(browserName)) {
             capabilities = getSeleniumGrid().getPersonality(getConfig(), browserName);
-        } else if (browserCaps != null) {
+        } else if (!Strings.isNullOrEmpty(browserCaps)) {
             capabilities = getCapabilitiesForJson(browserCaps)[0];
         } else {
             throw new IllegalStateException("Neither browser name nor capabilities are specified");
@@ -799,7 +795,7 @@ public abstract class AbstractSeleniumConfig extends
      * @return list of {@link Capabilities} objects
      */
     public Capabilities[] getCapabilitiesForName(final String browserName) {
-        return getCapabilitiesForJson(String.format(CAPS_PATTERN, browserName));
+        return getCapabilitiesForJson(String.format("{\"browserName\":\"%s\"}", browserName));
     }
     
     /**

@@ -1,6 +1,6 @@
 package com.nordstrom.automation.selenium.platform;
 
-interface TargetTypeName extends PlatformEnum {
+public interface TargetTypeName extends PlatformEnum {
     String SUPPORT_NAME = "support";
     String WEB_APP_NAME = "web-app";
     String ANDROID_NAME = "android";

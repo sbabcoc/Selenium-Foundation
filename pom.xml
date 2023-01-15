@@ -53,7 +53,7 @@
     <clean-plugin.version>3.2.0</clean-plugin.version>
     <hamcrest.version>2.2</hamcrest.version>
     <!-- managed to resolve identified threat -->
-    <snakeyaml.version>1.32</snakeyaml.version>
+    <snakeyaml.version>1.33</snakeyaml.version>
     <chromePlugin />
     <edgePlugin />
     <espressoPlugin />
@@ -408,6 +408,12 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-chrome-driver</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-remote-driver</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
     </profile>
