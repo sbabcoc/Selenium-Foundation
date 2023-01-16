@@ -57,7 +57,7 @@ As mentioned previously, you're able to override defaults in **`SeleniumConfig`*
 
 ## Configuration-Based API Abstration 
 
-**`SeleniumConfig`** is more than a collection of settings; this class also provides generic interfaces to several core aspects of the WebDriver API that differ between Selenium 2 and Selenium 3:
+**`SeleniumConfig`** is more than a collection of settings; this class also provides generic interfaces to several core aspects of the WebDriver API for Selenium 3:
 
 * Convert JSON string to **`Capabilities`** object: `getCapabilitiesForJson(String capabilities)`
 * Convert object to JSON string: `toJson(Object obj)`
