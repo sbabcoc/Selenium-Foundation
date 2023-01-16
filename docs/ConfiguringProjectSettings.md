@@ -99,22 +99,44 @@ The **`GRID_PLUGINS`** setting specifies a semicolon-delimited list of fully-qua
 
 #### Grid Configuration for Selenium Foundation unit tests
 
-As of this writing, the unit tests are [configured](LocalGridConfiguration.md) to get their browsers from a local Selenium Grid instance serving [HtmlUnit](http://htmlunit.sourceforge.net/) sessions. Described as "a GUI-less browser for Java programs", this browser is perfect for rendering the simple pages used to exercise the features of **Selenium Foundation**. 
+By default, the unit tests are [configured](LocalGridConfiguration.md) to run the "support" tests, which don't require browser sessions. The local Grid instance launched for this configuration runs in "servlet container" mode. The Maven and Gradle project file define sets of profiles, one for each supported browser, which specify the corresponding dependencies, settings, and driver plugin needed to run the unit tests for that browser.
+
+| Profile | Browser / Appium Engine |
+| --- |:---:|
+| chrome | Google Chrome |
+| edge | Microsoft Edge |
+| espresso | Android Espresso engine (Appium) |
+| firefox | Mozilla Firefox |
+| htmlunit | Gargoyle HtmlUnit |
+| mac2 | Macintosh Mac2 engine (Appium) |
+| opera | Opera |
+| phantomjs | PhantomJS |
+| safari | Apple Safari |
+| uiautomator2 | Android UiAutomator2 engine (Appium) |
+| windows | Microsoft Windows engine (Appium) |
+| xcuitest | Apple iOS engine (Appium) |
+
+To run the unit tests on a specific browser, add the corresponding option to the Gradle or `mvn-build.sh` command line:
+
+| Test Runner | Command Line Example | Description |
+|---|---|---| 
+| Gradle | `gradle test -Pbrowsers=htmlunit` | Run **Selenium Foundation** unit tests on the HtmlUnit headless browser |
+| `mvn-build` | `./mvn-build.sh -b espresso` | Build **Selenium Foundation** and run the Android Espresso unit tests|
 
 #### Desktop Browser Support
 
 **Selenium Foundation** provides the ability to drive web applications through common desktop browsers. Currently, plug-ins are available for the following browsers:
 
-| Browser | Selenium 2 | Selenium 3 |
-| --- |:---:|:---:|
-| Chrome | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
-| Edge | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
-| Firefox | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
-| HtmlUnit | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
-| Internet Explorer | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
-| Opera | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
-| PhantomJS | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
-| Safari | [source](../src/selenium2/java/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
+| Browser | Plug-In |
+| --- |:---:|
+| Chrome | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/ChromePlugin.java) |
+| Edge | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/EdgePlugin.java) |
+| Firefox | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
+| HtmlUnit | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
+| Internet Explorer | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
+| Opera | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
+| PhantomJS | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/PhantomJsPlugin.java) |
+| Safari | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
 
 #### Appium Automation Engine Support
 
@@ -128,7 +150,7 @@ In addition to support for desktop browsers, **Selenium Foundation** provides th
 | Windows | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/WindowsPlugin.java) |
 | XCUITest | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/XCUITestPlugin.java) |
 
-Note that these plug-ins are not version-specific; each will work with either Selenium 2 or Selenium 3 API, and no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](http://appium.io/docs/en/about-appium/getting-started/) on your system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
+Note that no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](http://appium.io/docs/en/about-appium/getting-started/) on your system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
 
 ###### Appium Binary Paths
 
