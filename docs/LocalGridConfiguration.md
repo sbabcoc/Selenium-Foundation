@@ -19,18 +19,13 @@ com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin
 
 ### Declaring Driver Dependencies
 
-In addition to declaring driver plug-ins in the **ServiceLoader** provider configuration file, the Java project itself must declare the dependencies of the corresponding driver(s). These dependencies vary by the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves. For example, here are the Maven dependencies for the **Selenium 2** version of **`HtmlUnitPlugin`**:
+In addition to declaring driver plug-ins in the **ServiceLoader** provider configuration file, the Java project itself must declare the dependencies of the corresponding driver(s). These dependencies vary by the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves. For example, here is the Maven dependency for the **Selenium 3** version of **`HtmlUnitPlugin`**:
 
 ```xml
 <dependency>
-  <groupId>net.sourceforge.htmlunit</groupId>
-  <artifactId>htmlunit</artifactId>
-  <version>2.22</version>
-</dependency>
-<dependency>
   <groupId>org.seleniumhq.selenium</groupId>
   <artifactId>htmlunit-driver</artifactId>
-  <version>2.22</version>
+  <version>2.67.0</version>
 </dependency>
 ```
 
@@ -54,21 +49,21 @@ In addition to specifying `Appium` driver plug-ins in the **ServiceLoader** prov
 
 Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency in your Java projects to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**. Here are the Maven artifact coordinates that correspond to each version of the **Selenium API**:
 
-| Selenium 2 | Selenium 3 |
-|:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;4.1.2&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| Selenium 3 |
+|:---|
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 ### Additional Local Grid Settings
 
-To enable the `Local Grid` feature to support both **Selenium 2** and **Selenium 3**, the core configuration in **`SeleniumConfig`** defines version-specific default values for several settings:
+To enable the `Local Grid` feature to support **Selenium 3**, the core configuration in **`SeleniumConfig`** defines version-specific default values for several settings:
 
-| Setting | Property Name | `s2` Default | `s3` Default |
-|---|---|---|---|
-| **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncher | org.openqa.grid.selenium.GridLauncherV3 |
-| **`LAUNCHER_DEPS`** | `selenium.launcher.deps` | [source](/src/selenium2/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L157) | [source](/src/selenium3/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L163) |
-| **`HUB_PORT`** | `selenium.hub.port` | 4444 | 4445 |
-| **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s2.json | hubConfig-s3.json |
-| **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s2.json | nodeConfig-s3.json |
+| Setting | Property Name | `s3` Default |
+|---|---|---|
+| **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncherV3 |
+| **`LAUNCHER_DEPS`** | `selenium.launcher.deps` | [source](/src/selenium3/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L163) |
+| **`HUB_PORT`** | `selenium.hub.port` | 4445 |
+| **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s3.json |
+| **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s3.json |
 
 #### NOTES
 
