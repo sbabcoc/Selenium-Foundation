@@ -206,7 +206,7 @@ You'll probably find that the defaults assigned to most settings will suffice in
 | **`TARGET_HOST`** | `selenium.target.host` | `localhost` |
 | **`TARGET_PATH`** | `selenium.target.path` | `/` |
 
-\* NOTE: By default, HtmlUnit is selected as the browser. For easier override, this is specified through **`BROWSER_CAPS`** instead of **`BROWSER_NAME`**. For details, see [Configuring Project Settings](docs/ConfiguringProjectSettings.md#introduction). 
+\* NOTE: To obtain instances of the "current" browser, you need to specify either **`BROWSER_CAPS`** or **`BROWSER_NAME`**. For details, see [Configuring Project Settings](docs/ConfiguringProjectSettings.md#introduction). 
 
 ## Overriding Defaults 
 
