@@ -9,7 +9,7 @@ There are two settings used to select which browser you want to run your tests o
 
 * **`BROWSER_NAME`** - This setting specifies the browser name or "personality" for new session requests.
 * **`BROWSER_CAPS`** - If **`BROWSER_NAME`** is undefined, this setting specifies the **Capabilities** for new session requests. This can be either a file path (absolute, relative, or simple filename) or a direct value.
-* By default, **`BROWSER_NAME`** is unspecified and **`BROWSER_CAPS`** specifies the `HtmlUnit` browser.
+* By default, neither **`BROWSER_NAME`** nor **`BROWSER_CAPS`** is specified.
 
 ### Selecting Browser Capabilities by Personality
 
