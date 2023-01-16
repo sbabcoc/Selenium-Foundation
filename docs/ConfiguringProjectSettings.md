@@ -167,7 +167,7 @@ The `getCurrentCapabilities()` method converts the configured browser settings i
 * If **`BROWSER_NAME`** is specified, **Selenium Foundation** uses this name to acquire a **`Capabilities`** object from the active Selenium Grid.
 * Otherwise, the JSON configuration is acquired from **`BROWSER_CAPS`**, which can be either a file path (absolute, relative, or simple filename) or a direct value.
 
-As indicated by the sequence above, the desired browser can be specified solely by name. This name can be associated with a Selenium Grid browser "personality", or it may simply specify the name associated with a particular browser by its corresponding driver. If browser name is omitted, a fully-specified JSON capabilities record is acquired from the settings collection. (By default, the browser capabilities setting specifies the **HtmlUnit** browser.)
+As indicated by the sequence above, the desired browser can be specified solely by name. This name can be associated with a Selenium Grid browser "personality", or it may simply specify the name associated with a particular browser by its corresponding driver. If browser name is omitted, a fully-specified JSON capabilities record is acquired from the settings collection.
 
 The `getCapabilitiesForName(String browserName)` method enables you to get a **`Capabilities`** object for a specified name or "personality" from the active Selenium Grid. This bypasses the configured default browser specification, allowing you to acquire browser sessions of any type supported by the active Grid.
 
