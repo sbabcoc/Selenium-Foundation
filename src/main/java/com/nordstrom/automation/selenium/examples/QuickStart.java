@@ -94,8 +94,8 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  *     </tr>
  * </table>
  * <p>
- * * <b>NOTE</b>: By default, HtmlUnit is selected as the browser. For easier override, this is specified through
- * {@link SeleniumSettings#BROWSER_CAPS BROWSER_CAPS} instead of {@link SeleniumSettings#BROWSER_NAME BROWSER_NAME}.
+ * * <b>NOTE</b>: By default, no target browser is selected. Either {@link SeleniumSettings#BROWSER_NAME BROWSER_NAME}
+ * or {@link SeleniumSettings#BROWSER_CAPS BROWSER_CAPS} must be specified for this test to run.
  * For details, see <a href=
  * "https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/ConfiguringProjectSettings.md">Configuring Project
  * Settings
