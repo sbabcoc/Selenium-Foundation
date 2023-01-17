@@ -312,9 +312,9 @@ public abstract class AbstractSeleniumConfig extends
          * This setting specifies the target platform for the current test context.
          * <p>
          * name: <b>selenium.context.platform</b><br>
-         * default: {@code null}
+         * default: <b>support</b>
          */
-        CONTEXT_PLATFORM("selenium.context.platform", null),
+        CONTEXT_PLATFORM("selenium.context.platform", "support"),
         
         /**
          * This setting specifies server arguments passed on to {@code Appium} when it's launched as a local
