@@ -14,8 +14,9 @@ usage()
   echo
   echo "    -b <browser>        {chrome|edge|espresso|firefox|htmlunit|mac2|opera|phantomjs|safari|uiautomator2|windows|xcuitest}"
   echo "    -h                  run in 'headless' mode (only supported by Chrome, Edge, and Firefox)"
+  echo "    -t                  run tests on the existing installed target (skip 'build' phase)"
   echo
-  echo "The browser-less support tests are executed if no options are specified"
+  echo "The support feature tests (which don't require a browser) are executed if no options are specified"
 }
 
 . gradle.properties > /dev/null 2>&1
@@ -24,8 +25,9 @@ if [[ ! "${version}" =~ -SNAPSHOT$ ]]; then
 fi
 
 revision=${version/-/-s3-}
+phase='clean install'
 
-while getopts :b:h flag
+while getopts :b:ht flag
 do
   case "${flag}" in
     b)
@@ -33,6 +35,9 @@ do
       ;;
     h)
       headless='.headless'
+      ;;
+    t)
+      phase='test'
       ;;
 
     *)
@@ -95,4 +100,4 @@ case "${browser}" in
     ;;
 esac
 
-mvn "-Drevision=${revision}" clean install -Pselenium3 ${browserProfile} "-Dselenium.context.platform=${targetPlatform}" "${seleniumSettings[@]}"
+mvn "-Drevision=${revision}" ${phase} -Pselenium3 ${browserProfile} "-Dselenium.context.platform=${targetPlatform}" "${seleniumSettings[@]}"
