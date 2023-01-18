@@ -1,4 +1,3 @@
-
 [![Maven Central](https://img.shields.io/maven-central/v/com.nordstrom.ui-tools/selenium-foundation.svg)](https://search.maven.org/search?q=g:com.nordstrom.ui-tools%20AND%20a:selenium-foundation&core=gav)
 
 # INTRODUCTION
@@ -16,6 +15,8 @@ With the release of **Selenium Foundation** version _26.3.4_, automation of Maci
   * [Building in Eclipse](#building-in-eclipse)
   * [Building from Command Line](#building-from-command-line)
   * [Maven Support](#maven-support)
+  * [Maven Build Script](#maven-build-script---mvn-buildsh)
+  * [Running Browser Unit Tests](#running-browser-unit-tests)
 * [Getting Started](#getting-started)
   * [Required Configuration](#required-configuration)
 * [Highlights](#highlights)
@@ -65,11 +66,11 @@ To add a dependency on **Selenium Foundation**, use the following:
 
 | Maven |
 |:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;27.0.1-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;27.0.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 | Gradle |
 |:---|
-| <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:27.0.1-s3'<br/>}</pre> |
+| <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:27.0.0-s3'<br/>}</pre> |
 
 ### Building Selenium Foundation
 
@@ -93,13 +94,30 @@ Use the `install` task to install SNAPSHOT builds in your local Maven repository
 
 #### Maven Support
 
-Although Gradle is used to produce official releases, **Selenium Foundation** also includes a fully-functional Maven POM file.
+Although Gradle is used to produce official releases, **Selenium Foundation** also includes a fully functional Maven POM file.
 
 > **`mvn package`**  
 
 Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at:
 
 > **`META-INF/maven/com.nordstrom.ui-tools/selenium-foundation/pom.xml`**
+
+#### Maven Build Script - `mvn-build.sh`
+
+Unlocking the full capabilities of the Maven project file of **Selenium Foundation** requires the specification of several correlated properties. To simplify the process of building and testing the project with Maven, we've provided a script that packages up the details in a concise format. To build the project with the version number from `gradle.properties`:
+
+> **`./mvn-build.sh`**
+
+#### Running Browser Unit Tests
+
+By default, the unit tests that run after the build completes are the support feature tests (which don't require a browser). The Gradle and Maven project files provide a set of browser profiles, one for each supported browser. By specifying one of these profiles, you activate dependencies, settings, and driver plug-in for the corresponding browser.
+
+> **`gradle test -Pbrowsers=espresso`** # run Android Espresso unit tests
+> **`./mvn-build.sh -b firefox -h -t`** # run Mozilla Firefox unit tests in "headless" mode
+
+The second command uses the Maven build script instead of invoking Maven directly. This replicates the behavior of the Gradle project, consolidating the entire configuration set into a single named value.
+
+A complete list of supported browser profiles can be found [here](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/ConfiguringProjectSettings.md#grid-configuration-for-selenium-foundation-unit-tests), 
 
 ## Getting Started
 
