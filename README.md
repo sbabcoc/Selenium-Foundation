@@ -112,7 +112,7 @@ Unlocking the full capabilities of the Maven project file of **Selenium Foundati
 
 By default, the unit tests that run after the build completes are the support feature tests (which don't require a browser). The Gradle and Maven project files provide a set of browser profiles, one for each supported browser. By specifying one of these profiles, you activate dependencies, settings, and driver plug-in for the corresponding browser.
 
-> **`gradle test -Pbrowsers=espresso`** # run Android Espresso unit tests
+> **`gradle test -Pbrowsers=espresso`** # run Android Espresso unit tests  
 > **`./mvn-build.sh -b firefox -h -t`** # run Mozilla Firefox unit tests in "headless" mode
 
 The second command uses the Maven build script instead of invoking Maven directly. This replicates the behavior of the Gradle project, consolidating the entire configuration set into a single named value.
