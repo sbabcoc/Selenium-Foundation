@@ -55,7 +55,7 @@ public final class WebDriverUtils {
      * 
      * @param context search context
      * @return search context driver
-     * @throws UnsupportOperationException if unable to extract driver from specified context
+     * @throws UnsupportedOperationException if unable to extract driver from specified context
      */
     public static WebDriver getDriver(final SearchContext context) {
         if (context instanceof WebDriver) {
