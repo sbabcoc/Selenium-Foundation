@@ -451,9 +451,9 @@ public abstract class ComponentContainer
                         }
                     }
                     if (!Strings.isNullOrEmpty(value)) {
-                        keys.append(value).append(Keys.TAB);
+                        keys.append(value);
                     }
-                    element.sendKeys(keys);
+                    element.sendKeys(keys.append(Keys.TAB));
                 }
                 return true;
             }
