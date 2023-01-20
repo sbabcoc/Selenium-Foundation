@@ -19,6 +19,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -29,10 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
+import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
@@ -85,6 +88,9 @@ public abstract class ComponentContainer
     private static final int PARAM_NAME_ONLY = 1;
     private static final int NAME_WITH_VALUE = 2;
     private static final String LOOPBACK = "http://127.0.0.1/";
+    
+    private static final String UPDATE_VALUE =
+            "arguments[0].value=arguments[1]; arguments[0].dispatchEvent(new Event('input',{bubbles:true}));";
     
     private static final Class<?> ACTIVITY_CLASS;
     private static final Constructor<?> ACTIVITY_CTOR;
@@ -432,9 +438,22 @@ public abstract class ComponentContainer
             if ("checkbox".equals(element.getAttribute("type"))) {
                 return updateValue(element, Boolean.parseBoolean(value));
             } else if (!valueEquals(element, value)) {
-                element.clear();
-                if (value != null) {
-                    element.sendKeys(value);
+                if (WebDriverUtils.isJavascriptEnabled(element)) {
+                    JsUtility.run(WebDriverUtils.getDriver(element), UPDATE_VALUE,
+                            element, (value != null) ? value : "");
+                } else {
+                    StringBuilder keys = new StringBuilder();
+                    String exist = element.getAttribute("value");
+                    if (!Strings.isNullOrEmpty(exist)) {
+                        keys.append(Keys.END);
+                        for (int i = 0; i < exist.length(); i++) {
+                            keys.append(Keys.BACK_SPACE);
+                        }
+                    }
+                    if (!Strings.isNullOrEmpty(value)) {
+                        keys.append(value).append(Keys.TAB);
+                    }
+                    element.sendKeys(keys);
                 }
                 return true;
             }

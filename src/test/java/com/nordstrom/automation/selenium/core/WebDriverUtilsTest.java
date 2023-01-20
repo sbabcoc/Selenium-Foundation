@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
@@ -88,7 +89,7 @@ public class WebDriverUtilsTest extends TestNgTargetRoot {
             WebDriverUtils.getExecutor(mock(WebDriver.class));
             fail("No exception was thrown");
         } catch (UnsupportedOperationException e) {
-            assertEquals(e.getMessage(), "The specified context is unable to execute JavaScript");
+            assertEquals(e.getMessage(), "The specified context doesn't support JavaScript");
         }
     }
     
@@ -106,12 +107,7 @@ public class WebDriverUtilsTest extends TestNgTargetRoot {
         assertThat(WebDriverUtils.getBrowserName(page), equalToIgnoringCase(browserName));
         assertThat(WebDriverUtils.getBrowserName(element), equalToIgnoringCase(browserName));
         
-        try {
-            WebDriverUtils.getBrowserName(mock(WebDriver.class));
-            fail("No exception was thrown");
-        } catch (UnsupportedOperationException e) {
-            assertEquals(e.getMessage(), "The specified context is unable to describe its capabilities");
-        }
+        assertThat(WebDriverUtils.getBrowserName(mock(WebDriver.class)), equalTo("(unknown)"));
     }
     
     @Test

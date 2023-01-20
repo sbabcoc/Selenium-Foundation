@@ -31,12 +31,13 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
      * Constructor for robust JavaScript executor
      * 
      * @param driver driver object
+     * @throws UnsupportedOperationException is the specified context doesn't support JavaScript
      */
     public RobustJavascriptExecutor(final WebDriver driver) {
-        if (driver instanceof JavascriptExecutor) {
+        if (driver instanceof JavascriptExecutor && WebDriverUtils.isJavascriptEnabled(driver)) {
             executor = (JavascriptExecutor) driver;
         } else {
-            throw new UnsupportedOperationException("The specified driver is unable to execute JavaScript");
+            throw new UnsupportedOperationException("The specified context doesn't support JavaScript");
         }
     }
 

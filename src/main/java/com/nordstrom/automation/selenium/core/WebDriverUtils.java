@@ -12,6 +12,7 @@ import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -19,6 +20,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.CapabilityType;
 
 import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
@@ -49,10 +51,11 @@ public final class WebDriverUtils {
     }
     
     /**
-     * Get the driver associated with the specified search context
+     * Get the driver associated with the specified search context.
      * 
      * @param context search context
      * @return search context driver
+     * @throws UnsupportOperationException if unable to extract driver from specified context
      */
     public static WebDriver getDriver(final SearchContext context) {
         if (context instanceof WebDriver) {
@@ -65,51 +68,65 @@ public final class WebDriverUtils {
     }
     
     /**
-     * Get a JavaScript code executor for the specified search context
+     * Get a JavaScript code executor for the specified search context.
      * 
      * @param context search context
      * @return context-specific {@link JavascriptExecutor}
+     * @throws UnsupportedOperationException if specified context doesn't support JavaScript
      */
     public static JavascriptExecutor getExecutor(final SearchContext context) {
-        WebDriver driver = getDriver(context);
-        if (driver instanceof JavascriptExecutor) {
-            return new RobustJavascriptExecutor(driver);
-        } else {
-            throw new UnsupportedOperationException("The specified context is unable to execute JavaScript");
-        }
+        return new RobustJavascriptExecutor(getDriver(context));
     }
 
     /**
-     * Get the browser name for the specified context
+     * Determine if the specified context supports JavaScript.
+     * 
+     * @param context search context
+     * @return {@code true} if the specified context supports JavaScript; otherwise {@code false}
+     */
+    public static boolean isJavascriptEnabled(final SearchContext context) {
+        Capabilities caps = getCapabilities(context);
+        return (caps != null) && caps.is(CapabilityType.SUPPORTS_JAVASCRIPT);
+    }
+    
+    /**
+     * Get the browser name for the specified context.
      *  
      * @param context search context
-     * @return context browser name
+     * @return context browser name; "(unknown)" if context doesn't describe its capabilities
      */
     public static String getBrowserName(final SearchContext context) {
-        return getCapabilities(context).getBrowserName();
+        Capabilities caps = getCapabilities(context);
+        return (caps != null) ? caps.getBrowserName() : "(unknown)";
+    }
+    
+    /**
+     * Get the platform on which the browser is running.
+     * 
+     * @param context search context
+     * @return {@link Platform} hosting the browser; {@code null} if context doesn't describe its capabilities
+     */
+    public Platform getPlatform(final SearchContext context) {
+        Capabilities caps = getCapabilities(context);
+        return (caps != null) ? caps.getPlatform() : null;
     }
     
     /**
      * Get the capabilities of the specified search context
      * 
      * @param context search context
-     * @return context capabilities
+     * @return context capabilities; {@code null} if context doesn't describe its capabilities
      */
     public static Capabilities getCapabilities(final SearchContext context) {
         WebDriver driver = getDriver(context);
-        
-        if (driver instanceof HasCapabilities) {
-            return ((HasCapabilities) driver).getCapabilities();
-        } else {
-            throw new UnsupportedOperationException("The specified context is unable to describe its capabilities");
-        }
+        return (driver instanceof HasCapabilities) ? ((HasCapabilities) driver).getCapabilities() : null;
     }
 
     /**
-     * Remove hidden elements from specified list
+     * Remove hidden elements from specified list.
      * 
      * @param elements list of elements
-     * @return 'true' if no visible elements were found; otherwise 'false'
+     * @return {@code true} if no visible elements were found; otherwise {@code false}
      */
     public static boolean filterHidden(final List<WebElement> elements) {
         Iterator<WebElement> iter = elements.iterator();
@@ -146,7 +163,7 @@ public final class WebDriverUtils {
      * Get the client code breakpoint from the stack trace of the specified exception.
      * 
      * @param exception exception whose stack trace is to be analyzed
-     * @return first stack trace element that exists in client code; 'null' if unable to identify breakpoint
+     * @return first stack trace element that exists in client code; {@code null} if unable to identify breakpoint
      */
     public static StackTraceElement getClientBreakpoint(final Throwable exception) {
         if (exception != null) {
