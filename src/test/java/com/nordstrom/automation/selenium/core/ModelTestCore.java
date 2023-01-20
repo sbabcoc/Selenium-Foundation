@@ -29,11 +29,13 @@ public class ModelTestCore {
     public static void updateTextInputSameValue(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertFalse(page.setInputValue("Nordstrom"));
+        assertEquals(page.getInputValue(), "Nordstrom");
     }
 
     public static void updateTextInputNewValue(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertTrue(page.setInputValue("HauteLook"));
+        assertEquals("HauteLook", page.getInputValue());
     }
 
     public static void updateTextInputBoolValue(TestBase instance) {
@@ -51,21 +53,25 @@ public class ModelTestCore {
     public static void updateCheckboxSameValue(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertFalse(page.setCheckValue(false));
+        assertFalse(page.isBoxChecked());
     }
 
     public static void updateCheckboxNewValue(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertTrue(page.setCheckValue(true));
+        assertTrue(page.isBoxChecked());
     }
 
     public static void updateCheckboxStringValue(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertTrue(page.setCheckValue("true"));
+        assertTrue(page.isBoxChecked());
     }
 
     public static void updateCheckboxNullValue(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertFalse(page.setCheckValue(null));
+        assertFalse(page.isBoxChecked());
     }
 
     public static void testParagraphs(TestBase instance) {

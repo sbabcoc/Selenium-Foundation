@@ -17,7 +17,7 @@ public class HtmlUnitCaps {
             "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
     
     private static final String BASELINE = 
-             "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\"," +
+             "{\"browserName\":\"htmlunit\"," +
               "\"nord:options\":{\"personality\":\"htmlunit\"," +
                                 "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
@@ -36,6 +36,11 @@ public class HtmlUnitCaps {
              "\"nord:options\":{\"personality\":\"htmlunit.ie\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
+    private static final String NO_JS = 
+            "{\"browserName\":\"htmlunit\",\"javascriptEnabled\":false," +
+             "\"nord:options\":{\"personality\":\"htmlunit.nojs\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
+   
     private static final Map<String, String> PERSONALITIES;
     
     static {
@@ -44,6 +49,7 @@ public class HtmlUnitCaps {
         personalities.put(DRIVER_NAME + ".chrome", CHROME);
         personalities.put(DRIVER_NAME + ".firefox", FIREFOX);
         personalities.put(DRIVER_NAME + ".ie", INT_EXP);
+        personalities.put(DRIVER_NAME + ".nojs", NO_JS);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
