@@ -13,9 +13,7 @@ The majority of the environment needed to build **Selenium Foundation** is compr
 | Version control | git version 2.27 |
 | Command shell | GNU bash, version 4.4.23(1) |
 | Gradle (build tool) | version 6.5 |
-| Maven (build tool) | version 3.5.2 |
 | Eclipse (IDE) | 2020-12 (4.18.0) |
-| Maven Plug-In | m2e 1.17.1.20201207-1112 |
 | BuildShip Plug-In | 3.1.5.v20210113-0904 |
 | TestNG Plug-In | 7.3.0.202011271758 |
 
@@ -29,15 +27,9 @@ To build **Selenium Foundation**, you'll need a Java 8 software development kit:
 
 The Gradle project file for **Selenium Foundation** includes a **selenium3Deps** sub-file. This reflects the past (and probable future) support for multiple versions of the Selenium API. 
 
-## Maven Configuration:
-
-### Project Profiles
-
-The Maven POM for **Selenium Foundation** defines an active-by-default **selenium3** profile. This reflects the past (and probable future) support for multiple versions of the Selenium API.
-
 ### JDK Toolchains
 
-To build the **Selenium Foundation** project with **Maven**, you'll also need to add a `toolchain` specification to your system configuration:
+To build the **Selenium Foundation** project, you'll also need to add a **Maven** `toolchain` specification to your system configuration. This configuration allows **Gradle** to auto-discover the JDK installations on your machine:
 
 ###### C:\\Users\\&lt;username&gt;\\.m2\\toolchains.xml
 ```xml
@@ -61,18 +53,7 @@ To build the **Selenium Foundation** project with **Maven**, you'll also need to
 | Variable | Target |
 |:---|:---|
 | **`GRADLE_HOME`** | Root folder of Gradle installation |
-| **`M2`** | Path to Maven `bin` folder
-| **`M2_HOME`** | Root folder of Maven installation |
-| **`M2_REPO`** | Root folder of Maven repository |
 | **`JDK8_HOME`** | Root folder of JDK 8 installation |
-
-## TestNG Eclipse Configuration
-
-In the **Selenium Foundation** POM file, the configuration for the Maven Surefire plug-in declares an `argLine`  property that specifies the `-javaagent` option. The declaration of this option isn't needed to run or debug **TestNG** tests and may cause test execution to fail.
-
-To resolve this issue, disable the option to pass the `argLine` property to **TestNG** in your **Eclipse** preferences:
-
-> Preferences > TestNG > Maven > &#9744; argLine
 
 ## JUnit Run Configuration
 

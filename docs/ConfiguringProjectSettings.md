@@ -99,7 +99,7 @@ The **`GRID_PLUGINS`** setting specifies a semicolon-delimited list of fully-qua
 
 #### Grid Configuration for Selenium Foundation unit tests
 
-By default, the unit tests are [configured](LocalGridConfiguration.md) to run the "support" tests, which don't require browser sessions. The local Grid instance launched for this configuration runs in "servlet container" mode. The Maven and Gradle project file define sets of profiles, one for each supported browser, which specify the corresponding dependencies, settings, and driver plugin needed to run the unit tests for that browser.
+By default, the unit tests are [configured](LocalGridConfiguration.md) to run the "support" tests, which don't require browser sessions. The local Grid instance launched for this configuration runs in "servlet container" mode. The Gradle project file defines a set of profiles, one for each supported browser, which specify the corresponding dependencies, settings, and driver plugin needed to run the unit tests for that browser.
 
 | Profile | Browser / Appium Engine |
 | --- |:---:|

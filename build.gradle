@@ -3,6 +3,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
   id 'java-library'
+  id 'eclipse'
   id 'maven-publish'
   id 'jacoco'
   id 'signing'
@@ -28,6 +29,10 @@ if (project.hasProperty('browsers')) {
       apply from: "${browser}Deps.gradle"
     }
   }
+}
+
+if (project.hasProperty('personality')) {
+  System.setProperty('selenium.browser.name', ext.personality)
 }
 
 def archiveVer = null

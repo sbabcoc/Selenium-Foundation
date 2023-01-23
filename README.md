@@ -14,8 +14,6 @@ With the release of **Selenium Foundation** version _26.3.4_, automation of Maci
 * [Building Selenium Foundation](#building-selenium-foundation)
   * [Building in Eclipse](#building-in-eclipse)
   * [Building from Command Line](#building-from-command-line)
-  * [Maven Support](#maven-support)
-  * [Maven Build Script](#maven-build-script---mvn-buildsh)
   * [Running Browser Unit Tests](#running-browser-unit-tests)
 * [Getting Started](#getting-started)
   * [Required Configuration](#required-configuration)
@@ -92,30 +90,17 @@ Use the `install` task to install SNAPSHOT builds in your local Maven repository
 
 > **`gradle install`**  
 
-#### Maven Support
-
-Although Gradle is used to produce official releases, **Selenium Foundation** also includes a fully functional Maven POM file.
-
-> **`mvn package`**  
-
-Note that the version number in this POM file is merely a placeholder - a token that gets replaced during the normal build process. Finalized, functional `POMs` can be found within the **Selenium Foundation** JARs themselves at:
-
-> **`META-INF/maven/com.nordstrom.ui-tools/selenium-foundation/pom.xml`**
-
-#### Maven Build Script - `mvn-build.sh`
-
-Unlocking the full capabilities of the Maven project file of **Selenium Foundation** requires the specification of several correlated properties. To simplify the process of building and testing the project with Maven, we've provided a script that packages up the details in a concise format. To build the project with the version number from `gradle.properties`:
-
-> **`./mvn-build.sh`**
-
 #### Running Browser Unit Tests
 
-By default, the unit tests that run after the build completes are the support feature tests (which don't require a browser). The Gradle and Maven project files provide a set of browser profiles, one for each supported browser. By specifying one of these profiles, you activate dependencies, settings, and driver plug-in for the corresponding browser.
+By default, the unit tests that run after the build completes are the support feature tests (which don't require a browser). The Gradle project file provides a set of browser profiles, one for each supported browser. By specifying one of these profiles, you activate dependencies, settings, and driver plug-in for the corresponding browser.
 
 > **`gradle test -Pbrowsers=espresso`** # run Android Espresso unit tests  
-> **`./mvn-build.sh -t -b firefox -h`** # run Mozilla Firefox unit tests in "headless" mode
+> **`gradle test -Pbrowsers=filefox -Ppersonality=firefox.headless`** # run Mozilla Firefox unit tests in "headless" mode  
+> **`gradle test -Pbrowsers=htmlunit -Ppersonality=htmlunit.nojs`** # run HtmlUnit unit tests without JavaScript support
 
-The second command uses the Maven build script instead of invoking Maven directly. This replicates the behavior of the Gradle project, consolidating the entire configuration set into a single named value.
+The `personality` property directs **Selenium Foundation** to run the unit tests on browsers with the specified named capabilities. Available personalities are defined by each driver plug-in, and the list of personalities supported by the current Grid is shown in the console output. For example:
+
+> `http://192.168.254.20:4445/wd/hub: Personalities => [chrome, chrome.headless]`
 
 A complete list of supported browser profiles can be found [here](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/ConfiguringProjectSettings.md#grid-configuration-for-selenium-foundation-unit-tests), 
 
