@@ -30,6 +30,10 @@ if (project.hasProperty('browsers')) {
   }
 }
 
+if (project.hasProperty('personality')) {
+  System.setProperty('selenium.browser.name', ext.personality)
+}
+
 def archiveVer = null
 def verBits = scmVersion.version.split('-')
 def seleniumApi = 's' + profile.charAt(8)
