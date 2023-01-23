@@ -10,7 +10,7 @@ In addition to providing a local Grid instance for running Selenium tests on you
 
 To maximize flexibility, configurability, consistency, and control, the browser sessions dispensed by **Selenium Foundation** are provided by an instance of **Selenium Grid**. To use an existing Grid instance for session provisioning, specify its endpoint URL in the [**`HUB_HOST`** setting](ConfiguringProjectSettings.md#selenium-grid-configuration).  By default, **Selenium Foundation** will launch a local Grid and acquire sessions from there.
 
-The unit tests of this project acquire browser sessions from a local Grid instance that gets launched at the start of the test run and torn down when the run is complete. By default, the local Grid runs in "servlet container" mode, and only non-browser support feature tests are run. Profiles defined in the Gradle and Maven project files allow you to specify which browser to target with the corresponding unit tests. This aspect of the **Selenium Foundation** project provides a working example of how to configure for the local Grid feature, as detailed in the following sections.
+The unit tests of this project acquire browser sessions from a local Grid instance that gets launched at the start of the test run and torn down when the run is complete. By default, the local Grid runs in "servlet container" mode, and only non-browser support feature tests are run. Profiles defined in the Gradle project file allows you to specify which browser to target with the corresponding unit tests. This aspect of the **Selenium Foundation** project provides a working example of how to configure for the local Grid feature, as detailed in the following sections.
 
 ### Specifying plug-ins via System property
 
