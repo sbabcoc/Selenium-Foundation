@@ -23,7 +23,7 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;2.67.0&lt;/version&gt;
+     *  &lt;version&gt;2.70.0&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
@@ -32,7 +32,6 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
                     "org.apache.commons.lang3.CharSet", "org.apache.commons.text.WordUtils",
                     "org.apache.http.client.HttpClient", "org.apache.http.HttpHost",
                     "org.apache.http.entity.mime.MIME", "org.apache.commons.codec.Encoder",
-                    "org.apache.xerces.parsers.XMLParser", "org.apache.xmlcommons.Version",
                     "org.apache.commons.io.IOUtils", "org.apache.commons.logging.Log",
                     "org.eclipse.jetty.websocket.client.WebSocketClient",
                     "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint",
@@ -41,7 +40,7 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
                     "net.sourceforge.htmlunit.xpath.XPath",
                     "net.sourceforge.htmlunit.corejs.javascript.Token",
                     "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
-                    "org.apache.xmlcommons.Version", "com.gargoylesoftware.css.util.LangUtils",
+                    "com.gargoylesoftware.css.util.LangUtils",
                     "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
                     "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils"};
     
