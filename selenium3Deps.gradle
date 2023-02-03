@@ -44,7 +44,7 @@ dependencies {
     testImplementation 'org.seleniumhq.selenium:selenium-opera-driver:3.141.59'
     testImplementation 'com.codeborne:phantomjsdriver:1.4.4'
     testImplementation 'org.seleniumhq.selenium:selenium-safari-driver:3.141.59'
-    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.67.0'
+    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.70.0'
     testImplementation 'org.mockito:mockito-core:4.6.1'
   }
   api 'com.nordstrom.tools:testng-foundation'
