@@ -42,7 +42,7 @@ dependencies {
     testImplementation 'io.appium:java-client:7.6.0'
     testImplementation 'org.seleniumhq.selenium:selenium-firefox-driver:3.141.59'
     testImplementation 'org.seleniumhq.selenium:selenium-opera-driver:3.141.59'
-    testImplementation 'com.codeborne:phantomjsdriver:1.5.0'
+    testImplementation 'com.codeborne:phantomjsdriver:1.4.4'
     testImplementation 'org.seleniumhq.selenium:selenium-safari-driver:3.141.59'
     testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.70.0'
     testImplementation 'org.mockito:mockito-core:4.6.1'
