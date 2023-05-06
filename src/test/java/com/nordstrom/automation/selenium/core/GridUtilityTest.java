@@ -54,14 +54,14 @@ public class GridUtilityTest extends TestNgBase {
         SeleniumConfig config = SeleniumConfig.getConfig();
         URL hubUrl = config.getHubUrl();
         if (hubUrl != null) {
-            assertFalse(GridUtility.isHubActive(hubUrl), "Configured local hub should initially be inactive");
+            assertFalse(GridServer.isHubActive(hubUrl), "Configured local hub should initially be inactive");
         }
         LocalSeleniumGrid localGrid = (LocalSeleniumGrid) config.getSeleniumGrid();
         hubUrl = config.getHubUrl();
         assertNotNull(hubUrl, "Configuration was not updated with local hub URL");
-        assertFalse(GridUtility.isHubActive(hubUrl), "Upon creation, local hub should be inactive");
+        assertFalse(GridServer.isHubActive(hubUrl), "Upon creation, local hub should be inactive");
         localGrid.activate();
-        assertTrue(GridUtility.isHubActive(hubUrl), "Local hub should have been activated");
+        assertTrue(GridServer.isHubActive(hubUrl), "Local hub should have been activated");
     }
     
     @NoDriver

@@ -207,21 +207,21 @@ public class JUnitModelTest extends JUnitTargetRoot {
     @Ignore
     @TargetPlatform(WEB_APP_NAME)
     public void testCssOptional() {
-    	ModelTestCore.testCssOptional(this);
+        ModelTestCore.testCssOptional(this);
     }
     
     @Test
     @Ignore
     @TargetPlatform(WEB_APP_NAME)
     public void testXpathOptional() {
-    	ModelTestCore.testXpathOptional(this);
+        ModelTestCore.testXpathOptional(this);
     }
     
     @Test
     @Ignore
     @TargetPlatform(WEB_APP_NAME)
     public void testBogusOptional() {
-    	ModelTestCore.testBogusOptional(this);
+        ModelTestCore.testBogusOptional(this);
     }
 
     @Test

@@ -11,13 +11,13 @@ sourceSets {
   main {
     java {
       srcDirs = [ 'src/main/java', 'src/selenium3/java' ]
-      outputDir = new File(buildRoot, 'classes')
+      destinationDirectory = new File(buildRoot, 'classes')
     }
     output.resourcesDir = "${buildRoot}/classes"
   }
   test {
     java {
-      outputDir = new File(buildRoot, 'test-classes')
+      destinationDirectory = new File(buildRoot, 'test-classes')
     }
   }
 }
@@ -27,6 +27,14 @@ dependencies {
     api 'com.nordstrom.tools:testng-foundation:4.0.4-j8'
     api 'org.seleniumhq.selenium:selenium-server:3.141.59'
     api 'org.seleniumhq.selenium:selenium-support:3.141.59'
+    api 'org.seleniumhq.selenium:selenium-chrome-driver:3.141.59'
+    api 'org.seleniumhq.selenium:selenium-edge-driver:3.141.59'
+    api 'org.seleniumhq.selenium:selenium-firefox-driver:3.141.59'
+    api 'org.seleniumhq.selenium:selenium-opera-driver:3.141.59'
+    api 'org.seleniumhq.selenium:selenium-safari-driver:3.141.59'
+    api 'org.seleniumhq.selenium:htmlunit-driver:2.70.0'
+    api 'com.codeborne:phantomjsdriver:1.4.4'
+    api 'io.github.bonigarcia:webdrivermanager:5.3.3' // final Java 8 release
     api 'org.apache.httpcomponents:httpclient:4.5.14'
     api 'org.jsoup:jsoup:1.15.3'
     api 'org.apache.commons:commons-lang3:3.12.0'
@@ -37,28 +45,17 @@ dependencies {
     api 'org.eclipse.jetty.websocket:websocket-client:9.4.50.v20221201'
     api 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
     api 'org.jetbrains.kotlin:kotlin-stdlib-common:1.8.10'
-    testImplementation 'org.seleniumhq.selenium:selenium-chrome-driver:3.141.59'
-    testImplementation 'org.seleniumhq.selenium:selenium-edge-driver:3.141.59'
     testImplementation 'io.appium:java-client:7.6.0'
-    testImplementation 'org.seleniumhq.selenium:selenium-firefox-driver:3.141.59'
-    testImplementation 'org.seleniumhq.selenium:selenium-opera-driver:3.141.59'
-    testImplementation 'com.codeborne:phantomjsdriver:1.4.4'
-    testImplementation 'org.seleniumhq.selenium:selenium-safari-driver:3.141.59'
-    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.70.0'
     testImplementation 'org.mockito:mockito-core:4.6.1'
   }
   api 'com.nordstrom.tools:testng-foundation'
-  api('org.seleniumhq.selenium:selenium-server') {
-    exclude module: 'selenium-chrome-driver'
-    exclude module: 'selenium-edge-driver'
-    exclude module: 'selenium-firefox-driver'
-    exclude module: 'selenium-ie-driver'
-    exclude module: 'selenium-opera-driver'
-    exclude module: 'selenium-java'
-    exclude module: 'selenium-safari-driver'
-    exclude module: 'htmlunit-driver'
-  }
+  api 'org.seleniumhq.selenium:selenium-server'
   api 'org.seleniumhq.selenium:selenium-support'
+  api 'org.seleniumhq.selenium:htmlunit-driver'
+  api 'com.codeborne:phantomjsdriver'
+  api('io.github.bonigarcia:webdrivermanager') {
+    exclude group: 'org.slf4j', module: 'slf4j-api'
+  }
   api 'org.apache.httpcomponents:httpclient'
   api 'org.jsoup:jsoup'
   api 'org.apache.commons:commons-lang3'
@@ -67,6 +64,5 @@ dependencies {
   api 'com.squareup.okhttp3:okhttp'
   api 'com.squareup.okio:okio'
   api 'org.eclipse.jetty.websocket:websocket-client'
-  testImplementation 'org.seleniumhq.selenium:htmlunit-driver'
   testImplementation 'org.mockito:mockito-core'
 }

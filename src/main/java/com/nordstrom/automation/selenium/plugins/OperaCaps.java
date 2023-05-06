@@ -25,7 +25,7 @@ public class OperaCaps {
         { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE };
     
     private static final String CAPABILITIES = 
-            "{\"browserName\":\"opera\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"opera\"}";
     
     private static final String BASELINE = 
             "{\"browserName\":\"opera\"," +
@@ -48,9 +48,9 @@ public class OperaCaps {
         return PERSONALITIES;
     }
 
-    public static String[] getPropertyNames() {
+    public static String[] getPropertyNames(String capabilities) {
         try {
-            File driverPath = BinaryFinder.findBinary("operadriver", DRIVER_PATH, null, null);
+            File driverPath = BinaryFinder.findDriver(capabilities);
             System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
         } catch (IllegalStateException e) {
             throw new DriverExecutableNotFoundException(DRIVER_PATH);

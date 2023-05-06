@@ -25,7 +25,7 @@ public class ChromeCaps {
         { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE, WHITELISTED };
     
     private static final String CAPABILITIES =
-            "{\"browserName\":\"chrome\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"chrome\"}";
 
     private static final String BASELINE =
             "{\"browserName\":\"chrome\"," +
@@ -58,9 +58,9 @@ public class ChromeCaps {
         return PERSONALITIES;
     }
     
-    public static String[] getPropertyNames() {
+    public static String[] getPropertyNames(String capabilities) {
         try {
-            File driverPath = BinaryFinder.findBinary("chromedriver", DRIVER_PATH, null, null);
+            File driverPath = BinaryFinder.findDriver(capabilities);
             System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
         } catch (IllegalStateException e) {
             throw new DriverExecutableNotFoundException(DRIVER_PATH);

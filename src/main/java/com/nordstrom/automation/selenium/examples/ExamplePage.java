@@ -19,6 +19,7 @@ import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
+import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
 
 @PageUrl("/grid/admin/ExamplePageServlet")
 public class ExamplePage extends Page {
@@ -254,13 +255,21 @@ public class ExamplePage extends Page {
     public static URI setHubAsTarget() {
         URI targetUri = null;
         SeleniumConfig config = SeleniumConfig.getConfig();
-        URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
         try {
-            targetUri = new URIBuilder()
-                    .setScheme(hubUrl.getProtocol())
-                    .setHost(hubUrl.getHost())
-                    .setPort(hubUrl.getPort())
-                    .build().normalize();
+            // if running Selenium 4+
+            if (config.getVersion() > 3) {
+                // get URI of example page servlet
+                targetUri = ExamplePageLauncher.getLauncher().getUrl().toURI();
+            } else {
+                // get URL of Selenium Grid hub server
+                URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
+                // assemble hub base URI
+                targetUri = new URIBuilder()
+                        .setScheme(hubUrl.getProtocol())
+                        .setHost(hubUrl.getHost())
+                        .setPort(hubUrl.getPort())
+                        .build().normalize();
+            }
             config.setTargetUri(targetUri);
         } catch (URISyntaxException eaten) {
             // nothing to do here

@@ -16,7 +16,7 @@ public class UiAutomator2Plugin extends AbstractAppiumPlugin {
 
     private static final String CAPABILITIES =
             "{\"appium:automationName\":\"UiAutomator2\",\"platformName\":\"Android\"," +
-             "\"browserName\":\"Chrome\",\"maxInstances\":1,\"deviceName\":\"Android Emulator\"}";
+             "\"browserName\":\"Chrome\",\"appium:deviceName\":\"Android Emulator\"}";
     
     private static final String BASELINE =
             "{\"appium:automationName\":\"UiAutomator2\",\"platformName\":\"Android\"," +

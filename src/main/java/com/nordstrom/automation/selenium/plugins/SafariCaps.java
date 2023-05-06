@@ -21,7 +21,7 @@ public class SafariCaps {
     private static final String[] PROPERTY_NAMES = { DRIVER_PATH, BINARY_PATH, "webdriver.safari.noinstall" };
 
     private static final String CAPABILITIES =
-            "{\"browserName\":\"safari\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"safari\"}";
     
     private static final String BASELINE = 
             "{\"browserName\":\"safari\"," +
@@ -44,9 +44,9 @@ public class SafariCaps {
         return PERSONALITIES;
     }
 
-    public static String[] getPropertyNames() {
+    public static String[] getPropertyNames(String capabilities) {
         try {
-            File driverPath = BinaryFinder.findBinary("safaridriver", DRIVER_PATH, null, null);
+            File driverPath = BinaryFinder.findDriver(capabilities);
             System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
         } catch (IllegalStateException e) {
             throw new DriverExecutableNotFoundException(DRIVER_PATH);

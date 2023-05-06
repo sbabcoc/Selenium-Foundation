@@ -24,7 +24,7 @@ public class FirefoxCaps {
         { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, PROFILE_PATH };
     
     private static final String CAPABILITIES =
-            "{\"browserName\":\"firefox\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"firefox\"}";
     
     private static final String BASELINE =
             "{\"browserName\":\"firefox\",\"marionette\":true," +
@@ -54,9 +54,9 @@ public class FirefoxCaps {
         return PERSONALITIES;
     }
 
-    public static String[] getPropertyNames() {
+    public static String[] getPropertyNames(String capabilities) {
         try {
-            File driverPath = BinaryFinder.findBinary("geckodriver", DRIVER_PATH, null, null);
+            File driverPath = BinaryFinder.findDriver(capabilities);
             System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
         } catch (IllegalStateException e) {
             throw new DriverExecutableNotFoundException(DRIVER_PATH);

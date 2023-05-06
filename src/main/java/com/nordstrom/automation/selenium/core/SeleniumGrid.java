@@ -5,6 +5,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
-import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
 import com.nordstrom.automation.selenium.plugins.PluginUtils;
-import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * <b>The {@code SeleniumGrid} Object</b>
@@ -71,7 +69,7 @@ public class SeleniumGrid {
         });
 
     private GridServer hubServer;
-    private Map<String, GridServer> nodeServers = new HashMap<>();
+    private Map<URL, GridServer> nodeServers = new HashMap<>();
     protected Map<String, String> personalities = new HashMap<>();
     
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
@@ -86,15 +84,15 @@ public class SeleniumGrid {
      * @throws IOException if unable to acquire Grid details
      */
     public SeleniumGrid(SeleniumConfig config, URL hubUrl) throws IOException {
-        hubServer = new GridServer(hubUrl, GridRole.HUB);
-        List<String> nodeEndpoints = GridUtility.getGridProxies(hubUrl);
+        hubServer = new GridServer(hubUrl, true);
+        List<URL> nodeEndpoints = GridServer.getGridProxies(config, hubUrl);
         if (nodeEndpoints.isEmpty()) {
             LOGGER.debug("Detected servlet container at: {}", hubUrl);
         } else {
             LOGGER.debug("Mapping structure of grid at: {}", hubUrl);
-            for (String nodeEndpoint : nodeEndpoints) {
-                URL nodeUrl = new URL(nodeEndpoint + GridServer.HUB_BASE);
-                nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, GridRole.NODE));
+            for (URL nodeEndpoint : nodeEndpoints) {
+                URL nodeUrl = new URL(nodeEndpoint, GridServer.HUB_BASE);
+                nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, false));
                 addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
             }
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
@@ -123,7 +121,8 @@ public class SeleniumGrid {
             LOGGER.debug("Assembling graph of grid at: {}", hubServer.getUrl());
             for (LocalGridServer nodeServer : nodeServers) {
                 String nodeEndpoint = nodeServer.getUrl().getProtocol() + "://" + nodeServer.getUrl().getAuthority();
-                this.nodeServers.put(nodeEndpoint, nodeServer);
+                URL nodeUrl = URI.create(nodeEndpoint).toURL();
+                this.nodeServers.put(nodeUrl, nodeServer);
                 this.personalities.putAll(nodeServer.getPersonalities());
             }
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
@@ -143,13 +142,13 @@ public class SeleniumGrid {
      * 
      * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of Grid hub
-     * @param nodeEndpoint node endpoint
+     * @param nodeUrl node endpoint URL
      * @throws IOException if an I/O error occurs
      */
-    private void addNodePersonalities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
-        LOGGER.debug("{}: Adding personalities of node: {}", hubUrl, nodeEndpoint);
-        Capabilities nodeCapabilities = GridUtility.getNodeCapabilities(config, hubUrl, nodeEndpoint);
-        for (Capabilities capabilities : GridUtility.getNodeDriverCaps(config, nodeCapabilities)) {
+    private void addNodePersonalities(SeleniumConfig config, URL hubUrl, URL nodeUrl) throws IOException {
+        LOGGER.debug("{}: Adding personalities of node: {}", hubUrl, nodeUrl);
+        List<Capabilities> capabilitiesList = GridServer.getNodeCapabilities(config, hubUrl, nodeUrl);
+        for (Capabilities capabilities : capabilitiesList) {
             personalities.putAll(PluginUtils.getPersonalitiesForBrowser(GridUtility.getPersonality(capabilities)));
         }
     }
@@ -166,7 +165,7 @@ public class SeleniumGrid {
      * @throws IOException if an I/O error occurs
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException {
-        if ((hubUrl != null) && GridUtility.isHubActive(hubUrl)) {
+        if ((hubUrl != null) && GridServer.isHubActive(hubUrl)) {
             // store hub host and hub port in system properties for subsequent retrieval
             System.setProperty(SeleniumSettings.HUB_HOST.key(), hubUrl.toExternalForm());
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
@@ -186,10 +185,10 @@ public class SeleniumGrid {
      */
     public boolean shutdown(final boolean localOnly) throws InterruptedException {
         boolean result = true;
-        Iterator<Entry<String, GridServer>> iterator = nodeServers.entrySet().iterator();
+        Iterator<Entry<URL, GridServer>> iterator = nodeServers.entrySet().iterator();
         
         while (iterator.hasNext()) {
-            Entry<String, GridServer> serverEntry = iterator.next();
+            Entry<URL, GridServer> serverEntry = iterator.next();
             if (serverEntry.getValue().shutdown(localOnly)) {
                 iterator.remove();
             } else {
@@ -220,7 +219,7 @@ public class SeleniumGrid {
      * 
      * @return map of {@link GridServer} objects that represent the attached node servers
      */
-    public Map<String, GridServer> getNodeServers() {
+    public Map<URL, GridServer> getNodeServers() {
         return nodeServers;
     }
     
@@ -249,92 +248,6 @@ public class SeleniumGrid {
         } else {
             return config.getCapabilitiesForJson(json)[0];
         }
-    }
-
-    /**
-     * This class represents a single Selenium Grid server (hub or node).
-     */
-    public static class GridServer {
-        private GridRole role;
-        private URL serverUrl;
-        protected String statusRequest;
-        protected String shutdownRequest;
-        
-        public static final String GRID_CONSOLE = "/grid/console";
-        public static final String HUB_BASE = "/wd/hub";
-        public static final String NODE_STATUS = "/wd/hub/status";
-        public static final String HUB_CONFIG = "/grid/api/hub/";
-        public static final String NODE_CONFIG = "/grid/api/proxy";
-        
-        private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
-        private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
-        private static final long SHUTDOWN_DELAY = 15;
-        
-        public GridServer(URL url, GridRole role) {
-            this.role = role;
-            this.serverUrl = url;
-            if (isHub()) {
-                statusRequest = HUB_CONFIG;
-                shutdownRequest = HUB_SHUTDOWN;
-            } else {
-                statusRequest = NODE_STATUS;
-                shutdownRequest = NODE_SHUTDOWN;
-            }
-        }
-        
-        /**
-         * Determine if this Grid server is a hub host.
-         * 
-         * @return {@code true} if this server is a hub; otherwise {@code false}
-         */
-        public boolean isHub() {
-            return (role == GridRole.HUB);
-        }
-        
-        /**
-         * Get the URL for this server.
-         * 
-         * @return {@link URL} object for this server
-         */
-        public URL getUrl() {
-            return serverUrl;
-        }
-        
-        public boolean isActive() {
-            return GridUtility.isHostActive(serverUrl, statusRequest);
-        }
-        
-        /**
-         * Stop the Selenium Grid server represented by this object.
-         * 
-         * @param localOnly {@code true} to target only local Grid server
-         * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
-         * @throws InterruptedException if this thread was interrupted
-         */
-        public boolean shutdown(final boolean localOnly) throws InterruptedException {
-            boolean isLocal = GridUtility.isLocalHost(serverUrl);
-            if (localOnly && !isLocal) {
-                return false;
-            }
-            
-            if (isActive()) {
-                if (isLocal && !isHub()) {
-                    if (AppiumGridServer.shutdownAppiumWithPM2(serverUrl)) {
-                        return true;
-                    }
-                }
-                try {
-                    GridUtility.getHttpResponse(serverUrl, shutdownRequest);
-                    waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
-                    Thread.sleep(1000);
-                } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
-                    throw UncheckedThrow.throwUnchecked(e);
-                }
-            }
-            
-            return true;
-        }
-
     }
 
     /**

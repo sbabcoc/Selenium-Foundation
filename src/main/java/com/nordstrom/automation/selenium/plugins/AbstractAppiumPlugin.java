@@ -14,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,7 +26,7 @@ import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
-import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
+import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.utility.BinaryFinder;
 import com.nordstrom.common.file.PathUtils;
@@ -101,7 +100,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String[] getPropertyNames() {
+    public String[] getPropertyNames(String capabilities) {
         return PROPERTY_NAMES;
     }
 
@@ -110,7 +109,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      */
     @Override
     public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            GridServer hubServer, Path workingPath, Path outputPath) throws IOException {
+            URL hubUrl, Path workingPath, Path outputPath) throws IOException {
         
         List<String> argsList = new ArrayList<>();
         String hostUrl = GridUtility.getLocalHost();
@@ -129,7 +128,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             nodeCapabilities = config.toJson(config.mergeCapabilities(capabilities, nordOptions));
         }
         
-        Path nodeConfigPath = config.createNodeConfig(nodeCapabilities, hubServer.getUrl());
+        Path nodeConfigPath = config.createNodeConfig(nodeCapabilities, hubUrl);
         
         // specify server host
         argsList.add("--address");
@@ -217,7 +216,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             } else {
                 executable = pm2Binary.getAbsolutePath();
             }
-            
+
             process = new CommandLine(executable, argsList.toArray(new String[0]));
         // otherwise
         } else { // (running with 'node')
@@ -225,7 +224,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             process = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
         }
         
-        return new AppiumGridServer(hostUrl, portNum, GridRole.NODE, process, workingPath, outputPath);
+        return new AppiumGridServer(hostUrl, portNum, false, process, workingPath, outputPath);
     }
 
     /**
@@ -354,7 +353,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     private static File findBinary(String exeName, SeleniumSettings setting, String what)
             throws GridServerLaunchFailedException {
         try {
-            return BinaryFinder.findBinary(exeName, setting.key(), null, null);
+            return BinaryFinder.findBinary(exeName, setting.key());
         } catch (IllegalStateException eaten) {
             IOException cause = fileNotFound(what, setting);
             throw new GridServerLaunchFailedException("node", cause);
@@ -375,10 +374,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     public static class AppiumGridServer extends LocalGridServer {
 
-        public AppiumGridServer(String host, Integer port, GridRole role, CommandLine process, Path workingPath, Path outputPath) {
-            super(host, port, role, process, workingPath, outputPath);
+        public AppiumGridServer(String host, Integer port, boolean isHub, CommandLine process, Path workingPath, Path outputPath) {
+            super(host, port, isHub, process, workingPath, outputPath);
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -438,15 +437,15 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             if (!appiumWithPM2) {
                 try {
                     // get capabilities of 'appium' node
-                    Capabilities nodeCapabilities = GridUtility.getNodeCapabilities(
-                            config, config.getHubUrl(), nodeUrl.toExternalForm());
-                    // extract driver capabilities from node capabilities
-                    Capabilities capabilities = GridUtility.getNodeDriverCaps(config, nodeCapabilities)[0];
+                    Capabilities capabilities = 
+                            GridServer.getNodeCapabilities(config, config.getHubUrl(), nodeUrl).get(0);
                     // get map of custom options from capabilities
                     Map<String, Object> options = GridUtility.getNordOptions(capabilities);
                     // determine is running 'appium' with 'pm2'
                     appiumWithPM2 = options.containsKey("appiumWithPM2");
-                } catch (IndexOutOfBoundsException | IOException eaten) { }
+                } catch (IndexOutOfBoundsException | IOException eaten) {
+                    // nothing to do here
+                }
             }
             return appiumWithPM2;
         }

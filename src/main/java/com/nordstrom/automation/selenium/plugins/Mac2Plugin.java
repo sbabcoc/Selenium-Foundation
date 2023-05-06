@@ -15,7 +15,7 @@ public class Mac2Plugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"Mac2\",\"platformName\":\"Mac\",\"maxInstances\":5}";
+            "{\"appium:automationName\":\"Mac2\",\"platformName\":\"Mac\"}";
     
     private static final String BASELINE =
             "{\"appium:automationName\":\"Mac2\",\"platformName\":\"Mac\"," +

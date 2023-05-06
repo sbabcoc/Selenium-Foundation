@@ -11,7 +11,6 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 
 import com.google.common.base.Optional;
@@ -40,7 +39,7 @@ public final class ScreenshotUtils {
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             if (driver instanceof HasCapabilities) {
-                if (((HasCapabilities) driver).getCapabilities().is(CapabilityType.TAKES_SCREENSHOT)) {
+                if (((HasCapabilities) driver).getCapabilities().is("takesScreenshot")) {
                     return true;
                 }
             }

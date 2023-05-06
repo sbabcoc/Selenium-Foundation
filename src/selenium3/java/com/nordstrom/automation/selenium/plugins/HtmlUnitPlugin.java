@@ -27,22 +27,23 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.htmlunit.HtmlUnitDriver", "org.openqa.selenium.By",
-                    "org.openqa.selenium.support.FindBy", "com.gargoylesoftware.htmlunit.Version",
-                    "org.apache.commons.lang3.CharSet", "org.apache.commons.text.WordUtils",
-                    "org.apache.http.client.HttpClient", "org.apache.http.HttpHost",
-                    "org.apache.http.entity.mime.MIME", "org.apache.commons.codec.Encoder",
-                    "org.apache.commons.io.IOUtils", "org.apache.commons.logging.Log",
-                    "org.eclipse.jetty.websocket.client.WebSocketClient",
-                    "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint",
-                    "org.eclipse.jetty.websocket.common.Parser",
-                    "org.eclipse.jetty.websocket.api.Session",
-                    "net.sourceforge.htmlunit.xpath.XPath",
-                    "net.sourceforge.htmlunit.corejs.javascript.Token",
-                    "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
-                    "com.gargoylesoftware.css.util.LangUtils",
-                    "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
-                    "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils"};
+        "org.openqa.selenium.htmlunit.HtmlUnitDriver", "org.openqa.selenium.By",
+        "org.openqa.selenium.support.FindBy", "com.gargoylesoftware.htmlunit.Version",
+        "org.apache.commons.lang3.CharSet", "org.apache.commons.text.WordUtils",
+        "org.apache.http.client.HttpClient", "org.apache.http.HttpHost",
+        "org.apache.http.entity.mime.MIME", "org.apache.commons.codec.Encoder",
+        "org.apache.commons.io.IOUtils", "org.apache.commons.logging.Log",
+        "org.eclipse.jetty.websocket.client.WebSocketClient",
+        "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint",
+        "org.eclipse.jetty.websocket.common.Parser",
+        "org.eclipse.jetty.websocket.api.Session",
+        "net.sourceforge.htmlunit.xpath.XPath",
+        "net.sourceforge.htmlunit.corejs.javascript.Token",
+        "net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter",
+        "com.gargoylesoftware.css.util.LangUtils",
+        "org.apache.commons.net.io.Util", "org.eclipse.jetty.client.Origin",
+        "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils"
+    };
     
     private static final String WEB_ELEMENT_CLASS_NAME =
             "org.openqa.selenium.htmlunit.HtmlUnitWebElement";
@@ -75,8 +76,8 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String[] getPropertyNames() {
-        return HtmlUnitCaps.getPropertyNames();
+    public String[] getPropertyNames(String capabilities) {
+        return HtmlUnitCaps.getPropertyNames(capabilities);
     }
 
     /**

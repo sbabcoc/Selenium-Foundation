@@ -15,7 +15,7 @@ public class WindowsPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"Windows\",\"platformName\":\"Windows\",\"maxInstances\":5}";
+            "{\"appium:automationName\":\"Windows\",\"platformName\":\"Windows\"}";
     
     private static final String BASELINE =
             "{\"appium:automationName\":\"Windows\",\"platformName\":\"Windows\"," +
