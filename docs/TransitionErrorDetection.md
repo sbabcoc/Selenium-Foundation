@@ -29,7 +29,7 @@ public class PageNotFoundDetector implements TransitionErrorDetector {
     private enum Using implements ByEnum {
         IMAGE_404(By.xpath("//img[starts-with(@alt, '404')]"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;
@@ -72,7 +72,7 @@ public class ErrorMessageDetector implements TransitionErrorDetector {
     private enum Using implements ByEnum {
         ALERT_CONTENT(By.xpath("//div[contains(concat(' ', @class, ' '), ' a-alert-content ')]"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;
@@ -120,7 +120,7 @@ public class ErrorMessageDetector implements TransitionErrorDetector {
     private enum Using implements ByEnum {
         LOGIN_POPUP(By.xpath("//div[contains(concat(' ', @class, ' '), ' login-popup ')]"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

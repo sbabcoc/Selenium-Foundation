@@ -8,6 +8,7 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
+import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
@@ -181,19 +182,31 @@ public class ModelTest extends TestNgTargetRoot {
     @Test
     @TargetPlatform(WEB_APP_NAME)
     public void testCssOptional() {
-    	ModelTestCore.testCssOptional(this);
+        ModelTestCore.testCssOptional(this);
     }
     
     @Test
     @TargetPlatform(WEB_APP_NAME)
     public void testXpathOptional() {
-    	ModelTestCore.testXpathOptional(this);
+        ModelTestCore.testXpathOptional(this);
     }
     
     @Test
     @TargetPlatform(WEB_APP_NAME)
     public void testBogusOptional() {
-    	ModelTestCore.testBogusOptional(this);
+        ModelTestCore.testBogusOptional(this);
+    }
+
+    @Test
+    @TargetPlatform(WEB_APP_NAME)
+    public void testOptionalBehavior() {
+        ModelTestCore.testOptionalBehavior(this);
+    }
+    
+    @Test(expectedExceptions = {ElementReferenceRefreshFailureException.class})
+    @TargetPlatform(WEB_APP_NAME)
+    public void testFailedReferenceRefreshAttempt() {
+        ModelTestCore.testReferenceRefreshFailure(this);
     }
     
     @Test

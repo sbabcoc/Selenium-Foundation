@@ -30,7 +30,7 @@ public class TableComponent extends PageComponent {
         HDR_ROW(By.cssSelector("tr[id*='-h']")),
         TBL_ROW(By.cssSelector("tr[id*='-r']"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

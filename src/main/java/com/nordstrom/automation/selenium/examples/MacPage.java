@@ -14,7 +14,7 @@ public class MacPage extends Page {
     protected enum Using implements ByEnum {
         EDIT_FIELD(By.className("XCUIElementTypeTextView"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

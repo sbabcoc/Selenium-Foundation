@@ -20,7 +20,7 @@ public class ByTypeTest {
         CSS_SELECTOR(By.cssSelector("iframe[id^='frame-']")),
         XPATH(By.xpath(".//iframe[contains(@id,'frame-')]"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;
