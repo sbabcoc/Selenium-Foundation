@@ -167,7 +167,14 @@ public class RobustElementWrapper implements ReferenceFetcher {
         try {
             return invoke(method, args);
         } catch (StaleElementReferenceException sere) {
+            // try to refresh ref
             refreshReference(sere);
+            // if optional not found
+            if (this.wrapped == null) {
+                // re-throw
+                throw sere;
+            }
+            // re-invoke with fresh ref
             return invoke(method, args);
         }
     }
@@ -264,14 +271,22 @@ public class RobustElementWrapper implements ReferenceFetcher {
             WaitType.IMPLIED.getWait((SearchContext) context).until(referenceIsRefreshed(this));
             return this;
         } catch (TimeoutException e) {
+            // if not auto-recovery
             if (refreshTrigger == null) {
-                throw new ElementReferenceRefreshFailureException(e.getMessage(), e.getCause());
+                throw UncheckedThrow.throwUnchecked(e.getCause());
+            } else {
+                StaleElementReferenceException refreshFailure = 
+                        new ElementReferenceRefreshFailureException(refreshTrigger.getMessage(), refreshTrigger.getCause());
+                refreshFailure.setStackTrace(refreshTrigger.getStackTrace());
+                throw refreshFailure;
             }
         } catch (WebDriverException e) {
+            // if not auto-recovery
             if (refreshTrigger == null) {
                 throw e;
             }
         }
+        // re-throw exception
         throw refreshTrigger;
     }
     
@@ -313,17 +328,24 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * 
      * @param wrapper robust element wrapper
      * @return wrapped element reference
+     * @throws StaleElementReferenceElementException if container element has gone stale
+     * @throws NoSuchElementException if unable to find element specified by the wrapper
      */
     private static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
         NoSuchElementException thrown = null;
         SearchContext context = wrapper.context.getWrappedContext();
         
         if (wrapper.strategy == Strategy.LOCATOR) {
+            // disable implicit wait
             Timeouts timeouts = wrapper.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
             try {
+                // if index specified
                 if (wrapper.index > 0) {
+                    // find elements specified by wrapper locator
                     List<WebElement> elements = context.findElements(wrapper.locator);
+                    // if sufficient elements were found
                     if (wrapper.index < elements.size()) {
+                        // get element at specified index
                         wrapper.wrapped = elements.get(wrapper.index);
                     } else {
                         thrown = new NoSuchElementException(
@@ -332,6 +354,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
                     }
                 } else {
                     try {
+                        // find element specified by wrapper locator
                         wrapper.wrapped = context.findElement(wrapper.locator);
                     } catch (NoSuchElementException e) {
                         // if context is a web element
@@ -343,35 +366,48 @@ public class RobustElementWrapper implements ReferenceFetcher {
                     }
                 }
             } finally {
+                // restore implicit wait
                 timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
             }
         } else {
+            // if context is a container element
             if (context instanceof WebElement) {
+                // invoke script to acquire reference (element-relative)
                 wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script, context);
             } else {
+                // invoke script to acquire reference (document-relative)
                 wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script);
             }
             
+            // if no reference acquired
             if (wrapper.wrapped == null) {
                 String message;
-                if (wrapper.index > 0) {
-                    message = String.format("Cannot locate an element at index %d using %s",
-                            wrapper.index, wrapper.locator);
+                // if context is a container element
+                if (context instanceof WebElement) {
+                    message = String.format("Failed to locate element using script: %s\nin context: %s",
+                            wrapper.script.trim(), context);
                 } else {
-                    message = String.format("Cannot locate an element using %s", wrapper.locator);
+                    message = String.format("Failed to locate element using script: %s", wrapper.script.trim());
                 }
                 thrown = new NoSuchElementException(message);
             }
         }
         
+        // if exception thrown
         if (thrown != null) {
+            // discard wrapped ref
             wrapper.wrapped = null;
+            // if element isn't optional
             if (wrapper.index != OPTIONAL) {
+                // throw now
                 throw thrown;
             }
+            // store deferred exception
             wrapper.deferredException = thrown;
         } else {
+            // set acquisition time for future refresh
             wrapper.acquiredAt = System.currentTimeMillis();
+            // clear deferred exception
             wrapper.deferredException = null;
         }
         

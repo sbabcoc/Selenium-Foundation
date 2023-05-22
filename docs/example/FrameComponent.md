@@ -35,7 +35,7 @@ public class FrameComponent extends Frame {
     private enum Using implements ByEnum {
         HEADING(By.cssSelector("h1"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

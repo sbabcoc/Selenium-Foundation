@@ -5,17 +5,25 @@ import static com.nordstrom.automation.selenium.examples.ExamplePage.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebElement;
+
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
+import com.nordstrom.automation.selenium.examples.FormComponent;
 import com.nordstrom.automation.selenium.examples.FrameComponent;
 import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
 import com.nordstrom.automation.selenium.examples.TableComponent;
+import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
 import com.nordstrom.automation.selenium.model.Enhanced;
+import com.nordstrom.automation.selenium.model.RobustWebElement;
 
 @InitialPage(ExamplePage.class)
 public class ModelTestCore {
@@ -302,6 +310,46 @@ public class ModelTestCore {
     public static void testBogusOptional(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         assertFalse(page.hasBogusOptional());
+    }
+
+    public static void testOptionalBehavior(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        FormComponent form = page.getForm();
+        RobustWebElement optional = form.getOptional();
+        assertFalse("Optional node should initially be absent", optional.hasReference());
+        assertTrue("Failed appending optional node", form.toggleOptionalNode());
+        assertTrue("Failed finding appended optional node", optional.hasReference());
+        assertEquals("Optional node context mismatch", "I'm optional", optional.getText());
+        assertFalse("Failed removing optional node", form.toggleOptionalNode());
+
+        try {
+            optional.getTagName();
+            fail("No exception thrown for removed node");
+        } catch (StaleElementReferenceException e) {
+            assertFalse("Failed clearing reference for optional node", optional.hasReference());
+            assertNotEquals("Refresh should not have been attempted for optional node",
+                    ElementReferenceRefreshFailureException.class, e.getClass());
+        }
+
+        assertTrue("Failed appending optional node", form.toggleOptionalNode());
+        assertEquals("Optional node context mismatch", "I'm optional", optional.getText());
+        
+        int count = page.getRefreshCount();
+        page.getWrappedDriver().navigate().refresh();
+        assertTrue("Failed appending optional node", form.toggleOptionalNode());
+        assertEquals("Optional node context mismatch", "I'm optional", optional.getText());
+        assertEquals("Page refresh count not incremented", count + 1, page.getRefreshCount());
+    }
+    
+    public static void testReferenceRefreshFailure(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        FormComponent form = page.getForm();
+        assertTrue("Failed appending optional node", form.toggleOptionalNode());
+        WebElement required = form.getRequired();
+        assertEquals("Optional node context mismatch", "I'm optional", required.getText());
+        assertFalse("Failed removing optional node", form.toggleOptionalNode());
+        required.getTagName();
+        fail("No exception thrown for removed node");
     }
     
     public static Runnable testShadowParagraphs(final TestBase instance) {

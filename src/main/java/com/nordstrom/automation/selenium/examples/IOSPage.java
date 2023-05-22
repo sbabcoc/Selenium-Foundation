@@ -14,7 +14,7 @@ public class IOSPage extends Page {
     protected enum Using implements ByEnum {
         TEXT_FIELD(By.className("XCUIElementTypeTextField"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

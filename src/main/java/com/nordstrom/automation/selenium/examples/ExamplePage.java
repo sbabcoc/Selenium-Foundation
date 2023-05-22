@@ -43,6 +43,7 @@ public class ExamplePage extends Page {
     private FrameComponent frameByElement;
     private FrameComponent frameByIndex;
     private FrameComponent frameById;
+    private FormComponent form;
     private TableComponent table;
     private List<TableComponent> tableList;
     private Map<Object, TableComponent> tableMap;
@@ -58,7 +59,7 @@ public class ExamplePage extends Page {
     protected static final String FRAME_B_ID = "frame-b";
     protected static final String FRAME_C_ID = "frame-c";
     protected static final String FRAME_D_ID = "frame-d";
-    
+
     protected enum Using implements ByEnum {
         FRAME(By.cssSelector("iframe[id^='frame-']")),
         FRAME_A(By.cssSelector("iframe#frame-a")),
@@ -72,9 +73,10 @@ public class ExamplePage extends Page {
         CHECK(By.cssSelector("input#checkbox")),
         SHADOW_ROOT(By.cssSelector("div[id^='shadow-root-']")),
         SHADOW_ROOT_A(By.cssSelector("div#shadow-root-a")),
-        SHADOW_ROOT_B(By.cssSelector("div#shadow-root-b"));
+        SHADOW_ROOT_B(By.cssSelector("div#shadow-root-b")),
+        FORM_DIV(By.cssSelector("div#form-div"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;
@@ -118,6 +120,13 @@ public class ExamplePage extends Page {
     public List<String> getParagraphs() {
         List<WebElement> paraList = findElements(Using.PARA);
         return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
+    }
+    
+    public FormComponent getForm() {
+        if (form == null) {
+            form = new FormComponent(Using.FORM_DIV.locator, this);
+        }
+        return form;
     }
     
     public TableComponent getTable() {
@@ -231,17 +240,17 @@ public class ExamplePage extends Page {
     }
     
     public boolean hasCssOptional() {
-    	return findOptional(By.cssSelector(ByType.cssLocatorFor(Using.FORM))).hasReference();
+        return findOptional(By.cssSelector(ByType.cssLocatorFor(Using.FORM))).hasReference();
     }
     
     public boolean hasXpathOptional() {
-    	return findOptional(By.xpath(ByType.xpathLocatorFor(Using.FORM))).hasReference();
+        return findOptional(By.xpath(ByType.xpathLocatorFor(Using.FORM))).hasReference();
     }
     
     public boolean hasBogusOptional() {
-    	return findOptional(By.tagName("BOGUS")).hasReference();
+        return findOptional(By.tagName("BOGUS")).hasReference();
     }
-    
+
     public static URI setHubAsTarget() {
         URI targetUri = null;
         SeleniumConfig config = SeleniumConfig.getConfig();

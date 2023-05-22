@@ -21,7 +21,7 @@ public class AndroidPage extends Page {
         SEARCH_BUTTON(By.id("btn_start_search")),
         SEARCH_RESULT(By.id("android:id/search_src_text"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

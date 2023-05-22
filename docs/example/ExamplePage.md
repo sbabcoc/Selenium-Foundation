@@ -56,7 +56,7 @@ public class ExamplePage extends Page {
         SHADOW_ROOT_A(By.cssSelector("div#shadow-root-a")),
         SHADOW_ROOT_B(By.cssSelector("div#shadow-root-b"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

@@ -26,7 +26,7 @@ public class TableRowComponent extends PageComponent {
     protected enum Using implements ByEnum {
         TBL_CELL(By.cssSelector("th,td"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

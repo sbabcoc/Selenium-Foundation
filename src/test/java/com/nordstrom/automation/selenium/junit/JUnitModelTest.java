@@ -2,7 +2,6 @@ package com.nordstrom.automation.selenium.junit;
 
 import static org.junit.Assume.assumeNoException;
 import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
-
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -10,6 +9,7 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.JUnitTargetRoot;
+import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
@@ -222,6 +222,20 @@ public class JUnitModelTest extends JUnitTargetRoot {
     @TargetPlatform(WEB_APP_NAME)
     public void testBogusOptional() {
     	ModelTestCore.testBogusOptional(this);
+    }
+
+    @Test
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void testOptionalBehavior() {
+        ModelTestCore.testOptionalBehavior(this);
+    }
+
+    @Test(expected = ElementReferenceRefreshFailureException.class)
+    @Ignore
+    @TargetPlatform(WEB_APP_NAME)
+    public void testReferenceRefreshFailure() {
+        ModelTestCore.testReferenceRefreshFailure(this);
     }
     
     @Test

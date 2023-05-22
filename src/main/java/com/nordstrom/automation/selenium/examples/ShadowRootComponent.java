@@ -32,7 +32,7 @@ public class ShadowRootComponent extends ShadowRoot {
         INPUT(By.cssSelector("input[id^='input-field-']")),
         CHECK(By.cssSelector("input[id^='checkbox-']"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;

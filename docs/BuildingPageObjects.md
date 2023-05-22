@@ -25,7 +25,7 @@ public class GoogleSearchPage extends Page implements DetectsLoadCompletion {
         SEARCH_BUTTON(By.name("btnG")),
         RESULT_STATS(By.id("resultStats"));
         
-        private By locator;
+        private final By locator;
         
         Using(By locator) {
             this.locator = locator;
