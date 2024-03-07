@@ -14,7 +14,7 @@ public class HtmlUnitCaps {
     private static final String[] PROPERTY_NAMES = {  };
     
     private static final String CAPABILITIES =
-            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\"}";
     
     private static final String BASELINE = 
              "{\"browserName\":\"htmlunit\"," +
@@ -61,7 +61,7 @@ public class HtmlUnitCaps {
         return PERSONALITIES;
     }
 
-    public static String[] getPropertyNames() {
+    public static String[] getPropertyNames(String capabilities) {
         return PROPERTY_NAMES;
     }
 

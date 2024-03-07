@@ -229,7 +229,6 @@ public final class JsUtility {
      * @return nothing (this method always throws the specified exception)
      * @since 17.4.0 
      */
-    @SuppressWarnings("deprecation")
     public static RuntimeException propagate(final WebDriver driver, final WebDriverException exception) {
         Throwable thrown = exception;
         // if exception is a WebDriverException (not a sub-class)
@@ -243,11 +242,13 @@ public final class JsUtility {
                 LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
 
                 // for each log entry
-                for (LogEntry logEntry : logEntries.filter(Level.WARNING)) {
-                    // extract serialized exception object from message
-                    thrown = extractException(exception, logEntry.getMessage());
-                    // done if serialized exception found
-                    if (!thrown.equals(exception)) break;
+                for (LogEntry logEntry : logEntries) {
+                    if (Level.WARNING.equals(logEntry.getLevel())) {
+                        // extract serialized exception object from message
+                        thrown = extractException(exception, logEntry.getMessage());
+                        // done if serialized exception found
+                        if (!thrown.equals(exception)) break;
+                    }
                 }
             }
         }

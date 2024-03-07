@@ -15,9 +15,9 @@ group = 'com.nordstrom.ui-tools'
 description = 'Selenium Foundation'
 
 if (!project.hasProperty('profile')) {
-  ext.profile = 'selenium3'
+  ext.profile = 'selenium4'
 } else {
-  assert ['selenium3'].contains(profile)
+  assert ['selenium3', 'selenium4'].contains(profile)
 }
 
 apply from: "${profile}Deps.gradle"
@@ -67,13 +67,13 @@ jacoco {
   reportsDirectory = file("${buildDir}/customJacocoReportDir")
 }
 
-jacocoTestReport {
-  reports {
-    xml.enabled false
-    csv.enabled false
-    html.destination file("${buildDir}/jacocoHtml")
-  }
-}
+//jacocoTestReport {
+//  reports {
+//    xml.enabled false
+//    csv.enabled false
+//    html.destination file("${buildDir}/jacocoHtml")
+//  }
+//}
 
 jar {
   group 'Build'
@@ -106,7 +106,7 @@ sourcesJar {
   group 'Build'
   description "Assembles a jar archive containing the '${profile}' source files."
   
-  classifier = 'sources'
+  archiveClassifier = 'sources'
   from sourceSets.main.allSource
   archiveFileName = archiveBase + '-sources.jar'
   destinationDirectory = libsDir
@@ -117,7 +117,7 @@ javadocJar {
   group 'Build'
   description "Assembles a jar archive containing the '${profile}' JavaDoc files."
   
-  classifier = 'javadoc'
+  archiveClassifier = 'javadoc'
   from javadoc.destinationDir
   archiveFileName = archiveBase + '-javadoc.jar'
   destinationDirectory = libsDir
@@ -255,7 +255,7 @@ dependencies {
 }
 
 test {
-    jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
+  jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
 }
 
 def getBrowserCaps() {

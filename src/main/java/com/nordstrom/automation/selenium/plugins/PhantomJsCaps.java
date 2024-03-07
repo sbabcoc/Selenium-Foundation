@@ -1,8 +1,12 @@
 package com.nordstrom.automation.selenium.plugins;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.nordstrom.automation.selenium.exceptions.DriverExecutableNotFoundException;
+import com.nordstrom.automation.selenium.utility.BinaryFinder;
 
 public class PhantomJsCaps {
     
@@ -11,11 +15,12 @@ public class PhantomJsCaps {
     }
 
     public static final String DRIVER_NAME = "phantomjs";
+    public static final String DRIVER_PATH = "phantomjs.binary.path";
     private static final String[] PROPERTY_NAMES = 
-        { "phantomjs.binary.path", "phantomjs.ghostdriver.path", "phantomjs.logfile.path" };
+        { DRIVER_PATH, "phantomjs.ghostdriver.path", "phantomjs.logfile.path" };
 
     private static final String CAPABILITIES =
-            "{\"browserName\":\"phantomjs\",\"maxInstances\":5,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"phantomjs\"}";
     
     private static final String BASELINE =
             "{\"browserName\":\"phantomjs\"," +
@@ -44,7 +49,13 @@ public class PhantomJsCaps {
         return PERSONALITIES;
     }
     
-    public static String[] getPropertyNames() {
+    public static String[] getPropertyNames(String capabilities) {
+        try {
+            File driverPath = BinaryFinder.findBinary(DRIVER_NAME, DRIVER_PATH);
+            System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
+        } catch (IllegalStateException e) {
+            throw new DriverExecutableNotFoundException(DRIVER_PATH);
+        }
         return PROPERTY_NAMES;
     }
 

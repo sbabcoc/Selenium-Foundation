@@ -24,7 +24,6 @@ import org.apache.commons.configuration2.io.FileLocator;
 import org.apache.commons.configuration2.io.FileLocatorUtils;
 import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.http.client.utils.URIBuilder;
-import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
@@ -35,6 +34,7 @@ import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
+import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servlet;
@@ -46,7 +46,7 @@ import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 
 /**
- * This class declares settings and methods related to WebDriver and Grid configuration for Selenium 2 and Selenium 3.
+ * This class declares settings and methods related to WebDriver and Grid configuration for Selenium 3 and Selenium 4.
  */
 public abstract class AbstractSeleniumConfig extends
                 SettingsCore<AbstractSeleniumConfig.SeleniumSettings> {
@@ -142,6 +142,7 @@ public abstract class AbstractSeleniumConfig extends
          * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
          * <ul>
          *     <li>Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b></li>
+         *     <li>Selenium 4: <b>org.openqa.selenium.grid.Bootstrap</b></li>
          * </ul>
          */
         GRID_LAUNCHER("selenium.grid.launcher", null),
@@ -159,7 +160,8 @@ public abstract class AbstractSeleniumConfig extends
          * This setting specifies the configuration file name/path for the local <b>Selenium Grid</b> hub server.
          * <p>
          * name: <b>selenium.hub.config</b><br>
-         * Selenium 3: <b>hubConfig-s3.json</b>
+         * Selenium 3: <b>hubConfig-s3.json</b><br>
+         * Selenium 4: <b>hubConfig-s4.json</b>
          */
         HUB_CONFIG("selenium.hub.config", null),
         
@@ -167,7 +169,8 @@ public abstract class AbstractSeleniumConfig extends
          * This is the URL for the <b>Selenium Grid</b> endpoint: [scheme:][//authority]/wd/hub
          * <p>
          * name: <b>selenium.hub.host</b><br>
-         * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4445/wd/hub</b>
+         * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4445/wd/hub</b><br>
+         * Selenium 4: <b>http://&lt;{@code localhost}&gt;:4446/wd/hub</b>
          */
         HUB_HOST("selenium.hub.host", null),
         
@@ -175,7 +178,8 @@ public abstract class AbstractSeleniumConfig extends
          * This is the port assigned to the local <b>Selenium Grid</b> hub server.
          * <p>
          * name: <b>selenium.hub.port</b><br>
-         * Selenium 3: <b>4445</b>
+         * Selenium 3: <b>4445</b><br>
+         * Selenium 4: <b>4446</b>
          */
         HUB_PORT("selenuim.hub.port", null),
         
@@ -189,10 +193,19 @@ public abstract class AbstractSeleniumConfig extends
         HUB_SERVLETS("selenium.hub.servlets", null),
         
         /**
+         * This setting specifies whether to launch the local <b>Selenium Grid</b> hub server with JDWP debugging.
+         * <p>
+         * name: <b>selenium.hub.debug</b><br>
+         * default: {@code false}
+         */
+        HUB_DEBUG("selenium.hub.debug", "false"),
+        
+        /**
          * This setting specifies the configuration template name/path for local <b>Selenium Grid</b> node servers.
          * <p>
          * name: <b>selenium.node.config</b><br>
-         * Selenium 3: <b>nodeConfig-s3.json</b>
+         * Selenium 3: <b>nodeConfig-s3.json</b><br>
+         * Selenium 4: <b>nodeConfig-s4.json</b>
          */
         NODE_CONFIG("selenium.node.config", null),
         
@@ -204,6 +217,14 @@ public abstract class AbstractSeleniumConfig extends
          * default: {@code null}
          */
         NODE_SERVLETS("selenium.node.servlets", null),
+        
+        /**
+         * This setting specifies whether to launch the local <b>Selenium Grid</b> node server with JDWP debugging.
+         * <p>
+         * name: <b>selenium.node.debug</b><br>
+         * default: {@code false}
+         */
+        NODE_DEBUG("selenium.node.debug", "false"),
         
         /**
          * This setting specifies the browser name or "personality" for new session requests.
@@ -542,6 +563,8 @@ public abstract class AbstractSeleniumConfig extends
         }
         throw new IllegalStateException("SELENIUM_CONFIG must be populated by subclass static initializer");
     }
+    
+    public abstract int getVersion();
 
     /**
      * Resolve the specified property name to its value.
@@ -626,6 +649,7 @@ public abstract class AbstractSeleniumConfig extends
             if (seleniumGrid != null) {
                 result = seleniumGrid.shutdown(localOnly);
                 if (result) {
+                    ExamplePageLauncher.getLauncher().shutdown();
                     seleniumGrid = null;
                 }
             }
@@ -967,11 +991,6 @@ public abstract class AbstractSeleniumConfig extends
         if ( ! Strings.isNullOrEmpty(nodeServlets)) {
             // collect servlet names, minus leading/trailing white space
             servlets.addAll(Arrays.asList(nodeServlets.trim().split("\\s*,\\s*")));
-        }
-        // if remote shutdown feature is specified
-        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
-            // add lifecycle servlet to the collection
-            servlets.add(LifecycleServlet.class.getName());
         }
         return servlets;
     }

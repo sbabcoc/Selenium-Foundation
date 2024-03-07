@@ -178,6 +178,7 @@ public final class DriverManager {
      * @param driver driver object in which to configure timeout intervals
      * @param config configuration object that specifies timeout intervals
      */
+    @SuppressWarnings("deprecation")
     public static void setDriverTimeouts(final WebDriver driver, final SeleniumConfig config) {
         Timeouts timeouts = driver.manage().timeouts();
         timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);

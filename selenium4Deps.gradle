@@ -1,0 +1,63 @@
+ext.buildRoot = file('build-s4')
+ext.libsDir = new File(buildRoot, 'libs')
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+  }
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = [ 'src/main/java', 'src/selenium4/java' ]
+      destinationDirectory = new File(buildRoot, 'classes')
+    }
+    output.resourcesDir = "${buildRoot}/classes"
+  }
+  test {
+    java {
+      destinationDirectory = new File(buildRoot, 'test-classes')
+    }
+  }
+}
+  
+dependencies {
+  constraints {
+    api 'com.nordstrom.tools:testng-foundation:4.0.4-j8'
+    api 'org.seleniumhq.selenium:selenium-grid:4.17.0'
+    api 'org.seleniumhq.selenium:selenium-support:4.17.0'
+    api 'org.seleniumhq.selenium:selenium-chrome-driver:4.17.0'
+    api 'org.seleniumhq.selenium:selenium-edge-driver:4.17.0'
+    api 'org.seleniumhq.selenium:selenium-firefox-driver:4.17.0'
+    api 'org.seleniumhq.selenium:selenium-opera-driver:4.4.0'
+    api 'org.seleniumhq.selenium:selenium-safari-driver:4.17.0'
+    api 'org.seleniumhq.selenium:htmlunit3-driver:4.17.0'
+    api 'com.codeborne:phantomjsdriver:1.5.0'
+    api 'org.apache.httpcomponents:httpclient:4.5.14'
+    api 'org.eclipse.jetty:jetty-servlet:9.4.50.v20221201'
+    api 'org.jsoup:jsoup:1.15.3'
+    api 'org.apache.commons:commons-lang3:3.12.0'
+    api ('com.google.guava:guava') {
+    version { strictly '31.1-jre' }
+    }
+    api 'com.beust:jcommander:1.82'
+    api 'io.netty:netty-transport-native-epoll:4.1.93.Final'
+    api 'io.netty:netty-transport-native-kqueue:4.1.93.Final'
+    testImplementation 'io.appium:java-client:7.6.0'
+    testImplementation 'org.mockito:mockito-core:4.6.1'
+  }
+  api 'com.nordstrom.tools:testng-foundation'
+  api 'org.seleniumhq.selenium:selenium-grid'
+  api 'org.seleniumhq.selenium:selenium-support'
+  api 'org.seleniumhq.selenium:selenium-chrome-driver' // temporary
+  api 'org.seleniumhq.selenium:htmlunit3-driver'       // temporary
+  api 'com.codeborne:phantomjsdriver'                  // temporary
+  api 'org.apache.httpcomponents:httpclient'
+  api 'org.eclipse.jetty:jetty-servlet'
+  api 'org.jsoup:jsoup'
+  api 'org.apache.commons:commons-lang3'
+  api 'com.google.guava:guava'
+  api 'com.beust:jcommander'
+  testImplementation 'org.mockito:mockito-core'
+}

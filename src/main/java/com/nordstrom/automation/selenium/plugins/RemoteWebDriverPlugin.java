@@ -2,8 +2,8 @@ package com.nordstrom.automation.selenium.plugins;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.nio.file.Path;
-import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,8 +14,6 @@ import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
-import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
-
 import net.bytebuddy.implementation.Implementation;
 
 /**
@@ -35,7 +33,7 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      * @param config {@link SeleniumConfig} object
      * @param launcherClassName fully-qualified class name for Grid launcher
      * @param dependencyContexts common dependency contexts for all Grid nodes
-     * @param hubServer Grid hub server with which node should register
+     * @param hubUrl Grid hub {@link URL} with which node should register
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
      * @return {@link LocalGridServer} object for specified node
@@ -43,14 +41,14 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      */
     @Override
     public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            GridServer hubServer, final Path workingPath, final Path outputPath) throws IOException {
+            URL hubUrl, final Path workingPath, final Path outputPath) throws IOException {
         
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, this);
         String capabilities = getCapabilities(config);
-        Path nodeConfigPath = config.createNodeConfig(capabilities, hubServer.getUrl());
-        String[] propertyNames = getPropertyNames();
-        return LocalSeleniumGrid.create(launcherClassName, combinedContexts, GridRole.NODE,
-                0, nodeConfigPath, workingPath, outputPath, propertyNames);
+        Path nodeConfigPath = config.createNodeConfig(capabilities, hubUrl);
+        String[] propertyNames = getPropertyNames(capabilities);
+        return LocalSeleniumGrid.create(config, launcherClassName, combinedContexts,
+                false, 0, nodeConfigPath, workingPath, outputPath, propertyNames);
     }
 
     /**

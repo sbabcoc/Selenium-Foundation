@@ -20,6 +20,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
+import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.json.Json;
@@ -213,6 +214,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return seleniumConfig;
     }
     
+    public int getVersion() {
+        return 3;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -305,6 +310,20 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             }
         }
         return filePath;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> getNodeServlets() {
+        Set<String> servlets = super.getNodeServlets();
+        // if remote shutdown feature is specified
+        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
+            // add lifecycle servlet to the collection
+            servlets.add(LifecycleServlet.class.getName());
+        }
+        return servlets;
     }
     
     /**

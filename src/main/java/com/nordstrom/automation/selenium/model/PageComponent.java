@@ -7,7 +7,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.WrapsElement;
 
 import com.nordstrom.automation.selenium.exceptions.ComponentStillDisplayedTimeoutException;
 import com.nordstrom.automation.selenium.exceptions.ComponentStillInvisibleTimeoutException;

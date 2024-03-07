@@ -20,8 +20,9 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-                    "org.openqa.selenium.chrome.ChromeDriver",
-                    "net.bytebuddy.matcher.ElementMatcher"};
+        "org.openqa.selenium.chrome.ChromeDriver",
+        "net.bytebuddy.matcher.ElementMatcher"
+    };
     
     /**
      * {@inheritDoc}
@@ -51,8 +52,8 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    public String[] getPropertyNames() {
-        return ChromeCaps.getPropertyNames();
+    public String[] getPropertyNames(String capabilities) {
+        return ChromeCaps.getPropertyNames(capabilities);
     }
 
 }

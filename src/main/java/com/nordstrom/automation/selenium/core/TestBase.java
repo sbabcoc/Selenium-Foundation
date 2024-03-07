@@ -69,7 +69,9 @@ public abstract class TestBase {
         if (pageObj.getWindowHandle() == null) {
             try {
                 pageObj.setWindowHandle(pageObj.getWrappedDriver().getWindowHandle());
-            } catch (WebDriverException e) { }
+            } catch (WebDriverException ignored) {
+                // nothing to do here
+            }
         }
         // required when initial page is local file
         setDriver(pageObj.getWrappedDriver());

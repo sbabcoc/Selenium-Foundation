@@ -331,6 +331,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * @throws StaleElementReferenceElementException if container element has gone stale
      * @throws NoSuchElementException if unable to find element specified by the wrapper
      */
+    @SuppressWarnings("deprecation")
     private static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
         NoSuchElementException thrown = null;
         SearchContext context = wrapper.context.getWrappedContext();

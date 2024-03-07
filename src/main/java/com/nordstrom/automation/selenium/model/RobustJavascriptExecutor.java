@@ -3,9 +3,9 @@ package com.nordstrom.automation.selenium.model;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WrapsDriver;
 
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
-import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
 
 /**
  * This is a wrapper class for drivers that implement the {@link JavascriptExecutor} interface. If a 

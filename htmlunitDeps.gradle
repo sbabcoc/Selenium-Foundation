@@ -3,7 +3,13 @@ System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.autom
 System.setProperty('selenium.browser.name', 'htmlunit')
 System.setProperty('selenium.context.platform', 'web-app')
 dependencies {
-  testImplementation('org.seleniumhq.selenium:htmlunit-driver') {
-    exclude module: 'selenium-support'
+  if ("${profile}" == "selenium4") {
+    testImplementation('org.seleniumhq.selenium:htmlunit3-driver') {
+      exclude module: 'selenium-support'
+    }
+  } else {
+    testImplementation('org.seleniumhq.selenium:htmlunit-driver') {
+      exclude module: 'selenium-support'
+    }
   }
 }

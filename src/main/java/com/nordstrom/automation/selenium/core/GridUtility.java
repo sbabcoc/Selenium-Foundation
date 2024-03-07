@@ -24,19 +24,16 @@ import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
-
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.openqa.grid.common.GridRole;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -47,7 +44,6 @@ import com.google.common.collect.ImmutableList;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.core.SeleniumGrid.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.utility.NetIdentity;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -68,35 +64,6 @@ public final class GridUtility {
         throw new AssertionError("GridUtility is a static utility class that cannot be instantiated");
     }
     
-    /**
-     * Determine if the specified Selenium Grid hub is active.
-     * 
-     * @param hubUrl {@link URL} to be checked
-     * @return 'true' if specified hub is active; otherwise 'false'
-     */
-    public static boolean isHubActive(URL hubUrl) {
-        return isHostActive(hubUrl, GridServer.HUB_CONFIG);
-    }
-    
-    /**
-     * Determine if the indicated Selenium Grid node is registered with the specified hub.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param hubUrl {@link URL} of hub to query
-     * @param nodeUrl {@link URL} of node in question
-     * @return 'true' if indicated node is registered; otherwise 'false'
-     */
-    public static boolean isNodeRegistered(SeleniumConfig config, URL hubUrl, URL nodeUrl) {
-        try {
-            String nodeEndpoint = nodeUrl.getProtocol() + "://" + nodeUrl.getAuthority();
-            Capabilities capabilities = getNodeCapabilities(config, hubUrl, nodeEndpoint);
-            return capabilities.is("success");
-        } catch (IOException eaten) {
-            // nothing to do here
-        }
-        return false;
-    }
-
     /**
      * Determine if the specified Selenium Grid host (hub or node) is active.
      * 
@@ -120,18 +87,34 @@ public final class GridUtility {
      * @param hostUrl {@link URL} of target host
      * @param request request path (may include parameters)
      * @return host response for the specified GET request
-     * @throws IOException The request triggered an I/O exception
+     * @throws IOException if the request triggered an I/O exception
      */
     public static HttpResponse getHttpResponse(final URL hostUrl, final String request) throws IOException {
         Objects.requireNonNull(hostUrl, "[hostUrl] must be non-null");
         Objects.requireNonNull(request, "[request] must be non-null");
         HttpClient client = HttpClientBuilder.create().build();
-        URL sessionURL = new URL(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), request);
-        BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest = 
-                new BasicHttpEntityEnclosingRequest("GET", sessionURL.toExternalForm());
-        return client.execute(extractHost(hostUrl), basicHttpEntityEnclosingRequest);
+        URL url = new URL(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), request);
+        return client.execute(extractHost(hostUrl), new HttpGet(url.toExternalForm()));
     }
     
+    /**
+     * Send the specified GraphQL query to the indicated host.
+     * 
+     * @param hostUrl {@link URL} of target host
+     * @param query JSON query string
+     * @return host response for the specified GraphQL query
+     * @throws IOException if the query triggered an I/O exception
+     */
+    public static HttpResponse callGraphQLService(final URL hostUrl, String query) throws IOException {
+        Objects.requireNonNull(hostUrl, "[hostUrl] must be non-null");
+        Objects.requireNonNull(query, "[query] must be non-null");
+        HttpClient client = HttpClientBuilder.create().build();
+        URL url = new URL(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), "/graphql");
+        HttpPost httpRequest = new HttpPost(url.toExternalForm());
+        httpRequest.setEntity(new StringEntity(query, ContentType.APPLICATION_JSON));
+        return client.execute(extractHost(hostUrl), httpRequest);
+    }
+
     /**
      * Get a driver with "current" capabilities from the active Selenium Grid.
      * <p>
@@ -159,7 +142,7 @@ public final class GridUtility {
         SeleniumConfig config = SeleniumConfig.getConfig();
         
         // if specified hub is inactive
-        if (!isHubActive(remoteAddress)) {
+        if (!GridServer.isHubActive(remoteAddress)) {
             // if hub URL is on local host
             if (isLocalHost(remoteAddress)) {
                 LocalSeleniumGrid localGrid = (LocalSeleniumGrid) config.getSeleniumGrid();
@@ -205,73 +188,6 @@ public final class GridUtility {
         return result.toString(StandardCharsets.UTF_8.name());
     }
 
-    /**
-     * Get the list of node endpoints attached to the specified Selenium Grid hub.
-     * 
-     * @param hubUrl {@link URL} of Grid hub
-     * @return list of node endpoints
-     * @throws IOException if an I/O error occurs
-     */
-    public static List<String> getGridProxies(URL hubUrl) throws IOException {
-        String url = hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + GridServer.GRID_CONSOLE;
-        Document doc = Jsoup.connect(url).get();
-        Elements proxyIds = doc.select("p.proxyid");
-        List<String> nodeList = new ArrayList<>();
-        for (Element proxyId : proxyIds) {
-            String text = proxyId.text();
-            int beginIndex = text.indexOf("http");
-            int endIndex = text.indexOf(',');
-            nodeList.add(text.substring(beginIndex, endIndex));
-        }
-        return nodeList;
-    }
-    
-    /**
-     * Get capabilities of the indicated node of the specified Selenium Grid hub.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param hubUrl {@link URL} of Grid hub
-     * @param nodeEndpoint node endpoint
-     * @return {@link Capabilities} object for the specified node
-     * @throws IOException if an I/O error occurs
-     */
-    public static Capabilities getNodeCapabilities(SeleniumConfig config, URL hubUrl, String nodeEndpoint) throws IOException {
-        String json;
-        String url = hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + GridServer.NODE_CONFIG + "?id=" + nodeEndpoint;
-        try (InputStream is = new URL(url).openStream()) {
-            json = readAvailable(is);
-        }
-        return config.getCapabilitiesForJson(json)[0];
-    }
-    
-    /**
-     * Extract driver capabilities from the specified node capabilities object.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param nodeCapabilities Grid node capabilities
-     * @return list of {@link Capabilities} objects for the drivers supported by the node.
-     */
-    @SuppressWarnings("unchecked")
-    public static Capabilities[] getNodeDriverCaps(SeleniumConfig config, Capabilities nodeCapabilities) {
-        try {
-            if (nodeCapabilities.is("success")) {
-                // extract request from node capabilities
-                Map<String, Object> request = (Map<String, Object>) nodeCapabilities.getCapability("request");
-                // extract configuration from request
-                Map<String, Object> configuration = (Map<String, Object>) request.get("configuration");
-                // extract capabilities list from configuration, converted to JSON
-                String capabilities = config.toJson(configuration.get("capabilities"));
-                // NOTE: array delimiters must be stripped
-                int beginIndex = capabilities.indexOf('[') + 1;
-                int endIndex = capabilities.lastIndexOf(']');
-                // return array of driver capabilities objects
-                return config.getCapabilitiesForJson(capabilities.substring(beginIndex, endIndex));
-            }
-        } catch (NullPointerException | ClassCastException e) { }
-        
-        return new Capabilities[0];
-    }
-    
     /**
      * Get the 'personality' value from the specified capabilities map.
      * <p>
@@ -379,14 +295,14 @@ public final class GridUtility {
      * Get next configured output path for Grid server of specified role.
      * 
      * @param config {@link SeleniumConfig} object
-     * @param role role of Grid server being started
+     * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
      * @return Grid server output path (may be {@code null})
      */
-    public static Path getOutputPath(SeleniumConfig config, GridRole role) {
+    public static Path getOutputPath(SeleniumConfig config, boolean isHub) {
         Path outputPath = null;
         
         if (!config.getBoolean(SeleniumSettings.GRID_NO_REDIRECT.key())) {
-            String gridRole = role.toString().toLowerCase();
+            String gridRole = isHub ? "hub" : "node";
             String logsFolder = config.getString(SeleniumSettings.GRID_LOGS_FOLDER.key());
             Path logsPath = Paths.get(logsFolder);
             if (!logsPath.isAbsolute()) {

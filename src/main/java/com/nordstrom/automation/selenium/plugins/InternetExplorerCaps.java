@@ -1,8 +1,12 @@
 package com.nordstrom.automation.selenium.plugins;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.nordstrom.automation.selenium.exceptions.DriverExecutableNotFoundException;
+import com.nordstrom.automation.selenium.utility.BinaryFinder;
 
 public class InternetExplorerCaps {
     
@@ -22,7 +26,7 @@ public class InternetExplorerCaps {
         { DRIVER_PATH, LOGFILE_PATH, LOG_LEVEL, DRIVER_HOST, EXTRACT_PATH, SILENT_MODE };
     
     private static final String CAPABILITIES =
-            "{\"browserName\":\"internet explorer\",\"maxInstances\":1,\"seleniumProtocol\":\"WebDriver\"}";
+            "{\"browserName\":\"internet explorer\"}";
     
     private static final String BASELINE =
             "{\"browserName\":\"internet explorer\"," +
@@ -45,7 +49,13 @@ public class InternetExplorerCaps {
         return PERSONALITIES;
     }
 
-    public static String[] getPropertyNames() {
+    public static String[] getPropertyNames(String capabilities) {
+        try {
+            File driverPath = BinaryFinder.findDriver(capabilities);
+            System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
+        } catch (IllegalStateException e) {
+            throw new DriverExecutableNotFoundException(DRIVER_PATH);
+        }
         return PROPERTY_NAMES;
     }
 

@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NotFoundException;
@@ -20,59 +20,55 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.CapabilityType;
-
-import com.nordstrom.automation.selenium.interfaces.WrapsDriver;
+import org.openqa.selenium.WrapsDriver;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
 
 /**
- * This static utility class contains a collection of methods primarily focused on extracting useful interfaces from
- * search contexts. It also includes a method that removes hidden elements from lists of elements.
+ * This static utility class contains a collection of methods primarily focused
+ * on extracting useful interfaces from search contexts. It also includes a
+ * method that removes hidden elements from lists of elements.
  */
 public final class WebDriverUtils {
-    
-    private static final List<Class<? extends WebDriverException>> REPORTABLE_EXCEPTION =
-                    Collections.unmodifiableList(
-                            Arrays.asList(
-                                    NotFoundException.class, ElementNotVisibleException.class,
-                                    UnhandledAlertException.class, StaleElementReferenceException.class,
-                                    TimeoutException.class));
-    
-    private static final Pattern FRAMEWORK_PACKAGE = Pattern.compile(
-                    "^(?:sun\\.reflect|java\\.lang"
-                    + "|org\\.(?:openqa|testng|junit|hamcrest)"
-                    + "|com\\.nordstrom\\.automation\\.selenium)\\.");
-            
+
+    private static final List<Class<? extends WebDriverException>> REPORTABLE_EXCEPTION = Collections
+            .unmodifiableList(Arrays.asList(NotFoundException.class, ElementNotInteractableException.class,
+                    UnhandledAlertException.class, StaleElementReferenceException.class, TimeoutException.class));
+
+    private static final Pattern FRAMEWORK_PACKAGE = Pattern.compile("^(?:sun\\.reflect|java\\.lang"
+            + "|org\\.(?:openqa|testng|junit|hamcrest)|com\\.nordstrom\\.automation\\.selenium)\\.");
+
     /**
      * Private constructor to prevent instantiation.
      */
     private WebDriverUtils() {
         throw new AssertionError("WebDriverUtils is a static utility class that cannot be instantiated");
     }
-    
+
     /**
      * Get the driver associated with the specified search context.
      * 
      * @param context search context
      * @return search context driver
-     * @throws UnsupportedOperationException if unable to extract driver from specified context
+     * @throws UnsupportedOperationException if unable to extract driver from
+     *                                       specified context
      */
     public static WebDriver getDriver(final SearchContext context) {
         if (context instanceof WebDriver) {
             return (WebDriver) context;
-        } else if (WrapsDriver.isAssignableFrom.apply(context)) {
-            return WrapsDriver.getWrappedDriver.apply(context);
+        } else if (context instanceof WrapsDriver) {
+            return ((WrapsDriver) context).getWrappedDriver();
         } else {
             throw new UnsupportedOperationException("Unable to extract the driver from the specified context");
         }
     }
-    
+
     /**
      * Get a JavaScript code executor for the specified search context.
      * 
      * @param context search context
      * @return context-specific {@link JavascriptExecutor}
-     * @throws UnsupportedOperationException if specified context doesn't support JavaScript
+     * @throws UnsupportedOperationException if specified context doesn't support
+     *                                       JavaScript
      */
     public static JavascriptExecutor getExecutor(final SearchContext context) {
         return new RobustJavascriptExecutor(getDriver(context));
@@ -82,40 +78,48 @@ public final class WebDriverUtils {
      * Determine if the specified context supports JavaScript.
      * 
      * @param context search context
-     * @return {@code true} if the specified context supports JavaScript; otherwise {@code false}
+     * @return {@code true} if the specified context supports JavaScript; otherwise
+     *         {@code false}
      */
     public static boolean isJavascriptEnabled(final SearchContext context) {
         Capabilities caps = getCapabilities(context);
-        return (caps != null) && caps.is(CapabilityType.SUPPORTS_JAVASCRIPT);
+        if (caps != null) {
+            Object javascriptEnabled = caps.getCapability("javascriptEnabled");
+            return (javascriptEnabled == null) || caps.is("javascriptEnabled");
+        }
+        return false;
     }
-    
+
     /**
      * Get the browser name for the specified context.
-     *  
+     * 
      * @param context search context
-     * @return context browser name; "(unknown)" if context doesn't describe its capabilities
+     * @return context browser name; "(unknown)" if context doesn't describe its
+     *         capabilities
      */
     public static String getBrowserName(final SearchContext context) {
         Capabilities caps = getCapabilities(context);
         return (caps != null) ? caps.getBrowserName() : "(unknown)";
     }
-    
+
     /**
      * Get the platform on which the browser is running.
      * 
      * @param context search context
-     * @return {@link Platform} hosting the browser; {@code null} if context doesn't describe its capabilities
+     * @return {@link Platform} hosting the browser; {@code null} if context doesn't
+     *         describe its capabilities
      */
     public Platform getPlatform(final SearchContext context) {
         Capabilities caps = getCapabilities(context);
-        return (caps != null) ? caps.getPlatform() : null;
+        return (caps != null) ? caps.getPlatformName() : null;
     }
-    
+
     /**
      * Get the capabilities of the specified search context
      * 
      * @param context search context
-     * @return context capabilities; {@code null} if context doesn't describe its capabilities
+     * @return context capabilities; {@code null} if context doesn't describe its
+     *         capabilities
      */
     public static Capabilities getCapabilities(final SearchContext context) {
         WebDriver driver = getDriver(context);
@@ -126,7 +130,8 @@ public final class WebDriverUtils {
      * Remove hidden elements from specified list.
      * 
      * @param elements list of elements
-     * @return {@code true} if no visible elements were found; otherwise {@code false}
+     * @return {@code true} if no visible elements were found; otherwise
+     *         {@code false}
      */
     public static boolean filterHidden(final List<WebElement> elements) {
         Iterator<WebElement> iter = elements.iterator();
@@ -137,7 +142,7 @@ public final class WebDriverUtils {
         }
         return elements.isEmpty();
     }
-    
+
     /**
      * Unwrap the specified exception to reveal its report-able cause.
      * 
@@ -158,12 +163,14 @@ public final class WebDriverUtils {
         }
         return exception;
     }
-    
+
     /**
-     * Get the client code breakpoint from the stack trace of the specified exception.
+     * Get the client code breakpoint from the stack trace of the specified
+     * exception.
      * 
      * @param exception exception whose stack trace is to be analyzed
-     * @return first stack trace element that exists in client code; {@code null} if unable to identify breakpoint
+     * @return first stack trace element that exists in client code; {@code null} if
+     *         unable to identify breakpoint
      */
     public static StackTraceElement getClientBreakpoint(final Throwable exception) {
         if (exception != null) {
@@ -172,9 +179,9 @@ public final class WebDriverUtils {
                 if (element.getLineNumber() < 0) {
                     continue;
                 }
-                
+
                 Matcher matcher = FRAMEWORK_PACKAGE.matcher(element.getClassName());
-                
+
                 // if not in framework code
                 if (!matcher.lookingAt()) {
                     return element;

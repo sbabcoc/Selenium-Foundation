@@ -26,7 +26,7 @@ public final class FirefoxShadowRoot extends PageComponent {
      * {@inheritDoc}
      */
     @Override
-	public List<WebElement> findElements(final By by) {
+    public List<WebElement> findElements(final By by) {
         String script = SearchContextUtils.buildScriptToLocateElements(ContextType.SHADOW, by);
         List<WebElement> elements = JsUtility.runAndReturn(driver, script, context);
         for (int index = 0; index < elements.size(); index++) {
