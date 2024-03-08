@@ -55,7 +55,7 @@
 
 ## Selenium API Support
 
-**Selenium Foundation** includes supports for both **Selenium 4** and **Selenium 3**. A single Gradle project defines version-specific profiles to produces two separate artifacts.
+**Selenium Foundation** includes supports for both **Selenium 4** and **Selenium 3**. A single Gradle project defines version-specific profiles to produce two separate artifacts.
 
 ### Dependency Artifact Coordinates
 
