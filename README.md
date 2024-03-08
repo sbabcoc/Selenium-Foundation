@@ -55,11 +55,11 @@
 
 ## Selenium API Support
 
-Since version _24.0.0_, **Selenium Foundation** exclusively supports the **Selenium 3** API. Prior releases support both **Selenium 2** (Java 7) and **Selenium 3** (Java 8).
+**Selenium Foundation** includes supports for both **Selenium 4** and **Selenium 3**. A single Gradle project defines version-specific profiles to produces two separate artifacts.
 
 ### Dependency Artifact Coordinates
 
-The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Artifacts version numbers have the `s3` suffix to indicate support for the **Selenium 3** API.
+The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Artifacts whose version numbers have the `s3` suffix support the **Selenium 3** API. Artifacts whose version numbers have the `s3` suffix support the **Selenium 3** API.
 
 To add a dependency on **Selenium Foundation** for Maven, use the following:
 
