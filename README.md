@@ -59,7 +59,7 @@
 
 ### Dependency Artifact Coordinates
 
-The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Artifacts whose version numbers have the `s3` suffix support the **Selenium 3** API. Artifacts whose version numbers have the `s3` suffix support the **Selenium 3** API.
+The Maven group ID is `com.nordstrom.ui-tools`, and the artifact ID is `selenium-foundation`. Artifacts whose version numbers have the `s4` suffix support the **Selenium 4** API. Artifacts whose version numbers have the `s3` suffix support the **Selenium 3** API.
 
 To add a dependency on **Selenium Foundation** for Maven, use the following:
 
