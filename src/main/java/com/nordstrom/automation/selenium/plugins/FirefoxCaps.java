@@ -27,12 +27,12 @@ public class FirefoxCaps {
             "{\"browserName\":\"firefox\"}";
     
     private static final String BASELINE =
-            "{\"browserName\":\"firefox\",\"marionette\":true," +
+            "{\"browserName\":\"firefox\"," +
              "\"nord:options\":{\"personality\":\"firefox\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"}}";
     
     private static final String HEADLESS =
-            "{\"browserName\":\"firefox\",\"marionette\":true," +
+            "{\"browserName\":\"firefox\"," +
              "\"moz:firefoxOptions\":{\"args\":[\"-headless\"]}," +
              "\"nord:options\":{\"personality\":\"firefox.headless\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.FirefoxPlugin\"}}";

@@ -326,6 +326,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             "io.opentelemetry.sdk.common.Clock",
             "io.opentelemetry.sdk.OpenTelemetrySdk",
             "io.opentelemetry.semconv.SemanticAttributes",
+            "io.opentelemetry.extension.incubator.trace.ExtendedSpan",
             "org.zeromq.Utils",
             "dev.failsafe.Call",
             "graphql.Assert",
@@ -348,9 +349,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             "org.reactivestreams.Publisher",
             "org.openqa.selenium.manager.SeleniumManager",
             "org.apache.commons.exec.Executor",
-            "io.netty.buffer.ByteBufUtil",
-//            "org.asynchttpclient.Dsl",
-//            "com.typesafe.netty.HandlerPublisher",
+            "io.netty.buffer.ByteBufUtil"
             };
     
     static {

@@ -120,7 +120,7 @@ To run the unit tests on a specific browser, add the corresponding option to the
 
 | Test Runner | Command Line Example | Description |
 |---|---|---| 
-| Gradle | `gradle test -Pbrowsers=htmlunit` | Run **Selenium Foundation** unit tests on the HtmlUnit headless browser |
+| Gradle | `./gradlew test -Pbrowsers=htmlunit` | Run **Selenium Foundation** unit tests on the HtmlUnit headless browser |
 | `mvn-build` | `./mvn-build.sh -b espresso` | Build **Selenium Foundation** and run the Android Espresso unit tests|
 
 #### Desktop Browser Support
