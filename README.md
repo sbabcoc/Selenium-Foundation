@@ -84,19 +84,19 @@ For Eclipse, we recommend enabling Gradle integration through the official [Buil
 
 To build **Selenium Foundation** from the command line: 
 
-> **`gradle build`**  
+> **`./gradlew build`**  
 
 Use the `install` task to install SNAPSHOT builds in your local Maven repository:
 
-> **`gradle install`**  
+> **`./gradlew install`**  
 
 #### Running Browser Unit Tests
 
 By default, the unit tests that run after the build completes are the support feature tests (which don't require a browser). The Gradle project file provides a set of browser profiles, one for each supported browser. By specifying one of these profiles, you activate dependencies, settings, and driver plug-in for the corresponding browser.
 
-> **`gradle test -Pbrowsers=espresso`** # run Android Espresso unit tests  
-> **`gradle test -Pbrowsers=filefox -Ppersonality=firefox.headless`** # run Mozilla Firefox unit tests in "headless" mode  
-> **`gradle test -Pbrowsers=htmlunit -Ppersonality=htmlunit.nojs`** # run HtmlUnit unit tests without JavaScript support
+> **`./gradlew test -Pbrowsers=espresso`** # run Android Espresso unit tests  
+> **`./gradlew test -Pbrowsers=firefox -Ppersonality=firefox.headless`** # run Mozilla Firefox unit tests in "headless" mode  
+> **`./gradlew test -Pbrowsers=htmlunit -Ppersonality=htmlunit.nojs`** # run HtmlUnit unit tests without JavaScript support
 
 The `personality` property directs **Selenium Foundation** to run the unit tests on browsers with the specified named capabilities. Available personalities are defined by each driver plug-in, and the list of personalities supported by the current Grid is shown in the console output. For example:
 
