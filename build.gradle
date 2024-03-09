@@ -255,7 +255,9 @@ dependencies {
 }
 
 test {
-  jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
+  jvmArgs = [
+    "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
+  ]
 }
 
 def getBrowserCaps() {

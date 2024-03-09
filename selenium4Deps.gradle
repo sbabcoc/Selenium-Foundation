@@ -39,7 +39,7 @@ dependencies {
     api 'org.jsoup:jsoup:1.15.3'
     api 'org.apache.commons:commons-lang3:3.12.0'
     api ('com.google.guava:guava') {
-    version { strictly '31.1-jre' }
+        version { strictly '31.1-jre' }
     }
     api 'com.beust:jcommander:1.82'
     api 'io.netty:netty-transport-native-epoll:4.1.93.Final'
