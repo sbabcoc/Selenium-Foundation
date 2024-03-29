@@ -51,8 +51,6 @@ dependencies {
   api 'com.nordstrom.tools:testng-foundation'
   api 'org.seleniumhq.selenium:selenium-server'
   api 'org.seleniumhq.selenium:selenium-support'
-  api 'org.seleniumhq.selenium:htmlunit-driver'
-  api 'com.codeborne:phantomjsdriver'
   api('io.github.bonigarcia:webdrivermanager') {
     exclude group: 'org.slf4j', module: 'slf4j-api'
   }

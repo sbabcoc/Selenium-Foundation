@@ -239,7 +239,7 @@ dependencies {
   constraints {
     api 'com.nordstrom.tools:java-utils:3.1.1'
     api 'com.nordstrom.tools:settings:3.0.5'
-    api 'com.nordstrom.tools:junit-foundation:17.0.3'
+    api 'com.nordstrom.tools:junit-foundation:17.0.4'
     api 'com.github.sbabcoc:logback-testng:2.0.0'
     api 'org.hamcrest:hamcrest-core:2.2'
     api 'org.yaml:snakeyaml:1.33'
@@ -255,7 +255,9 @@ dependencies {
 }
 
 test {
-  jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
+  jvmArgs = [
+    "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
+  ]
 }
 
 def getBrowserCaps() {

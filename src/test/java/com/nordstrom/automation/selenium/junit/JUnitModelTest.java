@@ -17,7 +17,6 @@ import com.nordstrom.automation.selenium.platform.TargetPlatform;
 public class JUnitModelTest extends JUnitTargetRoot {
 
     @Test
-    @Ignore
     @TargetPlatform(WEB_APP_NAME)
     public void testBasicPage() {
         ModelTestCore.testBasicPage(this);
