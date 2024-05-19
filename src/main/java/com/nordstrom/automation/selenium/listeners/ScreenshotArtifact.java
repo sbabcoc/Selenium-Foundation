@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.listeners;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.utility.ScreenshotUtils;
 import com.nordstrom.automation.testng.ArtifactType;

@@ -1,7 +1,7 @@
 package com.nordstrom.automation.selenium;
 
-import static org.openqa.selenium.json.Json.MAP_TYPE;
 import static org.openqa.selenium.json.Json.LIST_OF_MAPS_TYPE;
+import static org.openqa.selenium.json.Json.MAP_TYPE;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -27,6 +27,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.grid.config.ConfigException;
 import org.openqa.selenium.json.Json;
+
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.settings.SettingsCore;
 
@@ -307,50 +308,23 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;version&gt;1.0.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
-    private static final String[] DEPENDENCY_CONTEXTS = {
-            "org.openqa.selenium.grid.Main",
-            "com.beust.jcommander.Strings",
-            "org.openqa.selenium.remote.http.Route",
-            "com.google.common.base.Utf8",
-            "org.openqa.selenium.Keys",
-            "org.openqa.selenium.remote.tracing.Tracer",
-            "org.openqa.selenium.json.Json",
+    private static final String[] DEPENDENCY_CONTEXTS = { "org.openqa.selenium.grid.Main",
+            "com.beust.jcommander.Strings", "org.openqa.selenium.remote.http.Route", "com.google.common.base.Utf8",
+            "org.openqa.selenium.Keys", "org.openqa.selenium.remote.tracing.Tracer", "org.openqa.selenium.json.Json",
             "io.opentelemetry.sdk.autoconfigure.ResourceConfiguration",
-            "io.opentelemetry.sdk.autoconfigure.spi.Ordered",
-            "io.opentelemetry.api.trace.Span",
-            "io.opentelemetry.api.events.EventEmitter",
-            "io.opentelemetry.sdk.trace.SdkSpan",
-            "io.opentelemetry.context.Scope",
-            "io.opentelemetry.sdk.metrics.View",
-            "io.opentelemetry.sdk.logs.LogLimits",
-            "io.opentelemetry.sdk.common.Clock",
-            "io.opentelemetry.sdk.OpenTelemetrySdk",
-            "io.opentelemetry.semconv.SemanticAttributes",
-            "io.opentelemetry.extension.incubator.trace.ExtendedSpan",
-            "org.zeromq.Utils",
-            "dev.failsafe.Call",
-            "graphql.Assert",
-            "org.slf4j.MDC",
-            "io.netty.channel.Channel",
-            "io.netty.util.Timer",
-            "io.netty.handler.ssl.SslUtils",
-            "io.netty.buffer.ByteBuf",
-            "io.netty.handler.codec.Headers",
-            "io.netty.handler.codec.http.Cookie",
-            "org.openqa.selenium.io.Zip",
-            "org.slf4j.impl.StaticLoggerBinder",
-            "ch.qos.logback.core.Layout",
-            "io.netty.resolver.NameResolver",
-            "io.opentelemetry.api.logs.Logger",
-            "org.openqa.selenium.net.Urls",
-            "org.dataloader.DataLoader",
-            "com.google.common.util.concurrent.internal.InternalFutures",
-            "org.eclipse.jetty.server.Server",
-            "org.reactivestreams.Publisher",
-            "org.openqa.selenium.manager.SeleniumManager",
-            "org.apache.commons.exec.Executor",
-            "io.netty.buffer.ByteBufUtil"
-            };
+            "io.opentelemetry.sdk.autoconfigure.spi.Ordered", "io.opentelemetry.api.trace.Span",
+            "io.opentelemetry.sdk.trace.SdkSpan", "io.opentelemetry.context.Scope", "io.opentelemetry.sdk.metrics.View",
+            "io.opentelemetry.sdk.logs.LogLimits", "io.opentelemetry.sdk.common.Clock",
+            "io.opentelemetry.sdk.OpenTelemetrySdk", "io.opentelemetry.semconv.SemanticAttributes",
+            "io.opentelemetry.api.incubator.events.EventLoggerProvider", "org.zeromq.Utils", "dev.failsafe.Call",
+            "graphql.Assert", "org.slf4j.MDC", "io.netty.channel.Channel", "io.netty.util.Timer",
+            "io.netty.handler.ssl.SslUtils", "io.netty.buffer.ByteBuf", "io.netty.handler.codec.Headers",
+            "io.netty.handler.codec.http.Cookie", "org.openqa.selenium.io.Zip", "org.slf4j.impl.StaticLoggerBinder",
+            "ch.qos.logback.core.Layout", "io.netty.resolver.NameResolver", "io.opentelemetry.api.logs.Logger",
+            "org.openqa.selenium.net.Urls", "org.dataloader.DataLoader",
+            "com.google.common.util.concurrent.internal.InternalFutures", "org.eclipse.jetty.server.Server",
+            "org.reactivestreams.Publisher", "org.openqa.selenium.manager.SeleniumManager",
+            "org.apache.commons.exec.Executor", "io.netty.buffer.ByteBufUtil" };
     
     static {
         try {

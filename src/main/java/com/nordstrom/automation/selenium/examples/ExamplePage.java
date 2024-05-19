@@ -258,6 +258,8 @@ public class ExamplePage extends Page {
         try {
             // if running Selenium 4+
             if (config.getVersion() > 3) {
+                // ensure example page servlet is running
+                ExamplePageLauncher.getLauncher().start();
                 // get URI of example page servlet
                 targetUri = ExamplePageLauncher.getLauncher().getUrl().toURI();
             } else {

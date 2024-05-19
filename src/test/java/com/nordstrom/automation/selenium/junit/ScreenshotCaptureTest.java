@@ -5,9 +5,9 @@ import static org.junit.Assume.assumeTrue;
 import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.junit.Test;
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.JUnitTargetRoot;

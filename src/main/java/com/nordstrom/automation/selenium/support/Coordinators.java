@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.support;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -13,7 +14,6 @@ import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ConditionStillInvalidTimeoutException;
 import com.nordstrom.automation.selenium.exceptions.ConditionStillValidTimeoutException;

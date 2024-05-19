@@ -2,7 +2,9 @@ package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -11,8 +13,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.FluentWait;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -200,7 +200,7 @@ public final class DriverManager {
         if (obj instanceof TestBase) {
             return ((TestBase) obj).nabDriver();
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
     
@@ -227,7 +227,7 @@ public final class DriverManager {
             SessionId sessionId = ((RemoteWebDriver) driver).getSessionId();
             return Optional.of(sessionId);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**
@@ -242,7 +242,7 @@ public final class DriverManager {
             WebDriver driver = optDriver.get();
             
             try {
-                ((JavascriptExecutor) driver).executeScript("return window.stop");
+                ((JavascriptExecutor) driver).executeScript("window.stop();");
             } catch (WebDriverException | UnsupportedOperationException eaten) {
                 // Let's make sure our graceful shutdown process doesn't cause failures.
             }
@@ -255,7 +255,7 @@ public final class DriverManager {
             
             ((TestBase) obj).setInitialPage(null);
             ((TestBase) obj).setDriver(null);
-            optDriver = Optional.absent();
+            optDriver = Optional.empty();
             driver.quit();
         }
         

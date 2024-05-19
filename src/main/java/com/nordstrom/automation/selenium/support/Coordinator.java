@@ -1,6 +1,6 @@
 package com.nordstrom.automation.selenium.support;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
