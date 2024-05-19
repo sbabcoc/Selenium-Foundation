@@ -1,12 +1,13 @@
 package com.nordstrom.automation.selenium.junit;
 
 import java.nio.file.Path;
+import java.util.Optional;
+
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nordstrom.automation.selenium.core.DriverManager;
 import com.nordstrom.automation.selenium.utility.PageSourceUtils;
-import com.google.common.base.Optional;
 import com.nordstrom.automation.junit.ArtifactType;
 
 /**

@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
@@ -29,8 +30,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -444,13 +443,13 @@ public abstract class ComponentContainer
                 } else {
                     StringBuilder keys = new StringBuilder();
                     String exist = element.getAttribute("value");
-                    if (!Strings.isNullOrEmpty(exist)) {
+                    if (!(exist == null || exist.isEmpty())) {
                         keys.append(Keys.END);
                         for (int i = 0; i < exist.length(); i++) {
                             keys.append(Keys.BACK_SPACE);
                         }
                     }
-                    if (!Strings.isNullOrEmpty(value)) {
+                    if (!(value == null || value.isEmpty())) {
                         keys.append(value);
                     }
                     element.sendKeys(keys.append(Keys.TAB));

@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
@@ -29,9 +32,6 @@ import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
@@ -589,8 +589,9 @@ public abstract class AbstractSeleniumConfig extends
                 try {
                     // load contents of value file
                     Path path = Paths.get(valuePath);
-                    URL url = path.toUri().toURL();
-                    propertyValue = Resources.toString(url, Charsets.UTF_8);
+                    try (Stream<String> lines = Files.lines(path)) {
+                        propertyValue = lines.collect(Collectors.joining("\n"));
+                    }
                 } catch (IOException eaten) {
                     // nothing to do here
                 }
@@ -652,6 +653,8 @@ public abstract class AbstractSeleniumConfig extends
                     ExamplePageLauncher.getLauncher().shutdown();
                     seleniumGrid = null;
                 }
+            } else {
+                ExamplePageLauncher.getLauncher().shutdown();
             }
             return result;
         }
@@ -755,9 +758,9 @@ public abstract class AbstractSeleniumConfig extends
         Capabilities capabilities = null;
         String browserName = getString(SeleniumSettings.BROWSER_NAME.key());
         String browserCaps = resolveString(SeleniumSettings.BROWSER_CAPS.key());
-        if (!Strings.isNullOrEmpty(browserName)) {
+        if (!(browserName == null || browserName.isEmpty())) {
             capabilities = getSeleniumGrid().getPersonality(getConfig(), browserName);
-        } else if (!Strings.isNullOrEmpty(browserCaps)) {
+        } else if (!(browserCaps == null || browserCaps.isEmpty())) {
             capabilities = getCapabilitiesForJson(browserCaps)[0];
         } else {
             throw new IllegalStateException("Neither browser name nor capabilities are specified");
@@ -962,7 +965,7 @@ public abstract class AbstractSeleniumConfig extends
         // get specified hub servlet classes
         String hubServlets = getString(SeleniumSettings.HUB_SERVLETS.key());
         // if servlets are specified
-        if ( ! Strings.isNullOrEmpty(hubServlets)) {
+        if (!(hubServlets == null || hubServlets.isEmpty())) {
             // collect servlet names, minus leading/trailing white space
             servlets.addAll(Arrays.asList(hubServlets.trim().split("\\s*,\\s*")));
         }
@@ -988,7 +991,7 @@ public abstract class AbstractSeleniumConfig extends
         // get specified node servlet classes
         String nodeServlets = getString(SeleniumSettings.NODE_SERVLETS.key());
         // if servlets are specified
-        if ( ! Strings.isNullOrEmpty(nodeServlets)) {
+        if (!(nodeServlets == null || nodeServlets.isEmpty())) {
             // collect servlet names, minus leading/trailing white space
             servlets.addAll(Arrays.asList(nodeServlets.trim().split("\\s*,\\s*")));
         }

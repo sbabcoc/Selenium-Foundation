@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.support;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestNGListener;
@@ -13,7 +14,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.listeners.PageSourceCapture;

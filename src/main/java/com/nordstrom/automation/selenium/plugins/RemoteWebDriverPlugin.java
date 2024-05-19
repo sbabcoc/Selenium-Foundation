@@ -1,15 +1,18 @@
 package com.nordstrom.automation.selenium.plugins;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.google.common.collect.ObjectArrays;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
@@ -83,7 +86,8 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      * @return combined contexts for Selenium Grid dependencies
      */
     public static String[] combineDependencyContexts(String[] dependencyContexts, DriverPlugin driverPlugin) {
-        return ObjectArrays.concat(dependencyContexts, driverPlugin.getDependencyContexts(), String.class);
+        return Stream.concat(Arrays.stream(dependencyContexts), Arrays.stream(driverPlugin.getDependencyContexts()))
+                .toArray(size -> (String[]) Array.newInstance(String.class, size));
     }
     
 }

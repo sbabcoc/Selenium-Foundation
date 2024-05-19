@@ -3,13 +3,15 @@ package com.nordstrom.automation.selenium.utility;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.manager.SeleniumManager;
 import org.openqa.selenium.manager.SeleniumManagerOutput.Result;
-import org.openqa.selenium.os.ExecutableFinder;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.common.file.PathUtils;
 
 public class BinaryFinder {
 
@@ -22,7 +24,7 @@ public class BinaryFinder {
     public static File findDriver(String capabilities) {
         Capabilities caps = SeleniumConfig.getConfig().getCapabilitiesForJson(capabilities)[0];
         SeleniumManager manager = SeleniumManager.getInstance();
-        Result result = manager.getDriverPath(caps, false);
+        Result result = manager.getBinaryPaths(new ArrayList<String>(Arrays.asList("--browser", caps.getBrowserName())));
         return new File(result.getDriverPath());
     }
 
@@ -36,7 +38,7 @@ public class BinaryFinder {
     * @throws IllegalStateException if the executable is not found or cannot be executed
     */
     public static File findBinary(String exeName, String exeProperty) {
-        String defaultPath = new ExecutableFinder().find(exeName);
+        String defaultPath = PathUtils.findExecutableOnSystemPath(exeName);
         String exePath = System.getProperty(exeProperty, defaultPath);
         checkState(exePath != null,
                 "The path to the driver executable must be set by the %s system property",

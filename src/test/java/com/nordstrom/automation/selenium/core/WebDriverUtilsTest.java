@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
+import org.htmlunit.javascript.host.Element;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
@@ -117,6 +118,8 @@ public class WebDriverUtilsTest extends TestNgTargetRoot {
         
         List<WebElement> elements = page.findElements(By.tagName("p"));
         int total = elements.size();
+        String foo = elements.get(3).getCssValue("display");
+        String bar = elements.get(3).getAttribute("hidden");
         assertNotEquals(total, 0);
         assertFalse(WebDriverUtils.filterHidden(elements));
         assertEquals(elements.size(), total - 1);

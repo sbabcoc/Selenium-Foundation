@@ -1,16 +1,15 @@
 package com.nordstrom.automation.selenium.servlet;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 
 /**
@@ -49,9 +48,11 @@ public class ExamplePageServlet extends HttpServlet {
      * @return resource file content
      */
     public static String getResource(final String resource) {
-        URL url = Resources.getResource(resource);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         try {
-            return Resources.toString(url, Charsets.UTF_8);
+            try (InputStream is = classLoader.getResourceAsStream(resource)) {
+                return (is != null) ? new String(is.readAllBytes(), UTF_8) : null;
+            }
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to load servlet resource '" + resource + "'", e);
         }

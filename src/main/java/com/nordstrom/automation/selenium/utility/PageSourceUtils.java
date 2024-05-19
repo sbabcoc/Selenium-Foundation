@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.utility;
 
 import java.net.URI;
+import java.util.Optional;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
@@ -8,7 +9,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 /**

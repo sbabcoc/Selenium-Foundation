@@ -3,11 +3,14 @@ package com.nordstrom.automation.selenium.platform;
 import java.util.Map;
 
 import org.openqa.selenium.Capabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
+import com.nordstrom.automation.selenium.listeners.PlatformInterceptor;
 import com.nordstrom.automation.selenium.plugins.EspressoPlugin;
 import com.nordstrom.automation.selenium.plugins.Mac2Plugin;
 import com.nordstrom.automation.selenium.plugins.RemoteWebDriverPlugin;
@@ -63,7 +66,8 @@ public enum TargetType implements TargetTypeName {
                     if (thisClass.isAssignableFrom(pluginClass)) return true;
                 }
             } catch (NullPointerException | IllegalArgumentException | ClassNotFoundException eaten) {
-                // nothing to do here
+                Logger logger = LoggerFactory.getLogger(TargetType.class);
+                logger.warn("Target platform check triggered exception", eaten);
             }
         }
         // don't run

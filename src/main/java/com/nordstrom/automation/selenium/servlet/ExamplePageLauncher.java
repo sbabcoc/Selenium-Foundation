@@ -1,6 +1,5 @@
 package com.nordstrom.automation.selenium.servlet;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class ExamplePageLauncher {
             argsList.add(JarUtils.getContextPaths(ServletContainer.getDependencyContexts()).get(0));
             argsList.add(ServletContainer.class.getName());
 
-            String executable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+            String executable = ProcessHandle.current().info().command().get();
             process = new CommandLine(executable, argsList.toArray(new String[0]));
             process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
         }

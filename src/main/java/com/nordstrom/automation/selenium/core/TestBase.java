@@ -1,11 +1,11 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
 import com.nordstrom.automation.selenium.model.Page;
@@ -156,7 +156,7 @@ public abstract class TestBase {
         if (obj != null) {
             return Optional.of(obj);
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
     
