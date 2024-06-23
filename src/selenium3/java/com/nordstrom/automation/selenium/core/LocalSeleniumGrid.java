@@ -1,6 +1,5 @@
 package com.nordstrom.automation.selenium.core;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -234,7 +233,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             argsList.add(0, "-agentlib:jdwp=transport=dt_socket,server=y,address=" + address);
         }
         
-        String executable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        String executable = ProcessHandle.current().info().command().get();
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
         process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
         return new LocalGridServer(hostUrl, portNum, isHub, process, workingPath, outputPath);

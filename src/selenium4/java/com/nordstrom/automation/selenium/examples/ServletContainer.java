@@ -15,7 +15,6 @@ public class ServletContainer {
     private static final String[] DEPENDENCY_CONTEXTS = {
         ServletContainer.class.getName(),
         "javax.servlet.Servlet",
-        "com.google.common.io.Resources",
         "org.eclipse.jetty.http.HttpField",
         "org.eclipse.jetty.io.ByteBufferPool",
         "org.eclipse.jetty.security.SecurityHandler",

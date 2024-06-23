@@ -4,12 +4,12 @@ import static org.testng.Assert.assertTrue;
 import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.testng.Reporter;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;

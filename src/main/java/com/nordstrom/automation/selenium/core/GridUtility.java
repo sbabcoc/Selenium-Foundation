@@ -40,7 +40,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -357,13 +356,12 @@ public final class GridUtility {
      * @return list of driver plugin instances
      */
     public static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
-        List<DriverPlugin> driverPlugins;
+        List<DriverPlugin> driverPlugins = new ArrayList<>();
         
         // get grid plugins setting
         String gridPlugins = config.getString(SeleniumSettings.GRID_PLUGINS.key());
         // if setting is defined and not empty
         if ( ! (gridPlugins == null || gridPlugins.trim().isEmpty())) {
-            driverPlugins = new ArrayList<>();
             // iterate specified driver plugin class names
             for (String driverPlugin : gridPlugins.split(File.pathSeparator)) {
                 String className = driverPlugin.trim();
@@ -394,7 +392,7 @@ public final class GridUtility {
             // get service loader for driver plugins
             ServiceLoader<DriverPlugin> serviceLoader = ServiceLoader.load(DriverPlugin.class);
             // collect list of configured plugins
-            driverPlugins = ImmutableList.copyOf(serviceLoader.iterator());
+            serviceLoader.iterator().forEachRemaining(driverPlugins::add);
         }
         
         return driverPlugins;

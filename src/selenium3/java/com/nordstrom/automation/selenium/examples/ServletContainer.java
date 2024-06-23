@@ -15,8 +15,7 @@ public class ServletContainer {
     private static final String[] DEPENDENCY_CONTEXTS = {
         ServletContainer.class.getName(),
         "javax.servlet.Servlet",
-        "org.seleniumhq.jetty9.server.Handler",
-        "com.google.common.io.Resources"
+        "org.seleniumhq.jetty9.server.Handler"
     };
     
     public static String[] getDependencyContexts() {

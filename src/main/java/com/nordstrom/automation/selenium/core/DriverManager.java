@@ -2,7 +2,9 @@ package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -11,8 +13,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.FluentWait;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -21,6 +21,7 @@ import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.interfaces.DriverProvider;
 import com.nordstrom.automation.selenium.model.Page;
+import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
 
 /**
  * This TestNG listener performs several basic functions related to driver session management:
@@ -166,7 +167,12 @@ public final class DriverManager {
         long timeOutInSeconds = config.getLong(SeleniumSettings.HOST_TIMEOUT.key());
         DriverSessionWait wait = new DriverSessionWait(instance, timeOutInSeconds);
         wait.ignoring(WebDriverException.class);
+        
+        long initialTime = System.currentTimeMillis();
         WebDriver driver = wait.until(driverIsAcquired(method));
+        long interval = System.currentTimeMillis() - initialTime;
+        System.out.println("Driver acquisition took " + String.valueOf(interval) + "ms");
+
         setDriverTimeouts(driver, config);
         instance.setDriver(driver);
         return driver;
@@ -178,7 +184,6 @@ public final class DriverManager {
      * @param driver driver object in which to configure timeout intervals
      * @param config configuration object that specifies timeout intervals
      */
-    @SuppressWarnings("deprecation")
     public static void setDriverTimeouts(final WebDriver driver, final SeleniumConfig config) {
         Timeouts timeouts = driver.manage().timeouts();
         timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);
@@ -200,7 +205,7 @@ public final class DriverManager {
         if (obj instanceof TestBase) {
             return ((TestBase) obj).nabDriver();
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
     
@@ -227,7 +232,7 @@ public final class DriverManager {
             SessionId sessionId = ((RemoteWebDriver) driver).getSessionId();
             return Optional.of(sessionId);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**
@@ -242,7 +247,7 @@ public final class DriverManager {
             WebDriver driver = optDriver.get();
             
             try {
-                ((JavascriptExecutor) driver).executeScript("return window.stop");
+                ((JavascriptExecutor) driver).executeScript("window.stop();");
             } catch (WebDriverException | UnsupportedOperationException eaten) {
                 // Let's make sure our graceful shutdown process doesn't cause failures.
             }
@@ -255,7 +260,7 @@ public final class DriverManager {
             
             ((TestBase) obj).setInitialPage(null);
             ((TestBase) obj).setDriver(null);
-            optDriver = Optional.absent();
+            optDriver = Optional.empty();
             driver.quit();
         }
         
@@ -279,6 +284,7 @@ public final class DriverManager {
             public WebDriver apply(final TestBase instance) {
                 // if test class provides its own drivers
                 if (instance instanceof DriverProvider) {
+                    ExamplePageLauncher.getLauncher().start();
                     return ((DriverProvider) instance).provideDriver(method);
                 } else {
                     return GridUtility.getDriver();
