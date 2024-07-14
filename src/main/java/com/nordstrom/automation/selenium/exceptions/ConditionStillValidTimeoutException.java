@@ -5,7 +5,7 @@ import org.openqa.selenium.TimeoutException;
 import com.nordstrom.automation.selenium.support.Coordinators;
 
 /**
- * This exception is associated with the {@link Coordinators#not(com.google.common.base.Function)} wrapper method
+ * This exception is associated with the {@link Coordinators#not(java.util.function.Function)} wrapper method
  * and indicates that the wrapped condition was still returning a 'positive' result when the timeout interval expired. 
  */
 public class ConditionStillValidTimeoutException extends TimeoutException {

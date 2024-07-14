@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.junit;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 
 import com.nordstrom.automation.junit.AtomIdentity;
 import org.junit.After;
@@ -14,7 +15,6 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.WebDriver;
-import com.google.common.base.Optional;
 import com.nordstrom.automation.junit.ArtifactParams;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.model.Page;
@@ -149,6 +149,6 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      */
     @Override
     public Optional<Map<String, Object>> getParameters() {
-        return Optional.absent();
+        return Optional.empty();
     }
 }

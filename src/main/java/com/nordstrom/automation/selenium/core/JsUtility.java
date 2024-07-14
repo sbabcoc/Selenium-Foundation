@@ -1,9 +1,12 @@
 package com.nordstrom.automation.selenium.core;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static com.nordstrom.automation.selenium.servlet.ExamplePageServlet.readAllBytes;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -21,8 +24,6 @@ import org.openqa.selenium.logging.LogType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import com.nordstrom.automation.selenium.exceptions.DocumentNotReadyTimeoutException;
 import com.nordstrom.automation.selenium.model.FirefoxShadowRoot;
 import com.nordstrom.automation.selenium.support.Coordinator;
@@ -213,9 +214,11 @@ public final class JsUtility {
      * @return resource file content
      */
     public static String getScriptResource(final String resource) {
-        URL url = Resources.getResource(resource);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         try {
-            return Resources.toString(url, Charsets.UTF_8);
+            try (InputStream is = classLoader.getResourceAsStream(resource)) {
+                return (is != null) ? new String(readAllBytes(is), UTF_8) : null;
+            }
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to load JavaScript resource '" + resource + "'", e);
         }

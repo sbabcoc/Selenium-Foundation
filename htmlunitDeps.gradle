@@ -4,9 +4,7 @@ System.setProperty('selenium.browser.name', 'htmlunit')
 System.setProperty('selenium.context.platform', 'web-app')
 dependencies {
   if ("${profile}" == "selenium4") {
-    testImplementation('org.seleniumhq.selenium:htmlunit3-driver') {
-      exclude module: 'selenium-support'
-    }
+    testImplementation 'com.nordstrom.ui-tools:htmlunit-remote'
   } else {
     testImplementation('org.seleniumhq.selenium:htmlunit-driver') {
       exclude module: 'selenium-support'

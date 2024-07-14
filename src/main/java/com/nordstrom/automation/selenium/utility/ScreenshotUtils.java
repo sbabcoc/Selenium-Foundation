@@ -4,17 +4,19 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
+import java.util.Optional;
+
 import javax.imageio.ImageIO;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
-
-import com.google.common.base.Optional;
-import com.google.common.io.BaseEncoding;
 
 /**
  * This utility class contains low-level methods that support screenshot artifact capture.
@@ -36,21 +38,25 @@ public final class ScreenshotUtils {
      * @return 'true' if driver can take screenshots; otherwise 'false'
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
+        Boolean isAble = null;
         if (optDriver.isPresent()) {
             WebDriver driver = optDriver.get();
             if (driver instanceof HasCapabilities) {
-                if (((HasCapabilities) driver).getCapabilities().is("takesScreenshot")) {
-                    return true;
+                Capabilities caps = ((HasCapabilities) driver).getCapabilities();
+                Object takesScreenshot = caps.getCapability("takesScreenshot");
+                if (takesScreenshot != null) {
+                    isAble = Boolean.parseBoolean(String.valueOf(takesScreenshot));
                 }
             }
-            if (driver instanceof TakesScreenshot) {
-                return true; // for remote drivers, this may be bogus
+            if (isAble == null) {
+                // for remote drivers, this may be bogus
+                isAble = (driver instanceof TakesScreenshot);
             }
-            if (logger != null) {
+            if (!isAble && logger != null) {
                 logger.warn("This driver is not able to take screenshots.");
             }
         }
-        return false;
+        return isAble == Boolean.TRUE;
     }
     
     /**
@@ -68,11 +74,13 @@ public final class ScreenshotUtils {
             try {
                 WebDriver driver = optDriver.get();
                 return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+            } catch (UnsupportedCommandException e) {
+                return proxyArtifact();
             } catch (WebDriverException e) {
                 if (e.getCause() instanceof ClassCastException) {
                     return proxyArtifact();
                 } else if (logger != null) {
-                    logger.warn("The driver is capable of taking a screenshot, but it failed.", e);
+                    logger.warn("Failed taking a screenshot.", e);
                 }
             }
         }
@@ -90,14 +98,9 @@ public final class ScreenshotUtils {
         graphics.drawString("This remote driver is not", 10, 20);
         graphics.drawString("able to take screenshots", 10, 35);
         
-        String imageString = null;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        try {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             ImageIO.write(image, "png", bos);
-            imageString = BaseEncoding.base64().encode(bos.toByteArray());
-            bos.close();
-            
+            String imageString = Base64.getEncoder().encodeToString(bos.toByteArray());
             return OutputType.BYTES.convertFromBase64Png(imageString);
         } catch (IOException e) {
             return new byte[0];

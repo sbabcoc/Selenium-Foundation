@@ -58,5 +58,4 @@ public final class DataUtils {
     public static String toString(final Object object) {
         return new Json().toJson(object);
     }
-    
 }

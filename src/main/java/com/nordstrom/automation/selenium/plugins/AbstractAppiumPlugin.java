@@ -61,6 +61,7 @@ import net.bytebuddy.implementation.Implementation;
  *  &lt;/exclusions&gt;
  *&lt;/dependency&gt;</pre>
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractAppiumPlugin implements DriverPlugin {
 
     private static final String[] DEPENDENCY_CONTEXTS = {};

@@ -22,7 +22,6 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
-import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.jar.JarUtils;
@@ -38,6 +37,7 @@ import com.nordstrom.common.jar.JarUtils;
  * <b>NOTE</b>: If no test context is specified, the log file will be stored in the "current" directory of the parent
  * Java process.  
  */
+@SuppressWarnings("deprecation")
 public class LocalSeleniumGrid extends SeleniumGrid {
 
     private static final String OPT_HOST = "--host";
@@ -68,7 +68,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         }
         
         awaitGridReady(hubServer, nodeServers);
-        ExamplePageLauncher.getLauncher().start();
     }
 
     /**
