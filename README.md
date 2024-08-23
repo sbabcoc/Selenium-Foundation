@@ -5,7 +5,7 @@
 
 ### * BREAKING NEWS *
 
-* With the release of **Selenium Foundation** version _28.0.0_, we now provide support for the **Selenium 4 API**. There are still a few rough edges, and **HtmlUnitDriver** sessions are not yet available from Selenium 4 Grid, but all major functionality is working as expected. The Selenium 4 artifacts are designated with the _s4_ suffix.
+* With the release of **Selenium Foundation** version _28.1.1_, we now provide support for remote **HtmlUnitDriver** sessions with [HtmlUnit Remote](https://github.com/seleniumhq-community/htmlunit-remote). The project unit tests for **Selenium Foundation** have been switched back to running under this "headless" browser.
 * With the release of **Selenium Foundation** version _26.3.4_, automation of Macintosh native applications via the Mac2 engine of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent) project (_1.5.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include Mac2 nodes.
 
 #### Table of Contents
