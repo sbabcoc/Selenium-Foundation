@@ -29,6 +29,7 @@ public class GridServer {
     
     public static final String HUB_BASE = "/wd/hub";
     public static final String SERVER_STATUS = "/status";
+    public static final String GRID_REGISTER = "/grid/register";
     
     public GridServer(URL url, boolean isHub) {
         this.isHub = isHub;

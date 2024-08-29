@@ -14,7 +14,7 @@ public class HtmlUnitCaps {
     private static final String[] PROPERTY_NAMES = {  };
     
     private static final String CAPABILITIES =
-            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\"}";
+            "{\"browserName\":\"htmlunit\"}";
     
     private static final String BASELINE = 
              "{\"browserName\":\"htmlunit\"," +

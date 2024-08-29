@@ -11,6 +11,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.grid.data.Availability;
 import org.openqa.selenium.grid.data.NodeId;
+import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 
@@ -85,5 +86,10 @@ public class NodeStatus {
     
     public List<Capabilities> getCapabilities() {
         return capabilities;
+    }
+    
+    @Override
+    public String toString() {
+        return new Json().toJson(this);
     }
 }

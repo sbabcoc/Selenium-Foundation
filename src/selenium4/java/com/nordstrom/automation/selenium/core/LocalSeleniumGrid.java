@@ -22,9 +22,11 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
+import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.jar.JarUtils;
+import com.nordstrom.common.uri.UriUtils;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -103,7 +105,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     static boolean isGridReady(SeleniumConfig config, GridServer hubServer, Collection<GridServer> nodeServers) {
         if (!GridServer.isHubActive(hubServer.getUrl())) return false;
         for (GridServer nodeServer : nodeServers) {
-            if (!GridServer.isNodeRegistered(config, hubServer.getUrl(), nodeServer.getUrl())) return false;
+            // if not an Appium Grid server
+            if (!(nodeServer instanceof AppiumGridServer)) {
+                if (!GridServer.isNodeRegistered(config, hubServer.getUrl(), nodeServer.getUrl())) return false;
+            }
         }
         return true;
     }
@@ -138,8 +143,21 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubServer.getUrl().getPort()));
         
         List<LocalGridServer> nodeServers = new ArrayList<>();
+        // iterate over configured driver plugins
         for (DriverPlugin driverPlugin : GridUtility.getDriverPlugins(config)) {
-            nodeServers.add(driverPlugin.create(config, launcherClassName, dependencyContexts, hubServer.getUrl(), workingPath));
+            // create node server for this driver plugin
+            LocalGridServer nodeServer = driverPlugin.create(config, launcherClassName, dependencyContexts,
+                    hubServer.getUrl(), workingPath);
+            // add server to nodes list
+            nodeServers.add(nodeServer);
+            // if this is an Appium Grid server
+            if (nodeServer instanceof AppiumGridServer) {
+                // get path to relay configuration path from Appium process environment
+                Path nodeConfigPath = ((AppiumGridServer) nodeServer).getNodeConfigPath();
+                // add relay node for Appium Grid server to nodes list
+                nodeServers.add(create(config, launcherClassName, dependencyContexts, false, 0, nodeConfigPath,
+                        workingPath, GridUtility.getOutputPath(config, null)));
+            }
         }
         
         return new LocalSeleniumGrid(config, hubServer, nodeServers.toArray(new LocalGridServer[0]));
@@ -350,7 +368,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          */
         public static URL getServerUrl(String host, Integer port) {
             try {
-                return new URL("http://" + host + ":" + port.toString() + GridServer.HUB_BASE);
+                return UriUtils.makeBasicURI("http", host, port, GridServer.HUB_BASE).toURL();
             } catch (MalformedURLException e) {
                 throw UncheckedThrow.throwUnchecked(e);
             }

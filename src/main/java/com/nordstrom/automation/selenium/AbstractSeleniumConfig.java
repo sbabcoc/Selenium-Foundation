@@ -32,6 +32,7 @@ import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
@@ -182,6 +183,14 @@ public abstract class AbstractSeleniumConfig extends
          * Selenium 4: <b>4446</b>
          */
         HUB_PORT("selenuim.hub.port", null),
+        
+        /**
+         * This setting specifies the slot matcher used by the local <b>Selenium Grid</b> hub server.
+         * 
+         * name: <b>selenium.slot.matcher</b><br>
+         * default: <b>com.nordstrom.automation.selenium.core.FoundationSlotMatcher</b>
+         */
+        SLOT_MATCHER("selenium.slot.matcher", FoundationSlotMatcher.class.getName()),
         
         /**
          * This setting specifies a comma-delimited list of fully-qualified names of servlet classes to extend the
@@ -564,6 +573,11 @@ public abstract class AbstractSeleniumConfig extends
         throw new IllegalStateException("SELENIUM_CONFIG must be populated by subclass static initializer");
     }
     
+    /**
+     * Get the major version of the target Selenium API.
+     * 
+     * @return target Selenium major version
+     */
     public abstract int getVersion();
 
     /**
@@ -610,7 +624,7 @@ public abstract class AbstractSeleniumConfig extends
             String hostStr = getString(SeleniumSettings.HUB_HOST.key());
             if (hostStr != null) {
                 try {
-                    hubUrl = new URL(hostStr);
+                    hubUrl = URI.create(hostStr).toURL();
                 } catch (MalformedURLException e) {
                     throw UncheckedThrow.throwUnchecked(e);
                 }
@@ -926,12 +940,12 @@ public abstract class AbstractSeleniumConfig extends
     public String[] getDependencyContexts() {
         String gridLauncher = getString(SeleniumSettings.GRID_LAUNCHER.key());
         if (gridLauncher != null) {
+            StringBuilder builder = new StringBuilder(gridLauncher);
+            String slotMatcher = getString(SeleniumSettings.SLOT_MATCHER.key());
+            if (slotMatcher != null) builder.append(File.pathSeparator).append(slotMatcher);
             String dependencies = getString(SeleniumSettings.LAUNCHER_DEPS.key());
-            if (dependencies != null) {
-                return (gridLauncher + File.pathSeparator + dependencies).split(File.pathSeparator);
-            } else {
-                return new String[] { gridLauncher };
-            }
+            if (dependencies != null) builder.append(File.pathSeparator).append(dependencies);
+            return builder.toString().split(File.pathSeparator);
         } else {
             return new String[] {};
         }
@@ -1005,6 +1019,15 @@ public abstract class AbstractSeleniumConfig extends
      */
     public String getContextPlatform() {
         return getConfig().getString(SeleniumSettings.CONTEXT_PLATFORM.key());
+    }
+    
+    /**
+     * Determine if the {@code Appium} server should be managed by the {@code PM2} utility.
+     * 
+     * @return {@code true} if Appium should be managed by PM2; otherwise {@code false}
+     */
+    public boolean appiumWithPM2() {
+        return getConfig().getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key());
     }
     
     /**

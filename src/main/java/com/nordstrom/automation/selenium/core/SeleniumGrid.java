@@ -32,6 +32,7 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.plugins.PluginUtils;
+import com.nordstrom.common.uri.UriUtils;
 
 /**
  * <b>The {@code SeleniumGrid} Object</b>
@@ -91,8 +92,8 @@ public class SeleniumGrid {
         } else {
             LOGGER.debug("Mapping structure of grid at: {}", hubUrl);
             for (URL nodeEndpoint : nodeEndpoints) {
-                URL nodeUrl = new URL(nodeEndpoint, GridServer.HUB_BASE);
-                nodeServers.put(nodeEndpoint, new GridServer(nodeUrl, false));
+                URI nodeUri = UriUtils.uriForPath(nodeEndpoint, GridServer.HUB_BASE);
+                nodeServers.put(nodeEndpoint, new GridServer(nodeUri.toURL(), false));
                 addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
             }
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());

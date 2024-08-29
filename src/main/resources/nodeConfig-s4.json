@@ -1,6 +1,5 @@
 {
   "node": {
-    "detect-drivers": false,
-    "driver-configuration": [ ]
+    "detect-drivers": false
   }
 }

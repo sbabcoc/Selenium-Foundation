@@ -27,7 +27,9 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.grid.config.ConfigException;
 import org.openqa.selenium.json.Json;
+import org.openqa.selenium.net.PortProber;
 
+import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.settings.SettingsCore;
 
@@ -308,10 +310,13 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;version&gt;1.0.1&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
-    private static final String[] DEPENDENCY_CONTEXTS = { "org.openqa.selenium.grid.Main",
-            "com.beust.jcommander.Strings", "org.openqa.selenium.remote.http.Route", "com.google.common.base.Utf8",
-            "org.openqa.selenium.Keys", "org.openqa.selenium.remote.tracing.Tracer", "org.openqa.selenium.json.Json",
-            "io.opentelemetry.sdk.autoconfigure.ResourceConfiguration",
+    private static final String[] DEPENDENCY_CONTEXTS = { "com.nordstrom.automation.selenium.core.LocalSeleniumGrid",
+            "com.nordstrom.common.file.PathUtils", "org.apache.commons.lang3.StringUtils",
+            "org.eclipse.jetty.util.Attributes", "javax.servlet.http.HttpServletResponse",
+            "org.eclipse.jetty.http.HttpField", "org.openqa.selenium.chromium.ChromiumDriver",
+            "org.openqa.selenium.grid.Main", "com.beust.jcommander.Strings", "org.openqa.selenium.remote.http.Route",
+            "com.google.common.base.Utf8", "org.openqa.selenium.Keys", "org.openqa.selenium.remote.tracing.Tracer",
+            "org.openqa.selenium.json.Json", "io.opentelemetry.sdk.autoconfigure.ResourceConfiguration",
             "io.opentelemetry.sdk.autoconfigure.spi.Ordered", "io.opentelemetry.api.trace.Span",
             "io.opentelemetry.sdk.trace.SdkSpan", "io.opentelemetry.context.Scope", "io.opentelemetry.sdk.metrics.View",
             "io.opentelemetry.sdk.logs.LogLimits", "io.opentelemetry.sdk.common.Clock",
@@ -353,6 +358,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return seleniumConfig;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getVersion() {
         return 4;
     }
@@ -375,26 +384,68 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("unchecked")
     public Path createHubConfig() throws IOException {
-        return getHubConfigPath();
+        Map<String, Object> hubConfig;
+        // get path to hub configuration template
+        String hubConfigPath = getHubConfigPath().toString();
+        // create hub configuration from template
+        try (Reader reader = Files.newBufferedReader(getHubConfigPath())) {
+            hubConfig = new Json().toType(reader, MAP_TYPE);
+        } catch (IOException e) {
+            throw new ConfigException("Failed reading hub configuration template.", e);
+        }
+        
+        String slotMatcher = getString(SeleniumSettings.SLOT_MATCHER.key());
+        
+        // strip extension to get template base path
+        String configPathBase = hubConfigPath.substring(0, hubConfigPath.length() - 5);
+        // get hash code of slot matcher as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(slotMatcher));
+        // assemble hub configuration file path with aggregated hash code
+        Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
+        
+        // if assembled path does not exist
+        if (filePath.toFile().createNewFile()) {
+            // add driver configuration
+            Map<String, Object> distributorOptions = (Map<String, Object>) hubConfig.get("distributor");
+            distributorOptions.put("slot-matcher", slotMatcher);
+            try (OutputStream fos = new FileOutputStream(filePath.toFile());
+                 OutputStream out = new BufferedOutputStream(fos)) {
+                out.write(new Json().toJson(hubConfig).getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        return filePath;
     }
     
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public Path createNodeConfig(String capabilities, URL hubUrl) throws IOException {
         Map<String, Object> nodeConfig;
+        boolean isAppium = capabilities.contains("appium");
         // get path to node configuration template
         String nodeConfigPath = getNodeConfigPath().toString();
         // create node configuration from template
         try (Reader reader = Files.newBufferedReader(getNodeConfigPath())) {
             nodeConfig = new Json().toType(reader, MAP_TYPE);
-            Map<String, Object> nodeOption = (Map<String, Object>) nodeConfig.computeIfAbsent("node", k -> new HashMap<>());
-            nodeOption.put("hub", hubUrl.toString());
-            nodeOption.computeIfAbsent("detect-drivers", k -> false);
-            nodeOption.computeIfAbsent("driver-configuration", k -> new ArrayList<>());
+            Map<String, Object> nodeOptions = (Map<String, Object>) nodeConfig.computeIfAbsent("node", k -> new HashMap<>());
+            nodeOptions.put("hub", hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + GridServer.GRID_REGISTER);
+            nodeOptions.computeIfAbsent("detect-drivers", k -> false);
+            // if Appium
+            if (isAppium) {
+                // create relay configuration template if absent
+                Map<String, Object> relayOptions = (Map<String, Object>) nodeConfig.computeIfAbsent("relay", k -> new HashMap<>());
+                relayOptions.computeIfAbsent("host", k -> GridUtility.getLocalHost());
+                relayOptions.computeIfAbsent("port", k -> PortProber.findFreePort());
+                relayOptions.computeIfAbsent("configs", k -> new ArrayList<>());
+            // otherwise (not Appium)
+            } else {
+                // add driver configuration template if absent
+                nodeOptions.computeIfAbsent("driver-configuration", k -> new ArrayList<>());
+            }
         } catch (IOException e) {
             throw new ConfigException("Failed reading node configuration template.", e);
         } catch (ClassCastException e) {
@@ -418,14 +469,27 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         
         // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
-            Map<String, Object> nodeOption = (Map<String, Object>) nodeConfig.get("node");
-            List<Object> driverConfiguration = (List<Object>) nodeOption.get("driver-configuration");
-            capabilitiesList.stream().forEach(theseCaps -> {
-                Map<String, Object> thisConfig = new HashMap<>();
-                thisConfig.put("display-name", GridUtility.getPersonality(theseCaps));
-                thisConfig.put("stereotype", theseCaps);
-                driverConfiguration.add(thisConfig);
-            });
+            // if Appium
+            if (isAppium) {
+                // add relay slot specification 
+                Map<String, Object> relayOptions = (Map<String, Object>) nodeConfig.get("relay");
+                List<Object> configs = (List<Object>) relayOptions.get("configs");
+                capabilitiesList.stream().forEach(theseCaps -> {
+                    configs.add("1");
+                    configs.add(toJson(theseCaps));
+                });
+            // otherwise (not Appium)
+            } else {
+                // add driver configuration
+                Map<String, Object> nodeOptions = (Map<String, Object>) nodeConfig.get("node");
+                List<Object> driverConfiguration = (List<Object>) nodeOptions.get("driver-configuration");
+                capabilitiesList.stream().forEach(theseCaps -> {
+                    Map<String, Object> thisConfig = new HashMap<>();
+                    thisConfig.put("stereotype", theseCaps);
+                    thisConfig.put("display-name", GridUtility.getPersonality(theseCaps));
+                    driverConfiguration.add(thisConfig);
+                });
+            }
             try (OutputStream fos = new FileOutputStream(filePath.toFile());
                  OutputStream out = new BufferedOutputStream(fos)) {
                 out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));

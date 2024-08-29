@@ -25,6 +25,7 @@ import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedExcept
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.jar.JarUtils;
+import com.nordstrom.common.uri.UriUtils;
 
 /**
  * This class launches Selenium Grid server instances, each in its own system process. Clients of this class specify
@@ -351,7 +352,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          */
         public static URL getServerUrl(String host, Integer port) {
             try {
-                return new URL("http://" + host + ":" + port.toString() + GridServer.HUB_BASE);
+                return UriUtils.makeBasicURI("http", host, port, GridServer.HUB_BASE).toURL();
             } catch (MalformedURLException e) {
                 throw UncheckedThrow.throwUnchecked(e);
             }

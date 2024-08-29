@@ -237,7 +237,7 @@ repositories {
 
 dependencies {
   constraints {
-    api 'com.nordstrom.tools:java-utils:3.2.1'
+    api 'com.nordstrom.tools:java-utils:3.3.1'
     api 'com.nordstrom.tools:settings:3.0.5'
     api 'com.nordstrom.tools:junit-foundation:17.1.1'
     api 'com.github.sbabcoc:logback-testng:2.0.0'
