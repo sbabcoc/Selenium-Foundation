@@ -5,6 +5,8 @@
 
 ### * BREAKING NEWS *
 
+* With the release of **Selenium Foundation** version _28.2.0_, we now provide support for **Appium** sessions via **Seleniun 4 Grid**. The auto-generated configuration connects the **Appium** server to the local grid via a relay node.
+  * **NOTE**: To properly support **HtmlUnitDriver**, **Appium**, and **Safari**, this release includes new custom slot matcher (Selenium 4) and capabilities matcher (Selenium 3). These matchers are activated via a new setting, which can be easily overridden should the need arise.
 * With the release of **Selenium Foundation** version _28.1.1_, we now provide support for remote **HtmlUnitDriver** sessions with [HtmlUnit Remote](https://github.com/seleniumhq-community/htmlunit-remote). The project unit tests for **Selenium Foundation** have been switched back to running under this "headless" browser.
 * With the release of **Selenium Foundation** version _26.3.4_, automation of Macintosh native applications via the Mac2 engine of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent) project (_1.5.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include Mac2 nodes.
 
@@ -65,14 +67,14 @@ To add a dependency on **Selenium Foundation** for Maven, use the following:
 
 | Selenium 3 | Selenium 4 |
 |:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;28.2.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;28.0.0-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;28.2.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;28.2.0-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 To add a dependency for Gradle:
 
 | Platform | Dependency |
 |:---:|:---|
 | **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:28.2.0-s3'<br/>}</pre> |
-| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:28.0.0-s4'<br/>}</pre> |
+| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:28.2.0-s4'<br/>}</pre> |
 
 ### Building Selenium Foundation
 
