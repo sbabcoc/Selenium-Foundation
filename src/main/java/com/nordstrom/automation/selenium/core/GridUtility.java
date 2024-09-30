@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -47,6 +48,7 @@ import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedExcept
 import com.nordstrom.automation.selenium.utility.NetIdentity;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
+import com.nordstrom.common.uri.UriUtils;
 
 /**
  * This class provides basic support for interacting with a Selenium Grid instance.
@@ -67,12 +69,12 @@ public final class GridUtility {
      * Determine if the specified Selenium Grid host (hub or node) is active.
      * 
      * @param hostUrl {@link URL} to be checked
-     * @param request request path (may include parameters)
+     * @param pathAndParams path and query parameters
      * @return 'true' if specified host is active; otherwise 'false'
      */
-    public static boolean isHostActive(final URL hostUrl, final String request) {
+    public static boolean isHostActive(final URL hostUrl, final String... pathAndParams) {
         try {
-            HttpResponse response = getHttpResponse(hostUrl, request);
+            HttpResponse response = getHttpResponse(hostUrl, pathAndParams);
             return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
         } catch (IOException eaten) {
             // nothing to do here
@@ -84,16 +86,15 @@ public final class GridUtility {
      * Send the specified GET request to the indicated host.
      * 
      * @param hostUrl {@link URL} of target host
-     * @param request request path (may include parameters)
+     * @param pathAndParams path and query parameters
      * @return host response for the specified GET request
      * @throws IOException if the request triggered an I/O exception
      */
-    public static HttpResponse getHttpResponse(final URL hostUrl, final String request) throws IOException {
+    public static HttpResponse getHttpResponse(final URL hostUrl, final String... pathAndParams) throws IOException {
         Objects.requireNonNull(hostUrl, "[hostUrl] must be non-null");
-        Objects.requireNonNull(request, "[request] must be non-null");
         HttpClient client = HttpClientBuilder.create().build();
-        URL url = new URL(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), request);
-        return client.execute(extractHost(hostUrl), new HttpGet(url.toExternalForm()));
+        URI uri = UriUtils.makeBasicURI(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), pathAndParams);
+        return client.execute(extractHost(hostUrl), new HttpGet(uri.toURL().toExternalForm()));
     }
     
     /**
@@ -108,8 +109,8 @@ public final class GridUtility {
         Objects.requireNonNull(hostUrl, "[hostUrl] must be non-null");
         Objects.requireNonNull(query, "[query] must be non-null");
         HttpClient client = HttpClientBuilder.create().build();
-        URL url = new URL(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), "/graphql");
-        HttpPost httpRequest = new HttpPost(url.toExternalForm());
+        URI uri = UriUtils.makeBasicURI(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), "/graphql");
+        HttpPost httpRequest = new HttpPost(uri.toURL().toExternalForm());
         httpRequest.setEntity(new StringEntity(query, ContentType.APPLICATION_JSON));
         return client.execute(extractHost(hostUrl), httpRequest);
     }
@@ -294,14 +295,18 @@ public final class GridUtility {
      * Get next configured output path for Grid server of specified role.
      * 
      * @param config {@link SeleniumConfig} object
-     * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
+     * @param isHub role of Grid server being started: <ul>
+     *     <li>{@code true} = hub</li>
+     *     <li>{@code false} = node</li>
+     *     <li>{@code null} = relay</li>
+     * </ul>
      * @return Grid server output path (may be {@code null})
      */
-    public static Path getOutputPath(SeleniumConfig config, boolean isHub) {
+    public static Path getOutputPath(SeleniumConfig config, Boolean isHub) {
         Path outputPath = null;
         
         if (!config.getBoolean(SeleniumSettings.GRID_NO_REDIRECT.key())) {
-            String gridRole = isHub ? "hub" : "node";
+            String gridRole = (isHub == null) ? "relay" : (isHub) ? "hub" : "node";
             String logsFolder = config.getString(SeleniumSettings.GRID_LOGS_FOLDER.key());
             Path logsPath = Paths.get(logsFolder);
             if (!logsPath.isAbsolute()) {

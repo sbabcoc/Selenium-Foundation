@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.servlet;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,7 @@ public class ExamplePageLauncher {
         
         public URL getUrl() {
             try {
-                return new URL("http://" + GridUtility.getLocalHost() + ":8080");
+                return URI.create("http://" + GridUtility.getLocalHost() + ":8080").toURL();
             } catch (MalformedURLException e) {
                 // nothing to do here
             }

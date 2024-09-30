@@ -1,6 +1,6 @@
 {
   "newSessionWaitTimeout": -1,
-  "capabilityMatcher": "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
+  "capabilityMatcher": "com.nordstrom.automation.selenium.core.FoundationSlotMatcher",
   "throwOnCapabilityNotPresent": true,
   "cleanUpCycle": 5000,
   "role": "hub",

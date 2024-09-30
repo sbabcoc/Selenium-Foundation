@@ -1,5 +1,6 @@
 {
-  "session-request-timeout": -1,
-  "reject-unsupported-caps": true,
-  "session-timeout": 300
+  "distributor": {
+    "slot-matcher": "com.nordstrom.automation.selenium.core.FoundationSlotMatcher",
+    "reject-unsupported-caps": true	
+  }
 }

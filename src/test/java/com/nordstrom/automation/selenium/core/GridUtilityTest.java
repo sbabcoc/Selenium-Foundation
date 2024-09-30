@@ -10,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.TimeoutException;
 
@@ -41,11 +42,10 @@ public class GridUtilityTest extends TestNgBase {
     }
     
     @NoDriver
-    @Test(expectedExceptions = {NullPointerException.class},
-            expectedExceptionsMessageRegExp = "\\[request\\] must be non-null")
-    public void testRequestNullCheck() throws MalformedURLException {
-        URL hostUrl = new URL("http://" + GridUtility.getLocalHost());
-        GridUtility.isHostActive(hostUrl, null);
+    @Test
+    public void testHostWithoutRequest() throws MalformedURLException {
+        URI hostUri = URI.create("https://github.com");
+        assertTrue(GridUtility.isHostActive(hostUri.toURL()), "Failed activity check for: " + hostUri);
     }
     
     @Test

@@ -129,10 +129,10 @@ In addition to support for all of the standard Java-based browser drivers, the `
 
 Unlike the other drivers supported by **Selenium Foundation** which are implemented in Java, the "engines" provided by [Appium](https://appium.io) are implemented in NodeJS. To launch a **Selenium Grid** collection that includes Appium nodes, you'll need the following additional tools:
 * Platform-specific Node Version Manager: The installation page for `npm` (below) provides links to recommended version managers.
-* [NodeJS (node)](https://nodejs.org): Currently, I'm running version 17.5.0
-* [Node Package Manager (npm)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm): Currently, I'm running version 8.13.2
-* [Node Process Manager (pm2)](https://pm2.io/): Currently, I'm running version 5.2.0
-* [Appium](https://appium.io): Currently, I'm running version 1.22.3
+* [NodeJS (node)](https://nodejs.org): Currently, I'm running version 22.7.0
+* [Node Package Manager (npm)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm): Currently, I'm running version 10.8.2
+* [Node Process Manager (pm2)](https://pm2.io/): Currently, I'm running version 5.4.2
+* [Appium](https://appium.io): Currently, I'm running version 2.11.3
 
 Typically, these tools must be on the system file path. However, you can provide specific paths for each of these via **Selenium Foundation** settings:
 * **NPM_BINARY_PATH**: If unspecified, the `PATH` is searched

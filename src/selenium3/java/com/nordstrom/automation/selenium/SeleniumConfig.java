@@ -18,11 +18,13 @@ import java.util.Set;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.grid.internal.utils.CapabilityMatcher;
 import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
 import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.grid.config.ConfigException;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
 
@@ -169,23 +171,13 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;version&gt;1.4.10&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
-    private static final String[] DEPENDENCY_CONTEXTS = {
-                    "com.nordstrom.automation.selenium.utility.RevisedCapabilityMatcher",
-                    "com.nordstrom.common.file.PathUtils",
-                    "org.apache.commons.lang3.reflect.FieldUtils",
-                    "net.bytebuddy.matcher.ElementMatcher",
-                    "org.openqa.selenium.BuildInfo",
-                    "com.google.common.collect.ImmutableMap",
-                    "com.beust.jcommander.JCommander",
-                    "org.openqa.selenium.json.Json",
-                    "org.seleniumhq.jetty9.util.thread.ThreadPool",
-                    "javax.servlet.Servlet",
-                    "okhttp3.ConnectionPool",
-                    "okio.BufferedSource",
-                    "ch.qos.logback.classic.spi.ThrowableProxy",
-                    "kotlin.jvm.internal.Intrinsics",
-                    "org.apache.commons.exec.Executor"
-                    };
+    private static final String[] DEPENDENCY_CONTEXTS = { "com.nordstrom.automation.selenium.core.LocalSeleniumGrid",
+            "com.nordstrom.common.file.PathUtils", "org.apache.commons.lang3.reflect.FieldUtils",
+            "net.bytebuddy.matcher.ElementMatcher", "org.openqa.selenium.BuildInfo",
+            "com.google.common.collect.ImmutableMap", "com.beust.jcommander.JCommander",
+            "org.openqa.selenium.json.Json", "org.seleniumhq.jetty9.util.thread.ThreadPool", "javax.servlet.Servlet",
+            "okhttp3.ConnectionPool", "okio.BufferedSource", "ch.qos.logback.classic.spi.ThrowableProxy",
+            "kotlin.jvm.internal.Intrinsics", "org.apache.commons.exec.Executor" };
     
     static {
         try {
@@ -214,6 +206,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return seleniumConfig;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getVersion() {
         return 3;
     }
@@ -242,6 +238,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         // create hub configuration from template
         GridHubConfiguration hubConfig = GridHubConfiguration.loadFromJSON(hubConfigPath);
         
+        String slotMatcher = getString(SeleniumSettings.SLOT_MATCHER.key());
+        
         // get configured hub servlet collection
         Set<String> servlets = getHubServlets();
         // merge with hub template servlets
@@ -249,13 +247,18 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         
         // strip extension to get template base path
         String configPathBase = hubConfigPath.substring(0, hubConfigPath.length() - 5);
-        // get hash code of servlets as 8-digit hexadecimal string
-        String hashCode = String.format("%08X", servlets.hashCode());
+        // get hash code of slot matcher and servlets as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(slotMatcher, servlets));
         // assemble hub configuration file path with servlets hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         
         // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
+            try {
+                hubConfig.capabilityMatcher = (CapabilityMatcher) Class.forName(slotMatcher).newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                throw new ConfigException("Failed instantiating capability matcher: " + slotMatcher, e);
+            }
             hubConfig.servlets = Arrays.asList(servlets.toArray(new String[0]));
             try(OutputStream fos = new FileOutputStream(filePath.toFile());
                 OutputStream out = new BufferedOutputStream(fos)) {

@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -90,31 +92,6 @@ public abstract class ComponentContainer
     
     private static final String UPDATE_VALUE =
             "arguments[0].value=arguments[1]; arguments[0].dispatchEvent(new Event('input',{bubbles:true}));";
-    
-    private static final Class<?> ACTIVITY_CLASS;
-    private static final Constructor<?> ACTIVITY_CTOR;
-    private static final Method START_ACTIVITY;
-    
-    static {
-        Class<?> activityClass;
-        Constructor<?> activityCtor;
-        Method startActivity;
-        
-        try {
-            Class<?> androidDriver = Class.forName("io.appium.java_client.android.AndroidDriver");
-            activityClass = Class.forName("io.appium.java_client.android.Activity");
-            activityCtor = activityClass.getConstructor(String.class, String.class);
-            startActivity = androidDriver.getMethod("startActivity", activityClass);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-            activityClass = null;
-            activityCtor = null;
-            startActivity = null;
-        }
-        
-        ACTIVITY_CLASS = activityClass;
-        ACTIVITY_CTOR = activityCtor;
-        START_ACTIVITY = startActivity;
-    }
     
     private final Logger logger;
     
@@ -620,14 +597,12 @@ public abstract class ComponentContainer
         Objects.requireNonNull(driver, "[driver] must be non-null");
         
         if (url.startsWith("activity://")) {
-            Objects.requireNonNull(ACTIVITY_CLASS, "AndroidDriver is required to launch activities");
-            try {
-                String[] components = url.split("/");
-                START_ACTIVITY.invoke(driver, ACTIVITY_CTOR.newInstance(components[2], components[3]));
-            } catch (SecurityException | InstantiationException | IllegalAccessException
-                    | IllegalArgumentException | InvocationTargetException e) {
-                throw new RuntimeException("Unable to launch specified activity", e);
-            }
+            String[] components = url.split("/");
+            ((JavascriptExecutor) driver).executeScript("mobile: startActivity",
+                new HashMap<String, String>() {{
+                    put("package", components[2]);
+                    put("appActivity", components[3]);
+                }});
         } else {
             driver.get(url);
         }

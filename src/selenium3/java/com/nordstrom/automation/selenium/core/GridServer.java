@@ -29,7 +29,7 @@ public class GridServer {
     private boolean isHub;
     private URL serverUrl;
     protected String statusRequest;
-    protected String shutdownRequest;
+    protected String[] shutdownRequest;
     
     public static final String GRID_CONSOLE = "/grid/console";
     public static final String HUB_BASE = "/wd/hub";
@@ -37,8 +37,8 @@ public class GridServer {
     public static final String HUB_CONFIG = "/grid/api/hub/";
     public static final String NODE_CONFIG = "/grid/api/proxy";
     
-    private static final String HUB_SHUTDOWN = "/lifecycle-manager?action=shutdown";
-    private static final String NODE_SHUTDOWN = "/extra/LifecycleServlet?action=shutdown";
+    private static final String[] HUB_SHUTDOWN = { "/lifecycle-manager", "action=shutdown" };
+    private static final String[] NODE_SHUTDOWN = { "/extra/LifecycleServlet", "action=shutdown" };
     private static final long SHUTDOWN_DELAY = 15;
     
     public GridServer(URL url, boolean isHub) {
@@ -180,7 +180,7 @@ public class GridServer {
     private static String getStatusOfNode(SeleniumConfig config, URL hubUrl, URL nodeUrl) throws IOException {
         String nodeEndpoint = nodeUrl.getProtocol() + "://" + nodeUrl.getAuthority();
         String url = hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + NODE_CONFIG + "?id=" + nodeEndpoint;
-        try (InputStream is = new URL(url).openStream()) {
+        try (InputStream is = URI.create(url).toURL().openStream()) {
             return GridUtility.readAvailable(is);
         }
     }

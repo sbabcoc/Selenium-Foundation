@@ -1,13 +1,21 @@
 package com.nordstrom.automation.selenium.plugins;
 
+import static org.openqa.selenium.json.Json.MAP_TYPE;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,6 +25,8 @@ import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.grid.config.ConfigException;
+import org.openqa.selenium.json.Json;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -109,35 +119,16 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("unchecked")
     public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             URL hubUrl, Path workingPath, Path outputPath) throws IOException {
         
+        String address;
+        Integer portNum;
         List<String> argsList = new ArrayList<>();
-        String hostUrl = GridUtility.getLocalHost();
-        Integer portNum = PortProber.findFreePort();
         
-        // get node capabilities for this plug-in
-        String nodeCapabilities = getCapabilities(config);
-        // determine if using 'pm2' for stand-alone execution of 'appium'
-        boolean appiumWithPM2 = config.getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key()); 
-        
-        // if running with 'pm2'
-        if (appiumWithPM2) {
-            // add indication of stand-alone execution of 'appium' with 'pm2'
-            Capabilities capabilities = config.getCapabilitiesForJson(nodeCapabilities)[0];
-            Capabilities nordOptions = config.getCapabilitiesForJson(APPIUM_WITH_PM2)[0];
-            nodeCapabilities = config.toJson(config.mergeCapabilities(capabilities, nordOptions));
-        }
-        
-        Path nodeConfigPath = config.createNodeConfig(nodeCapabilities, hubUrl);
-        
-        // specify server host
-        argsList.add("--address");
-        argsList.add(hostUrl);
-        
-        // specify server port
-        argsList.add("--port");
-        argsList.add(portNum.toString());
+        // create node configuration for this plug-in
+        Path nodeConfigPath = config.createNodeConfig(getCapabilities(config), hubUrl);
         
         // allow specification of multiple command line arguments
         String[] cliArgs = config.getStringArray(SeleniumSettings.APPIUM_CLI_ARGS.key());
@@ -193,39 +184,91 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             }
         }
         
-        argsList.add("--nodeconfig");
-        argsList.add(nodeConfigPath.toString());
+        // if target is Selenium 3
+        if (config.getVersion() == 3) {
+            // get 'localhost' and free port
+            address = GridUtility.getLocalHost();
+            portNum = PortProber.findFreePort();
+            
+            // add 'base-path' argument
+            argsList.add("--base-path");
+            argsList.add("/wd/hub");
+            
+            // add 'nodeconfig' path
+            argsList.add("--nodeconfig");
+            argsList.add(nodeConfigPath.toString());
+        // otherwise (target is Selenium 4+)
+        } else {
+            // extract address and port from relay configuration
+            try (Reader reader = Files.newBufferedReader(nodeConfigPath)) {
+                Map<String, Object> nodeConfig = new Json().toType(reader, MAP_TYPE);
+                Map<String, Object> relayOptions = (Map<String, Object>) nodeConfig.get("relay");
+                address = (String) relayOptions.get("host");
+                portNum = ((Long) relayOptions.get("port")).intValue();
+            } catch (IOException e) {
+                throw new ConfigException("Failed reading node configuration.", e);
+            }
+            
+            // add driver specification
+            argsList.add("--use-drivers");
+            argsList.add(getBrowserName().toLowerCase());
+        }
+        
+        // specify server port
+        argsList.add(0, portNum.toString());
+        argsList.add(0, "--port");
+        
+        // specify server host
+        argsList.add(0, address);
+        argsList.add(0, "--address");
         
         CommandLine process;
         String appiumBinaryPath = findMainScript().getAbsolutePath();
         
         // if running with 'pm2'
-        if (appiumWithPM2) {
+        if (config.appiumWithPM2()) {
             File pm2Binary = findPM2Binary().getAbsoluteFile();
 
             argsList.add(0, "--");
+            
+            // if capturing output
+            if (outputPath != null) {
+                // specify 'pm2' log output path
+                argsList.add(0, "\"" + outputPath.toString() + "\"");
+                argsList.add(0, "--log");
+            }
+            
+            // specify 'pm2' process name
             argsList.add(0, "appium-" + portNum);
             argsList.add(0, "--name");
-            argsList.add(0, appiumBinaryPath);
+            
+            // specify path to 'appium' main script 
+            argsList.add(0, "\"" + appiumBinaryPath + "\"");
             argsList.add(0, "start");
             
             String executable;
             if (SystemUtils.IS_OS_WINDOWS) {
+                argsList.add(0, "\"" + pm2Binary.getAbsolutePath() + "\"");
+                String command = String.join(" ", argsList);
+                argsList.clear();
+                
                 executable = "cmd.exe";
-                argsList.add(0, pm2Binary.getAbsolutePath());
-                argsList.add(0, "/c");
+                argsList.add("/c");
+                argsList.add("\"" + command + "\"");
             } else {
                 executable = pm2Binary.getAbsolutePath();
             }
 
             process = new CommandLine(executable, argsList.toArray(new String[0]));
-        // otherwise
-        } else { // (running with 'node')
+        // otherwise (running with 'node')
+        } else {
             argsList.add(0, appiumBinaryPath);
             process = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
         }
         
-        return new AppiumGridServer(hostUrl, portNum, false, process, workingPath, outputPath);
+        // if target is Selenium 4+, store path to relay configuration in Appium process environment
+        if (config.getVersion() > 3) process.setEnvironmentVariable("nodeConfigPath", nodeConfigPath.toString());
+        return new AppiumGridServer(address, portNum, false, process, workingPath, outputPath);
     }
 
     /**
@@ -262,6 +305,24 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * @return driver-specific {@link WebDriver} class name
      */
     public abstract String getDriverClassName();
+    
+    /**
+     * Add the 'nord:options' object to the specified node capabilities string. <br>
+     * <b>NOTE</b>: The 'nord:options' object is only added if Appium is being managed by PM2.
+     * 
+     * @param config {@link SelenikumConfig} object
+     * @param nodeCapabilities node capabilities string
+     * @return node capabilities string 
+     */
+    String addNordOptions(SeleniumConfig config, String nodeCapabilities) {
+        // if not running with 'pm2', no options to add
+        if (!config.appiumWithPM2()) return nodeCapabilities;
+        
+        // add indication of stand-alone execution of 'appium' with 'pm2'
+        Capabilities capabilities = config.getCapabilitiesForJson(nodeCapabilities)[0];
+        Capabilities nordOptions = config.getCapabilitiesForJson(APPIUM_WITH_PM2)[0];
+        return config.toJson(config.mergeCapabilities(capabilities, nordOptions));
+    }
     
     /**
      * Find the 'npm' (Node Package Manager) binary.
@@ -318,7 +379,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         if (SystemUtils.IS_OS_WINDOWS) {
             executable = "cmd.exe";
             argsList.add("/c");
-            argsList.add(npm.getAbsolutePath());
+            argsList.add("\"" + npm.getAbsolutePath() + "\"");
         } else {
             executable = npm.getAbsolutePath();
         }
@@ -391,6 +452,36 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             }
             return true;
         }
+        
+        /**
+         * Get stored relay node configuration path. <br>
+         * <b>NOTE</b>: A relay node is needed to connect the Appium server to a Selenium 4+ Grid hub.
+         * 
+         * @return path to relay node configuration; may be {@code null}
+         */
+        public Path getNodeConfigPath() {
+            String nodeConfigPath = getEnvironment().get("nodeConfigPath");
+            return (nodeConfigPath != null) ? Paths.get(nodeConfigPath) : null;
+        }
+        
+        /**
+         * Get process environment from this AppiumGridServer object.
+         *  
+         * @return map of process environment variables
+         */
+        @SuppressWarnings("unchecked")
+        public Map<String, String> getEnvironment() {
+            try {
+                Field processField = CommandLine.class.getDeclaredField("process");
+                processField.setAccessible(true);
+                Object osProcess = processField.get(getProcess());
+                Method getEnvironment = osProcess.getClass().getDeclaredMethod("getEnvironment");
+                getEnvironment.setAccessible(true);
+                return (Map<String, String>) getEnvironment.invoke(osProcess);
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                return Collections.emptyMap();
+            }
+        }
 
         /**
          * If the specified URL is a local 'appium' node running with 'pm2', delete the process.
@@ -412,7 +503,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             
             if (SystemUtils.IS_OS_WINDOWS) {
                 executable = "cmd.exe";
-                argsList.add(0, pm2Binary.getAbsolutePath());
+                argsList.add(0, "\"" + pm2Binary.getAbsolutePath() + "\"");
                 argsList.add(0, "/c");
             } else {
                 executable = pm2Binary.getAbsolutePath();
