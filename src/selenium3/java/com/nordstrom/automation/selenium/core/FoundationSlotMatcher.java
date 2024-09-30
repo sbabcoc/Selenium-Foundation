@@ -96,6 +96,30 @@ public class FoundationSlotMatcher implements CapabilityMatcher {
         }
     }
 
+    class BrowserVersionValidator implements Validator {
+        @Override
+        public Boolean apply(Map<String, Object> providedCapabilities, Map<String, Object> requestedCapabilities) {
+            if ("htmlunit".equals(requestedCapabilities.get(BROWSER_NAME))) {
+                return true;
+            }
+
+            Object requested = Optional.ofNullable(requestedCapabilities.get(CapabilityType.BROWSER_VERSION))
+                    .orElse(requestedCapabilities.get(CapabilityType.VERSION));
+            if (anything(requested)) {
+                return true;
+            }
+            Object provided = Optional.ofNullable(providedCapabilities.get(CapabilityType.BROWSER_VERSION))
+                    .orElse(providedCapabilities.get(CapabilityType.VERSION));
+            Platform requestedPlatform = extractPlatform(requested);
+            if (requestedPlatform != null) {
+                Platform providedPlatform = extractPlatform(provided);
+                return providedPlatform != null && providedPlatform.is(requestedPlatform);
+            }
+
+            return provided != null && Objects.equals(requested.toString(), provided.toString());
+        }
+    }
+
     class SimplePropertyValidator implements Validator {
         private List<String> toConsider;
 
@@ -168,9 +192,8 @@ public class FoundationSlotMatcher implements CapabilityMatcher {
     private final List<Validator> validators = new ArrayList<>();
     {
         validators.addAll(Arrays.asList(new PlatformValidator(), new AliasedPropertyValidator(BROWSER_NAME, "browser"),
-                new AliasedPropertyValidator(CapabilityType.BROWSER_VERSION, CapabilityType.VERSION),
-                new SimplePropertyValidator(CapabilityType.APPLICATION_NAME), new FirefoxSpecificValidator(),
-                new SafariSpecificValidator()));
+                new BrowserVersionValidator(), new SimplePropertyValidator(CapabilityType.APPLICATION_NAME),
+                new FirefoxSpecificValidator(), new SafariSpecificValidator()));
     }
 
     public void addToConsider(String capabilityName) {
