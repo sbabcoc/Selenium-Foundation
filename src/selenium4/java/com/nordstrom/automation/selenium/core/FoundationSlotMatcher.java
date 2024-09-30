@@ -77,8 +77,7 @@ public class FoundationSlotMatcher implements SlotMatcher, Serializable {
                 || capabilities.getBrowserVersion().isEmpty()
                 || Objects.equals(capabilities.getBrowserVersion(), "stable")
                 || Objects.equals(stereotype.getBrowserVersion(), capabilities.getBrowserVersion());
-        boolean platformNameMatch = Browser.HTMLUNIT.is(capabilities)
-                || capabilities.getPlatformName() == null
+        boolean platformNameMatch = capabilities.getPlatformName() == null
                 || Objects.equals(stereotype.getPlatformName(), capabilities.getPlatformName())
                 || (stereotype.getPlatformName() != null
                         && stereotype.getPlatformName().is(capabilities.getPlatformName()));
