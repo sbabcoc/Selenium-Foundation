@@ -36,6 +36,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -162,9 +163,30 @@ public final class GridUtility {
         // get constructor for RemoteWebDriver class corresponding to desired capabilities
         Constructor<RemoteWebDriver> ctor = getRemoteWebDriverCtor(config, desiredCapabilities);
         
+        Map<String, Object> capsMap = new HashMap<>(desiredCapabilities.asMap());
+        
+        // if capabilities contain 'nord:options'
+        if (capsMap.containsKey("nord:options")) {
+            // get map of custom options from capabilities
+            Map<String, Object> options = getNordOptions(desiredCapabilities);
+            // remove 'personality'
+            options.remove("personality");
+            // remove 'pluginClass'
+            options.remove("pluginClass");
+            // if options are empty
+            if (options.isEmpty()) {
+                // remove 'nord:options'
+                capsMap.remove("nord:options");
+            // otherwise (non-empty)
+            } else {
+                // update 'nord:options'
+                capsMap.put("nord:options", options);
+            }
+        }
+        
         try {
             // instantiate desired driver via configured grid
-            return ctor.newInstance(remoteAddress, desiredCapabilities);
+            return ctor.newInstance(remoteAddress, new MutableCapabilities(capsMap));
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw UncheckedThrow.throwUnchecked(e);
         }

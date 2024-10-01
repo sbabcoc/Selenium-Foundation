@@ -13,14 +13,6 @@ import com.nordstrom.automation.selenium.platform.TargetPlatform;
 @InitialPage(AndroidPage.class)
 public class AndroidTest extends TestNgTargetRoot {
     
-//    private final String MY_PACKAGE = "com.example.myapplication";
-//    private final String SETTINGS_ACTIVITY = ".SettingsActivity";
-    
-//    private final String KEY_SIGNATURE = "signature";
-//    private final String KEY_REPLY = "reply";
-//    private final String KEY_SYNC = "sync";
-//    private final String KEY_ATTACHMENT = "attachment";
-    
     @Test
     @TargetPlatform(ANDROID_NAME)
     public void testSearchActivity() {
