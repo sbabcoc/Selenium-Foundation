@@ -130,11 +130,11 @@ public enum ContainerMethodInterceptor {
             // if expecting page without load logic
             if (returnsPage && !detectsCompletion) {
                 try {
-                    // get stale wait reference element by CSS selector
-                    reference = driver.findElement(By.cssSelector("*"));
-                } catch (WebDriverException e) {
                     // get stale wait reference element by XPath
                     reference = driver.findElement(By.xpath("/*"));
+                } catch (WebDriverException e) {
+                    // get stale wait reference element by CSS selector
+                    reference = driver.findElement(By.cssSelector("*"));
                 }
             }
             

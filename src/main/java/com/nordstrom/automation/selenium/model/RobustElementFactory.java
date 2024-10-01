@@ -121,9 +121,9 @@ public final class RobustElementFactory {
         }
         
         try {
-            reference = driver.findElement(By.cssSelector("*"));
-        } catch (WebDriverException e) {
             reference = driver.findElement(By.xpath("/*"));
+        } catch (WebDriverException e) {
+            reference = driver.findElement(By.cssSelector("*"));
         }
         
         Class<? extends WebElement> refClass = reference.getClass();
