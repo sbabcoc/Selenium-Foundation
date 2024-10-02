@@ -1,8 +1,6 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,7 +14,6 @@ import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.concurrent.TimeoutException;
 import org.openqa.selenium.net.PortProber;
-import org.openqa.selenium.os.CommandLine;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
@@ -39,7 +36,6 @@ import com.nordstrom.common.uri.UriUtils;
  * <b>NOTE</b>: If no test context is specified, the log file will be stored in the "current" directory of the parent
  * Java process.  
  */
-@SuppressWarnings("deprecation")
 public class LocalSeleniumGrid extends SeleniumGrid {
 
     private static final String OPT_HOST = "--host";
@@ -178,7 +174,6 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
      * @param propertyNames optional array of property names to propagate to server process
-     * 
      * @return {@link LocalGridServer} object for managing the server process
      * @throws GridServerLaunchFailedException If a Grid component process failed to start
      * @see #activate()
@@ -253,10 +248,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             argsList.add(0, "-agentlib:jdwp=transport=dt_socket,server=y,address=" + address);
         }
         
-        String executable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
-        CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
-        return new LocalGridServer(hostUrl, portNum, isHub, process, workingPath, outputPath);
+        argsList.add(0, System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+        ProcessBuilder builder = new ProcessBuilder(argsList);
+        builder.environment().put("PATH", PathUtils.getSystemPath());
+        return new LocalGridServer(hostUrl, portNum, isHub, builder, workingPath, outputPath);
     }
 
     /**
@@ -264,7 +259,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      */
     public static class LocalGridServer extends GridServer {
 
-        private final CommandLine process;
+        private final ProcessBuilder builder;
+        private Process process = null;
         private boolean hasStarted = false;
         private boolean isActive = false;
         private final Map<String, String> personalities = new HashMap<>();
@@ -275,26 +271,31 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * @param host IP address of local Grid server
          * @param port port of local Grid server
          * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
-         * @param process {@link Process} of local Grid server
+         * @param builder {@link ProcessBuilder} of local Grid server
          * @param workingPath {@link Path} of working directory for server process; {@code null} for default
          * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
          */
-        public LocalGridServer(String host, Integer port, boolean isHub, CommandLine process, Path workingPath, Path outputPath) {
+        public LocalGridServer(String host, Integer port, boolean isHub, ProcessBuilder builder, Path workingPath, Path outputPath) {
             super(getServerUrl(host, port), isHub);
             
             if (workingPath != null) {
-                process.setWorkingDirectory(workingPath.toString());
+                builder.directory(workingPath.toFile());
             }
             
             if (outputPath != null) {
-                try {
-                    process.copyOutputTo(new FileOutputStream(outputPath.toFile()));
-                } catch (FileNotFoundException e) {
-                    throw new GridServerLaunchFailedException(isHub ? "hub" : "node", e);
-                }
+                builder.redirectOutput(outputPath.toFile());
             }
             
-            this.process = process;
+            this.builder = builder;
+        }
+        
+        /**
+         * Get process environment of this local grid server.
+         *  
+         * @return map of process environment variables
+         */
+        public Map<String, String> getEnvironment() {
+            return builder.environment();
         }
         
         /**
@@ -302,7 +303,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * 
          * @return {@link Process} object
          */
-        public CommandLine getProcess() {
+        public Process getProcess() {
             return process;
         }
         
@@ -327,7 +328,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          */
         public void start() throws IOException, InterruptedException, TimeoutException {
             if (!hasStarted) {
-                process.executeAsync();
+                process = builder.start();
                 hasStarted = true;
             }
         }
@@ -352,6 +353,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                 getProcess().destroy();
                 hasStarted = false;
                 isActive = false;
+                getProcess().waitFor();
             }
             
             return true;

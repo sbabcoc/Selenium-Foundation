@@ -1,7 +1,5 @@
 package com.nordstrom.automation.selenium.exceptions;
 
-import java.io.IOException;
-
 /**
  * Thrown if a Grid component process failed to start.
  */
@@ -16,7 +14,7 @@ public class GridServerLaunchFailedException extends RuntimeException {
      * @param role Grid server role specifier ({@code hub} or {@code node})
      * @param cause the cause of this exception
      */
-    public GridServerLaunchFailedException(final String role, final IOException cause) {
+    public GridServerLaunchFailedException(final String role, final Throwable cause) {
         super(getMessage(role), cause);
     }
     
