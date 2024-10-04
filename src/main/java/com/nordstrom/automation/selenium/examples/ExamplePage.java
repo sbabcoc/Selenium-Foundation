@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.examples;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -7,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -20,6 +20,7 @@ import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
+import com.nordstrom.common.uri.UriUtils;
 
 @PageUrl("/grid/admin/ExamplePageServlet")
 public class ExamplePage extends Page {
@@ -265,15 +266,11 @@ public class ExamplePage extends Page {
             } else {
                 // get URL of Selenium Grid hub server
                 URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
-                // assemble hub base URI
-                targetUri = new URIBuilder()
-                        .setScheme(hubUrl.getProtocol())
-                        .setHost(hubUrl.getHost())
-                        .setPort(hubUrl.getPort())
-                        .build().normalize();
+                // get base URI of grid hub server
+                targetUri = UriUtils.uriForPath(hubUrl);
             }
             config.setTargetUri(targetUri);
-        } catch (URISyntaxException eaten) {
+        } catch (URISyntaxException | IOException eaten) {
             // nothing to do here
         }
         return targetUri;
