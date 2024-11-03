@@ -127,6 +127,19 @@ public abstract class AbstractSeleniumConfig extends
         GRID_PLUGINS("selenium.grid.plugins", null),
         
         /**
+         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes to extend the
+         * capabilities of the local <b>Selenium Grid</b>.
+         * <p>
+         * <b>NOTE</b>: For <b>Selenium 3</b>, the specified servlets are hosted by the <b>Grid</b> hub server.
+         * For <b>Selenium 4</b>, they're hosted by the {@link com.nordstrom.automation.selenium.examples.ServletContainer
+         * ServletContainer} class.
+         * <p>
+         * name: <b>selenium.grid.servlets</b><br>
+         * default: {@code null}
+         */
+        GRID_SERVLETS("selenium.grid.servlets", null),
+        
+        /**
          * This setting specifies whether the local <b>Selenium Grid</b> instance will be shut down at the end of the
          * test run.
          * <p>
@@ -193,15 +206,6 @@ public abstract class AbstractSeleniumConfig extends
         SLOT_MATCHER("selenium.slot.matcher", FoundationSlotMatcher.class.getName()),
         
         /**
-         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes to extend the
-         * capabilities of the local <b>Selenium Grid</b> hub server.
-         * <p>
-         * name: <b>selenium.hub.servlets</b><br>
-         * default: {@code null}
-         */
-        HUB_SERVLETS("selenium.hub.servlets", null),
-        
-        /**
          * This setting specifies whether to launch the local <b>Selenium Grid</b> hub server with JDWP debugging.
          * <p>
          * name: <b>selenium.hub.debug</b><br>
@@ -217,15 +221,6 @@ public abstract class AbstractSeleniumConfig extends
          * Selenium 4: <b>nodeConfig-s4.json</b>
          */
         NODE_CONFIG("selenium.node.config", null),
-        
-        /**
-         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes to extend the
-         * capabilities of local <b>Selenium Grid</b> node servers.
-         * <p>
-         * name: <b>selenium.node.servlets</b><br>
-         * default: {@code null}
-         */
-        NODE_SERVLETS("selenium.node.servlets", null),
         
         /**
          * This setting specifies whether to launch the local <b>Selenium Grid</b> node server with JDWP debugging.
@@ -974,14 +969,14 @@ public abstract class AbstractSeleniumConfig extends
      * 
      * @return collection of specified hub servlets (may be empty)
      */
-    public Set<String> getHubServlets() {
+    public Set<String> getGridServlets() {
         Set<String> servlets = new HashSet<>();
-        // get specified hub servlet classes
-        String hubServlets = getString(SeleniumSettings.HUB_SERVLETS.key());
+        // get specified grid servlet classes
+        String gridServlets = getString(SeleniumSettings.GRID_SERVLETS.key());
         // if servlets are specified
-        if (!(hubServlets == null || hubServlets.isEmpty())) {
+        if (!(gridServlets == null || gridServlets.isEmpty())) {
             // collect servlet names, minus leading/trailing white space
-            servlets.addAll(Arrays.asList(hubServlets.trim().split("\\s*,\\s*")));
+            servlets.addAll(Arrays.asList(gridServlets.trim().split("\\s*,\\s*")));
         }
         // if example page feature is specified
         if (getBoolean(SeleniumSettings.GRID_EXAMPLES.key())) {
@@ -991,23 +986,6 @@ public abstract class AbstractSeleniumConfig extends
             servlets.add(FrameB_Servlet.class.getName());
             servlets.add(FrameC_Servlet.class.getName());
             servlets.add(FrameD_Servlet.class.getName());
-        }
-        return servlets;
-    }
-    
-    /**
-     * Get the collection of servlets to install on Selenium Grid nodes.
-     * 
-     * @return collection of specified node servlets (may be empty)
-     */
-    public Set<String> getNodeServlets() {
-        Set<String> servlets = new HashSet<>();
-        // get specified node servlet classes
-        String nodeServlets = getString(SeleniumSettings.NODE_SERVLETS.key());
-        // if servlets are specified
-        if (!(nodeServlets == null || nodeServlets.isEmpty())) {
-            // collect servlet names, minus leading/trailing white space
-            servlets.addAll(Arrays.asList(nodeServlets.trim().split("\\s*,\\s*")));
         }
         return servlets;
     }
