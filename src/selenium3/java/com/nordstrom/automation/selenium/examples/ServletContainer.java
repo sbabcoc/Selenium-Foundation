@@ -1,14 +1,22 @@
 package com.nordstrom.automation.selenium.examples;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+
 import org.seleniumhq.jetty9.server.Server;
 import org.seleniumhq.jetty9.servlet.ServletContextHandler;
 import org.seleniumhq.jetty9.servlet.ServletHolder;
 
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
+import com.beust.jcommander.JCommander;
+import com.nordstrom.automation.selenium.SeleniumConfig;
 
 public class ServletContainer {
     
@@ -19,25 +27,65 @@ public class ServletContainer {
     };
     
     public static String[] getDependencyContexts() {
-        return DEPENDENCY_CONTEXTS;
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        Set<String> servlets = config.getGridServlets();
+        Collections.addAll(servlets, DEPENDENCY_CONTEXTS);
+        return servlets.toArray(new String[0]);
+    }
+    
+    public static List<String> getServletArgs() {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+       return config.getGridServlets().stream().flatMap(s -> Stream.of("--servlet", s)).collect(Collectors.toList());
     }
     
     public static void main(String[] args) throws Exception {
-        int port = 8080;
+        ServletFlags flags = new ServletFlags();
+        JCommander.newBuilder().addObject(flags).build().parse(args);
         
-        Server server = new Server(port);
-
         ServletContextHandler context = new ServletContextHandler();
-        context.setContextPath("/");
+        for (String servletClassName : flags.getServlets()) {
+            addServlet(context, servletClassName);
+        }
         
-        context.addServlet(new ServletHolder(new ExamplePageServlet()), "/grid/admin/ExamplePageServlet");
-        context.addServlet(new ServletHolder(new FrameA_Servlet()), "/grid/admin/FrameA_Servlet");
-        context.addServlet(new ServletHolder(new FrameB_Servlet()), "/grid/admin/FrameB_Servlet");
-        context.addServlet(new ServletHolder(new FrameC_Servlet()), "/grid/admin/FrameC_Servlet");
-        context.addServlet(new ServletHolder(new FrameD_Servlet()), "/grid/admin/FrameD_Servlet");
-        
+        Server server = new Server(flags.getPort());
         server.setHandler(context);
         server.start();
         server.join();
+    }
+    
+    private static void addServlet(final ServletContextHandler context, final String servletClassName) {
+        Class<?> clazz;
+        Object instance;
+        HttpServlet servlet;
+        ServletHolder holder;
+        WebServlet webServlet;
+        String[] pathSpecs;
+        
+        try {
+            clazz = Class.forName(servletClassName);
+            instance = clazz.getDeclaredConstructor().newInstance();
+            servlet = (HttpServlet) instance;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed getting class for name: " + servletClassName, e);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException("Failed instantiating servlet: " + servletClassName, e);
+        } catch (ClassCastException e) {
+            throw new RuntimeException("Class '" + servletClassName + "' does not extend 'HttpServlet'");
+        }
+        
+        webServlet = Objects.requireNonNull(clazz.getAnnotation(WebServlet.class),
+                "Failed getting 'WebServlet' annotation of servlet: " + servletClassName);
+        pathSpecs = webServlet.urlPatterns();
+        
+        if (pathSpecs.length == 0) {
+            throw new RuntimeException(
+                    "No URL patterns specified in 'WebServlet' annotation of servlet: " + servletClassName);
+        }
+        
+        holder = new ServletHolder(servlet);
+        for (String pathSpec : pathSpecs) {
+            context.addServlet(holder, pathSpec);
+        }
     }
 }

@@ -29,6 +29,7 @@ public class ExamplePageLauncher {
             argsList.add("-cp");
             argsList.add(JarUtils.getContextPaths(ServletContainer.getDependencyContexts()).get(0));
             argsList.add(ServletContainer.class.getName());
+            argsList.addAll(ServletContainer.getServletArgs());
 
             builder = new ProcessBuilder(argsList);
             builder.environment().put("PATH", PathUtils.getSystemPath());

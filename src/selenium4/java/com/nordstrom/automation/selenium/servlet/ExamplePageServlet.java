@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * tests. By default, this servlet is installed on the hub server of the local <b>Selenium Grid</b> instance. This
  * behavior can be overridden via the {@link SeleniumSettings#GRID_EXAMPLES GRID_EXAMPLES} setting.
  */
+@WebServlet(name = "ExamplePageServlet", urlPatterns = {"/grid/admin/ExamplePageServlet"})
 public class ExamplePageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -2195313096162880627L;
@@ -62,6 +64,7 @@ public class ExamplePageServlet extends HttpServlet {
         return inputStream.readAllBytes();
     }
 
+    @WebServlet(name = "FrameA_Servlet", urlPatterns = {"/grid/admin/FrameA_Servlet"})
     public static class FrameA_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 4547909165192240389L;
@@ -72,6 +75,7 @@ public class ExamplePageServlet extends HttpServlet {
         }
     }
 
+    @WebServlet(name = "FrameB_Servlet", urlPatterns = {"/grid/admin/FrameB_Servlet"})
     public static class FrameB_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 5903212244921125263L;
@@ -82,6 +86,7 @@ public class ExamplePageServlet extends HttpServlet {
         }
     }
 
+    @WebServlet(name = "FrameC_Servlet", urlPatterns = {"/grid/admin/FrameC_Servlet"})
     public static class FrameC_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 1448462233121165298L;
@@ -92,6 +97,7 @@ public class ExamplePageServlet extends HttpServlet {
         }
     }
 
+    @WebServlet(name = "FrameD_Servlet", urlPatterns = {"/grid/admin/FrameD_Servlet"})
     public static class FrameD_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 1444648483821114876L;
