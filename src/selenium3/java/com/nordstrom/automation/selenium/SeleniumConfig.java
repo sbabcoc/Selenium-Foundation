@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -240,8 +241,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         
         String slotMatcher = getString(SeleniumSettings.SLOT_MATCHER.key());
         
-        // get configured hub servlet collection
-        Set<String> servlets = getHubServlets();
+        // get configured grid servlet collection
+        Set<String> servlets = getGridServlets();
         // merge with hub template servlets
         servlets.addAll(hubConfig.servlets);
         
@@ -289,9 +290,12 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         }
         
         // get configured node servlet collection
-        Set<String> servlets = getNodeServlets();
-        // merge with node template servlets
-        servlets.addAll(nodeConfig.servlets);
+        Set<String> servlets = new HashSet<>(nodeConfig.servlets);
+        // if remote shutdown feature is specified
+        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
+            // add lifecycle servlet to the collection
+            servlets.add(LifecycleServlet.class.getName());
+        }
         
         // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
@@ -313,20 +317,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             }
         }
         return filePath;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> getNodeServlets() {
-        Set<String> servlets = super.getNodeServlets();
-        // if remote shutdown feature is specified
-        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
-            // add lifecycle servlet to the collection
-            servlets.add(LifecycleServlet.class.getName());
-        }
-        return servlets;
     }
     
     /**
