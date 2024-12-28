@@ -1,9 +1,22 @@
 def driverPlugins = System.getProperty('selenium.grid.plugins', '')
 System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.OperaPlugin' + File.pathSeparator)
 System.setProperty('selenium.browser.name', 'opera')
+System.setProperty('selenium.browser.caps', '{"browserName":"opera","platformName":"Windows","appium:automationName":"Opera"}')
 System.setProperty('selenium.context.platform', 'web-app')
-dependencies {
-  testImplementation('org.seleniumhq.selenium:selenium-opera-driver') {
-    exclude module: 'selenium-remote-driver'
+
+if (ext.profile == 'selenium4') {
+  System.setProperty('appium.with.pm2', 'true')
+  dependencies {
+    testImplementation('io.appium:java-client') {
+      exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'
+      exclude group: 'org.seleniumhq.selenium', module: 'selenium-support'
+      exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
+  }
+} else {
+  dependencies {
+    testImplementation('org.seleniumhq.selenium:selenium-opera-driver') {
+      exclude module: 'selenium-remote-driver'
+    }
   }
 }

@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.DriverExecutableNotFoundException;
 import com.nordstrom.automation.selenium.utility.BinaryFinder;
 
@@ -21,6 +24,10 @@ public class ChromeCaps {
     public static final String SILENT_MODE = "webdriver.chrome.silentOutput";
     public static final String WHITELISTED = "webdriver.chrome.whitelistedIps";
     public static final String OPTIONS_KEY = "goog:chromeOptions";
+    
+    public static final String OPERA_NAME = "opera";
+    public static final String PLACEHOLDER = "<opera-binary-path>";
+    
     private static final String[] PROPERTY_NAMES = 
         { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE, WHITELISTED };
     
@@ -41,12 +48,24 @@ public class ChromeCaps {
              "\"nord:options\":{\"personality\":\"chrome.headless\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"}}";
     
+    private static final String OPERA = 
+            "{\"browserName\":\"opera\"," +
+             "\"goog:chromeOptions\":{\"args\":[\"--disable-infobars\"]," +
+                                     "\"prefs\":{\"credentials_enable_service\":false}}," +
+                                     "\"binary\":\"" + PLACEHOLDER + "\"," +
+             "\"nord:options\":{\"personality\":\"opera\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.ChromePlugin\"}}";
+    
     private static final Map<String, String> PERSONALITIES;
     
     static {
         Map<String, String> personalities = new HashMap<>();
         personalities.put(DRIVER_NAME, BASELINE);
         personalities.put(DRIVER_NAME + ".headless", HEADLESS);
+        String operaPath = SeleniumConfig.getConfig().getString(SeleniumSettings.OPERA_BINARY_PATH.key());
+        if (operaPath != null) {
+            personalities.put(OPERA_NAME, OPERA.replace(PLACEHOLDER, operaPath));
+        }
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
