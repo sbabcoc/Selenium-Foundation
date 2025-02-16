@@ -408,7 +408,29 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>appium.with.pm2</b><br>
          * default: {@code false}
          */
-        APPIUM_WITH_PM2("appium.with.pm2", "false");
+        APPIUM_WITH_PM2("appium.with.pm2", "false"),
+        
+        /**
+         * This setting specifies the path to the {@code Opera} browser binary.
+         * <p>
+         * <b>NOTE</b>: If this setting is defined, the <b>opera</b> personality of <b>ChromePlugin</b> is activated,
+         * assigning the value of the setting to the {@code binary} option of the <b>goog:chromeOptions</b> object.
+         * <p>
+         * name: <b>opera.driver.path</b><br>
+         * default: {@code null}
+         */
+        OPERA_DRIVER_PATH("opera.driver.path", null),
+        
+        /**
+         * This setting specifies the path to the {@code Opera} browser binary.
+         * <p>
+         * <b>NOTE</b>: If this setting is defined, the <b>opera</b> personality of <b>ChromePlugin</b> is activated,
+         * assigning the value of the setting to the {@code binary} option of the <b>goog:chromeOptions</b> object.
+         * <p>
+         * name: <b>opera.binary.path</b><br>
+         * default: {@code null}
+         */
+        OPERA_BINARY_PATH("opera.binary.path", null);
         
         private String propertyName;
         private String defaultValue;
