@@ -38,6 +38,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.net.NetworkUtils;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,6 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
-import com.nordstrom.automation.selenium.utility.NetIdentity;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.uri.UriUtils;
@@ -57,7 +57,7 @@ import com.nordstrom.common.uri.UriUtils;
 public final class GridUtility {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
-    private static final NetIdentity IDENTITY = new NetIdentity();
+    private static final NetworkUtils IDENTITY = new NetworkUtils();
     
     /**
      * Private constructor to prevent instantiation.
@@ -310,7 +310,7 @@ public final class GridUtility {
      * @return IP address for the machine we're running on (a.k.a. - 'localhost')
      */
     public static String getLocalHost() {
-        return IDENTITY.getHostAddress();
+        return IDENTITY.getNonLoopbackAddressOfThisMachine();
     }
     
     /**
