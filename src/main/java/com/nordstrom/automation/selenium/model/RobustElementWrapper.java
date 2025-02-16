@@ -152,9 +152,9 @@ public class RobustElementWrapper implements ReferenceFetcher {
     }
     
     /**
-     * This is the method that intercepts component container methods in "enhanced" model objects.
+     * This is the method that intercepts <b>WebElement</b> methods in "wrapped" element objects.
      * 
-     * @param obj "enhanced" object upon which the method was invoked
+     * @param obj "wrapped" object upon which the method was invoked
      * @param method {@link Method} object for the invoked method
      * @param args method invocation arguments
      * @return {@code anything} (the result of invoking the intercepted method)
@@ -205,7 +205,9 @@ public class RobustElementWrapper implements ReferenceFetcher {
     }
     
     /**
-     * {@inheritDoc}
+     * Get the <b>WebElement</b> object contained within this wrapper.
+     * 
+     * @return unwrapped {@link WebElement} object
      */
     @Override
     public WebElement getWrappedElement() {
