@@ -451,7 +451,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         }
         
         // convert capabilities string to List<Map<String, Object>>
-        List<Map<String, Object>> capsMapList = new Json().toType("[" + capabilities + "]", LIST_OF_MAPS_TYPE);
+        String capsList = (capabilities.startsWith("[")) ? capabilities : "[" + capabilities + "]";
+        List<Map<String, Object>> capsMapList = new Json().toType(capsList, LIST_OF_MAPS_TYPE);
         
         List<MutableCapabilities> capabilitiesList = capsMapList.stream()
                  .map(MutableCapabilities::new)
@@ -501,7 +502,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public Capabilities[] getCapabilitiesForJson(String capabilities) {
-        List<Map<String, Object>> capsMapList = new Json().toType("[" + capabilities + "]", LIST_OF_MAPS_TYPE);
+        String capsList = (capabilities.startsWith("[")) ? capabilities : "[" + capabilities + "]";
+        List<Map<String, Object>> capsMapList = new Json().toType(capsList, LIST_OF_MAPS_TYPE);
         return capsMapList.stream().map(MutableCapabilities::new).collect(Collectors.toList()).toArray(new Capabilities[0]);
     }
 

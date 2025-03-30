@@ -62,7 +62,7 @@ public class ShadowRootComponent extends ShadowRoot {
     }
     
     public String getInputValue() {
-        return findElement(Using.INPUT).getAttribute("value");
+        return getDomPropertyOfElement(Using.INPUT, "value");
     }
     
     public String getCheckLocator() {
