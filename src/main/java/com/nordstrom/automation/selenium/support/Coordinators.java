@@ -607,7 +607,7 @@ public final class Coordinators {
             @Override
             public Boolean apply(SearchContext context) {
                 try {
-                    String elementText = context.findElement(locator).getAttribute("value");
+                    String elementText = WebDriverUtils.getDomPropertyOf(context.findElement(locator), "value");
                     return elementText != null && elementText.contains(text);
                 } catch (StaleElementReferenceException | NoSuchElementException e) {
                     return null;
@@ -653,7 +653,7 @@ public final class Coordinators {
             @Override
             public Boolean apply(SearchContext context) {
                 try {
-                    String attrib = context.findElement(locator).getAttribute(attribute);
+                    String attrib = WebDriverUtils.getDomPropertyOf(context.findElement(locator), attribute);
                     if (attrib != null) {
                         return attrib.equals(value);
                     } else {

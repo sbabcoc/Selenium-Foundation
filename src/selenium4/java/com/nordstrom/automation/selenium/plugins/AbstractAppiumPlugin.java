@@ -14,8 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -84,6 +86,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
     private static final String APPIUM_WITH_PM2 = "{\"nord:options\":{\"appiumWithPM2\":true}}";
+    private static final String APPIUM_HOME = "APPIUM_HOME";
     
     private final String browserName;
     
@@ -203,6 +206,12 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add("--use-drivers");
         argsList.add(getBrowserName().toLowerCase());
         
+        // UiAutomator2: enable ChromeDriver auto-download
+        if (getBrowserName().equalsIgnoreCase("uiautomator2")) {
+            argsList.add(0, "chromedriver_autodownload");
+            argsList.add(0, "--allow-insecure");
+        }
+        
         // specify server port
         argsList.add(0, portNum.toString());
         argsList.add(0, "--port");
@@ -259,6 +268,9 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         
         // store path to relay configuration in Appium process environment
         builder.environment().put("nodeConfigPath", nodeConfigPath.toString());
+        // set APPIUM_HOME to work around auto-detection issue
+        builder.environment().put(APPIUM_HOME, Optional.ofNullable(System.getenv(APPIUM_HOME))
+                .orElse(System.getProperty("user.home") + File.separator + ".appium"));
         return new AppiumGridServer(address, portNum, false, builder, workingPath, outputPath);
     }
 
@@ -310,9 +322,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         if (!config.appiumWithPM2()) return nodeCapabilities;
         
         // add indication of stand-alone execution of 'appium' with 'pm2'
-        Capabilities capabilities = config.getCapabilitiesForJson(nodeCapabilities)[0];
         Capabilities nordOptions = config.getCapabilitiesForJson(APPIUM_WITH_PM2)[0];
-        return config.toJson(config.mergeCapabilities(capabilities, nordOptions));
+        return config.toJson(Arrays.stream(config.getCapabilitiesForJson(nodeCapabilities))
+            .map(capabilities -> config.mergeCapabilities(capabilities, nordOptions))
+            .collect(Collectors.toList()));
     }
     
     /**

@@ -34,8 +34,10 @@ public final class WebDriverUtils {
             .unmodifiableList(Arrays.asList(NotFoundException.class, ElementNotInteractableException.class,
                     UnhandledAlertException.class, StaleElementReferenceException.class, TimeoutException.class));
 
-    private static final Pattern FRAMEWORK_PACKAGE = Pattern.compile("^(?:sun\\.reflect|java\\.lang"
-            + "|org\\.(?:openqa|testng|junit|hamcrest)|com\\.nordstrom\\.automation\\.selenium)\\.");
+    private static final Pattern FRAMEWORK_PACKAGE = Pattern.compile(
+            "^(?:sun\\.reflect|java\\.lang"
+            + "|org\\.(?:openqa|testng|junit|hamcrest)"
+            + "|com\\.nordstrom\\.automation\\.selenium)\\.");
 
     /**
      * Private constructor to prevent instantiation.
@@ -126,6 +128,28 @@ public final class WebDriverUtils {
         return (driver instanceof HasCapabilities) ? ((HasCapabilities) driver).getCapabilities() : null;
     }
 
+    /**
+     * Get the value of the named DOM property of the specified WebElement.
+     * 
+     * @param element the target element
+     * @param name the name of the property
+     * @return the property's current value or {@code null} if the value is not set
+     */
+    public static String getDomPropertyOf(final WebElement element, final String name) {
+        return element.getDomProperty(name);
+    }
+    
+    /**
+     * Get the value of the named DOM attribute of the specified WebElement.
+     * 
+     * @param element the target element
+     * @param name the name of the attribute
+     * @return the attribute's value or {@code null} if the value is not set
+     */
+    public static String getDomAttributeOf(final WebElement element, final String name) {
+        return element.getDomAttribute(name);
+    }
+    
     /**
      * Remove hidden elements from specified list.
      * 

@@ -374,6 +374,50 @@ public abstract class ComponentContainer
     }
     
     /**
+     * Get the value of the named DOM property of the first WebElement matching the specified locator constant.
+     * 
+     * @param constant the locator constant
+     * @param name the name of the property
+     * @return the property's current value or {@code null} if the value is not set
+     */
+    public String getDomPropertyOfElement(final ByEnum constant, final String name) {
+        return getDomPropertyOfElement(constant.locator(), name);
+    }
+    
+    /**
+     * Get the value of the named DOM property of the first WebElement matching the specified locator.
+     * 
+     * @param by the locating mechanism
+     * @param name the name of the property
+     * @return the property's current value or {@code null} if the value is not set
+     */
+    public String getDomPropertyOfElement(final By by, final String name) {
+        return WebDriverUtils.getDomPropertyOf(findElement(by), name);
+    }
+    
+    /**
+     * Get the value of the named DOM attribute of the first WebElement matching the specified locator constant.
+     * 
+     * @param constant the locator constant
+     * @param name the name of the attribute
+     * @return the attribute's value or {@code null} if the value is not set
+     */
+    public String getDomAttributeOfElement(final ByEnum constant, final String name) {
+        return getDomAttributeOfElement(constant.locator(), name);
+    }
+    
+    /**
+     * Get the value of the named DOM attribute of the first WebElement matching the specified locator.
+     * 
+     * @param by the locating mechanism
+     * @param name the name of the attribute
+     * @return the attribute's value or {@code null} if the value is not set
+     */
+    public String getDomAttributeOfElement(final By by, final String name) {
+        return WebDriverUtils.getDomAttributeOf(findElement(by), name);
+    }
+    
+    /**
      * Get the driver object associated with this container.
      * 
      * @return container driver object
@@ -394,7 +438,7 @@ public abstract class ComponentContainer
         Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
         String tagName = element.getTagName().toLowerCase();
-        if ("input".equals(tagName) && "checkbox".equals(element.getAttribute("type"))) {
+        if ("input".equals(tagName) && "checkbox".equals(WebDriverUtils.getDomAttributeOf(element, "type"))) {
             if (element.isSelected() != value) {
                 element.click();
                 return true;
@@ -418,7 +462,7 @@ public abstract class ComponentContainer
         
         String tagName = element.getTagName().toLowerCase();
         if ("input".equals(tagName)) {
-            if ("checkbox".equals(element.getAttribute("type"))) {
+            if ("checkbox".equals(WebDriverUtils.getDomAttributeOf(element, "type"))) {
                 return updateValue(element, Boolean.parseBoolean(value));
             } else if (!valueEquals(element, value)) {
                 if (WebDriverUtils.isJavascriptEnabled(element)) {
@@ -426,7 +470,7 @@ public abstract class ComponentContainer
                             element, (value != null) ? value : "");
                 } else {
                     StringBuilder keys = new StringBuilder();
-                    String exist = element.getAttribute("value");
+                    String exist = WebDriverUtils.getDomPropertyOf(element, "value");
                     if (!(exist == null || exist.isEmpty())) {
                         keys.append(Keys.END);
                         for (int i = 0; i < exist.length(); i++) {
@@ -457,7 +501,7 @@ public abstract class ComponentContainer
     private static boolean valueEquals(final WebElement element, final String value) {
         Objects.requireNonNull(element, ELEMENT_MESSAGE);
         
-        String exist = element.getAttribute("value");
+        String exist = WebDriverUtils.getDomPropertyOf(element, "value");
         return (exist != null) ? exist.equals(value) : (value == null);
     }
     
@@ -599,6 +643,7 @@ public abstract class ComponentContainer
      * @param url target URL or activity
      * @param driver driver object
      */
+    @SuppressWarnings("serial")
     public static void getUrl(final String url, final WebDriver driver) {
         Objects.requireNonNull(url, "[url] must be non-null");
         Objects.requireNonNull(driver, "[driver] must be non-null");

@@ -362,7 +362,7 @@ public class ExamplePage extends Page {
      * @return input field value
      */
     public String getInputValue() {
-        return findElement(Using.INPUT).getAttribute("value");
+        return getDomPropertyOfElement(Using.INPUT, "value");
     }
     
     /**
