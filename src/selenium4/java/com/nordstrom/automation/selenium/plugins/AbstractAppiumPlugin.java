@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -301,9 +302,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         if (!config.appiumWithPM2()) return nodeCapabilities;
         
         // add indication of stand-alone execution of 'appium' with 'pm2'
-        Capabilities capabilities = config.getCapabilitiesForJson(nodeCapabilities)[0];
         Capabilities nordOptions = config.getCapabilitiesForJson(APPIUM_WITH_PM2)[0];
-        return config.toJson(config.mergeCapabilities(capabilities, nordOptions));
+        return config.toJson(Arrays.stream(config.getCapabilitiesForJson(nodeCapabilities))
+            .map(capabilities -> config.mergeCapabilities(capabilities, nordOptions))
+            .collect(Collectors.toList()));
     }
     
     /**

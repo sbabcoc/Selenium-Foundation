@@ -19,7 +19,7 @@ import com.nordstrom.automation.selenium.plugins.XCUITestPlugin;
 
 public enum TargetType implements TargetTypeName {
     SUPPORT(SUPPORT_NAME),
-    WEB_APP(WEB_APP_NAME, RemoteWebDriverPlugin.class),
+    WEB_APP(WEB_APP_NAME, RemoteWebDriverPlugin.class, UiAutomator2Plugin.class, EspressoPlugin.class),
     ANDROID(ANDROID_NAME, UiAutomator2Plugin.class, EspressoPlugin.class),
     IOS_APP(IOS_APP_NAME, XCUITestPlugin.class),
     MAC_APP(MAC_APP_NAME, Mac2Plugin.class),
