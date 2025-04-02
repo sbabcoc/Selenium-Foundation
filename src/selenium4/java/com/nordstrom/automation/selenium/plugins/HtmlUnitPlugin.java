@@ -63,11 +63,11 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
             "org.apache.http.entity.mime.MIME", "org.apache.commons.codec.Encoder", "org.apache.commons.io.IOUtils",
             "org.apache.commons.logging.Log", "org.htmlunit.jetty.websocket.client.WebSocketClient",
             "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint", "org.htmlunit.jetty.websocket.common.Parser",
-            "org.htmlunit.jetty.websocket.api.Session", "org.apache.commons.net.io.Util",
-            "org.htmlunit.jetty.client.Origin", "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils",
-            "net.bytebuddy.matcher.ElementMatcher", "org.htmlunit.corejs.javascript.Symbol",
-            "org.htmlunit.cssparser.parser.CSSErrorHandler", "org.htmlunit.cyberneko.xerces.xni.XNIException",
-            "org.htmlunit.xpath.xml.utils.PrefixResolver", "org.htmlunit.WebClientOptions" };
+            "org.htmlunit.jetty.websocket.api.Session", "org.htmlunit.jetty.client.Origin",
+            "org.eclipse.jetty.http.Syntax", "org.brotli.dec.Utils", "net.bytebuddy.matcher.ElementMatcher",
+            "org.htmlunit.corejs.javascript.Symbol", "org.htmlunit.cssparser.parser.CSSErrorHandler",
+            "org.htmlunit.cyberneko.xerces.xni.XNIException", "org.htmlunit.xpath.xml.utils.PrefixResolver",
+            "org.htmlunit.WebClientOptions" };
     
     private static final String WEB_ELEMENT_CLASS_NAME =
             "org.openqa.selenium.htmlunit.HtmlUnitWebElement";
