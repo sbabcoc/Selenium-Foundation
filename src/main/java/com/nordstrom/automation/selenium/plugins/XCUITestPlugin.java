@@ -15,12 +15,17 @@ public class XCUITestPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\",\"browserName\":\"Safari\"," +
-             "\"appium:deviceName\":\"iPhone Simulator\"}";
+            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\"}," +
+            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\",\"browserName\":\"safari\"}";
     
     private static final String BASELINE =
             "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\"," +
              "\"nord:options\":{\"personality\":\"XCUITest\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.XCUITestPlugin\"}}";
+    
+    private static final String SAFARI =
+            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\",\"browserName\":\"safari\"," +
+             "\"nord:options\":{\"personality\":\"XCUITest.safari\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.XCUITestPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
@@ -30,6 +35,7 @@ public class XCUITestPlugin extends AbstractAppiumPlugin {
     static {
         Map<String, String> personalities = new HashMap<>();
         personalities.put(DRIVER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME + ".safari", SAFARI);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     

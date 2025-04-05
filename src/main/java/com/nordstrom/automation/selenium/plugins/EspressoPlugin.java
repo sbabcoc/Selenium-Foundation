@@ -15,12 +15,18 @@ public class EspressoPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"Espresso\",\"platformName\":\"Android\"}";
+            "{\"appium:automationName\":\"Espresso\",\"platformName\":\"Android\"}," +
+            "{\"appium:automationName\":\"Espresso\",\"platformName\":\"Android\",\"browserName\":\"chrome\"}";
     
     private static final String BASELINE =
             "{\"appium:automationName\":\"Espresso\",\"platformName\":\"Android\"," +
              "\"nord:options\":{\"personality\":\"Espresso\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EspressoPlugin\"}}";
+    
+    private static final String CHROME =
+            "{\"appium:automationName\":\"Espresso\",\"platformName\":\"Android\",\"browserName\":\"chrome\"," +
+                    "\"nord:options\":{\"personality\":\"Espresso.chrome\"," +
+                                      "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.EspressoPlugin\"}}";
     
     private static final Map<String, String> PERSONALITIES;
     
@@ -29,6 +35,7 @@ public class EspressoPlugin extends AbstractAppiumPlugin {
     static {
         Map<String, String> personalities = new HashMap<>();
         personalities.put(DRIVER_NAME, BASELINE);
+        personalities.put(DRIVER_NAME + ".chrome", CHROME);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
