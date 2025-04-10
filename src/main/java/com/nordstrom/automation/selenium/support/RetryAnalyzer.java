@@ -3,16 +3,13 @@ package com.nordstrom.automation.selenium.support;
 import org.openqa.selenium.WebDriverException;
 import org.testng.ITestResult;
 
-import com.nordstrom.automation.testng.RetryManager;
+import com.nordstrom.automation.testng.TestNGRetryAnalyzer;
 
-public class RetryAnalyzer extends RetryManager {
+public class RetryAnalyzer implements TestNGRetryAnalyzer {
     
     @Override
-    protected boolean isRetriable(ITestResult result) {
-        if (result.getThrowable() instanceof WebDriverException) {
-            return true;
-        }
-        return super.isRetriable(result);
+    public boolean retry(ITestResult result) {
+        return (result.getThrowable() instanceof WebDriverException);
     }
 
 }

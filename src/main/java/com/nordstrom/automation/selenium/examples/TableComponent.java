@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.PageComponent;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
@@ -68,7 +69,7 @@ public class TableComponent extends PageComponent {
     }
     
     public static Object getKey(SearchContext context) {
-        return ((WebElement) context).getAttribute("id");
+        return WebDriverUtils.getDomAttributeOf((WebElement) context, "id");
     }
 
     @Override

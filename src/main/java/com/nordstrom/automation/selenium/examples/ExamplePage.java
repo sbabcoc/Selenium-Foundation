@@ -218,7 +218,7 @@ public class ExamplePage extends Page {
     }
     
     public String getInputValue() {
-        return findElement(Using.INPUT).getAttribute("value");
+        return getDomPropertyOfElement(Using.INPUT, "value");
     }
     
     public String getCheckLocator() {

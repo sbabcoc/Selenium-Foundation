@@ -24,7 +24,7 @@ sourceSets {
   
 dependencies {
   constraints {
-    api 'com.nordstrom.tools:testng-foundation:5.1.3-j11'
+    api 'com.nordstrom.tools:testng-foundation:5.2.0-j11-SNAPSHOT'
     api 'org.seleniumhq.selenium:selenium-grid:4.30.0'
     api 'org.seleniumhq.selenium:selenium-support:4.30.0'
     api 'org.seleniumhq.selenium:selenium-chrome-driver:4.30.0'
