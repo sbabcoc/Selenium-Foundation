@@ -2,8 +2,6 @@ package com.nordstrom.automation.selenium.junit;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
-import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
-
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -11,14 +9,12 @@ import org.junit.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.JUnitTargetRoot;
-import com.nordstrom.automation.selenium.platform.TargetPlatform;
 import com.nordstrom.common.file.PathUtils;
 
 @InitialPage(ExamplePage.class)
 public class ScreenshotCaptureTest extends JUnitTargetRoot {
     
     @Test
-    @TargetPlatform(WEB_APP_NAME)
     public void testScreenshotCapture() {
         ScreenshotCapture collector = screenshotCapture;
         assumeTrue(collector.getArtifactProvider().canGetArtifact(this));

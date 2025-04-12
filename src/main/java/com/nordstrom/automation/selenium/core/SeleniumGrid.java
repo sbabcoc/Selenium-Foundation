@@ -76,7 +76,7 @@ public class SeleniumGrid {
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
     /**
-     * Constructor for Selenium Grid from hub URL.
+     * Constructor for models of Selenium Grid instances from hub URL.
      * <p>
      * This is used to create an interface for an active grid - remote or local.
      * 

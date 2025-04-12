@@ -83,7 +83,7 @@ The **`HUB_HOST`** setting specifies the URL of the **Selenium Grid** hub server
 
 > If this setting is left undefined or specifies an inactive `localhost` URL, **Selenium Foundation** will automatically launch a local Grid instance as specified by the [local Grid configuration](LocalGridConfiguration.md).
 
-The **`GRID_PLUGINS`** setting specifies a semicolon-delimited list of fully-qualified names of local **Selenium Grid** driver plugin classes.
+The **`GRID_PLUGINS`** setting specifies a semicolon-delimited list of fully-qualified names of local **Selenium Grid** driver plug-in classes.
 
 **NOTE**: Defining a value for this setting overrides the **ServiceLoader** specification defined by the associated provider configuration file (_com.nordstrom.automation.selenium.DriverPlugin_).
 
@@ -99,7 +99,7 @@ The **`GRID_PLUGINS`** setting specifies a semicolon-delimited list of fully-qua
 
 #### Grid Configuration for Selenium Foundation unit tests
 
-By default, the unit tests are [configured](LocalGridConfiguration.md) to run the "support" tests, which don't require browser sessions. The local Grid instance launched for this configuration runs in "servlet container" mode. The Gradle project file defines a set of profiles, one for each supported browser, which specify the corresponding dependencies, settings, and driver plugin needed to run the unit tests for that browser.
+By default, the unit tests are [configured](LocalGridConfiguration.md) to run the "support" tests, which don't require browser sessions. The local Grid instance launched for this configuration runs in "servlet container" mode. The Gradle project file defines a set of profiles, one for each supported browser, which specify the corresponding dependencies, settings, and driver plug-in needed to run the unit tests for that browser.
 
 | Profile | Browser / Appium Engine |
 | --- |:---:|

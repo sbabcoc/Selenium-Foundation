@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -22,21 +22,40 @@ import com.nordstrom.automation.selenium.model.RobustWebElement;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
 import com.nordstrom.common.uri.UriUtils;
 
+/**
+ * This class is the model for the 'Example' page used by Selenium Foundation unit tests.
+ */
 @PageUrl("/grid/admin/ExamplePageServlet")
 public class ExamplePage extends Page {
 
+    /** page title */
     public static final String TITLE = "Example Page";
+    /** text content of example paragraphs collection */
     public static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
+    /** text content of example table headers collection */
     public static final String[] HEADINGS = {"Firstname", "Lastname", "Age"};
+    /** text content of example table rows collection */
     public static final String[][] CONTENT = {{"Jill", "Smith", "50"}, {"Eve", "Jackson", "94"}, {"John", "Doe", "80"}};
+    /** text content of example frame 'A' */
     public static final String FRAME_A = "Frame A";
+    /** text content of example frame 'B' */
     public static final String FRAME_B = "Frame B";
+    /** text content of example frame 'C' */
     public static final String FRAME_C = "Frame C";
+    /** text content of example frame 'D' */
     public static final String FRAME_D = "Frame D";
+    /** example table context element identifier */
     public static final String TABLE_ID = "t1";
+    /** text content of example shadow DOM 'A' */
     public static final String SHADOW_DOM_A = "Shadow DOM A";
+    /** text content of example shadow DOM 'B' */
     public static final String SHADOW_DOM_B = "Shadow DOM B";
     
+    /**
+     * Constructor for main view context.
+     * 
+     * @param driver driver object
+     */
     public ExamplePage(WebDriver driver) {
         super(driver);
     }
@@ -57,25 +76,46 @@ public class ExamplePage extends Page {
     private Map<Object, ShadowRootComponent> shadowRootMap;
     private int refreshCount;
     
+    /** identifier for frame 'A' */
     protected static final String FRAME_A_ID = "frame-a";
+    /** identifier for frame 'B' */
     protected static final String FRAME_B_ID = "frame-b";
+    /** identifier for frame 'C' */
     protected static final String FRAME_C_ID = "frame-c";
+    /** identifier for frame 'D' */
     protected static final String FRAME_D_ID = "frame-d";
 
+    /**
+     * This enumeration defines element locator constants.
+     */
     protected enum Using implements ByEnum {
+        /** common locator for frame elements */
         FRAME(By.cssSelector("iframe[id^='frame-']")),
+        /** frame element 'A' */
         FRAME_A(By.cssSelector("iframe#frame-a")),
+        /** frame element 'B' */
         FRAME_B(By.cssSelector("iframe#frame-b")),
+        /** frame element 'C' */
         FRAME_C(By.cssSelector("iframe#frame-c")),
+        /** frame element 'D' */
         FRAME_D(By.cssSelector("iframe#frame-d")),
+        /** common locator for paragraph elements */
         PARA(By.cssSelector("p[id^='para-']")),
+        /** table element */
         TABLE(By.cssSelector("table#t1")),
+        /** form element */
         FORM(By.tagName("form")),
+        /** input field element */
         INPUT(By.cssSelector("input#input-field")),
+        /** check box element */
         CHECK(By.cssSelector("input#checkbox")),
+        /** common locator shadow root elements */
         SHADOW_ROOT(By.cssSelector("div[id^='shadow-root-']")),
+        /** shadow root element 'A' */
         SHADOW_ROOT_A(By.cssSelector("div#shadow-root-a")),
+        /** shadow root element 'B' */
         SHADOW_ROOT_B(By.cssSelector("div#shadow-root-b")),
+        /** division element */
         FORM_DIV(By.cssSelector("div#form-div"));
         
         private final By locator;
@@ -90,6 +130,11 @@ public class ExamplePage extends Page {
         }
     }
     
+    /**
+     * Get the automation component that models frame 'A' via the associated element locator.
+     * 
+     * @return {@link FrameComponent} model for frame 'A'
+     */
     public FrameComponent getFrameByLocator() {
         if (frameByLocator == null) {
             frameByLocator = new FrameComponent(Using.FRAME_A.locator, this);
@@ -97,6 +142,11 @@ public class ExamplePage extends Page {
         return frameByLocator;
     }
     
+    /**
+     * Get the automation component that models frame 'B' via the associated element reference.
+     * 
+     * @return {@link FrameComponent} model for frame 'B'
+     */
     public FrameComponent getFrameByElement() {
         if (frameByElement == null) {
             RobustWebElement element = (RobustWebElement) findElement(Using.FRAME_B);
@@ -105,6 +155,11 @@ public class ExamplePage extends Page {
         return frameByElement;
     }
     
+    /**
+     * Get the automation component that models frame 'C' via element list index.
+     * 
+     * @return {@link FrameComponent} model for frame 'C'
+     */
     public FrameComponent getFrameByIndex() {
         if (frameByIndex == null) {
             frameByIndex = new FrameComponent(2, this);
@@ -112,6 +167,11 @@ public class ExamplePage extends Page {
         return frameByIndex;
     }
     
+    /**
+     * Get the automation component that models frame 'D' via element identifier.
+     * 
+     * @return {@link FrameComponent} model for frame 'D'
+     */
     public FrameComponent getFrameById() {
         if (frameById == null) {
             frameById = new FrameComponent(FRAME_D_ID, this);
@@ -119,11 +179,20 @@ public class ExamplePage extends Page {
         return frameById;
     }
     
+    /**
+     * Get text content of the paragraphs collection.
+     * 
+     * @return list of paragraph strings
+     */
     public List<String> getParagraphs() {
-        List<WebElement> paraList = findElements(Using.PARA);
-        return Arrays.asList(paraList.get(0).getText(), paraList.get(1).getText(), paraList.get(2).getText());
+        return findElements(Using.PARA).stream().map(WebElement::getText).collect(Collectors.toList());
     }
     
+    /**
+     * Get the automation component the models the example form.
+     * 
+     * @return {@link FormComponent} model
+     */
     public FormComponent getForm() {
         if (form == null) {
             form = new FormComponent(Using.FORM_DIV.locator, this);
@@ -131,6 +200,11 @@ public class ExamplePage extends Page {
         return form;
     }
     
+    /**
+     * Get the automation component that models the first table.
+     * 
+     * @return {@link TableComponent} model for example table
+     */
     public TableComponent getTable() {
         if (table == null) {
             table = new TableComponent(Using.TABLE.locator, this);
@@ -138,6 +212,11 @@ public class ExamplePage extends Page {
         return table;
     }
     
+    /**
+     * Get a list of automation components that model the tables collection.
+     *  
+     * @return list of {@link TableComponent} models
+     */
     public List<TableComponent> getTableList() {
         if (tableList == null) {
             tableList = newComponentList(TableComponent.class, Using.TABLE.locator);
@@ -145,6 +224,11 @@ public class ExamplePage extends Page {
         return tableList;
     }
     
+    /**
+     * Get a map of automation components that model the tables collection.
+     * 
+     * @return map of {@link TableComponent} models keyed by element identifier
+     */
     public Map<Object, TableComponent> getTableMap() {
         if (tableMap == null) {
             tableMap = newComponentMap(TableComponent.class, Using.TABLE.locator);
@@ -152,6 +236,11 @@ public class ExamplePage extends Page {
         return tableMap;
     }
     
+    /**
+     * Get a list of automation components that model the frames collection.
+     * 
+     * @return list of {@link FrameComponent} models
+     */
     public List<FrameComponent> getFrameList() {
         if (frameList == null) {
             frameList = newFrameList(FrameComponent.class, Using.FRAME.locator);
@@ -159,6 +248,11 @@ public class ExamplePage extends Page {
         return frameList;
     }
     
+    /**
+     * Get a map of automation components that model the frames collection.
+     * 
+     * @return map of {@link FrameComponent} models keyed by heading text
+     */
     public Map<Object, FrameComponent> getFrameMap() {
         if (frameMap == null) {
             frameMap = newFrameMap(FrameComponent.class, Using.FRAME.locator);
@@ -166,6 +260,11 @@ public class ExamplePage extends Page {
         return frameMap;
     }
     
+    /**
+     * Get the automation component that models shadow root 'A' via the associated element locator.
+     * 
+     * @return {@link ShadowRootComponent} model for shadow root 'A'
+     */
     public ShadowRootComponent getShadowRootByLocator() {
         if (shadowRootByLocator == null) {
             shadowRootByLocator = new ShadowRootComponent(Using.SHADOW_ROOT_A.locator, this);
@@ -173,6 +272,11 @@ public class ExamplePage extends Page {
         return shadowRootByLocator;
     }
     
+    /**
+     * Get the automation component that models shadow root 'B' via the associated element reference.
+     * 
+     * @return {@link ShadowRootComponent} model for shadow root 'B'
+     */
     public ShadowRootComponent getShadowRootByElement() {
         if (shadowRootByElement == null) {
             RobustWebElement element = (RobustWebElement) findElement(Using.SHADOW_ROOT_B);
@@ -181,6 +285,11 @@ public class ExamplePage extends Page {
         return shadowRootByElement;
     }
     
+    /**
+     * Get a list of automation components that model the shadow root collection.
+     *  
+     * @return list of {@link ShadowRootComponent} models
+     */
     public List<ShadowRootComponent> getShadowRootList() {
         if (shadowRootList == null) {
             shadowRootList = newComponentList(ShadowRootComponent.class, Using.SHADOW_ROOT.locator);
@@ -188,6 +297,11 @@ public class ExamplePage extends Page {
         return shadowRootList;
     }
     
+    /**
+     * Get a map of automation components that model the shadow root collection.
+     * 
+     * @return map of {@link ShadowRootComponent} models keyed by heading text
+     */
     public Map<Object, ShadowRootComponent> getShadowRootMap() {
         if (shadowRootMap == null) {
             shadowRootMap = newComponentMap(ShadowRootComponent.class, Using.SHADOW_ROOT.locator);
@@ -195,64 +309,139 @@ public class ExamplePage extends Page {
         return shadowRootMap;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchContext refreshContext(long expiration) {
         refreshCount++;
         return super.refreshContext(expiration);
     }
     
+    /**
+     * Get page refresh count.
+     * 
+     * @return page refresh count
+     */
     public int getRefreshCount() {
         return refreshCount;
     }
     
+    /**
+     * Get CSS locator string for the form input field.
+     * 
+     * @return input field locator string
+     */
     public String getInputLocator() {
         return ByType.cssLocatorFor(Using.INPUT);
     }
     
+    /**
+     * Set value of the form input field to specified string.
+     * 
+     * @param value input value string
+     * @return {@code true} if field value changed; otherwise {@code false}
+     */
     public boolean setInputValue(String value) {
         return updateValue(findElement(Using.INPUT), value);
     }
     
+    /**
+     * Set value of the form input field to specified boolean.
+     * 
+     * @param value input value boolean
+     * @return {@code true} if field value changed; otherwise {@code false}
+     */
     public boolean setInputValue(boolean value) {
         return updateValue(findElement(Using.INPUT), value);
     }
     
+    /**
+     * Get current value of the form input field.
+     * 
+     * @return input field value
+     */
     public String getInputValue() {
         return findElement(Using.INPUT).getAttribute("value");
     }
     
+    /**
+     * Get CSS locator string for the form check box.
+     * 
+     * @return check box locator string
+     */
     public String getCheckLocator() {
         return ByType.cssLocatorFor(Using.CHECK);
     }
     
+    /**
+     * Determine if the form check box is checked.
+     * 
+     * @return {@code true} if box is checked; otherwise {@code false}
+     */
     public boolean isBoxChecked() {
         return findElement(Using.CHECK).isSelected();
     }
     
+    /**
+     * Set value of the form check box to specified boolean.
+     * 
+     * @param value {@code true} to set 'checked' state; {@code false} to clear it
+     * @return {@code true} if 'checked' state changed; otherwise {@code false}
+     */
     public boolean setCheckValue(boolean value) {
         return updateValue(findElement(Using.CHECK), value);
     }
     
+    /**
+     * Set value of the form check box to specified string.
+     * 
+     * @param value "true" to set 'checked' state (case insensitive); all other values clear it
+     * @return {@code true} if 'checked' state changed; otherwise {@code false}
+     */
     public boolean setCheckValue(String value) {
         return updateValue(findElement(Using.CHECK), value);
     }
     
+    /**
+     * Reset all values in the form.
+     */
     public void resetForm() {
         JsUtility.run(driver, "document.getElementById('form').reset()");
     }
     
+    /**
+     * Determine if the example optional element is found via the associated CSS locator.
+     * 
+     * @return {@code true} if optional element if found; otherwise {@code false}
+     */
     public boolean hasCssOptional() {
         return findOptional(By.cssSelector(ByType.cssLocatorFor(Using.FORM))).hasReference();
     }
     
+    /**
+     * Determine if the example optional element is found via the associated XPath locator.
+     * 
+     * @return {@code true} if optional element if found; otherwise {@code false}
+     */
     public boolean hasXpathOptional() {
         return findOptional(By.xpath(ByType.xpathLocatorFor(Using.FORM))).hasReference();
     }
     
+    /**
+     * Determine if an optional element is found via a bogus locator.
+     * 
+     * @return this method should always return {@code false}
+     */
     public boolean hasBogusOptional() {
         return findOptional(By.tagName("BOGUS")).hasReference();
     }
 
+    /**
+     * Set the active Grid hub as the base URI for all relative loads of test pages.
+     * 
+     * @return {@link URI} for the active Grid hub
+     */
     public static URI setHubAsTarget() {
         URI targetUri = null;
         SeleniumConfig config = SeleniumConfig.getConfig();

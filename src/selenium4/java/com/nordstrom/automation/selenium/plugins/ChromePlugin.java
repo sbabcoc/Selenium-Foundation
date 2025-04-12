@@ -4,8 +4,14 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for <b>ChromeDriver</b>.
+ */
 public class ChromePlugin extends RemoteWebDriverPlugin {
     
+    /**
+     * Constructor for <b>ChromePlugin</b> objects.
+     */
     public ChromePlugin() {
         super(ChromeCaps.DRIVER_NAME);
     }
@@ -16,7 +22,23 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
      *  &lt;artifactId&gt;selenium-chrome-driver&lt;/artifactId&gt;
-     *  &lt;version&gt;3.141.59&lt;/version&gt;
+     *  &lt;version&gt;4.30.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>org.openqa.selenium.chrome.ChromiumDriver</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-chromium-driver&lt;/artifactId&gt;
+     *  &lt;version&gt;4.30.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>net.bytebuddy.matcher.ElementMatcher</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;net.bytebuddy&lt;/groupId&gt;
+     *  &lt;artifactId&gt;byte-buddy&lt;/artifactId&gt;
+     *  &lt;version&gt;1.17.5&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {

@@ -27,10 +27,19 @@ public class GridServer {
     private boolean isHub;
     private URL serverUrl;
     
+    /** base path for hub server URLs */
     public static final String HUB_BASE = "/wd/hub";
+    /** sub-path for Grid server 'status' endpoint */
     public static final String SERVER_STATUS = "/status";
+    /** sub-path for Grid server 'register' endpoint */
     public static final String GRID_REGISTER = "/grid/register";
     
+    /**
+     * Constructor for Grid server object.
+     * 
+     * @param url base {@link URL} for Grid server
+     * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
+     */
     public GridServer(URL url, boolean isHub) {
         this.isHub = isHub;
         this.serverUrl = url;

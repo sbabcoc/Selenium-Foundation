@@ -17,12 +17,45 @@ import com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin;
 import com.nordstrom.automation.selenium.plugins.WindowsPlugin;
 import com.nordstrom.automation.selenium.plugins.XCUITestPlugin;
 
+/**
+ * This enumeration defines a platform that associates test methods with target characteristics and supporting driver
+ * plug-in types.
+ */
 public enum TargetType implements TargetTypeName {
+    /**
+     * target: support feature<br>
+     * driver: (not-applicable)
+     */
     SUPPORT(SUPPORT_NAME),
+    
+    /**
+     * target: web application<br>
+     * driver: {@link RemoteWebDriverPlugin}
+     */
     WEB_APP(WEB_APP_NAME, RemoteWebDriverPlugin.class),
+    
+    /**
+     * target: Android application<br>
+     * driver: {@link UiAutomator2Plugin}, {@link EspressoPlugin}
+     */
     ANDROID(ANDROID_NAME, UiAutomator2Plugin.class, EspressoPlugin.class),
+    
+    /**
+     * target: iOS application<br>
+     * driver: {@link XCUITestPlugin}
+     */
     IOS_APP(IOS_APP_NAME, XCUITestPlugin.class),
+    
+    /**
+     * target: Macintosh application<br>
+     * driver: {@link Mac2Plugin}
+     */
     MAC_APP(MAC_APP_NAME, Mac2Plugin.class),
+    
+    /**
+     * target: Windows application<br>
+     * driver: {@link WindowsPlugin}
+     */
     WINDOWS(WINDOWS_NAME, WindowsPlugin.class);
     
     private String name;
@@ -33,11 +66,17 @@ public enum TargetType implements TargetTypeName {
         this.classes = classes;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return name;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean matches(String contextPlatform) {
         // always run 'support' tests

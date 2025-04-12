@@ -4,8 +4,14 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for <b>GhostDriver</b>.
+ */
 public class PhantomJsPlugin extends RemoteWebDriverPlugin {
     
+    /**
+     * Constructor for <b>GhostPlugin</b> objects.
+     */
     public PhantomJsPlugin() {
         super(PhantomJsCaps.DRIVER_NAME);
     }
@@ -23,6 +29,14 @@ public class PhantomJsPlugin extends RemoteWebDriverPlugin {
      *      &lt;artifactId&gt;*&lt;/artifactId&gt;
      *    &lt;/exclusion&gt;
      *  &lt;/exclusions&gt;
+     *&lt;/dependency&gt;</pre>
+     *
+     * <b>net.bytebuddy.matcher.ElementMatcher</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;net.bytebuddy&lt;/groupId&gt;
+     *  &lt;artifactId&gt;byte-buddy&lt;/artifactId&gt;
+     *  &lt;version&gt;1.17.5&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {

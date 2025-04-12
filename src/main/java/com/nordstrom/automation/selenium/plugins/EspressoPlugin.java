@@ -6,10 +6,17 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for the <b>Espresso</b> engine of <b>Appium</b>
+ */
 public class EspressoPlugin extends AbstractAppiumPlugin {
 
+    /** driver name */
     public static final String DRIVER_NAME = "Espresso";
     
+    /**
+     * Constructor for <b>EspressoPlugin</b> objects.
+     */
     public EspressoPlugin() {
         super(DRIVER_NAME);
     }
@@ -32,16 +39,25 @@ public class EspressoPlugin extends AbstractAppiumPlugin {
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return addNordOptions(config, CAPABILITIES);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDriverClassName() {
         return DRIVER_CLASS_NAME;

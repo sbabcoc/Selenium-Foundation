@@ -41,7 +41,6 @@ public class BinaryFinder extends DriverService {
     * 
     * @param exeName Name of the executable file to look for in PATH
     * @param exeProperty Name of a system property that specifies the path to the executable file
-    *
     * @return The specified executable as a {@link File} object
     * @throws IllegalStateException if the executable is not found or cannot be executed
     */

@@ -7,15 +7,27 @@ import org.junit.runners.model.Statement;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * 
+ * @param <P> platform specifier
+ */
 public class TargetPlatformRule<P extends Enum<?> & PlatformEnum> implements TestRule {
 
     private Object testObject;
     private P platform;
     
+    /**
+     * Constructor for target platform method rule objects.
+     * 
+     * @param testObject test class instance
+     */
     public TargetPlatformRule(Object testObject) {
         this.testObject = testObject;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Statement apply(final Statement base, final Description description) {
         if (!description.isTest()) return base;
@@ -39,6 +51,11 @@ public class TargetPlatformRule<P extends Enum<?> & PlatformEnum> implements Tes
         }
     }
     
+    /**
+     * Get platform specifier for this test rule.
+     * 
+     * @return platform specified
+     */
     public P getPlatform() {
         return platform;
     }

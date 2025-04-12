@@ -15,6 +15,11 @@ import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 
+/**
+ * This class is used to extract the information from a node status GraphQL query.
+ * 
+ * @see Nodes#NODE_STATUS
+ */
 public class NodeStatus {
     
     private final NodeId id;
@@ -22,6 +27,14 @@ public class NodeStatus {
     private final Availability status;
     private final List<Capabilities> capabilities;
     
+    /**
+     * Constructor for node status object with specified parameters.
+     * 
+     * @param id node ID
+     * @param uri node {@link URI}
+     * @param status node {@link Availability}
+     * @param capabilities list of node {@link Capabilities}
+     */
     public NodeStatus(NodeId id, URI uri, Availability status, List<Capabilities> capabilities) {
         this.id = id;
         this.uri = uri;
@@ -29,6 +42,12 @@ public class NodeStatus {
         this.capabilities = capabilities;
     }
     
+    /**
+     * Extract node status from the specified JSON input.
+     * 
+     * @param input {@link JsonInput} object
+     * @return extracted {@link NodeStatus} object
+     */
     @SuppressWarnings("unchecked")
     public static NodeStatus fromJson(JsonInput input) {
         NodeId id = null;
@@ -72,22 +91,47 @@ public class NodeStatus {
         return new NodeStatus(id, uri, status, capabilities);
     }
     
+    /**
+     * Get the node ID.
+     * 
+     * @return node ID
+     */
     public NodeId getId() {
         return id;
     }
     
+    /**
+     * Get the node URI.
+     * 
+     * @return node {@link URI}
+     */
     public URI getUri() {
         return uri;
     }
     
+    /**
+     * Get the node status.
+     * 
+     * @return node {@link Availability}
+     */
     public Availability getStatus() {
         return status;
     }
     
+    /**
+     * Get list of node capabilities.
+     * 
+     * @return list of {@link Capabilities}
+     */
     public List<Capabilities> getCapabilities() {
         return capabilities;
     }
     
+    /**
+     * Get the string representation of this node status object.
+     * 
+     * @return node status as JSON string
+     */
     @Override
     public String toString() {
         return new Json().toJson(this);
