@@ -6,12 +6,12 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.examples.MacPage;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
+import com.nordstrom.automation.selenium.support.TestNgTargetBase;
 
 @InitialPage(MacPage.class)
-public class MacTest extends TestNgTargetRoot {
+public class MacTest extends TestNgTargetBase {
     
     @Test
     @TargetPlatform(MAC_APP_NAME)

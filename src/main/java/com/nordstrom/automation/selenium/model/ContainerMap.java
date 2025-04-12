@@ -29,9 +29,13 @@ import com.nordstrom.common.base.UncheckedThrow;
  */
 abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Object, V> {
 
+    /** parent for containers */
     protected ComponentContainer parent;
+    /** type of containers */
     protected Class<V> containerType;
+    /** context element locator */
     protected By locator;
+    /** container {@code getKey()} method */
     protected Method method;
     
     private List<WebElement> elements;

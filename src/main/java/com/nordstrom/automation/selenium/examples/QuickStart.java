@@ -160,6 +160,10 @@ public class QuickStart extends TestNgRoot {
     private static final String PAGE_TITLE = "Example Page";
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickStart.class);
     
+    /**
+     * This simple example test demonstrates how to acquire the name of the current browser from the configuration,
+     * get the initial page object, and verify the current page title.
+     */
     @Test
     public void dummyTest() {
         SeleniumConfig config = SeleniumConfig.getConfig();

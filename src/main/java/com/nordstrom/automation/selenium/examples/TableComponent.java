@@ -11,12 +11,27 @@ import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.PageComponent;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
 
+/**
+ * This class is the model for example page table component.
+ */
 public class TableComponent extends PageComponent {
 
+    /**
+     * Constructor for page component by element locator
+     * 
+     * @param locator component context element locator
+     * @param parent component parent container
+     */
     public TableComponent(By locator, ComponentContainer parent) {
         super(locator, parent);
     }
     
+    /**
+     * Constructor for page component by context element
+     * 
+     * @param element component context element
+     * @param parent component parent
+     */
     public TableComponent(RobustWebElement element, ComponentContainer parent) {
         super(element, parent);
     }
@@ -25,8 +40,13 @@ public class TableComponent extends PageComponent {
     private List<TableRowComponent> tableRows;
     private int refreshCount;
     
+    /**
+     * This enumeration defines element locator constants.
+     */
     protected enum Using implements ByEnum {
+        /** table header row */
         HDR_ROW(By.cssSelector("tr[id*='-h']")),
+        /** table body row */
         TBL_ROW(By.cssSelector("tr[id*='-r']"));
         
         private final By locator;
@@ -41,10 +61,21 @@ public class TableComponent extends PageComponent {
         }
     }
     
+    
+    /**
+     * Get headings of this table component.
+     * 
+     * @return list of component headings
+     */
     public List<String> getHeadings() {
         return getTableHdr().getContent();
     }
     
+    /**
+     * Get table content in tabular format.
+     * 
+     * @return table content as list of lists (rows / columns)
+     */
     public List<List<String>> getContent() {
         List<List<String>> result = new ArrayList<>();
         for (TableRowComponent row : getTableRows()) {
@@ -53,6 +84,11 @@ public class TableComponent extends PageComponent {
         return result;
     }
     
+    /**
+     * Get table header row component.
+     * 
+     * @return {@link TableRowComponent} for table header
+     */
     private TableRowComponent getTableHdr() {
         if (tableHdr == null) {
             tableHdr = new TableRowComponent(Using.HDR_ROW.locator, this);
@@ -60,6 +96,11 @@ public class TableComponent extends PageComponent {
         return tableHdr;
     }
     
+    /**
+     * Get list of table body row components.
+     * 
+     * @return list of {@link TableRowComponent} for table body
+     */
     private List<TableRowComponent> getTableRows() {
         if (tableRows == null) {
             tableRows = newComponentList(TableRowComponent.class, Using.TBL_ROW.locator);
@@ -67,24 +108,48 @@ public class TableComponent extends PageComponent {
         return tableRows;
     }
     
+    /**
+     * Get the key that uniquely identifies the specified table context.
+     * 
+     * @param context table component search context
+     * @return table component key
+     */
     public static Object getKey(SearchContext context) {
         return ((WebElement) context).getAttribute("id");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchContext refreshContext(long expiration) {
         refreshCount++;
         return super.refreshContext(expiration);
     }
     
+    /**
+     * Get table refresh count.
+     * 
+     * @return table refresh count
+     */
     public int getRefreshCount() {
         return refreshCount;
     }
     
+    /**
+     * Get table header refresh count.
+     * 
+     * @return table header refresh count
+     */
     public int getHeadRefreshCount() {
         return getTableHdr().getRefreshCount();
     }
     
+    /**
+     * Get table body refresh counts.
+     * 
+     * @return array of table body refresh counts
+     */
     public int[] getBodyRefreshCounts() {
         List<TableRowComponent> tableRows = getTableRows();
         int[] counts = new int[tableRows.size()];

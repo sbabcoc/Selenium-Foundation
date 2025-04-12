@@ -18,6 +18,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
  * always operates within the context of the driver, which encompasses the entire page. 
  */
 public class SearchContextWait extends FluentWait<SearchContext> {
+    /** default sleep timeout (500 milliseconds) */
     public static final long DEFAULT_SLEEP_TIMEOUT = 500;
     private final SearchContext context;
 

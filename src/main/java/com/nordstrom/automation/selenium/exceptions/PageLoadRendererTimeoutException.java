@@ -12,6 +12,17 @@ public class PageLoadRendererTimeoutException extends TimeoutException {
 
     private static final long serialVersionUID = 2076867125637147698L;
 
+    /**
+     * Constructor for a new "page load renderer" timeout exception with the
+     * specified message and cause.
+     *
+     * @param  message the detail message (which is saved for later retrieval
+     *         by the {@link #getMessage()} method).
+     * @param  cause the cause (which is saved for later retrieval by the
+     *         {@link #getCause()} method).  (A {@code null} value is
+     *         permitted, and indicates that the cause is nonexistent or
+     *         unknown.)
+     */
     public PageLoadRendererTimeoutException(String message, Throwable cause) {
         super(message, cause);
     }

@@ -9,17 +9,31 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.model.Page;
 
+/**
+ * This class is the model for the "Invoke Search" view of the Android API Demos app.
+ */
 @PageUrl(appPackage="io.appium.android.apis", value=".app.SearchInvoke")
 public class AndroidPage extends Page {
 
+    /**
+     * Constructor for main view context.
+     * 
+     * @param driver driver object
+     */
     public AndroidPage(WebDriver driver) {
         super(driver);
     }
     
+    /**
+     * This enumeration defines element locator constants.
+     */
     protected enum Using implements ByEnum {
-        SEARCH_QUERY(By.id("txt_query_prefill")),
-        SEARCH_BUTTON(By.id("btn_start_search")),
-        SEARCH_RESULT(By.id("android:id/search_src_text"));
+        /** search query "prefill" field */
+        QUERY_PREFILL(By.id("txt_query_prefill")),
+        /** 'onSearchRequested' button */
+        ACTIVATE_SEARCH(By.id("btn_start_search")),
+        /** search query input field */
+        QUERY_INPUT_FIELD(By.id("android:id/search_src_text"));
         
         private final By locator;
         
@@ -33,14 +47,24 @@ public class AndroidPage extends Page {
         }
     }
     
+    /**
+     * Submit the specified search query.
+     * 
+     * @param query search query
+     */
     public void submitSearchQuery(String query) {
-        findElement(Using.SEARCH_QUERY).sendKeys(query);
-        findElement(Using.SEARCH_BUTTON).click();
+        findElement(Using.QUERY_PREFILL).sendKeys(query);
+        findElement(Using.ACTIVATE_SEARCH).click();
     }
     
+    /**
+     * Get result of submitted search query.
+     * 
+     * @return search result
+     */
     public String getSearchResult() {
         WebDriverWait wait = new WebDriverWait(driver, 30);
-        WebElement searchResult = wait.until(ExpectedConditions.visibilityOfElementLocated(Using.SEARCH_RESULT.locator));
+        WebElement searchResult = wait.until(ExpectedConditions.visibilityOfElementLocated(Using.QUERY_INPUT_FIELD.locator));
         return searchResult.getText();
     }
     

@@ -18,6 +18,9 @@ import io.github.bonigarcia.wdm.WebDriverManager;
  */
 public class BinaryFinder extends DriverService {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private BinaryFinder(File executable, int port, ImmutableList<String> args,
             ImmutableMap<String, String> environment) throws IOException {
         super(executable, port, args, environment);
@@ -41,7 +44,6 @@ public class BinaryFinder extends DriverService {
     * 
     * @param exeName Name of the executable file to look for in PATH
     * @param exeProperty Name of a system property that specifies the path to the executable file
-    *
     * @return The specified executable as a {@link File} object
     * @throws IllegalStateException if the executable is not found or cannot be executed
     */

@@ -42,6 +42,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_PORT = "--port";
     private static final String OPT_CONFIG = "--config";
     
+    /**
+     * Constructor for models of local Selenium Grid instances from hub URL.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubServer {@link LocalGridServer} instance for a local grid hub process
+     * @param nodeServers {@link LocalGridServer} instances for local grid node processes (zero or more)
+     * @throws IOException if unable to acquire local Grid details
+     */
     public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         super(config, hubServer, nodeServers);
     }
@@ -141,7 +149,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         List<LocalGridServer> nodeServers = new ArrayList<>();
         // iterate over configured driver plugins
         for (DriverPlugin driverPlugin : GridUtility.getDriverPlugins(config)) {
-            // create node server for this driver plugin
+            // create node server for this driver plug-in
             LocalGridServer nodeServer = driverPlugin.create(config, launcherClassName, dependencyContexts,
                     hubServer.getUrl(), workingPath);
             // add server to nodes list

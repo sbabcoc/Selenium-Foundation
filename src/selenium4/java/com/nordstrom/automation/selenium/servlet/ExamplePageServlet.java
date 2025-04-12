@@ -23,15 +23,20 @@ public class ExamplePageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -2195313096162880627L;
 
+    /** page source for this servlet */
     protected String pageSource;
-    protected String target;
     
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init() throws ServletException {
         pageSource = getResource("ExamplePage.html");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
@@ -60,48 +65,79 @@ public class ExamplePageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Reads all remaining bytes from the specified input stream.
+     * 
+     * @param inputStream input stream to read
+     * @return array of remaining bytes
+     * @throws IOException if an I/O error occurs
+     */
     public static byte[] readAllBytes(final InputStream inputStream) throws IOException {
         return inputStream.readAllBytes();
     }
 
+    /**
+     * This class implements the HTTP servlet for example frame 'A'.
+     */
     @WebServlet(name = "FrameA_Servlet", urlPatterns = {"/grid/admin/FrameA_Servlet"})
     public static class FrameA_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 4547909165192240389L;
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_a.html");
         }
     }
 
+    /**
+     * This class implements the HTTP servlet for example frame 'B'.
+     */
     @WebServlet(name = "FrameB_Servlet", urlPatterns = {"/grid/admin/FrameB_Servlet"})
     public static class FrameB_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 5903212244921125263L;
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_b.html");
         }
     }
 
+    /**
+     * This class implements the HTTP servlet for example frame 'C'.
+     */
     @WebServlet(name = "FrameC_Servlet", urlPatterns = {"/grid/admin/FrameC_Servlet"})
     public static class FrameC_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 1448462233121165298L;
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_c.html");
         }
     }
 
+    /**
+     * This class implements the HTTP servlet for example frame 'D'.
+     */
     @WebServlet(name = "FrameD_Servlet", urlPatterns = {"/grid/admin/FrameD_Servlet"})
     public static class FrameD_Servlet extends ExamplePageServlet {
 
         private static final long serialVersionUID = 1444648483821114876L;
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_d.html");

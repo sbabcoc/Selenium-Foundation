@@ -12,7 +12,7 @@ public class OptionalElementNotAcquiredException extends NoSuchElementException 
     private static final long serialVersionUID = -1817241270199904930L;
     
     /**
-     * Constructor for {@code not acquired} exception.
+     * Constructor for {@code optional element not acquired} exception.
      * 
      * @param cause the cause of this exception
      */

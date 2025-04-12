@@ -48,7 +48,7 @@ public class PluginUtils {
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed building class path model", e);
         }
-        LOGGER.warn("No plugin for browser '{}' found in package: {}", browserName, PLUGIN_PACKAGE_NAME);
+        LOGGER.warn("No plug-in for browser '{}' found in package: {}", browserName, PLUGIN_PACKAGE_NAME);
         return Collections.emptyMap();
     }
     

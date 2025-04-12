@@ -380,7 +380,7 @@ public final class GridUtility {
      * Get instances of all configured driver plugins.
      * 
      * @param config {@link SeleniumConfig} object
-     * @return list of driver plugin instances
+     * @return list of driver plug-in instances
      */
     public static List<DriverPlugin> getDriverPlugins(SeleniumConfig config) {
         List<DriverPlugin> driverPlugins = new ArrayList<>();
@@ -389,29 +389,29 @@ public final class GridUtility {
         String gridPlugins = config.getString(SeleniumSettings.GRID_PLUGINS.key());
         // if setting is defined and not empty
         if ( ! (gridPlugins == null || gridPlugins.trim().isEmpty())) {
-            // iterate specified driver plugin class names
+            // iterate specified driver plug-in class names
             for (String driverPlugin : gridPlugins.split(File.pathSeparator)) {
                 String className = driverPlugin.trim();
                 try {
-                    // load driver plugin class
+                    // load driver plug-in class
                     Class<?> pluginClass = Class.forName(className);
                     // get no-argument constructor
                     Constructor<?> ctor = pluginClass.getConstructor();
                     // add instance to plugins list
                     driverPlugins.add((DriverPlugin) ctor.newInstance());
                 } catch (ClassNotFoundException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className + "' not found", e);
+                    throw new ServiceConfigurationError("Specified driver plug-in '" + className + "' not found", e);
                 } catch (ClassCastException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                    throw new ServiceConfigurationError("Specified driver plug-in '" + className
                             + "' is not a subclass of DriverPlugin", e);
                 } catch (NoSuchMethodException | SecurityException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                    throw new ServiceConfigurationError("Specified driver plug-in '" + className
                             + "' lacks an accessible no-argument constructor", e);
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-                    throw new ServiceConfigurationError("Specified driver plugin '" + className
+                    throw new ServiceConfigurationError("Specified driver plug-in '" + className
                             + "' could not be instantiated", e);
                 } catch (InvocationTargetException e) {
-                    throw new ServiceConfigurationError("Constructor for driver plugin '" + className
+                    throw new ServiceConfigurationError("Constructor for driver plug-in '" + className
                             + "' threw an exception", e.getTargetException());
                 }
             }

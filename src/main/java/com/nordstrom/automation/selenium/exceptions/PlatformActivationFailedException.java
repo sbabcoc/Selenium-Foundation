@@ -3,7 +3,13 @@ package com.nordstrom.automation.selenium.exceptions;
 import org.apache.commons.lang3.StringUtils;
 
 import com.nordstrom.automation.selenium.platform.PlatformEnum;
+import com.nordstrom.automation.selenium.platform.PlatformTargetable;
 
+/**
+ * This exception is thrown by implementation of the {@link PlatformTargetable#activatePlatform activatePlatform}
+ * method to indicate that platform activation failed.
+ * 
+ */
 public class PlatformActivationFailedException extends RuntimeException {
 
     private static final long serialVersionUID = 7336291801605667538L;

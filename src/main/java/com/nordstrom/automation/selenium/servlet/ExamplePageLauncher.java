@@ -13,9 +13,17 @@ import com.nordstrom.automation.selenium.examples.ServletContainer;
 import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.jar.JarUtils;
 
+/**
+ * This class is a thin wrapper around the example page servlet launcher.
+ */
 public class ExamplePageLauncher {
     
+    /**
+     * This enumeration implements the launcher for the local example page servlet used by the
+     * <b>Selenium Foundation</b> unit tests.
+     */
     public enum Container {
+        /** singleton instance of example page launcher */
         INSTANCE;
         
         private final ProcessBuilder builder;
@@ -60,6 +68,7 @@ public class ExamplePageLauncher {
         
         /**
          * Stop the example page servlet.
+         * 
          * @throws InterruptedException if interrupted while awaiting shutdown
          */
         public void shutdown() throws InterruptedException {
@@ -71,6 +80,11 @@ public class ExamplePageLauncher {
             }
         }
         
+        /**
+         * Get the example page servlet URL.
+         * 
+         * @return example page servlet URL
+         */
         public URL getUrl() {
             try {
                 return URI.create("http://" + GridUtility.getLocalHost() + ":8080").toURL();
@@ -81,6 +95,11 @@ public class ExamplePageLauncher {
         }
     }
     
+    /**
+     * Get the singleton instance of the example page servlet launcher.
+     * 
+     * @return {@link Container#INSTANCE} example page servlet launcher
+     */
     public static Container getLauncher() {
         return Container.INSTANCE;
     }

@@ -4,8 +4,14 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for <b>EdgeDriver</b>.
+ */
 public class EdgePlugin extends RemoteWebDriverPlugin {
     
+    /**
+     * Constructor for <b>EdgePlugin</b> objects.
+     */
     public EdgePlugin() {
         super(EdgeCaps.DRIVER_NAME);
     }

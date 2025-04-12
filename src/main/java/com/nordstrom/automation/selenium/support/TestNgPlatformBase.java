@@ -17,6 +17,12 @@ import com.nordstrom.automation.selenium.platform.PlatformTargetable;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
+/**
+ * This abstract class implements the contract for TestNG Selenium Foundation test classes that provide support
+ * for the {@link com.nordstrom.automation.selenium.platform.TargetPlatform TargetPlatform} feature.
+ * 
+ * @param <P> platform specifier
+ */
 @Listeners(PlatformInterceptor.class)
 public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> extends TestNgBase implements PlatformTargetable<P> {
     
@@ -25,6 +31,11 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
 
     private static final String PLATFORM = "Platform";
     
+    /**
+     * Constructor for test classes that provide target platform support.
+     * 
+     * @param platformClass platform specifier
+     */
     public TestNgPlatformBase(Class<P> platformClass) {
         this.platformClass = platformClass;
         try {

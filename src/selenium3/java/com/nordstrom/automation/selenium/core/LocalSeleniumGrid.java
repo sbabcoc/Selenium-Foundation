@@ -19,6 +19,7 @@ import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -44,6 +45,14 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_HOST = "-host";
     private static final String OPT_PORT = "-port";
     
+    /**
+     * Constructor for models of local Selenium Grid instances from hub URL.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubServer {@link LocalGridServer} instance for a local grid hub process
+     * @param nodeServers {@link LocalGridServer} instances for local grid node processes (zero or more)
+     * @throws IOException if unable to acquire local Grid details
+     */
     public LocalSeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         super(config, hubServer, nodeServers);
     }

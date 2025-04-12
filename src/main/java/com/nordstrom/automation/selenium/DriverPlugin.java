@@ -17,6 +17,9 @@ import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import net.bytebuddy.implementation.Implementation;
 
+/**
+ * This interface defines the contract for driver plug-in objects.
+ */
 public interface DriverPlugin {
     
     /**

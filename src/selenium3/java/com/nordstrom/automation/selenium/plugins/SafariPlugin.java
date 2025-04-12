@@ -4,8 +4,14 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for <b>SafariDriver</b>.
+ */
 public class SafariPlugin extends RemoteWebDriverPlugin {
     
+    /**
+     * Constructor for <b>SafariPlugin</b> objects.
+     */
     public SafariPlugin() {
         super(SafariCaps.DRIVER_NAME);
     }

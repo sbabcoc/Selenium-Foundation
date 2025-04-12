@@ -13,8 +13,18 @@ import org.openqa.selenium.manager.SeleniumManagerOutput.Result;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.common.file.PathUtils;
 
+/**
+ * This static utility class provides methods to find/validate drivers and executable binary files.
+ */
 public class BinaryFinder {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private BinaryFinder() {
+        throw new AssertionError("BinaryFinder is a static utility class that cannot be instantiated");
+    }
+    
     /**
      * Find/install driver indicated by the specified capabilities.
      * 
@@ -33,7 +43,6 @@ public class BinaryFinder {
     * 
     * @param exeName Name of the executable file to look for in PATH
     * @param exeProperty Name of a system property that specifies the path to the executable file
-    *
     * @return The specified executable as a {@link File} object
     * @throws IllegalStateException if the executable is not found or cannot be executed
     */
@@ -49,10 +58,16 @@ public class BinaryFinder {
         return exe;
     }
 
+    /**
+     * Ensure that the specified object exists as an executable file.
+     * 
+     * @param exe executable to check as a {@link File} object
+     * @throws IllegalStateException if the executable is not found or cannot be executed
+     */
     protected static void checkExecutable(File exe) {
-        checkState(exe.exists(), "The driver executable does not exist: %s", exe.getAbsolutePath());
-        checkState(!exe.isDirectory(), "The driver executable is a directory: %s", exe.getAbsolutePath());
-        checkState(exe.canExecute(), "The driver is not executable: %s", exe.getAbsolutePath());
+        checkState(exe.exists(), "Specified file does not exist: %s", exe.getAbsolutePath());
+        checkState(!exe.isDirectory(), "Specified file is a directory: %s", exe.getAbsolutePath());
+        checkState(exe.canExecute(), "Specified file is not executable: %s", exe.getAbsolutePath());
     }
 
 }

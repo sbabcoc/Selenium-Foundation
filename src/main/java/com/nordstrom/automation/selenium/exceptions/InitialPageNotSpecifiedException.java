@@ -8,7 +8,7 @@ public class InitialPageNotSpecifiedException extends RuntimeException {
     private static final long serialVersionUID = -6182879162513331011L;
 
     /**
-     * Constructor for exception with default message.
+     * Constructor for "initial page not specified" exception with default message.
      */
     public InitialPageNotSpecifiedException() {
         super("No initial page has been specified");
