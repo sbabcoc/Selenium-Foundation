@@ -10,6 +10,10 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
         super(ChromeCaps.DRIVER_NAME);
     }
     
+    protected ChromePlugin(String driverName) {
+        super(driverName);
+    }
+    
     /**
      * <b>org.openqa.selenium.chrome.ChromeDriver</b>
      * 
