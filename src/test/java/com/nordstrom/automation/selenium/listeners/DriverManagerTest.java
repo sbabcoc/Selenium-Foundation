@@ -2,8 +2,6 @@ package com.nordstrom.automation.selenium.listeners;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -11,7 +9,6 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
-import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 public class DriverManagerTest extends TestNgTargetRoot {
     
@@ -22,14 +19,12 @@ public class DriverManagerTest extends TestNgTargetRoot {
     }
     
     @Test(groups = {"WithDriverBefore"})
-    @TargetPlatform(WEB_APP_NAME)
     public void testWithDriverBefore() {
         assertTrue(nabDriver().isPresent(), "Driver should have been created");
     }
     
     @NoDriver
     @Test(groups = {"WithDriverBefore"})
-    @TargetPlatform(WEB_APP_NAME)
     public void testCloseDriverBefore() {
         assertFalse(nabDriver().isPresent(), "Driver should have been closed");
     }

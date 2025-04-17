@@ -44,7 +44,7 @@ In addition to declaring driver plug-ins in the **ServiceLoader** provider confi
 
 ### Driver Plug-Ins for Desktop Browsers and Appium Engines
 
-Driver plug-ins encapsulate the specific details related to launching **Selenium Grid** nodes that support the corresponding drivers. **Selenium Foundation** provides [driver plugin-ins](ConfiguringProjectSettings.md#desktop-browser-support) for all of the major browsers. It also provides plug-ins for all of the major [automation engines](ConfiguringProjectSettings.md#appium-automation-engine-support) of the `Appium` project.
+Driver plug-ins encapsulate the specific details related to launching **Selenium Grid** nodes that support the corresponding drivers. **Selenium Foundation** provides [driver plug-ins](ConfiguringProjectSettings.md#desktop-browser-support) for all of the major browsers. It also provides plug-ins for all of the major [automation engines](ConfiguringProjectSettings.md#appium-automation-engine-support) of the `Appium` project.
 
 #### Drivers for Desktop Browsers
 

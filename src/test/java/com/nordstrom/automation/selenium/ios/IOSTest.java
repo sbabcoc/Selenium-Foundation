@@ -6,12 +6,12 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.examples.IOSPage;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
+import com.nordstrom.automation.selenium.support.TestNgTargetBase;
 
 @InitialPage(IOSPage.class)
-public class IOSTest extends TestNgTargetRoot {
+public class IOSTest extends TestNgTargetBase {
     
     @Test
     @TargetPlatform(IOS_APP_NAME)

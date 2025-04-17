@@ -20,12 +20,17 @@ import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import net.bytebuddy.implementation.Implementation;
 
 /**
- * This class provides the base plugin implementation for drivers that extend {@code RemoteWebDriver}.
+ * This class provides the base plug-in implementation for drivers that extend {@code RemoteWebDriver}.
  */
 public abstract class RemoteWebDriverPlugin implements DriverPlugin {
     
     private final String browserName;
     
+    /**
+     * Base constructor for <b>RemoteWebDriver</b> plug-in objects.
+     * 
+     * @param browserName browser name
+     */
     protected RemoteWebDriverPlugin(String browserName) {
         this.browserName = browserName;
     }

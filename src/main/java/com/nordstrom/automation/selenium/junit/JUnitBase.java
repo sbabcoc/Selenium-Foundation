@@ -29,9 +29,11 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
     @Rule(order = 0)
     public final TestWatcher driverTestWatcher = DriverWatcher.getTestWatcher(this);
     
+    /** This method rule captures page source on test failures. */
     @Rule(order = 1)
     public final PageSourceCapture pageSourceCapture = new PageSourceCapture(this);
     
+    /** This method rule captures screenshots on test failures. */
     @Rule(order = 2)
     public final ScreenshotCapture screenshotCapture = new ScreenshotCapture(this);
     

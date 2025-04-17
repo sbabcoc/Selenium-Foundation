@@ -41,9 +41,9 @@ import com.nordstrom.common.file.PathUtils;
 import net.bytebuddy.implementation.Implementation;
 
 /**
- * This class provides the base plugin implementation for drivers provided by {@code appium}.
+ * This class provides the base plug-in implementation for drivers provided by {@code appium}.
  * <p>
- * All of the Java driver classes associated with this plugin are contained in a single dependency:
+ * All of the Java driver classes associated with this plug-in are contained in a single dependency:
  * 
  * <ul>
  *     <li><b>io.appium.java_client.android.AndroidDriver</b></li>
@@ -55,7 +55,7 @@ import net.bytebuddy.implementation.Implementation;
  * <pre>&lt;dependency&gt;
  *  &lt;groupId&gt;io.appium&lt;/groupId&gt;
  *  &lt;artifactId&gt;java-client&lt;/artifactId&gt;
- *  &lt;version&gt;7.6.0&lt;/version&gt;
+ *  &lt;version&gt;9.4.0&lt;/version&gt;
  *  &lt;exclusions&gt;
  *    &lt;exclusion&gt;
  *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
@@ -64,6 +64,10 @@ import net.bytebuddy.implementation.Implementation;
  *    &lt;exclusion&gt;
  *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
  *      &lt;artifactId&gt;selenium-support&lt;/artifactId&gt;
+ *    &lt;/exclusion&gt;
+ *    &lt;exclusion&gt;
+ *      &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+ *      &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;
  *    &lt;/exclusion&gt;
  *  &lt;/exclusions&gt;
  *&lt;/dependency&gt;</pre>
@@ -83,6 +87,11 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     
     private final String browserName;
     
+    /**
+     * Base constructor for <b>Appium</b> plug-in objects.
+     * 
+     * @param browserName browser name
+     */
     protected AbstractAppiumPlugin(String browserName) {
         this.browserName = browserName;
     }
@@ -292,7 +301,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * Add the 'nord:options' object to the specified node capabilities string. <br>
      * <b>NOTE</b>: The 'nord:options' object is only added if Appium is being managed by PM2.
      * 
-     * @param config {@link SelenikumConfig} object
+     * @param config {@link SeleniumConfig} object
      * @param nodeCapabilities node capabilities string
      * @return node capabilities string 
      */
@@ -400,7 +409,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * @param exeName file name of binary to find
      * @param setting associated configuration setting
      * @param what human-readable description of binary
-     * @return path to specified binary as a {link File} object
+     * @return path to specified binary as a {@link File} object
      * @throws GridServerLaunchFailedException if specified binary isn't found
      */
     private static File findBinary(String exeName, SeleniumSettings setting, String what)
@@ -425,8 +434,21 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         return new FileNotFoundException(String.format(template, what, setting.name(), setting.key()));
     }
 
+    /**
+     * This class represents a single Appium node server belonging to a local Grid collection.
+     */
     public static class AppiumGridServer extends LocalGridServer {
 
+        /**
+         * Constructor for local Appium node server object.
+         * 
+         * @param host IP address of local Grid server
+         * @param port port of local Grid server
+         * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
+         * @param builder {@link ProcessBuilder} of local Grid server
+         * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+         * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
+         */
         public AppiumGridServer(String host, Integer port, boolean isHub, ProcessBuilder builder, Path workingPath, Path outputPath) {
             super(host, port, isHub, builder, workingPath, outputPath);
         }
@@ -459,7 +481,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
          * If the specified URL is a local 'appium' node running with 'pm2', delete the process.
          * 
          * @param nodeUrl {@link URL} object for target node server
-         * @return {@code true} node was shut down'; otherwise {@code false}
+         * @return {@code true} if node was shut down; otherwise {@code false}
          */
         public static boolean shutdownAppiumWithPM2(URL nodeUrl) {
             if ( ! GridUtility.isLocalHost(nodeUrl)) return false;

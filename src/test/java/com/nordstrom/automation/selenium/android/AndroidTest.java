@@ -7,11 +7,11 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.AndroidPage;
-import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
+import com.nordstrom.automation.selenium.support.TestNgTargetBase;
 
 @InitialPage(AndroidPage.class)
-public class AndroidTest extends TestNgTargetRoot {
+public class AndroidTest extends TestNgTargetBase {
     
     @Test
     @TargetPlatform(ANDROID_NAME)

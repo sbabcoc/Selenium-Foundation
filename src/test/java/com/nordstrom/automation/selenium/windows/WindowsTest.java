@@ -8,11 +8,11 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.examples.WindowsPage;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
-import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
+import com.nordstrom.automation.selenium.support.TestNgTargetBase;
 
 @InitialPage(WindowsPage.class)
-public class WindowsTest extends TestNgTargetRoot {
+public class WindowsTest extends TestNgTargetBase {
     
     @Test
     @TargetPlatform(WINDOWS_NAME)

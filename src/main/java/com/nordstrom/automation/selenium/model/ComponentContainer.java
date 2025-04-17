@@ -67,15 +67,22 @@ public abstract class ComponentContainer
         By locator();
     }
 
+    /** driver for this container */
     protected final WebDriver driver;
+    /** context of this container */
     protected final SearchContext context;
+    /** parent for this container */
     protected final ComponentContainer parent;
+    /** call stack at invalidation */
     protected VacationStackTrace vacated;
+    /** container-specific 'wait' */
     protected SearchContextWait wait;
     private List<Class<?>> bypassClasses;
     private List<String> bypassMethods;
     
+    /** XPath locator for current node */
     public static final By SELF = By.xpath(".");
+    
     private static final String PLACEHOLDER = "{}";
     private static final Class<?>[] BYPASS_CLASSES = {WrapsContext.class};
     private static final String[] BYPASS_METHODS = {"validateParent", "getDriver", "getContext", "getParent",

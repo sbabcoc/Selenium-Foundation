@@ -243,6 +243,7 @@ dependencies {
     api 'com.github.sbabcoc:logback-testng:2.0.1'
     api 'org.hamcrest:hamcrest-core:3.0'
     api 'org.yaml:snakeyaml:2.4'
+    api 'org.apache.commons:commons-configuration2:2.11.1-SNAPSHOT'
   }
   api 'com.nordstrom.tools:java-utils'
   api 'com.nordstrom.tools:settings'
