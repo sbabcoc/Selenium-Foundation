@@ -18,11 +18,16 @@ import org.openqa.selenium.WebElement;
  */
 abstract class ContainerList<E extends ComponentContainer> extends AbstractList<E> {
 
+    /** parent for containers */
     protected ComponentContainer parent;
+    /** type of containers */
     protected Class<E> containerType;
+    /** context element locator */
     protected By locator;
     
+    /** list of context elements */
     protected List<WebElement> elements;
+    /** list of containers */
     protected List<E> containers;
     
     /**

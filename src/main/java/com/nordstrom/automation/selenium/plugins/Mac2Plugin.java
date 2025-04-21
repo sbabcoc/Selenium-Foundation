@@ -6,10 +6,17 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for the <b>Mac2</b> engine of <b>Appium</b>
+ */
 public class Mac2Plugin extends AbstractAppiumPlugin {
 
+    /** driver name */
     public static final String DRIVER_NAME = "Mac2";
     
+    /**
+     * Constructor for <b>Mac2Plugin</b> objects.
+     */
     public Mac2Plugin() {
         super(DRIVER_NAME);
     }
@@ -32,16 +39,25 @@ public class Mac2Plugin extends AbstractAppiumPlugin {
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return addNordOptions(config, CAPABILITIES);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDriverClassName() {
         return DRIVER_CLASS_NAME;

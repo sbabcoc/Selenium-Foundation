@@ -6,10 +6,17 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for the <b>Windows</b> engine of <b>Appium</b>
+ */
 public class WindowsPlugin extends AbstractAppiumPlugin {
 
+    /** driver name */
     public static final String DRIVER_NAME = "Windows";
     
+    /**
+     * Constructor for <b>WindowsPlugin</b> objects.
+     */
     public WindowsPlugin() {
         super(DRIVER_NAME);
     }
@@ -32,16 +39,25 @@ public class WindowsPlugin extends AbstractAppiumPlugin {
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return addNordOptions(config, CAPABILITIES);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDriverClassName() {
         return DRIVER_CLASS_NAME;

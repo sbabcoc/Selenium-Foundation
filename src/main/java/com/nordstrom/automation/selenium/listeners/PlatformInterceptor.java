@@ -21,6 +21,10 @@ import com.nordstrom.automation.selenium.platform.TargetPlatformHandler;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
+/**
+ * This class implements the <b>TestNG</b> {@link IMethodInterceptor} interface to assemble a list of methods
+ * that support the current target platform.
+ */
 public class PlatformInterceptor implements IMethodInterceptor {
 
     private static final String INTERCEPT = "Intercept";
@@ -94,6 +98,7 @@ public class PlatformInterceptor implements IMethodInterceptor {
     /**
      * Resolve the target platform for the associated method.
      * 
+     * @param <P> target platform class (enumeration)
      * @param testMethod test method object
      * @return target platform constant; 'null' if test class object is not {@link PlatformTargetable}
      */
@@ -114,51 +119,114 @@ public class PlatformInterceptor implements IMethodInterceptor {
         return realMethod.getAnnotation(TargetPlatform.class);
     }
 
+    /**
+     * This class implements a "platform identity" object, which is used to attach a specified platform
+     * value to a test method.
+     * 
+     * @param <P> target platform class (enumeration)
+     */
     public static class PlatformIdentity<P extends Enum<?> & PlatformEnum> implements Serializable {
         
         private static final long serialVersionUID = 3048495330930703188L;
         
+        /** platform constant name */
         private String constName;
+        /** platform class name */
         private String className;
+        /** test method description */
         private String description;
         
+        /**
+         * No-argument constructor for platform identity objects.
+         * <p>
+         * <b>NOTE</b>: This constructor is required by the <b>JavaBeans</b> de-serialization functionality
+         * of the {@link org.openqa.selenium.json.Json Json} API.
+         */
         public PlatformIdentity() { }
         
+        /**
+         * Constructor for platform identity object with the specified constant and description.
+         * 
+         * @param platformConst platform constant
+         * @param description test method description
+         */
         private PlatformIdentity(P platformConst, String description) {
             setConstName(platformConst.name());
             setClassName(platformConst.getClass().getName());
             setDescription(description);
         }
         
+        /**
+         * Set the constant name of this platform identity.
+         * 
+         * @param constName platform identity constant name
+         */
         public void setConstName(String constName) {
             this.constName = constName;
         }
         
+        /**
+         * Get the constant name of this platform identity.
+         * 
+         * @return platform identity constant name
+         */
         public String getConstName() {
             return constName;
         }
         
+        /**
+         * Set the name of the class (enumeration) that defines the constant assigned to this platform identity.
+         *  
+         * @param className platform constant class name
+         */
         public void setClassName(String className) {
             this.className = className;
         }
         
+        /**
+         * Get the name of the class (enumeration) that defines the constant assigned to this platform identity.
+         *  
+         * @return platform constant class name
+         */
         public String getClassName() {
             return className;
         }
         
+        /**
+         * Set the test method description for this platform identity.
+         * 
+         * @param description platform identity test method description
+         */
         public void setDescription(String description) {
             this.description = description;
         }
         
+        /**
+         * Get the test method description for this platform identity.
+         * 
+         * @return platform identity test method description
+         */
         public String getDescription() {
             return description;
         }
         
+        /**
+         * De-serialize the platform constant of this platform identity.
+         * 
+         * @return platform constant
+         */
         @SuppressWarnings("unchecked")
         public P deserialize() {
             return (P) valueOf(classForName(className), constName);
         }
         
+        /**
+         * Get the target platform class (enumeration) for the specified name.
+         * 
+         * @param <P> target platform class (enumeration)
+         * @param className name of target platform class (enumeration)
+         * @return target platform class (enumeration)
+         */
         @SuppressWarnings("unchecked")
         public static <P extends Enum<?> & PlatformEnum> Class<P> classForName(String className) {
             try {
@@ -168,6 +236,14 @@ public class PlatformInterceptor implements IMethodInterceptor {
             }
         }
         
+        /**
+         * Get the value of the specified platform constant name from the indicated class (enumeration).
+         * 
+         * @param <P> target platform class (enumeration)
+         * @param platformClass target platform class (enumeration)
+         * @param constName name of platform constant
+         * @return target platform constant
+         */
         @SuppressWarnings("unchecked")
         public static <P extends Enum<?> & PlatformEnum> P valueOf(Class<P> platformClass, String constName) {
             try {

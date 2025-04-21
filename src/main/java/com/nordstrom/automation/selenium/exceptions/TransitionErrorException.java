@@ -14,6 +14,7 @@ import com.nordstrom.automation.selenium.model.Enhanceable;
  */
 public class TransitionErrorException extends IllegalStateException {
 
+    /** exception error message */
     private final String errorMessage;
     private static final long serialVersionUID = -2969607575378647073L;
 

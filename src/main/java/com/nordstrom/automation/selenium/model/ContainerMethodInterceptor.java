@@ -58,6 +58,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
  * </ul>
  */
 public enum ContainerMethodInterceptor {
+    /** singleton instance of this interceptor */
     INSTANCE;
     
     private static final ThreadLocal<Integer> DEPTH = new InheritableThreadLocal<Integer>() {

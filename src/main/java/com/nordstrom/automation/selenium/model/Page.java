@@ -27,7 +27,10 @@ public class Page extends ComponentContainer {
     private String windowHandle;
     private Page spawningPage;
     private WindowState windowState;
+    
+    /** constructor argument types */
     protected Class<?>[] argumentTypes;
+    /** constructor argument values */
     protected Object[] arguments;
     
     private static final Class<?>[] ARG_TYPES_1 = {WebDriver.class};

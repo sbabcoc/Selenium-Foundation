@@ -12,14 +12,26 @@ import com.nordstrom.automation.selenium.platform.PlatformTargetable;
 import com.nordstrom.automation.selenium.platform.TargetPlatformRule;
 import com.nordstrom.common.base.UncheckedThrow;
 
+/**
+ * This abstract class implements the contract for JUnit Selenium Foundation test classes that provide support
+ * for the {@link com.nordstrom.automation.selenium.platform.TargetPlatform TargetPlatform} feature.
+ * 
+ * @param <P> platform specifier
+ */
 public abstract class JUnitPlatformBase<P extends Enum<?> & PlatformEnum> extends JUnitBase implements PlatformTargetable<P> {
     
     private final Class<P> platformClass;
     private final Method values;
 
+    /** This method rule implements the target platform feature */
     @Rule
     public TargetPlatformRule<P> targetPlatformRule = new TargetPlatformRule<>(this);
 
+    /**
+     * Constructor for test classes that provide target platform support.
+     * 
+     * @param platformClass platform specifier
+     */
     public JUnitPlatformBase(Class<P> platformClass) {
         this.platformClass = platformClass;
         try {

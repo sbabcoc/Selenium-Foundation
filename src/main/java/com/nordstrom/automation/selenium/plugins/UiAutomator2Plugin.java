@@ -6,10 +6,17 @@ import java.util.Map;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
+/**
+ * This class is the plug-in for the <b>UiAutomator2</b> engine of <b>Appium</b>
+ */
 public class UiAutomator2Plugin extends AbstractAppiumPlugin {
 
+    /** driver name */
     public static final String DRIVER_NAME = "UiAutomator2";
     
+    /**
+     * Constructor for <b>UiAutomator2Plugin</b> objects.
+     */
     public UiAutomator2Plugin() {
         super(DRIVER_NAME);
     }
@@ -33,16 +40,25 @@ public class UiAutomator2Plugin extends AbstractAppiumPlugin {
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCapabilities(SeleniumConfig config) {
         return addNordOptions(config, CAPABILITIES);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> getPersonalities() {
         return PERSONALITIES;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDriverClassName() {
         return DRIVER_CLASS_NAME;

@@ -54,6 +54,7 @@ public abstract class AbstractSeleniumConfig extends
 
     private static final String SETTINGS_FILE = "settings.properties";
 
+    /** suffix for node configuration modifier files */
     protected static final String NODE_MODS_SUFFIX = ".node.mods";
     private static final String CAPS_MODS_SUFFIX = ".caps.mods";
     
@@ -116,7 +117,7 @@ public abstract class AbstractSeleniumConfig extends
         
         /**
          * This setting specifies a path-delimited list of fully-qualified names of local <b>Selenium Grid</b> driver
-         * plugin classes.
+         * plug-in classes.
          * <p>
          * <b>NOTE</b>: Defining a value for this setting overrides the <b>ServiceLoader</b> specification defined
          * by the associated provider configuration file (<i>com.nordstrom.automation.selenium.DriverPlugin</i>).
@@ -522,6 +523,7 @@ public abstract class AbstractSeleniumConfig extends
         
     }
 
+    /** singleton instance of concrete version-specific configuration */
     protected static SeleniumConfig seleniumConfig;
     
     private URI targetUri;
@@ -530,6 +532,12 @@ public abstract class AbstractSeleniumConfig extends
     private URL hubUrl;
     private SeleniumGrid seleniumGrid;
     
+    /**
+     * Instantiate a configuration object for the specified enumeration class.
+     * 
+     * @throws ConfigurationException if a failure is encountered while initializing this configuration object
+     * @throws IOException if a failure is encountered while reading from a configuration input stream
+     */
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
     }

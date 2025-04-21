@@ -41,6 +41,12 @@ public class GridServer {
     private static final String[] NODE_SHUTDOWN = { "/extra/LifecycleServlet", "action=shutdown" };
     private static final long SHUTDOWN_DELAY = 15;
     
+    /**
+     * Constructor for Grid server object.
+     * 
+     * @param url base {@link URL} for Grid server
+     * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
+     */
     public GridServer(URL url, boolean isHub) {
         this.isHub = isHub;
         this.serverUrl = url;

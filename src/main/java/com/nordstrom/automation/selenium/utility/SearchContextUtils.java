@@ -26,9 +26,15 @@ public class SearchContextUtils {
     private static final String LOCATE_INDEX_BY_CSS = JsUtility.getScriptResource("locateIndexByCss.format");
     private static final String LOCATE_INDEX_BY_XPATH = JsUtility.getScriptResource("locateIndexByXpath.format");
     
+    /**
+     * This enumeration defines constants for JavaScript search context types.
+     */
     public enum ContextType {
+        /** document scope */
         DOCUMENT("document"),
+        /** element scope */
         ELEMENT("arguments[0]"),
+        /** shadow DOM scope */
         SHADOW("shadow");
         
         final String name;

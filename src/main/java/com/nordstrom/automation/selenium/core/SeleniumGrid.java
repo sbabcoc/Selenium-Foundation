@@ -71,12 +71,14 @@ public class SeleniumGrid {
 
     private GridServer hubServer;
     private Map<URL, GridServer> nodeServers = new HashMap<>();
-    protected Map<String, String> personalities = new HashMap<>();
     
+    /** "personalities" supported by this Grid instance */
+    protected Map<String, String> personalities = new HashMap<>();
+    /** SLF4J logger for this Selenium Grid model */
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
     /**
-     * Constructor for Selenium Grid from hub URL.
+     * Constructor for models of Selenium Grid instances from hub URL.
      * <p>
      * This is used to create an interface for an active grid - remote or local.
      * 

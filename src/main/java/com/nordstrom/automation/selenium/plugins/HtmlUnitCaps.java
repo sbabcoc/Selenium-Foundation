@@ -4,13 +4,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class defines properties and methods used by plug-ins that support the Gargoyle HtmlUnit browser.
+ */
 public class HtmlUnitCaps {
     
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private HtmlUnitCaps() {
         throw new AssertionError("HtmlUnitCaps is a static constants class that cannot be instantiated");
     }
 
+    /** driver name */
     public static final String DRIVER_NAME = "htmlunit";
+    
     private static final String[] PROPERTY_NAMES = {  };
     
     private static final String CAPABILITIES =
@@ -53,14 +61,30 @@ public class HtmlUnitCaps {
         PERSONALITIES = Collections.unmodifiableMap(personalities);
     }
     
+    /**
+     * Get capabilities supported by this plug-in.
+     * 
+     * @return core {@link org.openqa.selenium.Capabilities Capabilities} as JSON object
+     */
     public static String getCapabilities() {
         return CAPABILITIES;
     }
 
+    /**
+     * Get browser "personalities" provided by this plug-in.
+     * 
+     * @return map of JSON {@link org.openqa.selenium.Capabilities Capabilities} objects keyed by "personality" name
+     */
     public static Map<String, String> getPersonalities() {
         return PERSONALITIES;
     }
 
+    /**
+     * Get list of system property names recognized by the driver associated with this plug-in.
+     * 
+     * @param capabilities JSON {@link org.openqa.selenium.Capabilities Capabilities} object
+     * @return list of system property names
+     */
     public static String[] getPropertyNames(String capabilities) {
         return PROPERTY_NAMES;
     }

@@ -5,6 +5,12 @@ import java.lang.reflect.Method;
 import com.nordstrom.automation.selenium.utility.ReflectUtil;
 import com.nordstrom.common.base.StackTrace;
 
+/**
+ * This exception is used to record the execution stack trace for the point at which the
+ * associated container became invalid.
+ * 
+ * @see ContainerVacatedException
+ */
 public class VacationStackTrace extends StackTrace {
 
     private static final long serialVersionUID = -512001372372827847L;

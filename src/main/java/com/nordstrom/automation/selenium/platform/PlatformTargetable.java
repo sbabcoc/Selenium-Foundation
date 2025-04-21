@@ -10,6 +10,8 @@ import com.nordstrom.common.file.PathUtils.PathModifier;
  * of its test methods. Each test method can specify one or more target platform on which it should run. At run-time,
  * the test flow controller determines which test methods should run on the current target platform, only including
  * those test methods that support that platform.
+ * 
+ * @param <P> platform specifier
  */
 public interface PlatformTargetable<P extends Enum<?> & PlatformEnum> extends PathModifier {
     

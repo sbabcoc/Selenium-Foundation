@@ -38,9 +38,9 @@ import com.nordstrom.common.file.PathUtils;
 import net.bytebuddy.implementation.Implementation;
 
 /**
- * This class provides the base plugin implementation for drivers provided by {@code appium}.
+ * This class provides the base plug-in implementation for drivers provided by {@code appium}.
  * <p>
- * All of the Java driver classes associated with this plugin are contained in a single dependency:
+ * All of the Java driver classes associated with this plug-in are contained in a single dependency:
  * 
  * <ul>
  *     <li><b>io.appium.java_client.android.AndroidDriver</b></li>
@@ -80,6 +80,11 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     
     private final String browserName;
     
+    /**
+     * Base constructor for Appium plug-in objects.
+     * 
+     * @param browserName browser name
+     */
     protected AbstractAppiumPlugin(String browserName) {
         this.browserName = browserName;
     }
@@ -406,8 +411,21 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         return new FileNotFoundException(String.format(template, what, setting.name(), setting.key()));
     }
 
+    /**
+     * This class represents a single Appium node server belonging to a local Grid collection.
+     */
     public static class AppiumGridServer extends LocalGridServer {
 
+        /**
+         * Constructor for local Grid Appium node server object.
+         * 
+         * @param host IP address of local Grid server
+         * @param port port of local Grid server
+         * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
+         * @param process {@link Process} of local Grid server
+         * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+         * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
+         */
         public AppiumGridServer(String host, Integer port, boolean isHub, CommandLine process, Path workingPath, Path outputPath) {
             super(host, port, isHub, process, workingPath, outputPath);
         }

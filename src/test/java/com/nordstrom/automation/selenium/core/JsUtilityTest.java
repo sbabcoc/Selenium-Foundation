@@ -3,7 +3,7 @@ package com.nordstrom.automation.selenium.core;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import static com.nordstrom.automation.selenium.platform.TargetType.WEB_APP_NAME;
+import static com.nordstrom.automation.selenium.platform.TargetType.SUPPORT_NAME;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +29,7 @@ import com.nordstrom.automation.selenium.platform.TargetPlatform;
 public class JsUtilityTest extends TestNgTargetRoot {
 
     @NoDriver
+    @TargetPlatform(SUPPORT_NAME)
     @Test(expectedExceptions = {AssertionError.class},
             expectedExceptionsMessageRegExp = "JsUtility is a static utility class that cannot be instantiated")
     public void testPrivateConstructor() throws Throwable {
@@ -49,7 +50,6 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     @Test
-    @TargetPlatform(WEB_APP_NAME)
     public void testRun() {
         ExamplePage page = getPage();
         String script = "document.querySelector(arguments[0]).value = arguments[1];";
@@ -58,7 +58,6 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     @Test
-    @TargetPlatform(WEB_APP_NAME)
     public void testRunAndReturn() {
         ExamplePage page = getPage();
         page.setInputValue("test");
@@ -68,7 +67,6 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     @Test
-    @TargetPlatform(WEB_APP_NAME)
     public void testInjectGlueLib() {
         ExamplePage page = getPage();
         WebDriver driver = page.getWrappedDriver();
@@ -79,7 +77,6 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     @Test
-    @TargetPlatform(WEB_APP_NAME)
     public void testPropagate() {
         ExamplePage page = getPage();
         try {
@@ -91,7 +88,6 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     @Test
-    @TargetPlatform(WEB_APP_NAME)
     public void testShadowRun() {
         try {
             ExamplePage page = getPage();
@@ -106,7 +102,6 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     @Test
-    @TargetPlatform(WEB_APP_NAME)
     public void testShadowRunAndReturn() {
         try {
             ExamplePage page = getPage();
