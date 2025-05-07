@@ -243,7 +243,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;io.netty&lt;/groupId&gt;
      *  &lt;artifactId&gt;netty-transport&lt;/artifactId&gt;
-     *  &lt;version&gt;4.1.91.Final&lt;/version&gt;
+     *  &lt;version&gt;4.2.0.Final&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>io.netty.util.Timer</b>
@@ -251,7 +251,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;io.netty&lt;/groupId&gt;
      *  &lt;artifactId&gt;netty-common&lt;/artifactId&gt;
-     *  &lt;version&gt;4.1.91.Final&lt;/version&gt;
+     *  &lt;version&gt;4.2.0.Final&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>io.netty.handler.ssl.SslUtils</b>
@@ -259,7 +259,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;io.netty&lt;/groupId&gt;
      *  &lt;artifactId&gt;netty-handler&lt;/artifactId&gt;
-     *  &lt;version&gt;4.1.91.Final&lt;/version&gt;
+     *  &lt;version&gt;4.2.0.Final&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>org.slf4j.impl.StaticLoggerBinder</b>
@@ -283,7 +283,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;io.netty&lt;/groupId&gt;
      *  &lt;artifactId&gt;netty-buffer&lt;/artifactId&gt;
-     *  &lt;version&gt;4.1.91.Final&lt;/version&gt;
+     *  &lt;version&gt;4.2.0.Final&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>io.netty.handler.codec.http.Cookie</b>
@@ -291,7 +291,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;io.netty&lt;/groupId&gt;
      *  &lt;artifactId&gt;netty-codec-http&lt;/artifactId&gt;
-     *  &lt;version&gt;4.1.91.Final&lt;/version&gt;
+     *  &lt;version&gt;4.2.0.Final&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>io.netty.handler.codec.Headers</b>
@@ -299,7 +299,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;io.netty&lt;/groupId&gt;
      *  &lt;artifactId&gt;netty-codec&lt;/artifactId&gt;
-     *  &lt;version&gt;4.1.91.Final&lt;/version&gt;
+     *  &lt;version&gt;4.2.0.Final&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
      * <b>com.google.common.util.concurrent.internal.InternalFutures</b>
@@ -308,6 +308,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      *  &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
      *  &lt;artifactId&gt;failureaccess&lt;/artifactId&gt;
      *  &lt;version&gt;1.0.1&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
+     * 
+     * <b>io.netty.handler.codec.compression.ZlibCodecFactory</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;io.netty&lt;/groupId&gt;
+     *  &lt;artifactId&gt;netty-codec-compression&lt;/artifactId&gt;
+     *  &lt;version&gt;4.2.0.Final&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = { "com.nordstrom.automation.selenium.core.LocalSeleniumGrid",
@@ -327,7 +335,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             "io.opentelemetry.api.logs.Logger", "org.openqa.selenium.net.Urls", "org.dataloader.DataLoader",
             "com.google.common.util.concurrent.internal.InternalFutures", "org.eclipse.jetty.server.Server",
             "org.reactivestreams.Publisher", "org.openqa.selenium.manager.SeleniumManager",
-            "org.apache.commons.exec.Executor", "io.netty.buffer.ByteBufUtil" };
+            "org.apache.commons.exec.Executor", "io.netty.buffer.ByteBufUtil", 
+            "io.netty.handler.codec.compression.ZlibCodecFactory" };
     
     static {
         try {
@@ -451,7 +460,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         }
         
         // convert capabilities string to List<Map<String, Object>>
-        List<Map<String, Object>> capsMapList = new Json().toType("[" + capabilities + "]", LIST_OF_MAPS_TYPE);
+        String capsList = (capabilities.startsWith("[")) ? capabilities : "[" + capabilities + "]";
+        List<Map<String, Object>> capsMapList = new Json().toType(capsList, LIST_OF_MAPS_TYPE);
         
         List<MutableCapabilities> capabilitiesList = capsMapList.stream()
                  .map(MutableCapabilities::new)
@@ -501,7 +511,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     public Capabilities[] getCapabilitiesForJson(String capabilities) {
-        List<Map<String, Object>> capsMapList = new Json().toType("[" + capabilities + "]", LIST_OF_MAPS_TYPE);
+        String capsList = (capabilities.startsWith("[")) ? capabilities : "[" + capabilities + "]";
+        List<Map<String, Object>> capsMapList = new Json().toType(capsList, LIST_OF_MAPS_TYPE);
         return capsMapList.stream().map(MutableCapabilities::new).collect(Collectors.toList()).toArray(new Capabilities[0]);
     }
 

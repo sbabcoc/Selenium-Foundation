@@ -122,7 +122,7 @@ public class JsUtilityTest extends TestNgTargetRoot {
          
         try {
             WebElement response = JsUtility.runAndReturn(driver, script, name);
-            return response.getAttribute("content");
+            return WebDriverUtils.getDomPropertyOf(response, "content");
         } catch (WebDriverException e) {
             throw JsUtility.propagate(driver, e);
         }

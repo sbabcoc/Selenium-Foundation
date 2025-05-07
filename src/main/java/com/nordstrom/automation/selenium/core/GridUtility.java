@@ -310,7 +310,7 @@ public final class GridUtility {
      * @return IP address for the machine we're running on (a.k.a. - 'localhost')
      */
     public static String getLocalHost() {
-        return IDENTITY.getNonLoopbackAddressOfThisMachine();
+        return IDENTITY.getIp4NonLoopbackAddressOfThisMachine().getHostAddress();
     }
     
     /**

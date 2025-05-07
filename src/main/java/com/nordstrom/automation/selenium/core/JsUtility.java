@@ -55,7 +55,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  *         // Execute script as anonymous function, passing specified argument
  *         WebElement response = JsUtility.runAndReturn(driver, script, name);
  *         // If element reference was returned, extract 'content' attribute
- *         return (response == null) ? null : response.getAttribute("content");
+ *         return (response == null) ? null : WebDriverUtils.getDomAttributeOf(response, "content");
  *     }
  * }</code></pre>
  * 
@@ -64,7 +64,7 @@ import com.nordstrom.common.base.UncheckedThrow;
  * 
  * <pre><code> var found = document.getElementsByTagName("meta");
  * for (var i = 0; i &lt; found.length; i++) {
- *     if (found[i].getAttribute("name") == arguments[0]) return found[i];
+ *     if (WebDriverUtils.getDomAttributeOf(found[i], "name") == arguments[0]) return found[i];
  * }
  * return null;</code></pre>
  */
