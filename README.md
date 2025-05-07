@@ -5,6 +5,7 @@
 
 ### * BREAKING NEWS *
 
+* With the release of **Selenium Foundation** version _28.6.0_, we now provide support for **Chrome** browser sessions on **Android** through the **UiAutomator2** plug-in. 
 * With the release of **Selenium Foundation** version _28.2.0_, we now provide support for **Appium** sessions via **Selenium 4 Grid**. The auto-generated configuration connects the **Appium** server to the local grid via a relay node.
   * **NOTE**: To properly support **HtmlUnitDriver**, **Appium**, and **Safari**, this release includes new custom slot matcher (Selenium 4) and capabilities matcher (Selenium 3). These matchers are activated via a new setting, which can be easily overridden should the need arise.
 * With the release of **Selenium Foundation** version _28.1.1_, we now provide support for remote **HtmlUnitDriver** sessions with [HtmlUnit Remote](https://github.com/seleniumhq-community/htmlunit-remote). The project unit tests for **Selenium Foundation** have been switched back to running under this "headless" browser.
