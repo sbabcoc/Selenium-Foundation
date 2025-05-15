@@ -7,9 +7,13 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.core.ServerProcessKiller;
 import com.nordstrom.automation.selenium.examples.ServletContainer;
+import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.jar.JarUtils;
 
@@ -17,6 +21,8 @@ import com.nordstrom.common.jar.JarUtils;
  * This class is a thin wrapper around the example page servlet launcher.
  */
 public class ExamplePageLauncher {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExamplePageLauncher.class);
     
     /**
      * This enumeration implements the launcher for the local example page servlet used by the
@@ -48,8 +54,9 @@ public class ExamplePageLauncher {
          * @throws IOException if an I/O error occurs
          */
         public void start() throws IOException {
-            if (!hasStarted) {
+            if (!hasStarted && !isActive()) {
                 process = builder.start();
+                LOGGER.debug("Activated example page site at: {}", getUrl());
                 hasStarted = true;
             }
         }
@@ -72,12 +79,23 @@ public class ExamplePageLauncher {
          * @throws InterruptedException if interrupted while awaiting shutdown
          */
         public void shutdown() throws InterruptedException {
-            if (isActive()) {
+            if (!isActive()) return;
+            
+            if (process != null) {
                 process.destroy();
+                if (1 == process.waitFor()) {
+                    LOGGER.debug("Terminated local server process listening to: {}", getUrl());
+                    hasStarted = false;
+                    isActive = false;
+                    return;
+                }
+            }
+            
+            if (ServerProcessKiller.killServerProcess(null, getUrl())) {
                 hasStarted = false;
                 isActive = false;
-                process.waitFor();
             }
+            
         }
         
         /**
@@ -87,7 +105,7 @@ public class ExamplePageLauncher {
          */
         public URL getUrl() {
             try {
-                return URI.create("http://" + GridUtility.getLocalHost() + ":8080").toURL();
+                return URI.create("http://" + HostUtils.getLocalHost() + ":8080").toURL();
             } catch (MalformedURLException e) {
                 // nothing to do here
             }

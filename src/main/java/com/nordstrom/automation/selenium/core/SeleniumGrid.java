@@ -90,9 +90,9 @@ public class SeleniumGrid {
         hubServer = new GridServer(hubUrl, true);
         List<URL> nodeEndpoints = GridServer.getGridProxies(config, hubUrl);
         if (nodeEndpoints.isEmpty()) {
-            LOGGER.debug("Detected servlet container at: {}", hubUrl);
+            LOGGER.debug("Detected existing servlet container at: {}", hubUrl);
         } else {
-            LOGGER.debug("Mapping structure of grid at: {}", hubUrl);
+            LOGGER.debug("Mapping structure of existing grid at: {}", hubUrl);
             for (URL nodeEndpoint : nodeEndpoints) {
                 URI nodeUri = UriUtils.uriForPath(nodeEndpoint, GridServer.HUB_BASE);
                 nodeServers.put(nodeEndpoint, new GridServer(nodeUri.toURL(), false));
@@ -118,10 +118,8 @@ public class SeleniumGrid {
      */
     public SeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
         this.hubServer = Objects.requireNonNull(hubServer, "[hubServer] must be non-null");
-        if (nodeServers.length == 0) {
-            LOGGER.debug("Defined servlet container at: {}", hubServer.getUrl());
-        } else {
-            LOGGER.debug("Assembling graph of grid at: {}", hubServer.getUrl());
+        if (nodeServers.length > 0) {
+            LOGGER.debug("Assembling graph of pending grid at: {}", hubServer.getUrl());
             for (LocalGridServer nodeServer : nodeServers) {
                 String nodeEndpoint = nodeServer.getUrl().getProtocol() + "://" + nodeServer.getUrl().getAuthority();
                 URL nodeUrl = URI.create(nodeEndpoint).toURL();
@@ -129,6 +127,10 @@ public class SeleniumGrid {
                 this.personalities.putAll(nodeServer.getPersonalities());
             }
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
+        } else if (config.getVersion() == 3) {
+            LOGGER.debug("Queued up servlet container at: {}", hubServer.getUrl());
+        } else {
+            LOGGER.debug("Queued up hub without nodes at: {}", hubServer.getUrl());
         }
     }
     
@@ -163,43 +165,49 @@ public class SeleniumGrid {
      * Grid instance and returns a {@link LocalSeleniumGrid} object.
      * 
      * @param config {@link SeleniumConfig} object
-     * @param hubUrl {@link URL} of hub host
+     * @param hubUrl {@link URL} of hub host (may be {@code null})
      * @return {@link SeleniumGrid} object for the specified hub endpoint
      * @throws IOException if an I/O error occurs
      */
     public static SeleniumGrid create(SeleniumConfig config, URL hubUrl) throws IOException {
-        if ((hubUrl != null) && GridServer.isHubActive(hubUrl)) {
+        Objects.requireNonNull(config, "[config] must be non-null");
+        
+        // if URL is undefined or specifies 'localhost' address
+        if (hubUrl == null || GridUtility.isLocalHost(hubUrl)) {
+            // create/augment local grid instance
+            return LocalSeleniumGrid.create(config, hubUrl);
+        // otherwise, if URL responds to requests
+        } else if (GridServer.isHubActive(hubUrl)) {
             // store hub host and hub port in system properties for subsequent retrieval
             System.setProperty(SeleniumSettings.HUB_HOST.key(), hubUrl.toExternalForm());
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
+            // build graph of existing grid
             return new SeleniumGrid(config, hubUrl);
-        } else if ((hubUrl == null) || GridUtility.isLocalHost(hubUrl)) {
-            return LocalSeleniumGrid.create(config, config.createHubConfig());
         }
+        
         throw new IllegalStateException("Specified remote hub URL '" + hubUrl + "' isn't active");
     }
     
     /**
      * Shutdown the Selenium Grid represented by this object.
      * 
-     * @param localOnly {@code true} to target only local Grid servers
      * @return {@code false} if non-local Grid server encountered; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
-    public boolean shutdown(final boolean localOnly) throws InterruptedException {
+    public boolean shutdown() throws InterruptedException {
         boolean result = true;
         Iterator<Entry<URL, GridServer>> iterator = nodeServers.entrySet().iterator();
         
         while (iterator.hasNext()) {
             Entry<URL, GridServer> serverEntry = iterator.next();
-            if (serverEntry.getValue().shutdown(localOnly)) {
+            if (serverEntry.getValue().shutdown()) {
                 iterator.remove();
             } else {
                 result = false;
             }
         }
         
-        if (hubServer.shutdown(localOnly)) {
+        if (hubServer.shutdown()) {
             hubServer = null;
         } else {
             result = false;

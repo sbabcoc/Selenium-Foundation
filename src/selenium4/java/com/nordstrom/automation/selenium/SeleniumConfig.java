@@ -31,6 +31,7 @@ import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.automation.settings.SettingsCore;
 
 /**
@@ -445,7 +446,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             if (isAppium) {
                 // create relay configuration template if absent
                 Map<String, Object> relayOptions = (Map<String, Object>) nodeConfig.computeIfAbsent("relay", k -> new HashMap<>());
-                relayOptions.computeIfAbsent("host", k -> GridUtility.getLocalHost());
+                relayOptions.computeIfAbsent("host", k -> HostUtils.getLocalHost());
                 relayOptions.computeIfAbsent("port", k -> PortProber.findFreePort());
                 relayOptions.computeIfAbsent("configs", k -> new ArrayList<>());
             // otherwise (not Appium)

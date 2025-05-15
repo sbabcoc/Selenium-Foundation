@@ -56,7 +56,7 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubUrl);
         String[] propertyNames = getPropertyNames(capabilities);
         return LocalSeleniumGrid.create(config, launcherClassName, combinedContexts,
-                false, 0, nodeConfigPath, workingPath, outputPath, propertyNames);
+                false, -1, nodeConfigPath, workingPath, outputPath, propertyNames);
     }
 
     /**
