@@ -29,11 +29,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.grid.config.ConfigException;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.core.ServerProcessKiller;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -87,6 +90,8 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
     private static final String APPIUM_WITH_PM2 = "{\"nord:options\":{\"appiumWithPM2\":true}}";
     private static final String APPIUM_HOME = "APPIUM_HOME";
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAppiumPlugin.class);
     
     private final String browserName;
     
@@ -470,10 +475,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
          * {@inheritDoc}
          */
         @Override
-        public boolean shutdown(final boolean localOnly) throws InterruptedException {
+        public boolean shutdown() throws InterruptedException {
             if (isActive()) {
-                if ( ! shutdownAppiumWithPM2(getUrl())) {
-                    getProcess().destroy();
+                if (!shutdownAppiumWithPM2(getUrl())) {
+                    ServerProcessKiller.killServerProcess(getProcess(), getUrl());
                 }
             }
             return true;
@@ -523,10 +528,13 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             
             try {
                 exitCode = builder.start().waitFor();
+                LOGGER.debug("Deleted PM2 process: appium-{}", nodeUrl.getPort());
             } catch (IOException eaten) {
+                LOGGER.debug("I/O exception while shutting down PM2-managed Appium node", e);
                 exitCode = -1;
             } catch (InterruptedException cause) {
                 Thread.currentThread().interrupt();
+                LOGGER.debug("Interrupted while shutting down PM2-managed Appium node", e);
                 exitCode = -1;
             }
             

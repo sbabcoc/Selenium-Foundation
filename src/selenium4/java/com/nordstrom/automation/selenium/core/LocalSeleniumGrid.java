@@ -11,9 +11,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import java.util.concurrent.TimeoutException;
 import org.openqa.selenium.net.PortProber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
@@ -41,6 +44,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_HOST = "--host";
     private static final String OPT_PORT = "--port";
     private static final String OPT_CONFIG = "--config";
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalSeleniumGrid.class);
     
     /**
      * Constructor for models of local Selenium Grid instances from hub URL.
@@ -125,46 +130,91 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * subsequent retrieval.
      * 
      * @param config {@link SeleniumConfig} object
-     * @param hubConfigPath Selenium Grid hub configuration path
+     * @param hubUrl {@link URL} for grid hub host (may be {@code null})
      * @return {@link SeleniumGrid} object for local Grid
      * @throws IOException if an I/O error occurs
      * @throws ServiceConfigurationError if unable to instantiate all configured driver plugins
      * @see #activate()
      */
-    public static SeleniumGrid create(SeleniumConfig config, final Path hubConfigPath) throws IOException {
+    public static SeleniumGrid create(SeleniumConfig config, final URL hubUrl) throws IOException {
+        GridServer hubServer = null;
+        SeleniumGrid seleniumGrid = null;
+        
+        Objects.requireNonNull(config, "[config] must be non-null");
         
         String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
         String[] dependencyContexts = config.getDependencyContexts();
-        Integer hubPort = config.getInteger(SeleniumSettings.HUB_PORT.key(), 0);
         String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
         Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
-        Path outputPath = GridUtility.getOutputPath(config, true);
-        LocalGridServer hubServer = create(config, launcherClassName, dependencyContexts,
-                        true, hubPort, hubConfigPath, workingPath, outputPath);
+        
+        // if specified hub is already active
+        if (hubUrl != null && GridServer.isHubActive(hubUrl)) {
+            seleniumGrid =  new SeleniumGrid(config, hubUrl);
+            hubServer = seleniumGrid.getHubServer();
+        // otherwise (creating new local Grid)
+        } else {
+            // create hub configuration
+            Path hubConfigPath = config.createHubConfig();
+            // get hub port:
+            // - if hub URL if specified, extract port from URL
+            // - otherwise, use specified hub port, defaulting to zero
+            Integer hubPort = (hubUrl != null) ?
+                    hubUrl.getPort() : config.getInteger(SeleniumSettings.HUB_PORT.key(), -1);
+            Path outputPath = GridUtility.getOutputPath(config, true);
+            hubServer = create(config, launcherClassName, dependencyContexts, 
+                    true, hubPort, hubConfigPath, workingPath, outputPath);
+        }
         
         // store hub host and hub port in system properties for subsequent retrieval
         System.setProperty(SeleniumSettings.HUB_HOST.key(), hubServer.getUrl().toString());
         System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubServer.getUrl().getPort()));
         
-        List<LocalGridServer> nodeServers = new ArrayList<>();
+        List<GridServer> nodeServers = new ArrayList<>();
+        
         // iterate over configured driver plugins
         for (DriverPlugin driverPlugin : GridUtility.getDriverPlugins(config)) {
-            // create node server for this driver plug-in
-            LocalGridServer nodeServer = driverPlugin.create(config, launcherClassName, dependencyContexts,
-                    hubServer.getUrl(), workingPath);
-            // add server to nodes list
-            nodeServers.add(nodeServer);
-            // if this is an Appium Grid server
-            if (nodeServer instanceof AppiumGridServer) {
-                // get path to relay configuration path from Appium process environment
-                Path nodeConfigPath = ((AppiumGridServer) nodeServer).getNodeConfigPath();
-                // add relay node for Appium Grid server to nodes list
-                nodeServers.add(create(config, launcherClassName, dependencyContexts, false, 0, nodeConfigPath,
-                        workingPath, GridUtility.getOutputPath(config, null)));
+            // if creating new local Grid or active Grid doesn't include current driver plug-in
+            if (seleniumGrid == null || !seleniumGrid.personalities.containsKey(driverPlugin.getBrowserName())) {
+                // create node server for this driver plug-in
+                LocalGridServer nodeServer = driverPlugin.create(config, launcherClassName, dependencyContexts,
+                        hubServer.getUrl(), workingPath);
+                // add server to nodes list
+                nodeServers.add(nodeServer);
+                // if this is an Appium Grid server
+                if (nodeServer instanceof AppiumGridServer) {
+                    // get path to relay configuration path from Appium process environment
+                    Path nodeConfigPath = ((AppiumGridServer) nodeServer).getNodeConfigPath();
+                    // add relay node for Appium Grid server to nodes list
+                    nodeServers.add(create(config, launcherClassName, dependencyContexts, false, 0, nodeConfigPath,
+                            workingPath, GridUtility.getOutputPath(config, null)));
+                }
             }
         }
         
-        return new LocalSeleniumGrid(config, hubServer, nodeServers.toArray(new LocalGridServer[0]));
+        // if graphing active Grid
+        if (seleniumGrid != null) {
+            // if no local nodes added
+            if (nodeServers.isEmpty()) {
+                return seleniumGrid;
+            // otherwise (local nodes added)
+            } else {
+                try {
+                    for (GridServer nodeServer : nodeServers) {
+                        ((LocalGridServer) nodeServer).start();
+                    }
+                    awaitGridReady(hubServer, nodeServers);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted activating new local nodes", e);
+                } catch (IOException | TimeoutException e) {
+                    throw new IllegalStateException("Failed activating new local nodes", e);
+                }
+            }
+            
+            return new SeleniumGrid(config, hubUrl);
+        } else {
+            return new LocalSeleniumGrid(config, (LocalGridServer) hubServer, nodeServers.toArray(new LocalGridServer[0]));
+        }
     }
 
     /**
@@ -177,7 +227,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
      * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
-     * @param port port that Grid server should use; 0 to specify auto-configuration
+     * @param port port that Grid server should use; -1 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
@@ -212,7 +262,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         
         Integer portNum = port;
         // if port auto-select spec'd
-        if (portNum == 0) {
+        if (portNum == -1) {
             // acquire available port
             portNum = PortProber.findFreePort();
         }
@@ -338,6 +388,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             if (!hasStarted) {
                 process = builder.start();
                 hasStarted = true;
+                LOGGER.debug("Activated local grid {} server at: {}", isHub() ? "hub" : "node", getUrl());
             }
         }
         
@@ -356,12 +407,9 @@ public class LocalSeleniumGrid extends SeleniumGrid {
          * {@inheritDoc}
          */
         @Override
-        public boolean shutdown(final boolean localOnly) throws InterruptedException {
+        public boolean shutdown() throws InterruptedException {
             if (isActive()) {
-                getProcess().destroy();
-                hasStarted = false;
-                isActive = false;
-                getProcess().waitFor();
+                return ServerProcessKiller.killServerProcess(process, getUrl());
             }
             
             return true;
