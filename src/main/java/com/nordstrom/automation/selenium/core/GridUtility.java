@@ -152,6 +152,7 @@ public final class GridUtility {
                     localGrid.activate();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted activating local grid instance", e);
                 } catch (IOException | TimeoutException e) {
                     throw new IllegalStateException("Failed activating local grid instance", e);
                 }
@@ -257,6 +258,8 @@ public final class GridUtility {
      * @return 'true' if server is local host; otherwise 'false'
      */
     public static boolean isLocalHost(URL host) {
+        Objects.requireNonNull(host, "[host] must be non-null");
+        
         try {
             InetAddress addr = InetAddress.getByName(host.getHost());
             return (isThisMyIpAddress(addr));

@@ -1,35 +1,36 @@
 package com.nordstrom.automation.selenium.plugins;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.net.PortProber;
-import org.openqa.selenium.os.CommandLine;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
+import com.nordstrom.automation.selenium.core.ServerProcessKiller;
 import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.utility.BinaryFinder;
@@ -77,6 +78,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
     private static final String APPIUM_WITH_PM2 = "{\"nord:options\":{\"appiumWithPM2\":true}}";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAppiumPlugin.class);
     
     private final String browserName;
     
@@ -201,7 +203,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add(0, address);
         argsList.add(0, "--address");
         
-        CommandLine process;
+        ProcessBuilder builder;
         String appiumBinaryPath = findMainScript().getAbsolutePath();
         
         // if running with 'pm2'
@@ -238,14 +240,16 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
                 executable = pm2Binary.getAbsolutePath();
             }
 
-            process = new CommandLine(executable, argsList.toArray(new String[0]));
+            argsList.add(0, executable);
+            builder = new ProcessBuilder(argsList);
         // otherwise (running with 'node')
         } else {
             argsList.add(0, appiumBinaryPath);
-            process = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
+            argsList.add(0, findNodeBinary().getAbsolutePath());
+            builder = new ProcessBuilder(argsList);
         }
         
-        return new AppiumGridServer(address, portNum, false, process, workingPath, outputPath);
+        return new AppiumGridServer(address, portNum, false, builder, workingPath, outputPath);
     }
 
     /**
@@ -361,21 +365,30 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             executable = npm.getAbsolutePath();
         }
         
+        argsList.add(executable);
         argsList.add("root");
         argsList.add("-g");
         
-        CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
+        ProcessBuilder builder = new ProcessBuilder(argsList);
+        builder.environment().put("PATH", PathUtils.getSystemPath());
         
         try {
-            process.execute();
-            nodeModulesRoot = process.getStdOut().trim();
+            Process process = builder.start();
+            process.waitFor();
+            
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                nodeModulesRoot = reader.lines().parallel().collect(Collectors.joining("\n"));
+            }
+            
             int index = nodeModulesRoot.lastIndexOf('\n');
             if (index > 0) nodeModulesRoot = nodeModulesRoot.substring(index).trim();
             File appiumMain = Paths.get(nodeModulesRoot, APPIUM_PATH_TAIL).toFile();
             if (appiumMain.exists()) return appiumMain;
             throw fileNotFound("'appium' main script", SeleniumSettings.APPIUM_BINARY_PATH);
         } catch (IOException cause) {
+            throw new GridServerLaunchFailedException("node", cause);
+        } catch (InterruptedException cause) {
+            Thread.currentThread().interrupt();
             throw new GridServerLaunchFailedException("node", cause);
         }
     }
@@ -422,46 +435,27 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
          * @param host IP address of local Grid server
          * @param port port of local Grid server
          * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
-         * @param process {@link Process} of local Grid server
+         * @param builder {@link ProcessBuilder} of local Grid server
          * @param workingPath {@link Path} of working directory for server process; {@code null} for default
          * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
          */
-        public AppiumGridServer(String host, Integer port, boolean isHub, CommandLine process, Path workingPath, Path outputPath) {
-            super(host, port, isHub, process, workingPath, outputPath);
+        public AppiumGridServer(String host, Integer port, boolean isHub, ProcessBuilder builder, Path workingPath, Path outputPath) {
+            super(host, port, isHub, builder, workingPath, outputPath);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public boolean shutdown(final boolean localOnly) throws InterruptedException {
+        public boolean shutdown() throws InterruptedException {
             if (isActive()) {
-                if ( ! shutdownAppiumWithPM2(getUrl())) {
-                    getProcess().destroy();
+                if (!shutdownAppiumWithPM2(getUrl())) {
+                    ServerProcessKiller.killServerProcess(getProcess(), getUrl());
                 }
             }
             return true;
         }
         
-        /**
-         * Get process environment from this AppiumGridServer object.
-         *  
-         * @return map of process environment variables
-         */
-        @SuppressWarnings("unchecked")
-        public Map<String, String> getEnvironment() {
-            try {
-                Field processField = CommandLine.class.getDeclaredField("process");
-                processField.setAccessible(true);
-                Object osProcess = processField.get(getProcess());
-                Method getEnvironment = osProcess.getClass().getDeclaredMethod("getEnvironment");
-                getEnvironment.setAccessible(true);
-                return (Map<String, String>) getEnvironment.invoke(osProcess);
-            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                return Collections.emptyMap();
-            }
-        }
-
         /**
          * If the specified URL is a local 'appium' node running with 'pm2', delete the process.
          * 
@@ -472,8 +466,9 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             if ( ! GridUtility.isLocalHost(nodeUrl)) return false;
             if ( ! isAppiumWithPM2(nodeUrl)) return false;
             
+            int exitCode = 0;
             String executable;
-            CommandLine process;
+            ProcessBuilder builder;
             List<String> argsList = new ArrayList<>();
             File pm2Binary = findPM2Binary().getAbsoluteFile();
 
@@ -488,10 +483,23 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
                 executable = pm2Binary.getAbsolutePath();
             }
             
-            process = new CommandLine(executable, argsList.toArray(new String[0]));
-            process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
-            process.execute();
-            return true;
+            argsList.add(0, executable);
+            builder = new ProcessBuilder(argsList);
+            builder.environment().put("PATH", PathUtils.getSystemPath());
+            
+            try {
+                exitCode = builder.start().waitFor();
+                LOGGER.debug("Deleted PM2 process: appium-{}", nodeUrl.getPort());
+            } catch (IOException e) {
+                LOGGER.debug("I/O exception while shutting down PM2-managed Appium node", e);
+                exitCode = -1;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOGGER.debug("Interrupted while shutting down PM2-managed Appium node", e);
+                exitCode = -1;
+            }
+            
+            return exitCode == 0;
         }
 
         /**

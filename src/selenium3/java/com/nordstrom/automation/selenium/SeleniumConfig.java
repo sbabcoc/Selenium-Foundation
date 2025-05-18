@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.internal.utils.CapabilityMatcher;
 import org.openqa.grid.internal.utils.configuration.GridHubConfiguration;
 import org.openqa.grid.internal.utils.configuration.GridNodeConfiguration;
-import org.openqa.grid.web.servlet.LifecycleServlet;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.grid.config.ConfigException;
@@ -291,11 +290,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         
         // get configured node servlet collection
         Set<String> servlets = new HashSet<>(nodeConfig.servlets);
-        // if remote shutdown feature is specified
-        if (getBoolean(SeleniumSettings.GRID_LIFECYCLE.key())) {
-            // add lifecycle servlet to the collection
-            servlets.add(LifecycleServlet.class.getName());
-        }
         
         // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
