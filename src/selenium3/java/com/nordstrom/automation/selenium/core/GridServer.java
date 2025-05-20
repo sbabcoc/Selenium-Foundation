@@ -8,19 +8,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.json.Json;
-import org.openqa.selenium.net.UrlChecker.TimeoutException;
+
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.api.GridProxyResponse;
 import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
-import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class represents a single Selenium Grid server (hub or node).
@@ -29,17 +26,12 @@ public class GridServer {
     private boolean isHub;
     private URL serverUrl;
     protected String statusRequest;
-    protected String[] shutdownRequest;
     
     public static final String GRID_CONSOLE = "/grid/console";
     public static final String HUB_BASE = "/wd/hub";
     public static final String NODE_STATUS = "/wd/hub/status";
     public static final String HUB_CONFIG = "/grid/api/hub/";
     public static final String NODE_CONFIG = "/grid/api/proxy";
-    
-    private static final String[] HUB_SHUTDOWN = { "/lifecycle-manager", "action=shutdown" };
-    private static final String[] NODE_SHUTDOWN = { "/extra/LifecycleServlet", "action=shutdown" };
-    private static final long SHUTDOWN_DELAY = 15;
     
     /**
      * Constructor for Grid server object.
@@ -50,13 +42,7 @@ public class GridServer {
     public GridServer(URL url, boolean isHub) {
         this.isHub = isHub;
         this.serverUrl = url;
-        if (isHub()) {
-            statusRequest = HUB_CONFIG;
-            shutdownRequest = HUB_SHUTDOWN;
-        } else {
-            statusRequest = NODE_STATUS;
-            shutdownRequest = NODE_SHUTDOWN;
-        }
+        statusRequest = (isHub()) ? HUB_CONFIG : NODE_STATUS;
     }
     
     /**
@@ -89,32 +75,14 @@ public class GridServer {
     /**
      * Stop the Selenium Grid server represented by this object.
      * 
-     * @param localOnly {@code true} to target only local Grid server
      * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
-    public boolean shutdown(final boolean localOnly) throws InterruptedException {
-        boolean isLocal = GridUtility.isLocalHost(serverUrl);
-        if (localOnly && !isLocal) {
-            return false;
-        }
-        
-        if (isActive()) {
-            if (isLocal && !isHub()) {
-                if (AppiumGridServer.shutdownAppiumWithPM2(serverUrl)) {
-                    return true;
-                }
-            }
-            try {
-                GridUtility.getHttpResponse(serverUrl, shutdownRequest);
-                SeleniumGrid.waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
-                Thread.sleep(1000);
-            } catch (IOException | TimeoutException e) {
-                throw UncheckedThrow.throwUnchecked(e);
-            }
-        }
-        
-        return true;
+    public boolean shutdown() throws InterruptedException {
+        if (!GridUtility.isLocalHost(serverUrl)) return false;
+        if (!isActive()) return true;
+        if (!isHub() && AppiumGridServer.shutdownAppiumWithPM2(serverUrl)) return true;
+        return ServerProcessKiller.killServerProcess(null, serverUrl);
     }
 
     /**

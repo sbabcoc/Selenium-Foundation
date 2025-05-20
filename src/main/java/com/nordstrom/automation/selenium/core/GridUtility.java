@@ -38,7 +38,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.net.NetworkUtils;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,6 @@ import com.nordstrom.common.uri.UriUtils;
 public final class GridUtility {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
-    private static final NetworkUtils IDENTITY = new NetworkUtils();
     
     /**
      * Private constructor to prevent instantiation.
@@ -152,6 +150,7 @@ public final class GridUtility {
                     localGrid.activate();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted activating local grid instance", e);
                 } catch (IOException | TimeoutException e) {
                     throw new IllegalStateException("Failed activating local grid instance", e);
                 }
@@ -257,6 +256,8 @@ public final class GridUtility {
      * @return 'true' if server is local host; otherwise 'false'
      */
     public static boolean isLocalHost(URL host) {
+        Objects.requireNonNull(host, "[host] must be non-null");
+        
         try {
             InetAddress addr = InetAddress.getByName(host.getHost());
             return (isThisMyIpAddress(addr));
@@ -304,15 +305,6 @@ public final class GridUtility {
         return null;
     }
 
-    /**
-     * Get Internet protocol (IP) address for the machine we're running on.
-     * 
-     * @return IP address for the machine we're running on (a.k.a. - 'localhost')
-     */
-    public static String getLocalHost() {
-        return IDENTITY.getIp4NonLoopbackAddressOfThisMachine().getHostAddress();
-    }
-    
     /**
      * Get next configured output path for Grid server of specified role.
      * 

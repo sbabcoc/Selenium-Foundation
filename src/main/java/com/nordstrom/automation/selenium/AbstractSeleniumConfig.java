@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
@@ -42,6 +43,7 @@ import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servl
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
@@ -619,8 +621,11 @@ public abstract class AbstractSeleniumConfig extends
     
     /**
      * Get the URL for the configured Selenium Grid hub host.
+     * <p>
+     * <b>NOTE</b>: If hub host is unspecified, a local address is synthesized from hub port.
+     * If hub port is also unspecified, this method returns {@code null}.
      * 
-     * @return {@link URL} for hub host; {@code null} if hub host is unspecified
+     * @return {@link URL} for hub host; {@code null} if neither host nor port is unspecified
      */
     public synchronized URL getHubUrl() {
         if (hubUrl == null) {
@@ -628,8 +633,16 @@ public abstract class AbstractSeleniumConfig extends
             if (hostStr != null) {
                 try {
                     hubUrl = URI.create(hostStr).toURL();
+                    LOGGER.debug("Specified hub URL: {}", hubUrl);
                 } catch (MalformedURLException e) {
                     throw UncheckedThrow.throwUnchecked(e);
+                }
+            } else {
+                Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), -1);
+                if (hubPort != -1) {
+                    String localHost = HostUtils.getLocalHost();
+                    hubUrl = LocalGridServer.getServerUrl(localHost, hubPort);
+                    LOGGER.debug("Synthesized hub URL: {}", hubUrl);
                 }
             }
         }
@@ -657,15 +670,16 @@ public abstract class AbstractSeleniumConfig extends
     /**
      * Shutdown the active Selenium Grid.
      * 
-     * @param localOnly {@code true} to target only local Grid servers
      * @return {@code false} if non-local Grid server encountered; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
-    public boolean shutdownGrid(final boolean localOnly) throws InterruptedException {
+    public boolean shutdownGrid() throws InterruptedException {
         boolean result = true;
         synchronized(SeleniumGrid.class) {
-            if (seleniumGrid != null) {
-                result = seleniumGrid.shutdown(localOnly);
+            getSeleniumGrid(); // ensure local grid mappings are initialized
+            // if grid hub is active
+            if (seleniumGrid.getHubServer().isActive()) {
+                result = seleniumGrid.shutdown();
                 if (result) {
                     ExamplePageLauncher.getLauncher().shutdown();
                     seleniumGrid = null;

@@ -2,7 +2,7 @@ package com.nordstrom.automation.selenium.exceptions;
 
 import java.lang.reflect.Method;
 
-import com.nordstrom.automation.selenium.utility.ReflectUtil;
+import com.nordstrom.automation.selenium.utility.ReflectUtils;
 import com.nordstrom.common.base.StackTrace;
 
 /**
@@ -67,7 +67,7 @@ public class VacationStackTrace extends StackTrace {
      */
     private static String getMessage(final Method method, final String reason) {
         String className = method.getDeclaringClass().getSimpleName();
-        String signature = ReflectUtil.getSignature(method);
+        String signature = ReflectUtils.getSignature(method);
         String suffix = (reason != null) ? "\n" + reason : "";
         return PREAMBLE + className + ":" + signature + suffix;
     }

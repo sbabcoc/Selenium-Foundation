@@ -93,9 +93,7 @@ The **`GRID_PLUGINS`** setting specifies a semicolon-delimited list of fully-qua
 
 * `getSeleniumGrid()` - Get an object that represents the active Selenium Grid. If indicated, this method wil launch a local Grid instance.
 * `getHubUrl()` - Get the URL for the configured Selenium Grid hub host. In local Grid configurations, this value will be populated when the Grid is launched.
-* `shutdownGrid(boolean localOnly)` - Shut down the active Selenium Grid. To enable shutdown of remote Grid instances, attached Grid nodes must install the **`LifecycleServlet`**:
-
-> -servlets org.openqa.grid.web.servlet.LifecycleServlet
+* `shutdownGrid()` - Shut down the active Selenium Grid.
 
 #### Grid Configuration for Selenium Foundation unit tests
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
@@ -19,6 +20,7 @@ import org.openqa.selenium.json.JsonInput;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class represents a single Selenium Grid server (hub or node).
@@ -75,48 +77,14 @@ public class GridServer {
     /**
      * Stop the Selenium Grid server represented by this object.
      * 
-     * @param localOnly {@code true} to target only local Grid server
      * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
-    public boolean shutdown(final boolean localOnly) throws InterruptedException {
-        boolean isLocal = GridUtility.isLocalHost(serverUrl);
-        if (localOnly && !isLocal) {
-            return false;
-        }
-        
-        if (isActive()) {
-            if (isLocal) {
-                if (!isHub() && AppiumGridServer.shutdownAppiumWithPM2(serverUrl)) {
-                    return true;
-                }
-
-// FIXME: This functionality relies on Selenium 3 Grid server remote shutdown features that are no
-// longer available in Selenium 4. New implementation will require determination of the server PID
-// and command line process termination.
-
-//              try {
-//                  GridUtility.getHttpResponse(serverUrl, shutdownRequest);
-//                  SeleniumGrid.waitUntilUnavailable(SHUTDOWN_DELAY, TimeUnit.SECONDS, serverUrl);
-//                  Thread.sleep(1000);
-//              } catch (IOException | org.openqa.selenium.net.UrlChecker.TimeoutException e) {
-//                  throw UncheckedThrow.throwUnchecked(e);
-//              }
-                
-                /*
-                 * FIXME: Implement this -
-                 * 
-                 * Get process IDs associated with port
-                 * - on Windows: netstat -a -n -o | find "123456"
-                 * - on Mac: netstat -vanp tcp | grep 123456
-                 * - on Linux: netstat -ltnp | grep -w ':123456'
-                 * 
-                 * Can I create a process object using a found PID? Doesn't seem that I can.
-                */
-            }
-        }
-        
-        return true;
+    public boolean shutdown() throws InterruptedException {
+        if (!GridUtility.isLocalHost(serverUrl)) return false;
+        if (!isActive()) return true;
+        if (!isHub() && AppiumGridServer.shutdownAppiumWithPM2(serverUrl)) return true;
+        return ServerProcessKiller.killServerProcess(null, serverUrl);
     }
 
     /**
@@ -183,6 +151,13 @@ public class GridServer {
                 .map(node -> node.getCapabilities()).flatMap(Collection::stream).collect(Collectors.toList());
     }
     
+    /**
+     * Get status of the nodes registered with the specified Selenium Grid hub.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param hubUrl {@link URL} of Grid hub
+     * @return list of {@link NodeStatus> objects
+     */
     private static List<NodeStatus> getStatusOfNodes(SeleniumConfig config, URL hubUrl) {
         try {
             HttpResponse response = GridUtility.callGraphQLService(hubUrl, Nodes.NODE_STATUS);

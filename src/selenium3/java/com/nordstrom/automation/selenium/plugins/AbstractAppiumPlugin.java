@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
@@ -24,6 +23,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.os.CommandLine;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
@@ -33,6 +34,7 @@ import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.automation.selenium.utility.BinaryFinder;
+import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.common.file.PathUtils;
 
 import net.bytebuddy.implementation.Implementation;
@@ -77,6 +79,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
     
     private static final Pattern OPTION_PATTERN = Pattern.compile("\\s*(-[a-zA-Z0-9]+|--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)");
     private static final String APPIUM_WITH_PM2 = "{\"nord:options\":{\"appiumWithPM2\":true}}";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAppiumPlugin.class);
     
     private final String browserName;
     
@@ -182,7 +185,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         }
         
         // get 'localhost' and free port
-        address = GridUtility.getLocalHost();
+        address = HostUtils.getLocalHost();
         portNum = PortProber.findFreePort();
         
         // add 'base-path' argument
@@ -201,7 +204,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add(0, address);
         argsList.add(0, "--address");
         
-        CommandLine process;
+        CommandLine cmdLine;
         String appiumBinaryPath = findMainScript().getAbsolutePath();
         
         // if running with 'pm2'
@@ -238,14 +241,14 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
                 executable = pm2Binary.getAbsolutePath();
             }
 
-            process = new CommandLine(executable, argsList.toArray(new String[0]));
+            cmdLine = new CommandLine(executable, argsList.toArray(new String[0]));
         // otherwise (running with 'node')
         } else {
             argsList.add(0, appiumBinaryPath);
-            process = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
+            cmdLine = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
         }
         
-        return new AppiumGridServer(address, portNum, false, process, workingPath, outputPath);
+        return new AppiumGridServer(address, portNum, false, cmdLine, workingPath, outputPath);
     }
 
     /**
@@ -364,12 +367,12 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add("root");
         argsList.add("-g");
         
-        CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
-        process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
+        CommandLine cmdLine = new CommandLine(executable, argsList.toArray(new String[0]));
+        cmdLine.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
         
         try {
-            process.execute();
-            nodeModulesRoot = process.getStdOut().trim();
+            cmdLine.execute();
+            nodeModulesRoot = cmdLine.getStdOut().trim();
             int index = nodeModulesRoot.lastIndexOf('\n');
             if (index > 0) nodeModulesRoot = nodeModulesRoot.substring(index).trim();
             File appiumMain = Paths.get(nodeModulesRoot, APPIUM_PATH_TAIL).toFile();
@@ -422,25 +425,22 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
          * @param host IP address of local Grid server
          * @param port port of local Grid server
          * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
-         * @param process {@link Process} of local Grid server
+         * @param cmdLine {@link CommandLine} of local Grid server
          * @param workingPath {@link Path} of working directory for server process; {@code null} for default
          * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
          */
-        public AppiumGridServer(String host, Integer port, boolean isHub, CommandLine process, Path workingPath, Path outputPath) {
-            super(host, port, isHub, process, workingPath, outputPath);
+        public AppiumGridServer(String host, Integer port, boolean isHub, CommandLine cmdLine, Path workingPath, Path outputPath) {
+            super(host, port, isHub, cmdLine, workingPath, outputPath);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public boolean shutdown(final boolean localOnly) throws InterruptedException {
-            if (isActive()) {
-                if ( ! shutdownAppiumWithPM2(getUrl())) {
-                    getProcess().destroy();
-                }
-            }
-            return true;
+        public boolean shutdown() throws InterruptedException {
+            if (!isActive()) return true;
+            if (shutdownAppiumWithPM2(getUrl())) return true;
+            return super.shutdown();
         }
         
         /**
@@ -453,7 +453,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             try {
                 Field processField = CommandLine.class.getDeclaredField("process");
                 processField.setAccessible(true);
-                Object osProcess = processField.get(getProcess());
+                Object osProcess = processField.get(getCmdLine());
                 Method getEnvironment = osProcess.getClass().getDeclaredMethod("getEnvironment");
                 getEnvironment.setAccessible(true);
                 return (Map<String, String>) getEnvironment.invoke(osProcess);
@@ -473,7 +473,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             if ( ! isAppiumWithPM2(nodeUrl)) return false;
             
             String executable;
-            CommandLine process;
+            CommandLine cmdLine;
             List<String> argsList = new ArrayList<>();
             File pm2Binary = findPM2Binary().getAbsoluteFile();
 
@@ -488,9 +488,10 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
                 executable = pm2Binary.getAbsolutePath();
             }
             
-            process = new CommandLine(executable, argsList.toArray(new String[0]));
-            process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
-            process.execute();
+            cmdLine = new CommandLine(executable, argsList.toArray(new String[0]));
+            cmdLine.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
+            cmdLine.execute();
+            LOGGER.debug("Deleted PM2 process: appium-{}", nodeUrl.getPort());
             return true;
         }
 

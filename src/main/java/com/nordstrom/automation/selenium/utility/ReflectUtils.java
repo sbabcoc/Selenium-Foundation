@@ -21,13 +21,13 @@ import java.lang.reflect.Method;
 /**
  * This static utility class contains methods that use reflection to produce method signature strings.
  */
-public final class ReflectUtil {
+public final class ReflectUtils {
     
     /**
      * Private constructor to prevent instantiation.
      */
-    private ReflectUtil() {
-        throw new AssertionError("ReflectUtil is a static utility class that cannot be instantiated");
+    private ReflectUtils() {
+        throw new AssertionError("ReflectUtils is a static utility class that cannot be instantiated");
     }
     
     /**

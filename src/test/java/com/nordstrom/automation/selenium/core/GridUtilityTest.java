@@ -29,7 +29,7 @@ public class GridUtilityTest extends TestNgBase {
     
     @BeforeClass
     public void stopLocalGrid() throws InterruptedException {
-        if (!SeleniumConfig.getConfig().shutdownGrid(true)) {
+        if (!SeleniumConfig.getConfig().shutdownGrid()) {
             throw new IllegalStateException("Configured for non-local hub host");
         }
     }
