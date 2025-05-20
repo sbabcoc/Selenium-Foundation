@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
@@ -20,7 +19,6 @@ import org.openqa.selenium.json.JsonInput;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
-import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class represents a single Selenium Grid server (hub or node).
