@@ -5,6 +5,7 @@
 
 ### * BREAKING NEWS *
 
+* With the release of **Selenium Foundation** version _29.0.0_, we now detect active local Grid instances, adopting and managing them if found at the specified (or implied) address.
 * With the release of **Selenium Foundation** version _28.6.0_, we now provide support for **Chrome** browser sessions on **Android** through the **UiAutomator2** plug-in. 
 * With the release of **Selenium Foundation** version _28.2.0_, we now provide support for **Appium** sessions via **Selenium 4 Grid**. The auto-generated configuration connects the **Appium** server to the local grid via a relay node.
   * **NOTE**: To properly support **HtmlUnitDriver**, **Appium**, and **Safari**, this release includes new custom slot matcher (Selenium 4) and capabilities matcher (Selenium 3). These matchers are activated via a new setting, which can be easily overridden should the need arise.
