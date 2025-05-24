@@ -84,7 +84,7 @@ public class ExamplePageLauncher {
             if (process != null) {
                 process.destroy();
                 if (1 == process.waitFor()) {
-                    LOGGER.debug("Terminated local server process listening to: {}", getUrl());
+                    LOGGER.debug("Terminated example page server process listening to: {}", getUrl());
                     hasStarted = false;
                     isActive = false;
                     return;
