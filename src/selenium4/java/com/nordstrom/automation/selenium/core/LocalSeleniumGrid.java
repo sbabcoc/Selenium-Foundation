@@ -183,6 +183,11 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                     // add relay node for Appium Grid server to nodes list
                     nodeServers.add(create(config, launcherClassName, dependencyContexts, false, -1, nodeConfigPath,
                             workingPath, GridUtility.getOutputPath(config, null)));
+                    LOGGER.debug("Adding local Grid relay for Appium server providing personalities: {}",
+                            nodeServer.getPersonalities().keySet());
+                } else {
+                    LOGGER.debug("Adding local Grid node providing personalities: {}",
+                            nodeServer.getPersonalities().keySet());
                 }
             }
         }
