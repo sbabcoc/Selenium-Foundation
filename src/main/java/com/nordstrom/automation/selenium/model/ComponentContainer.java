@@ -43,6 +43,7 @@ import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.exceptions.VacationStackTrace;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
+import com.nordstrom.automation.selenium.plugins.OperaPlugin;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -657,6 +658,7 @@ public abstract class ComponentContainer
                 }});
         } else {
             driver.get(url);
+            OperaPlugin.foo(driver, url);
         }
     }
     
