@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
@@ -209,6 +210,17 @@ public final class GridUtility {
         return result.toString(StandardCharsets.UTF_8.name());
     }
 
+    /**
+     * Get the 'driverPath' value from the specified capabilities map.
+     * 
+     * @param capabilities map of capabilities
+     * @return 'driverPath' value; {@code null} if no 'driverPath' value is found
+     */
+    public static String getDriverPath(Capabilities capabilities) {
+        Map<String, Object> options = getNordOptions(capabilities);
+        return (String) Optional.ofNullable(options.get("driverPath")).orElse(null);
+    }
+    
     /**
      * Get the 'personality' value from the specified capabilities map.
      * <p>

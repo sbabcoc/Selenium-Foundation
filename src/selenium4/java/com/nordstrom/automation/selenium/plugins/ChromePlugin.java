@@ -17,6 +17,15 @@ public class ChromePlugin extends RemoteWebDriverPlugin {
     }
     
     /**
+     * Extension constructor for <b>ChromeDriver</b> subclass objects.
+     * 
+     * @param browserName browser name
+     */
+    protected ChromePlugin(String browserName) {
+        super(browserName);
+    }
+    
+    /**
      * <b>org.openqa.selenium.chrome.ChromeDriver</b>
      * 
      * <pre>&lt;dependency&gt;
