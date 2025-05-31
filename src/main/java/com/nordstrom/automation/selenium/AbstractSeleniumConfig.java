@@ -897,7 +897,7 @@ public abstract class AbstractSeleniumConfig extends
      * @param path configuration file path (absolute, relative, or simple filename)
      * @return resolved absolute path of specified file; {@code null} if file not found
      */
-    private static String getConfigPath(final String path) {
+    public static String getConfigPath(final String path) {
         FileHandler handler = new FileHandler();
         handler.setPath(path);
         

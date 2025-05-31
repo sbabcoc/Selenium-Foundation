@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -496,6 +497,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                     Map<String, Object> thisConfig = new HashMap<>();
                     thisConfig.put("stereotype", theseCaps);
                     thisConfig.put("display-name", GridUtility.getPersonality(theseCaps));
+                    Optional.ofNullable(GridUtility.getDriverPath(theseCaps))
+                            .ifPresent(value -> thisConfig.put("webdriver-executable", value));
                     driverConfiguration.add(thisConfig);
                 });
             }

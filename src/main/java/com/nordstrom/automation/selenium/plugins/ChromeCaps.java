@@ -36,7 +36,7 @@ public class ChromeCaps {
     /** extension capability name for <b>ChromeOptions</b> */
     public static final String OPTIONS_KEY = "goog:chromeOptions";
     
-    private static final String[] PROPERTY_NAMES = 
+    static final String[] PROPERTY_NAMES = 
         { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE, WHITELISTED };
     
     private static final String CAPABILITIES =

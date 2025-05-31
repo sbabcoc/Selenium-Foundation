@@ -1,0 +1,18 @@
+{
+  "name": "Open URL via Message",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["scripting", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["https://*/*", "http://*/*"],
+  "action": {
+    "default_title": "URL Opener",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  }
+}
