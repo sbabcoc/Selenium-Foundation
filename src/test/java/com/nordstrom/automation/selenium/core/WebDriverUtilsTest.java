@@ -107,13 +107,13 @@ public class WebDriverUtilsTest extends TestNgTargetRoot {
     public void testFilterHidden() {
         ExamplePage page = getPage();
         
-        List<WebElement> elements = page.findElements(By.tagName("p"));
+        List<WebElement> elements = page.findElements(By.cssSelector("p[id^='para-']"));
         int total = elements.size();
         assertNotEquals(total, 0);
         assertFalse(WebDriverUtils.filterHidden(elements));
         assertEquals(elements.size(), total - 1);
         
-        elements = page.findElements(By.cssSelector("#hidden-para"));
+        elements = page.findElements(By.cssSelector("#para-hidden"));
         total = elements.size();
         assertEquals(total, 1);
         assertTrue(WebDriverUtils.filterHidden(elements));

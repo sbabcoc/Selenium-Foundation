@@ -6,6 +6,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -113,10 +114,10 @@ public enum ContainerMethodInterceptor {
             }
             
             WebElement reference = null;
-            
             Class<?> returnType = method.getReturnType();
             Page parentPage = container.getParentPage();
             Set<String> initialHandles = null;
+            
             try {
                 // get initial set of window handles
                 initialHandles = driver.getWindowHandles();
@@ -126,16 +127,23 @@ public enum ContainerMethodInterceptor {
             
             boolean returnsContainer = ComponentContainer.class.isAssignableFrom(returnType);
             boolean returnsPage = Page.class.isAssignableFrom(returnType) && !Frame.class.isAssignableFrom(returnType);
+            
+            // if method returns a container, set initial "detects completion" status based on method return type
             boolean detectsCompletion = returnsContainer && DetectsLoadCompletion.class.isAssignableFrom(returnType);
             
             // if expecting page without load logic
             if (returnsPage && !detectsCompletion) {
                 try {
-                    // get stale wait reference element by XPath
-                    reference = driver.findElement(By.xpath("/*"));
-                } catch (WebDriverException e) {
-                    // get stale wait reference element by CSS selector
-                    reference = driver.findElement(By.cssSelector("*"));
+                    // check is alert is shown
+                    driver.switchTo().alert();
+                } catch (NoAlertPresentException eaten) {
+                    try {
+                        // get stale wait reference element by XPath
+                        reference = driver.findElement(By.xpath("/*"));
+                    } catch (WebDriverException e) {
+                        // get stale wait reference element by CSS selector
+                        reference = driver.findElement(By.cssSelector("*"));
+                    }
                 }
             }
             
@@ -176,6 +184,12 @@ public enum ContainerMethodInterceptor {
             if (returnsContainer) {
                 // ensure that a non-null result was returned
                 Objects.requireNonNull(result, "A method that returns container objects cannot produce a null result");
+                
+                // if actual result detects load completion
+                if (result instanceof DetectsLoadCompletion) {
+                    reference = null;
+                    detectsCompletion = true;
+                }
                 
                 String newHandle = null;
                 ComponentContainer newChild = (ComponentContainer) result;
@@ -226,6 +240,9 @@ public enum ContainerMethodInterceptor {
                 } else if (reference != null) {
                     // wait until reference element goes stale
                     WaitType.PAGE_LOAD.getWait((ComponentContainer) result).until(loadIsComplete(reference));
+                } else {
+                    container.getLogger().warn("Container type '{}' doesn't detect load completion, " +
+                            "and modal dialog precluded fallback load completion check", result.getClass());
                 }
             }
             
@@ -324,10 +341,10 @@ public enum ContainerMethodInterceptor {
     }
     
     /**
-     * Returns a 'wait' proxy that determines if the container has finished loading.
+     * Returns a 'wait' proxy that determines if the specified reference element has gone stale.
      * 
-     * @param element the element to wait for
-     * @return 'true' if the container has finished loading; otherwise 'false'
+     * @param element the reference element to wait for
+     * @return 'true' if the reference element has gone stale; otherwise 'false'
      */
     public static Coordinator<Boolean> loadIsComplete(final WebElement element) {
         return new Coordinator<Boolean>() {
@@ -342,7 +359,7 @@ public enum ContainerMethodInterceptor {
             
             @Override
             public String toString() {
-                return "container to finish loading";
+                return "reference element to go stale";
             }
         };
     }
