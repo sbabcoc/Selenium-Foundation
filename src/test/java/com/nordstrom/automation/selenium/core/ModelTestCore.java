@@ -85,7 +85,7 @@ public class ModelTestCore {
     public static void testParagraphs(TestBase instance) {
         ExamplePage page = instance.getInitialPage();
         List<String> paraList = page.getParagraphs();
-        assertEquals(paraList.size(), 3);
+        assertEquals(paraList.size(), 4);
         assertArrayEquals(PARAS, paraList.toArray());
     }
     

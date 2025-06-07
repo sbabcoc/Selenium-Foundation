@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
@@ -17,6 +18,8 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
+import com.nordstrom.automation.selenium.model.AlertHandler;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
@@ -26,12 +29,13 @@ import com.nordstrom.common.uri.UriUtils;
  * This class is the model for the 'Example' page used by Selenium Foundation unit tests.
  */
 @PageUrl("/grid/admin/ExamplePageServlet")
-public class ExamplePage extends Page {
+public class ExamplePage extends Page implements DetectsLoadCompletion {
 
     /** page title */
     public static final String TITLE = "Example Page";
     /** text content of example paragraphs collection */
-    public static final String[] PARAS = {"This is paragraph one.", "This is paragraph two.", "This is paragraph three."};
+    public static final String[] PARAS =
+        {"This is paragraph one.", "This is paragraph two.", "This is paragraph three.", /* hidden paragraph */ ""};
     /** text content of example table headers collection */
     public static final String[] HEADINGS = {"Firstname", "Lastname", "Age"};
     /** text content of example table rows collection */
@@ -58,6 +62,7 @@ public class ExamplePage extends Page {
      */
     public ExamplePage(WebDriver driver) {
         super(driver);
+        alertHandler = new ExampleAlertHandler(this);
     }
     
     private FrameComponent frameByLocator;
@@ -74,7 +79,9 @@ public class ExamplePage extends Page {
     private ShadowRootComponent shadowRootByElement;
     private List<ShadowRootComponent> shadowRootList;
     private Map<Object, ShadowRootComponent> shadowRootMap;
+    private final AlertHandler alertHandler;
     private int refreshCount;
+    private boolean isLoaded;
     
     /** identifier for frame 'A' */
     protected static final String FRAME_A_ID = "frame-a";
@@ -116,7 +123,15 @@ public class ExamplePage extends Page {
         /** shadow root element 'B' */
         SHADOW_ROOT_B(By.cssSelector("div#shadow-root-b")),
         /** division element */
-        FORM_DIV(By.cssSelector("div#form-div"));
+        FORM_DIV(By.cssSelector("div#form-div")),
+        /** alert button */
+        ALERT(By.cssSelector("button#alert")),
+        /** confirm button */
+        CONFIRM(By.cssSelector("button#confirm")),
+        /** prompt button */
+        PROMPT(By.cssSelector("button#prompt")),
+        /** result paragraph */
+        RESULT(By.cssSelector("p#result"));
         
         private final By locator;
         
@@ -127,6 +142,39 @@ public class ExamplePage extends Page {
         @Override
         public By locator() {
             return locator;
+        }
+    }
+    
+    /**
+     * This enumeration defined alert type constants. 
+     */
+    public enum ModalType {
+        /** 'alert' modal */
+        ALERT("I am a JS Alert"),
+        /** 'confirm' modal */
+        CONFIRM("I am a JS Confirm"),
+        /** 'prompt' modal */
+        PROMPT("I am a JS Prompt");
+        
+        private String text;
+
+        ModalType(String text) {
+            this.text = text;
+        }
+        
+        /**
+         * Convert the specified modal text to the corresponding constant.
+         * 
+         * @param text modal text
+         * @return modal type constant
+         * @throws IllegalArgumentException if specified text is unrecognized
+         */
+        public static ModalType fromString(String text) {
+            if (text == null) return null;
+            for (ModalType type : values()) {
+                if (type.text.equals(text)) return type;
+            }
+            throw new IllegalArgumentException("Unrecognized modal text: " + text);
         }
     }
     
@@ -436,7 +484,74 @@ public class ExamplePage extends Page {
     public boolean hasBogusOptional() {
         return findOptional(By.tagName("BOGUS")).hasReference();
     }
+    
+    /**
+     * Get the type of the browser modal.
+     * 
+     * @return {@link ModalType} representing the current modal; {@code null} if modal is not shown
+     */
+    public ModalType getModalType() {
+        return ModalType.fromString(alertHandler.getText());
+    }
+    
+    /**
+     * Open the {@link ModalType#ALERT ALERT} modal.
+     */
+    public void openAlertModal() {
+        findElement(Using.ALERT).click();
+    }
 
+    /**
+     * Open the {@link ModalType#CONFIRM CONFIRM} modal.
+     */
+    public void openConfirmModal() {
+        findElement(Using.CONFIRM).click();
+    }
+
+    /**
+     * Open the {@link ModalType#PROMPT PROMPT} modal.
+     */
+    public void openPromptModal() {
+        findElement(Using.PROMPT).click();
+    }
+    
+    /**
+     * Accept the browser modal.
+     * 
+     * @return landing page object
+     */
+    public Page acceptModal() {
+        return alertHandler.accept();
+    }
+    
+    /**
+     * Send the specified keys to the browser modal and accept it.
+     * 
+     * @param keys keys to send
+     * @return landing page object
+     */
+    public Page sendKeysAndAccept(String keys) {
+        return alertHandler.sendKeysAndAccept(keys);
+    }
+    
+    /**
+     * Dismiss the browser modal.
+     * 
+     * @return landing page object
+     */
+    public Page dismissModal() {
+        return alertHandler.dismiss();
+    }
+    
+    /**
+     * Get the modal result text.
+     * 
+     * @return modal result text
+     */
+    public String getModalResult() {
+        return findElement(Using.RESULT).getText();
+    }
+    
     /**
      * Set the active Grid hub as the base URI for all relative loads of test pages.
      * 
@@ -464,5 +579,65 @@ public class ExamplePage extends Page {
         }
         return targetUri;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLoadComplete() {
+        if (!isLoaded) {
+            isLoaded = true;
+            return false;
+        }
+        return true;
+    }
     
+    /**
+     * This class models the browser alerts of the example page.
+     */
+    private static class ExampleAlertHandler extends AlertHandler {
+        public ExampleAlertHandler(Page parentPage) {
+            super(parentPage);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ExamplePage accept() {
+            return Optional.ofNullable(waitForAlert())
+                    .map(alert -> {
+                        alert.accept();
+                        return new ExamplePage(driver);
+                    })
+                    .orElse((ExamplePage) parentPage);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ExamplePage sendKeysAndAccept(final String keys) {
+            return Optional.ofNullable(waitForAlert())
+                    .map(alert -> {
+                        alert.sendKeys(keys);
+                        alert.accept();
+                        return new ExamplePage(driver);
+                    })
+                    .orElse((ExamplePage) parentPage);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ExamplePage dismiss() {
+            return Optional.ofNullable(waitForAlert())
+                    .map(alert -> {
+                        alert.dismiss();
+                        return new ExamplePage(driver);
+                    })
+                    .orElse((ExamplePage) parentPage);
+        }
+    }
 }

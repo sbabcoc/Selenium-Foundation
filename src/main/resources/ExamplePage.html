@@ -125,16 +125,16 @@
     <table style="width:100%">
       <tr class="iframe-row">
         <td class="iframe-col">
-          <div><iframe id="frame-a" src="/grid/admin/FrameA_Servlet"></iframe>
+          <div><iframe id="frame-a" src="/grid/admin/FrameA_Servlet"></iframe></div>
         </td>
         <td class="iframe-col">
-          <div><iframe id="frame-b" src="/grid/admin/FrameB_Servlet"></iframe>
+          <div><iframe id="frame-b" src="/grid/admin/FrameB_Servlet"></iframe></div>
         </td>
         <td class="iframe-col">
-          <div><iframe id="frame-c" src="/grid/admin/FrameC_Servlet"></iframe>
+          <div><iframe id="frame-c" src="/grid/admin/FrameC_Servlet"></iframe></div>
         </td>
         <td class="iframe-col">
-          <div><iframe id="frame-d" src="/grid/admin/FrameD_Servlet"></iframe>
+          <div><iframe id="frame-d" src="/grid/admin/FrameD_Servlet"></iframe></div>
         </td>
       </tr>
     </table>
@@ -145,7 +145,7 @@
           <p id="para-1">This is paragraph one.</p>
           <p id="para-2">This is paragraph two.</p>
           <p id="para-3">This is paragraph three.</p>
-          <p id="hidden-para" hidden>This paragraph should be hidden.</p>
+          <p id="para-hidden" hidden>This paragraph should be hidden.</p>
         </td>
         <td>
           <div id="form-div">
@@ -190,6 +190,45 @@
         <td><div id="shadow-root-b"></div></td>
       </tr>
     </table>
-  
+    
+    <script>
+      function jsAlert() {
+        log('');
+        alert('I am a JS Alert');
+        log('You successfully clicked an alert');
+      }
+      
+      function jsConfirm() {
+        log('');
+        var c = confirm('I am a JS Confirm');
+        var result = c === true ? 'Ok' : 'Cancel';
+        log('You clicked: ' + result);
+      }
+      
+      function jsPrompt() {
+        log('');
+        var p = prompt('I am a JS Prompt');
+        log('You entered: ' + p);
+      }
+      
+      function log(msg) {
+        var result = document.getElementById('result');
+        result.innerHTML = msg;
+      }
+    </script>
+    
+    <div id="modal-buttons">
+      <h3>JavaScript Alerts</h3>
+      <p>Here are some examples of different JavaScript alerts which can be troublesome for automation</p>
+      <ul style='list-style-type: none;'>
+        <li><button id="alert" onclick="jsAlert()">Click for JS Alert</button></li>
+        <li><button id="confirm" onclick="jsConfirm()">Click for JS Confirm</button></li>
+        <li><button id="prompt" onclick="jsPrompt()">Click for JS Prompt</button></li>
+      </ul>
+    </div>
+    <div id="modal-result">
+      <h4>Result:</h4>
+      <p id='result' style='color:green'></p>
+    </div>
   </body>
 </html>
