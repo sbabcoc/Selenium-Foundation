@@ -21,17 +21,17 @@ sourceSets {
     }
   }
 }
-  
+
 dependencies {
   constraints {
     api 'com.nordstrom.tools:testng-foundation:5.2.1-j11'
-    api 'org.seleniumhq.selenium:selenium-grid:4.32.0'
-    api 'org.seleniumhq.selenium:selenium-support:4.32.0'
-    api 'org.seleniumhq.selenium:selenium-chrome-driver:4.32.0'
-    api 'org.seleniumhq.selenium:selenium-edge-driver:4.32.0'
-    api 'org.seleniumhq.selenium:selenium-firefox-driver:4.32.0'
+    api 'org.seleniumhq.selenium:selenium-grid:4.33.0'
+    api 'org.seleniumhq.selenium:selenium-support:4.33.0'
+    api 'org.seleniumhq.selenium:selenium-chrome-driver:4.33.0'
+    api 'org.seleniumhq.selenium:selenium-edge-driver:4.33.0'
+    api 'org.seleniumhq.selenium:selenium-firefox-driver:4.33.0'
     api 'org.seleniumhq.selenium:selenium-opera-driver:4.4.0'
-    api 'org.seleniumhq.selenium:selenium-safari-driver:4.32.0'
+    api 'org.seleniumhq.selenium:selenium-safari-driver:4.33.0'
     api 'com.nordstrom.ui-tools:htmlunit-remote:4.32.0'
     api 'org.seleniumhq.selenium:htmlunit3-driver:4.32.0'
     api 'org.htmlunit:htmlunit:4.12.0'

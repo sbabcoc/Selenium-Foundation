@@ -2,11 +2,10 @@ package com.nordstrom.automation.selenium.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -333,14 +332,14 @@ public class RobustElementWrapper implements ReferenceFetcher {
      * @throws StaleElementReferenceElementException if container element has gone stale
      * @throws NoSuchElementException if unable to find element specified by the wrapper
      */
-    @SuppressWarnings("deprecation")
     private static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
         NoSuchElementException thrown = null;
         SearchContext context = wrapper.context.getWrappedContext();
         
         if (wrapper.strategy == Strategy.LOCATOR) {
             // disable implicit wait
-            Timeouts timeouts = wrapper.driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+            Timeouts timeouts = wrapper.driver.manage().timeouts();
+            WebDriverUtils.implicitlyWait(timeouts, Duration.ZERO);
             try {
                 // if index specified
                 if (wrapper.index > 0) {
@@ -370,7 +369,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 }
             } finally {
                 // restore implicit wait
-                timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(), TimeUnit.SECONDS);
+                WebDriverUtils.implicitlyWait(timeouts, Duration.ofSeconds(WaitType.IMPLIED.getInterval()));
             }
         } else {
             // if context is a container element
