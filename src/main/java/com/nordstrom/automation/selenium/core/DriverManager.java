@@ -3,7 +3,6 @@ package com.nordstrom.automation.selenium.core;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -180,13 +179,8 @@ public final class DriverManager {
      */
     public static void setDriverTimeouts(final WebDriver driver, final SeleniumConfig config) {
         Timeouts timeouts = driver.manage().timeouts();
-        timeouts.implicitlyWait(WaitType.IMPLIED.getInterval(config), TimeUnit.SECONDS);
-        
-        try {
-            timeouts.pageLoadTimeout(WaitType.PAGE_LOAD.getInterval(config), TimeUnit.SECONDS);
-        } catch (WebDriverException eaten) {
-            // unsupported feature: nothing to do here
-        }
+        WebDriverUtils.implicitlyWait(timeouts, Duration.ofSeconds(WaitType.IMPLIED.getInterval(config)));
+        WebDriverUtils.pageLoadTimeout(timeouts, Duration.ofSeconds(WaitType.PAGE_LOAD.getInterval(config)));
     }
     
     /**

@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.core;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.SearchContext;
@@ -18,6 +20,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
@@ -148,6 +151,49 @@ public final class WebDriverUtils {
      */
     public static String getDomAttributeOf(final WebElement element, final String name) {
         return element.getDomAttribute(name);
+    }
+    
+    /**
+     * Specifies the amount of time the driver should wait when searching for an element if it is
+     * not immediately present.
+     *
+     * <p>When searching for a single element, the driver should poll the page until the element has
+     * been found, or this timeout expires before throwing a {@link NoSuchElementException}. When
+     * searching for multiple elements, the driver should poll the page until at least one element
+     * has been found or this timeout has expired.
+     *
+     * <p>Increasing the implicit wait timeout should be used judiciously as it will have an adverse
+     * effect on test run time, especially when used with slower location strategies like XPath.
+     *
+     * <p>If the timeout is negative, not null, or greater than 2e16 - 1, an error code with invalid
+     * argument will be returned.
+     *
+     * @param timeouts target {@link Timeouts} object
+     * @param duration The duration to wait.
+     * @return A self reference.
+     */
+    public static Timeouts implicitlyWait(final Timeouts timeouts, final Duration duration) {
+        return timeouts.implicitlyWait(duration);
+    }
+    
+    /**
+     * Sets the amount of time to wait for a page load to complete before throwing an error. If the
+     * timeout is negative, not null, or greater than 2e16 - 1, an error code with invalid argument
+     * will be returned.
+     *
+     * @param timeouts target {@link Timeouts} object
+     * @param duration The timeout value.
+     * @return A Timeouts interface.
+     * @see <a href="https://www.w3.org/TR/webdriver/#set-timeouts">W3C WebDriver</a>
+     * @see <a href="https://www.w3.org/TR/webdriver/#dfn-timeouts-configuration">W3C WebDriver</a>
+     */
+    public static Timeouts pageLoadTimeout(final Timeouts timeouts, final Duration duration) {
+        try {
+            return timeouts.pageLoadTimeout(duration);
+        } catch (WebDriverException eaten) {
+            // unsupported
+            return timeouts;
+        }
     }
     
     /**
