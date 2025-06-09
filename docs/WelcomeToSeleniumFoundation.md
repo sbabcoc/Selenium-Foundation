@@ -93,4 +93,14 @@ Learn more...
 
 [Learn more...](PageComponents.md)
 
+## Working with Browser Modals
+
+**Selenium Foundation** provides an integrated approach to handling browser modals (a.k.a. - alerts). Incorporating alert handling into the associated page models through the **AlertHandler** class provides the following benefits:
+
+* The **AlertHandler** base class switches the driver to the alert for you, removing this concern from your own implementation.
+* Routing calls to alert functions through page object methods maintains control of transition synchronization and page object life cycle.
+* Your code never has to deal with **NoAlertPresentException** just to check for the presence of an alert or to wait for one to appear.
+
+[Learn more...](WorkingWithBrowserModals.md)
+
 > Written with [StackEdit](https://stackedit.io/).

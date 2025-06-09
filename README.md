@@ -54,6 +54,7 @@
 * [Target Platform Feature](docs/TargetPlatformFeature.md#introduction)
 * [Building Page Objects](docs/BuildingPageObjects.md#introduction)
 * [Page Components](docs/PageComponents.md#introduction)
+* [Working with Browser Modals](docs/WorkingWithBrowserModals.md#introduction)
 * [Transition Error Detection](docs/TransitionErrorDetection.md#introduction)
 * [JavaScript Enhancements](docs/JavaScriptEnhancements.md#the-basics-what-webdriver-provides)
 
