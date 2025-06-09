@@ -118,9 +118,7 @@ public class SkuDescriptionSearchDialog extends Dialog {
      */
     public void resetSearch() {
         findElement(Using.RESET_BUTTON.locator).click();
-        getParentPage().getWait(WaitType.PAGE_LOAD)
-                        .ignoring(PageNotLoadedException.class)
-                        .until(ContainerMethodInterceptor.loadIsComplete());
+        getParentPage().getWait(WaitType.PAGE_LOAD).until(ContainerMethodInterceptor.pageLoadIsComplete());
     }
 }
 ```
@@ -130,6 +128,10 @@ In this scenario, the **`Dialog`** class doesn't implement **`DetectsLoadComplet
 # Automatic Driver Targeting
 
 For web applications that use frames or multiple windows, a major source of boilerplate code is management of the driver target. In addition to being extremely repetitive, this code is also surprisingly difficult to implement correctly. **Selenium Foundation** completely eliminates the need for explicit driver targeting. You get to focus on scenario-specific details instead of low-level plumbing. For more details, see the **Automatic Driver Targeting** section on [front page](https://github.com/sbabcoc/Selenium-Foundation#automatic-driver-targeting)
+
+## Working with Browser Modals
+
+For working with web applications that present modal dialogs (a.k.a. - alerts), **Selenium Foundation** provides the **AlertHandler** class. This class manages the details of targeting browser modals, providing a more rational and integrated API and eliminating the need to deal with **NoAlertPresentException**. Check out the details [here](WorkingWithBrowserModals.md). 
 
 # Wrapped Element References
 
