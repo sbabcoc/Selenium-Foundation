@@ -10,12 +10,16 @@ To incorporate alert handling into your web application page collection, declare
 ###### Alert handler
 ```java
 public  class ExamplePage extends Page implements DetectsLoadCompletion {
+    
     ...
+    
     public ExamplePage(WebDriver driver) {
         super(driver);
         alertHandler = new ExampleAlertHandler(this);
     }
-    private  final AlertHandler alertHandler;
+    
+    private final AlertHandler alertHandler;
+    private boolean isLoaded;
     
     ...
     
