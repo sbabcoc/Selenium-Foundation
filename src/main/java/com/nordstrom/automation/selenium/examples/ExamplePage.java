@@ -131,7 +131,9 @@ public class ExamplePage extends Page implements DetectsLoadCompletion {
         /** prompt button */
         PROMPT(By.cssSelector("button#prompt")),
         /** result paragraph */
-        RESULT(By.cssSelector("p#result"));
+        RESULT(By.cssSelector("p#result")),
+        /** open tab button */
+        OPEN_TAB(By.cssSelector("button#open-tab"));
         
         private final By locator;
         
@@ -550,6 +552,16 @@ public class ExamplePage extends Page implements DetectsLoadCompletion {
      */
     public String getModalResult() {
         return findElement(Using.RESULT).getText();
+    }
+    
+    /**
+     * Open the example tab.
+     * 
+     * @return tab page object (either {@link TabPageA} or {@link TabPageB})
+     */
+    public TabPage openTab() {
+        findElement(Using.OPEN_TAB).click();
+        return new TabPage(driver).setWindowState(WindowState.WILL_OPEN);
     }
     
     /**

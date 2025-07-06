@@ -216,5 +216,11 @@ public class JUnitModelTest extends JUnitTargetRoot {
             assumeNoException(e);
         }
     }
+    
+    @Test
+    @Ignore
+    public void testContainerResolution() {
+        ModelTestCore.testContainerResolution(this);
+    }
 
 }

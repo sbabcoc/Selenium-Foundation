@@ -20,7 +20,9 @@ import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.FormComponent;
 import com.nordstrom.automation.selenium.examples.FrameComponent;
 import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
+import com.nordstrom.automation.selenium.examples.TabPage;
 import com.nordstrom.automation.selenium.examples.TableComponent;
+import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
 import com.nordstrom.automation.selenium.model.Enhanced;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
@@ -371,6 +373,22 @@ public class ModelTestCore {
                 assertArrayEquals(expect, paraList.toArray());
             }
         };
+    }
+    
+    public static void testContainerResolution(final TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        TabPage tabPage = page.openTab();
+        assertTrue(tabPage instanceof Enhanced);
+        assertTrue("Failed verifying tab page content", tabPage.verifyContent());
+        tabPage.close();
+        try {
+            tabPage.getPageContent();
+            fail("Tab page should be vacated upon close");
+        } catch (ContainerVacatedException e) {
+            // nothing to do here
+        }
+        assertEquals(page.getTitle(), TITLE);
+        assertTrue(page instanceof Enhanced);
     }
     
 }

@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -7,6 +8,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.nordstrom.automation.selenium.annotations.Resolver;
+import com.nordstrom.automation.selenium.exceptions.ContainerResolverInvocationException;
+import com.nordstrom.automation.selenium.exceptions.UnresolvedContainerTypeException;
+import com.nordstrom.automation.selenium.interfaces.ContainerResolver;
 import com.nordstrom.common.base.UncheckedThrow;
 
 import net.bytebuddy.ByteBuddy;
@@ -26,7 +32,7 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
  * 
  * @param <T> "enhanceable" object base class
  */
-public abstract class Enhanceable<T> {
+public abstract class Enhanceable<T extends ComponentContainer> {
     
     private static final List<Class<?>> BYPASS_CLASSES = Arrays.<Class<?>>asList(Enhanceable.class);
     private static final Map<Class<?>, Class<?>> proxyMap = new HashMap<>();
@@ -76,9 +82,10 @@ public abstract class Enhanceable<T> {
             return container;
         }
         
-        Class<?> containerClass = container.getClass();
+        T resolved = resolveContainer(container);
+        Class<?> containerClass = resolved.getClass();
         
-        Enhanceable<T> enhanceable = (Enhanceable<T>) container;
+        Enhanceable<T> enhanceable = (Enhanceable<T>) resolved;
         Class<?>[] argumentTypes = enhanceable.getArgumentTypes();
         Object[] arguments = enhanceable.getArguments();
         
@@ -139,6 +146,33 @@ public abstract class Enhanceable<T> {
         {
             throw UncheckedThrow.throwUnchecked(e);
         }
+    }
+    
+    /**
+     * Resolve the specified container to its context-specific type.
+     * 
+     * @param T resolved container type
+     * @param container container object to be resolved
+     * @return context-specific container object
+     * @throws UnresolvedContainerTypeException if concrete type cannot be resolved
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private T resolveContainer(final T container) {
+        Class<? extends ComponentContainer> containerType = container.getClass();
+        try {
+            Resolver annotation = containerType.getAnnotation(Resolver.class);
+            if (annotation != null) {
+                Class<? extends ContainerResolver> resolverType = annotation.value();
+                Constructor<? extends ContainerResolver> ctor = resolverType.getDeclaredConstructor();
+                ContainerResolver<T> resolver = (ContainerResolver<T>) ctor.newInstance();
+                return resolver.resolve(container);
+            }
+        } catch (IllegalArgumentException | NoSuchMethodException | SecurityException |
+                InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new ContainerResolverInvocationException(
+                    "Failed instantiating or invoking container resolver for " + containerType, e);
+        }
+        return container;
     }
     
     /**
