@@ -638,6 +638,14 @@ public abstract class ComponentContainer
     }
     
     /**
+     * Close the browser window associate with this container.
+     */
+    public void close() {
+        driver.close();
+        getParentPage().setWindowState(WindowState.WILL_CLOSE);
+    }
+    
+    /**
      * Navigate to the specified URL or activity.
      * 
      * @param url target URL or activity

@@ -185,5 +185,10 @@ public class ModelTest extends TestNgTargetRoot {
             throw new SkipException(e.getMessage(), e);
         }
     }
+    
+    @Test
+    public void testContainerResolution() {
+        ModelTestCore.testContainerResolution(this);
+    }
 
 }

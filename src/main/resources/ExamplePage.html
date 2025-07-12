@@ -119,6 +119,22 @@
         }
       }
     </script>
+    <script>
+      function openRandomPage() {
+        const landingPages = [
+          "/grid/admin/FrameA_Servlet",
+          "/grid/admin/FrameB_Servlet"
+        ];
+
+        // Pick a random URL
+        const randomIndex = Math.floor(Math.random() * landingPages.length);
+        const randomUrl = landingPages[randomIndex];
+
+        // Open in a new tab
+        window.open(randomUrl, '_blank');
+      }
+    </script>
+    
   </head>
   <body onload="attachShadows();">
   
@@ -230,5 +246,7 @@
       <h4>Result:</h4>
       <p id='result' style='color:green'></p>
     </div>
+    
+    <button id="open-tab" onclick="openRandomPage()">Open A/B Tab</button>
   </body>
 </html>

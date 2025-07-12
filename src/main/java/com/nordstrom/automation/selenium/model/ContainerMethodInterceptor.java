@@ -113,6 +113,7 @@ public enum ContainerMethodInterceptor {
                 TARGET.set(container);
             }
             
+            boolean hasDialog = false;
             WebElement reference = null;
             Class<?> returnType = method.getReturnType();
             Page parentPage = container.getParentPage();
@@ -134,8 +135,10 @@ public enum ContainerMethodInterceptor {
             // if expecting page without load logic
             if (returnsPage && !detectsCompletion) {
                 try {
-                    // check is alert is shown
+                    // check if alert is shown
                     driver.switchTo().alert();
+                    // alert is shown
+                    hasDialog = true;
                 } catch (NoAlertPresentException eaten) {
                     try {
                         // get stale wait reference element by XPath
@@ -201,6 +204,8 @@ public enum ContainerMethodInterceptor {
                     if (newPage.getWindowState() == WindowState.WILL_OPEN) {
                         // wait until new window opens
                         newHandle = WaitType.WAIT.getWait(driver).until(Coordinators.newWindowIsOpened(initialHandles));
+                        // switch driver context to new window
+                        driver.switchTo().window(newHandle);
                         // record parent of new page
                         newPage.setSpawningPage(parentPage);
                         // no stale wait
@@ -228,6 +233,8 @@ public enum ContainerMethodInterceptor {
                     ((Page) result).setWindowHandle(newHandle);
                     // wait for expected landing page to appear
                     ComponentContainer.waitForLandingPage((Page) result);
+                    // record page context
+                    TARGET.set((Page) result);
                 }
                 
                 // if load logic spec'd
@@ -240,9 +247,14 @@ public enum ContainerMethodInterceptor {
                 } else if (reference != null) {
                     // wait until reference element goes stale
                     WaitType.PAGE_LOAD.getWait((ComponentContainer) result).until(loadIsComplete(reference));
-                } else {
+                // otherwise, if dialog is shown
+                } else if (hasDialog) {
                     container.getLogger().warn("Container type '{}' doesn't detect load completion, " +
                             "and modal dialog precluded fallback load completion check", result.getClass());
+                // otherwise (new window opened)
+                } else {
+                    container.getLogger().warn("Container type '{}' doesn't detect load completion, " +
+                            "and new window precluded fallback load completion check", result.getClass());
                 }
             }
             

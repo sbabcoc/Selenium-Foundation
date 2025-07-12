@@ -126,21 +126,25 @@ public class Page extends ComponentContainer {
     /**
      * Get the page from which this page was spawned.
      * 
+     * @param <T> page class
      * @return page from which this page was spawned
      */
-    public Page getSpawningPage() {
-        return spawningPage;
+    @SuppressWarnings("unchecked")
+    public <T extends Page> T getSpawningPage() {
+        return (T) spawningPage;
     }
     
     /**
      * Set the window state of this page object.
      * 
+     * @param <T> page class
      * @param windowState page object {@link WindowState}
      * @return this {@link Page} object
      */
-    public Page setWindowState(final WindowState windowState) {
+    @SuppressWarnings("unchecked")
+    public <T extends Page> T setWindowState(final WindowState windowState) {
         this.windowState = windowState;
-        return this;
+        return (T) this;
     }
     
     /**
