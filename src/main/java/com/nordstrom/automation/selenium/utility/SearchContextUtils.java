@@ -159,30 +159,28 @@ public class SearchContextUtils {
      * @return containing {@link ComponentContainer}
      */
     public static ComponentContainer getContainingContext(final SearchContext context) {
-        SearchContext unwrapped = unwrapContext(context);
-        while (unwrapped != null) {
-            if (unwrapped instanceof ComponentContainer) {
-                return (ComponentContainer) unwrapped;
-            }
-            unwrapped = unwrapContext(unwrapped);
+        SearchContext candidate = context;
+        while (candidate instanceof RobustWebElement) {
+            candidate = (SearchContext) ((RobustWebElement) candidate).getContext();
         }
-        return null;
+        if (candidate instanceof ComponentContainer) {
+            return (ComponentContainer) candidate;
+        }
+        throw new UnsupportedOperationException("Failed getting containing context");
     }
     
     /**
-     * Get the parent context for the specified search context.
+     * Unwrap the specified search context.
      * 
      * @param context target search context
-     * @return parent {@link SearchContext}
+     * @return unwrapped {@link SearchContext}
      */
     public static SearchContext unwrapContext(final SearchContext context) {
-        if (context instanceof RobustWebElement) {
-            return (SearchContext) ((RobustWebElement) context).getContext();
+        SearchContext unwrapped = context;
+        while (unwrapped instanceof WrapsContext) {
+            unwrapped = ((WrapsContext) context).getWrappedContext();
         }
-        if (context instanceof WrapsContext) {
-            return ((WrapsContext) context).getWrappedContext();
-        }
-        return null;
+        return unwrapped;
     }
     
     /**

@@ -248,4 +248,17 @@ public final class RobustElementFactory {
     public static WebElement getElement(final WrapsContext context, final By locator, final int index) {
         return makeRobustElement(null, context, locator, index);
     }
+    
+    /**
+     * Get a wrapped reference to the first element matching the specified locator.
+     * <p>
+     * <b>NOTE</b>: Use {@link RobustWebElement#hasReference()} to determine if a valid reference was acquired.
+     * 
+     * @param context element search context
+     * @param locator element locator
+     * @return optional robust element in context that matches the locator
+     */
+    public static RobustWebElement getOptional(final WrapsContext context, final By locator) {
+        return (RobustWebElement) makeRobustElement(null, context, locator, RobustElementWrapper.OPTIONAL);
+    }
 }
