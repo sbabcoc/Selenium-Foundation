@@ -5,8 +5,8 @@ import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 
 /**
- * This class is the model for the first concrete tab pages opened by the "Open A/B Tab" button on the 'Example'
- * page.
+ * This class is the model for the first concrete tab page subclass opened by the "Open A/B Tab" button on the
+ * 'Example' page.
  */
 @PageUrl("/grid/admin/FrameA_Servlet")
 public class TabPageA extends TabPage {
