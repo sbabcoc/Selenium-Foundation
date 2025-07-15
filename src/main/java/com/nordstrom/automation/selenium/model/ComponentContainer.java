@@ -106,7 +106,7 @@ public abstract class ComponentContainer
      * Constructor for component container
      * 
      * @param context container search context
-     * @param parent container parent (may be {@code null} for {@link Page} objects
+     * @param parent container parent (may be {@code null} for {@link Page} objects)
      */
     public ComponentContainer(final SearchContext context, final ComponentContainer parent) {
         Objects.requireNonNull(context, "[context] must be non-null");
@@ -370,7 +370,7 @@ public abstract class ComponentContainer
      * @return robust web element
      */
     public RobustWebElement findOptional(final By by) {
-        return (RobustWebElement) RobustElementFactory.getElement(this, by, RobustElementWrapper.OPTIONAL);
+        return RobustElementFactory.getOptional(this, by);
     }
     
     /**
