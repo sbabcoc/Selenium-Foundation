@@ -10,6 +10,7 @@
 * With the release of **Selenium Foundation** version _28.2.0_, we now provide support for **Appium** sessions via **Selenium 4 Grid**. The auto-generated configuration connects the **Appium** server to the local grid via a relay node.
   * **NOTE**: To properly support **HtmlUnitDriver**, **Appium**, and **Safari**, this release includes new custom slot matcher (Selenium 4) and capabilities matcher (Selenium 3). These matchers are activated via a new setting, which can be easily overridden should the need arise.
 * With the release of **Selenium Foundation** version _28.1.1_, we now provide support for remote **HtmlUnitDriver** sessions with [HtmlUnit Remote](https://github.com/seleniumhq-community/htmlunit-remote). The project unit tests for **Selenium Foundation** have been switched back to running under this "headless" browser.
+* With the release of **Selenium Foundation** version _28.0.0_, we now use **Selenium Manager** (Selenium 4) and **Web Driver Manager** (Selenium 3) to acquire compatible drivers for the browsers targeted by your tests.
 * With the release of **Selenium Foundation** version _26.3.4_, automation of Macintosh native applications via the Mac2 engine of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent) project (_1.5.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include Mac2 nodes.
 
 #### Table of Contents
@@ -31,6 +32,7 @@
   * [Landing Page Verification and Model-Directed Navigation](#landing-page-verification-and-model-directed-navigation)
   * [Customizable Transition Error Detection](#customizable-transition-error-detection)
   * [Component Collection Classes](#component-collection-classes)
+  * [Handling Web Site Variations](#handling-web-site-variations)
   * [Automatic Stale Element Reference Protection](#automatic-stale-element-reference-protection)
   * [Optional Elements](#optional-elements)
   * [Page-Load Synchronization](#page-load-synchronization)
@@ -40,7 +42,7 @@
   * [Support for TestNG and JUnit 4](#support-for-testng-and-junit-4)
   * [Essential Settings](#essential-settings)
   * [Overriding Defaults](#overriding-defaults)
-  * [Installing Drivers](#installing-drivers)
+  * [Automatic Installation of Drivers](#automatic-installation-of-drivers)
 
 #### In-Depth Documentation
 
@@ -54,7 +56,8 @@
 * [Target Platform Feature](docs/TargetPlatformFeature.md#introduction)
 * [Building Page Objects](docs/BuildingPageObjects.md#introduction)
 * [Page Components](docs/PageComponents.md#introduction)
-* [Working with Browser Modals](docs/WorkingWithBrowserModals.md#introduction)
+* [Handling Web Site Variations](docs/HandlingWebSiteVariations.md#introduction)
+* [Working with Browser Modals](docs/WorkingWithBrowserModals.md)
 * [Transition Error Detection](docs/TransitionErrorDetection.md#introduction)
 * [JavaScript Enhancements](docs/JavaScriptEnhancements.md#the-basics-what-webdriver-provides)
 
@@ -70,14 +73,14 @@ To add a dependency on **Selenium Foundation** for Maven, use the following:
 
 | Selenium 3 | Selenium 4 |
 |:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.2.1-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.2.1-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.1.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.1.0-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 To add a dependency for Gradle:
 
 | Platform | Dependency |
 |:---:|:---|
-| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.2.1-s3'<br/>}</pre> |
-| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.2.1-s4'<br/>}</pre> |
+| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.1.0-s3'<br/>}</pre> |
+| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.1.0-s4'<br/>}</pre> |
 
 ### Building Selenium Foundation
 
@@ -171,6 +174,18 @@ Examples of the sorts of conditions you may want to detect include error pages (
 
 **Selenium Foundation** also includes collection classes ([ComponentList](src/main/java/com/nordstrom/automation/selenium/model/ComponentList.java), [ComponentMap](src/main/java/com/nordstrom/automation/selenium/model/ComponentMap.java), [FrameList](src/main/java/com/nordstrom/automation/selenium/model/FrameList.java), [FrameMap](src/main/java/com/nordstrom/automation/selenium/model/FrameMap.java), [ShadowRootList](src/main/java/com/nordstrom/automation/selenium/model/ShadowRootList.java), and [ShadowRootMap](src/main/java/com/nordstrom/automation/selenium/model/ShadowRootMap.java)) that enable you to define collections of components for your page models. For example, you can define a **SearchResultTile** component and include a map of these tiles keyed by product ID in your **SearchResultsPage** class. **Selenium Foundation** collections are lazy-initialized automatically - the composition of the collection is determined when it's instantiated, but each item in the collection is only populated when it's explicitly referenced.
 
+### Handling Web Site Variations
+
+When modeling a web application, it's common to encounter scenarios where the presentation of a page or component varies from one run to the next. For example:
+
+* You're modeling a site that uses responsive layout and have configured separate runs to verify site behavior in each of the supported breakpoint dimensions.
+* The UI/UX team is running an A/B test to evaluate multiple design ideas to determine which one increases engagement and conversion rates.
+* You're maintaining an automation suite through a design transition where a new version of a site-wide component (e.g. - header navigation) has been installed on some pages, but other pages are still using the old version.
+
+To enable seamless handling of these sorts of scenarios, **Selenium Foundation** provides a `container resolution` feature that automatically selects the version of a page or component model that corresponds to the current presentation in the browser.
+
+[Learn more...](docs/HandlingWebSiteVariations.md#introduction)
+
 ### Automatic Stale Element Reference Protection
 
 One of the most impactful features of **Selenium Foundation** saves your automation from the dreaded **StaleElementReferenceException** failure. Web element search operations performed within the **Selenium Foundation** framework return enhanced references, which retain all of the parameters needed to re-acquire the reference if it goes stale. Every web element method call is guarded by an automatic recovery feature. If a reference goes stale, **Selenium Foundation** re-acquires the reference and re-issues the web element method call that encountered the exception. Your automation continues on normally, blissfully unaware of the disaster that was averted.
@@ -236,16 +251,12 @@ The hierarchy of evaluation produces the following results:
 
 > **BROWSER_NAME** = <mark>firefox</mark>; **TARGET_HOST** = <mark>my.server.com</mark>; **TARGET_PATH** = <mark>/</mark> 
 
-## Installing Drivers 
+## Automatic Installation of Drivers 
 
-Whichever browser you choose to run your automation on, you need to make sure to install the latest driver for that browser compatible with your target version of **Selenium WebDriver**, along with a compatible release of the browser itself. We recommend that you install the drivers and browsers on the file search path to avoid the need to provide additional configuration details via scenario-specific means. 
+Since the release of **Selenium Foundation** [28.0.0](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v28.0.0), we now use **Selenium Manager** (Selenium 4) and **Web Driver Manager** (Selenium 3) to acquire compatible drivers for the browsers targeted by your tests. If the manager is unable to locate or download a required driver, **DriverExecutableNotFoundException** is thrown.
 
-Here are the official homes for several of the major drivers: 
+This feature does not include management of Appium [automation engines](docs/ConfiguringProjectSettings.md#appium-automation-engine-support), which must be installed separately.
 
-* GhostDriver (PhantomJS) - [http://phantomjs.org/download.html](http://phantomjs.org/download.html)
-* ChromeDriver - [https://sites.google.com/a/chromium.org/chromedriver/downloads](https://sites.google.com/a/chromium.org/chromedriver/downloads)
-* IEDriver - [http://selenium-release.storage.googleapis.com/index.html?path=2.53/](http://selenium-release.storage.googleapis.com/index.html?path=2.53/)
-
-**NOTE**: GhostDriver and ChromeDriver are simple binary installations, but several system configuration changes must be applied for IEDriver to work properly. For details, visit the InternetExplorerDriver project Wiki on GitHub and follow the [Required Configuration](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration) procedure.
+**NOTE**: This driver acquisition process is bypassed for test classes that implement the **DriverProvider** interface.
 
 > Written with [StackEdit](https://stackedit.io/).
