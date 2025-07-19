@@ -148,7 +148,7 @@ In addition to support for desktop browsers, **Selenium Foundation** provides th
 | Windows | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/WindowsPlugin.java) |
 | XCUITest | [source](../src/main/java/com/nordstrom/automation/selenium/plugins/XCUITestPlugin.java) |
 
-Note that no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](http://appium.io/docs/en/about-appium/getting-started/) on your system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
+Note that no Java dependencies are required for **Selenium Foundation** to launch the associated Grid node. However, you'll need to have Appium and its dependencies [installed](https://appium.io/docs/en/latest/quickstart/install/) on your system. At a minimum, you need `NodeJS`, `NPM` (Node Package Manager), and `Appium` itself. By default, **Selenium Foundation** will search for `NodeJS` and `NPM` on the system path, and expects to find `Appium` in the global Node package repository. However, you can supply explicit paths to these item in your settings:
 
 ###### Appium Binary Paths
 
