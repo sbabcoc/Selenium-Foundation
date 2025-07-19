@@ -32,15 +32,11 @@ com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin
 
 ### Declaring Driver Dependencies
 
-In addition to declaring driver plug-ins in the **ServiceLoader** provider configuration file, the Java project itself must declare the dependencies of the corresponding driver(s). These dependencies vary by the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves. For example, here is the Maven dependency for the **Selenium 3** version of **`HtmlUnitPlugin`**:
+In addition to declaring driver plug-ins in the **ServiceLoader** provider configuration file, the Java project itself must declare the dependencies of the corresponding driver(s). These dependencies vary by the version of **Selenium API** you're using, and they're documented in the plug-in classes themselves. For example, here are the Maven dependency declarations for **`HtmlUnitPlugin`**:
 
-```xml
-<dependency>
-  <groupId>org.seleniumhq.selenium</groupId>
-  <artifactId>htmlunit-driver</artifactId>
-  <version>2.67.0</version>
-</dependency>
-```
+| Selenium 3 | Selenium 4 |
+|:---|:---|
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;htmlunit-driver&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;2.70.0&lt;/version&gt;<br/>&nbsp;&nbsp;&lt;exclusions&gt;<br/>&nbsp;&nbsp;&nbsp;&nbsp;&lt;exclusion&gt;<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;selenium-support&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/exclusion&gt;<br/>&nbsp;&nbsp;&lt;/exclusions&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;:htmlunit-remote&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;4.33.0&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 ### Driver Plug-Ins for Desktop Browsers and Appium Engines
 
@@ -48,11 +44,13 @@ Driver plug-ins encapsulate the specific details related to launching **Selenium
 
 #### Drivers for Desktop Browsers
 
-In addition to specifying browser driver plug-ins in the **ServiceLoader** provider configuration file, you'll need to [install](../README.md#installing-drivers) the corresponding browsers and matching drivers. The process for installing browsers and drivers varies. Just follow the instruction provided by the driver vendor.
+Since the release of **Selenium Foundation** [28.0.0](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v28.0.0), we now use **Selenium Manager** (Selenium 4) and **Web Driver Manager** (Selenium 3) to acquire compatible drivers for the browsers targeted by your tests. If the manager is unable to locate or download a required driver, **DriverExecutableNotFoundException** is thrown.
+
+**NOTE**: This driver acquisition process is bypassed for test classes that implement the [DriverProvider](ConfiguringProjectSettings.md#testing-with-non-default-browser-sessions) interface.
 
 #### Appium-Specific Configuration
 
-In addition to specifying `Appium` driver plug-ins in the **ServiceLoader** provider configuration file, you'll need to [install](http://appium.io/docs/en/about-appium/getting-started) `Appium` and its dependencies. With a conventional installation, **Selenium Foundation** can use your system configuration to locate the components that comprise an `Appium` node. For non-standard installations, **Selenium Foundation** provides [settings](ConfiguringProjectSettings.md#appium-binary-paths) that enable you to supply explicit paths to these items.
+The automatic driver installation feature does not include management of Appium [automation engines](ConfiguringProjectSettings.md#appium-automation-engine-support), which must be installed separately, along with Appium's dependencies. With a conventional installation, **Selenium Foundation** can use your system configuration to locate the components that comprise an `Appium` node. For non-standard installations, **Selenium Foundation** provides [settings](ConfiguringProjectSettings.md#appium-binary-paths) that enable you to supply explicit paths to these items.
 
 #### Appium Server Arguments
 
@@ -62,21 +60,21 @@ In addition to specifying `Appium` driver plug-ins in the **ServiceLoader** prov
 
 Although **Selenium Foundation** doesn't need the Java bindings for `Appium` to launch the Grid node, you'll need to declare this dependency in your Java projects to acquire device-specific drivers like **AndroidDriver** or **IOSDriver**. Here are the Maven artifact coordinates that correspond to each version of the **Selenium API**:
 
-| Selenium 3 |
-|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.4.1&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| Selenium 3 | Selenium 4 |
+|:---|:---|
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;7.6.0&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;io.appium&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;java-client&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;9.4.0&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 ### Additional Local Grid Settings
 
-To enable the `Local Grid` feature to support **Selenium 3**, the core configuration in **`SeleniumConfig`** defines version-specific default values for several settings:
+To enable the `Local Grid` feature to support both **Selenium 3** and **Selenium 4**, the core configuration in **`SeleniumConfig`** defines version-specific default values for several settings:
 
-| Setting | Property Name | `s3` Default |
-|---|---|---|
-| **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncherV3 |
-| **`LAUNCHER_DEPS`** | `selenium.launcher.deps` | [source](/src/selenium3/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L163) |
-| **`HUB_PORT`** | `selenium.hub.port` | 4445 |
-| **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s3.json |
-| **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s3.json |
+| Setting | Property Name | `s3` Default | `s4` Default |
+|---|---|---|---|
+| **`GRID_LAUNCHER`** | `selenium.grid.launcher` | org.openqa.grid.selenium.GridLauncherV3 | org.openqa.selenium.grid.Bootstrap |
+| **`LAUNCHER_DEPS`** | `selenium.launcher.deps` | [source](/src/selenium3/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L174) | [source](/src/selenium4/java/com/nordstrom/automation/selenium/SeleniumConfig.java#L323) |
+| **`HUB_PORT`** | `selenium.hub.port` | 4445 | 4446 |
+| **`HUB_CONFIG`** | `selenium.hub.config` | hubConfig-s3.json | hubConfig-s4.json |
+| **`NODE_CONFIG`** | `selenium.node.config` | nodeConfig-s3.json | nodeConfig-s4.json |
 
 #### NOTES
 
@@ -105,7 +103,7 @@ Once the configuration of the `Local Grid` is resolved, **Selenium Foundation** 
   * ... with the grid launcher class specified by the **`GRID_LAUNCHER`** setting
   * ... with dependency contexts specified by the **`LAUNCHER_DEPS`** setting
   * ... with the hub configuration specified by the **`HUB_CONFIG`** setting
-  * ... specifying the IP address returned by `GridUtility.getLocalHost()`
+  * ... specifying the IP address returned by `HostUtils.getLocalHost()`
   * ... listening to the port specified by the **`HUB_PORT`** setting
 * Update the values of **`HUB_HOST`** and **`HUB_PORT`** to reflect the grid hub server configuration.
 * For each plug-in specified in the **ServiceLoader** [provider configuration file](#serviceloader-provider-configuration-file):
@@ -115,7 +113,7 @@ Once the configuration of the `Local Grid` is resolved, **Selenium Foundation** 
       * ... with additional dependency contexts specified by the plug-in
       * ... propagating the values of System properties specified by the plug-in
       * ... with the [assembled driver-specific node configuration](#building-driver-specific-node-configurations)
-      * ... specifying the IP address returned by `GridUtility.getLocalHost()`
+      * ... specifying the IP address returned by `HostUtils.getLocalHost()`
       * ... listening to the port returned by `PortProber.findFreePort()`
     * `for `[**`Appium`**](ConfiguringProjectSettings.md#appium-binary-paths)`plug-in`:
       * ... with `Node` executable specified by the **`NODE_BINARY_PATH`** setting
@@ -124,7 +122,7 @@ Once the configuration of the `Local Grid` is resolved, **Selenium Foundation** 
         * ... searching the global `Node` modules repository if unspecified
       * ... with command-line arguments specified by the **`APPIUM_CLI_ARGS`** setting
       * ... with the [assembled driver-specific node configuration](#building-driver-specific-node-configurations)
-      * ... specifying the IP address returned by `GridUtility.getLocalHost()`
+      * ... specifying the IP address returned by `HostUtils.getLocalHost()`
       * ... listening to the port returned by `PortProber.findFreePort()`
 
 > Written with [StackEdit](https://stackedit.io/).
