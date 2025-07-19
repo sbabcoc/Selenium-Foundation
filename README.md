@@ -257,6 +257,6 @@ Since the release of **Selenium Foundation** [28.0.0](https://github.com/sbabcoc
 
 This feature does not include management of Appium [automation engines](docs/ConfiguringProjectSettings.md#appium-automation-engine-support), which must be installed separately.
 
-**NOTE**: This driver acquisition process is bypassed for test classes that implement the [DriverProvider](docs/ConfiguringProjectSettings.md#testing-with-non-default-browser-sessions interface).
+**NOTE**: This driver acquisition process is bypassed for test classes that implement the [DriverProvider](docs/ConfiguringProjectSettings.md#testing-with-non-default-browser-sessions) interface.
 
 > Written with [StackEdit](https://stackedit.io/).
