@@ -338,7 +338,8 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             "com.google.common.util.concurrent.internal.InternalFutures", "org.eclipse.jetty.server.Server",
             "org.reactivestreams.Publisher", "org.openqa.selenium.manager.SeleniumManager",
             "org.apache.commons.exec.Executor", "io.netty.buffer.ByteBufUtil", 
-            "io.netty.handler.codec.compression.ZlibCodecFactory" };
+            "io.netty.handler.codec.compression.ZlibCodecFactory", "io.opentelemetry.common.ComponentLoader",
+            "com.github.benmanes.caffeine.cache.Weigher"};
     
     static {
         try {
