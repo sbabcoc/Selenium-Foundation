@@ -295,14 +295,6 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
      *  &lt;version&gt;9.4.57.v20241219&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      * 
-     * <b>org.brotli.dec.Utils</b>
-     * 
-     * <pre>&lt;dependency&gt;
-     *  &lt;groupId&gt;org.brotli&lt;/groupId&gt;
-     *  &lt;artifactId&gt;dec&lt;/artifactId&gt;
-     *  &lt;version&gt;0.1.2&lt;/version&gt;
-     *&lt;/dependency&gt;</pre>
-     * 
      * <b>net.bytebuddy.matcher.ElementMatcher</b>
      * 
      * <pre>&lt;dependency&gt;
@@ -350,7 +342,7 @@ public class HtmlUnitPlugin extends RemoteWebDriverPlugin {
             "org.apache.http.entity.mime.MIME", "org.apache.commons.codec.Encoder", "org.apache.commons.io.IOUtils",
             "org.apache.commons.logging.Log", "org.htmlunit.jetty.websocket.client.WebSocketClient",
             "org.eclipse.jetty.util.IO", "org.eclipse.jetty.io.EndPoint", "org.eclipse.jetty.http.Syntax",
-            "org.brotli.dec.Utils", "net.bytebuddy.matcher.ElementMatcher", "org.htmlunit.corejs.javascript.Symbol",
+            "net.bytebuddy.matcher.ElementMatcher", "org.htmlunit.corejs.javascript.Symbol",
             "org.htmlunit.cssparser.parser.CSSErrorHandler", "org.htmlunit.cyberneko.xerces.xni.XNIException",
             "org.htmlunit.xpath.xml.utils.PrefixResolver" };
     
