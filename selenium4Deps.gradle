@@ -43,7 +43,7 @@ dependencies {
     api 'com.beust:jcommander:1.82'
     api 'io.netty:netty-transport-native-epoll:4.1.119.Final'
     api 'io.netty:netty-transport-native-kqueue:4.1.119.Final'
-    testImplementation 'io.appium:java-client:9.4.0'
+    testImplementation 'io.appium:java-client:10.0.0'
     testImplementation 'org.mockito:mockito-core:4.11.0'
   }
   api 'com.nordstrom.tools:testng-foundation'
