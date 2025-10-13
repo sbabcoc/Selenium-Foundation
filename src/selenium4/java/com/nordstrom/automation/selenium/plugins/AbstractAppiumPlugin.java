@@ -59,7 +59,7 @@ import net.bytebuddy.implementation.Implementation;
  * <pre>&lt;dependency&gt;
  *  &lt;groupId&gt;io.appium&lt;/groupId&gt;
  *  &lt;artifactId&gt;java-client&lt;/artifactId&gt;
- *  &lt;version&gt;9.4.0&lt;/version&gt;
+ *  &lt;version&gt;10.0.0&lt;/version&gt;
  *  &lt;exclusions&gt;
  *    &lt;exclusion&gt;
  *      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
