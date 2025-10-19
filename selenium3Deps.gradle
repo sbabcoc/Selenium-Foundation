@@ -44,7 +44,7 @@ dependencies {
     api 'org.eclipse.jetty.websocket:websocket-client:9.4.57.v20241219'
     api 'org.jetbrains.kotlin:kotlin-stdlib:2.1.20'
     api 'org.jetbrains.kotlin:kotlin-stdlib-common:2.1.20'
-    testImplementation 'io.appium:java-client:7.6.0'
+    api 'io.appium:java-client:7.6.0'
     testImplementation 'org.mockito:mockito-core:4.11.0'
   }
   api 'com.nordstrom.tools:testng-foundation'

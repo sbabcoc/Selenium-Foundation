@@ -8,7 +8,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -43,6 +41,7 @@ import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.exceptions.VacationStackTrace;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.automation.selenium.model.Page.WindowState;
+import com.nordstrom.automation.selenium.plugins.AndroidActivityLauncher;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -651,18 +650,12 @@ public abstract class ComponentContainer
      * @param url target URL or activity
      * @param driver driver object
      */
-    @SuppressWarnings("serial")
     public static void getUrl(final String url, final WebDriver driver) {
         Objects.requireNonNull(url, "[url] must be non-null");
         Objects.requireNonNull(driver, "[driver] must be non-null");
         
         if (url.startsWith("activity://")) {
-            String[] components = url.split("/");
-            ((JavascriptExecutor) driver).executeScript("mobile: startActivity",
-                new HashMap<String, String>() {{
-                    put("package", components[2]);
-                    put("appActivity", components[3]);
-                }});
+            AndroidActivityLauncher.startAndroidActivity(driver, url);
         } else {
             driver.get(url);
         }
@@ -718,8 +711,21 @@ public abstract class ComponentContainer
         
         // if Android activity is specified
         if ( ! PLACEHOLDER.equals(appPackage)) {
-            // assemble Android activity URL
-            result = "activity://" + appPackage + "/" + path;
+            String action = pageUrl.action();
+            String category = pageUrl.category();
+            
+            URIBuilder builder = new URIBuilder().setScheme("activity").setHost(appPackage).setPath(path);
+            
+            if (!PLACEHOLDER.equals(action)) {
+                builder.addParameter("action", action);
+            }
+            
+            if (!PLACEHOLDER.equals(category)) {
+                builder.addParameter("category", category);
+            }
+            
+            result = builder.toString();
+
         // otherwise, if file is specified
         } else if ("file".equals(scheme)) {
             // resolve file path using context class loader

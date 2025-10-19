@@ -126,4 +126,18 @@ public @interface PageUrl {
      * @return application package name
      */
     String appPackage() default "{}";
+    
+    /**
+     * Get the Android intent action.
+     * 
+     * @return intent action
+     */
+    String action() default "{}";
+    
+    /**
+     * Get the Android intent category.
+     * 
+     * @return intent category
+     */
+    String category() default "{}";
 }
