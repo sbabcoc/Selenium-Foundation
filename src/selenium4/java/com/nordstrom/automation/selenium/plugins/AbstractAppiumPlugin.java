@@ -212,7 +212,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         
         // UiAutomator2: enable ChromeDriver auto-download
         if (getBrowserName().equalsIgnoreCase("uiautomator2")) {
-            argsList.add(0, "chromedriver_autodownload");
+            argsList.add(0, "*:chromedriver_autodownload,*:adb_shell");
             argsList.add(0, "--allow-insecure");
         }
         

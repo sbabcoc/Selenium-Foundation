@@ -142,7 +142,7 @@ public enum ContainerMethodInterceptor {
                 } catch (NoAlertPresentException eaten) {
                     try {
                         // get stale wait reference element by XPath
-                        reference = driver.findElement(By.xpath("/*"));
+                        reference = driver.findElement(By.xpath("//*"));
                     } catch (WebDriverException e) {
                         // get stale wait reference element by CSS selector
                         reference = driver.findElement(By.cssSelector("*"));

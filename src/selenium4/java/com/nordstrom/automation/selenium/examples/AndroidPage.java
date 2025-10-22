@@ -4,7 +4,6 @@ import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -31,9 +30,9 @@ public class AndroidPage extends Page {
      */
     protected enum Using implements ByEnum {
         /** search query "prefill" field */
-        QUERY_PREFILL(By.id("txt_query_prefill")),
+        QUERY_PREFILL(By.id("io.appium.android.apis:id/txt_query_prefill")),
         /** 'onSearchRequested' button */
-        ACTIVATE_SEARCH(By.id("btn_start_search")),
+        ACTIVATE_SEARCH(By.id("io.appium.android.apis:id/btn_start_search")),
         /** search query input field */
         QUERY_INPUT_FIELD(By.id("android:id/search_src_text"));
         
@@ -57,6 +56,8 @@ public class AndroidPage extends Page {
     public void submitSearchQuery(String query) {
         findElement(Using.QUERY_PREFILL).sendKeys(query);
         findElement(Using.ACTIVATE_SEARCH).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(Using.QUERY_INPUT_FIELD.locator));
     }
     
     /**
@@ -65,9 +66,6 @@ public class AndroidPage extends Page {
      * @return search result
      */
     public String getSearchResult() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-        WebElement searchResult = wait.until(ExpectedConditions.visibilityOfElementLocated(Using.QUERY_INPUT_FIELD.locator));
-        return searchResult.getText();
+        return findElement(Using.QUERY_INPUT_FIELD).getText();
     }
-    
 }
