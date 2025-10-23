@@ -1,12 +1,16 @@
 package com.nordstrom.automation.selenium.plugins;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
+import com.nordstrom.common.base.UncheckedThrow;
+
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -106,8 +110,12 @@ public class AndroidActivityLauncher {
             int idx = pair.indexOf('=');
             String key = idx > 0 ? pair.substring(0, idx) : pair;
             String value = idx > 0 && pair.length() > idx + 1 ? pair.substring(idx + 1) : "";
-            key = URLDecoder.decode(key, StandardCharsets.UTF_8);
-            value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+            try {
+                key = URLDecoder.decode(key, UTF_8.name());
+                value = URLDecoder.decode(value, UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
             rawParams.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
         }
         

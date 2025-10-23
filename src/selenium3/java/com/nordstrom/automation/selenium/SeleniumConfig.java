@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,7 +9,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -262,7 +263,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             hubConfig.servlets = Arrays.asList(servlets.toArray(new String[0]));
             try(OutputStream fos = new FileOutputStream(filePath.toFile());
                 OutputStream out = new BufferedOutputStream(fos)) {
-                out.write(new Json().toJson(hubConfig).getBytes(StandardCharsets.UTF_8));
+                out.write(new Json().toJson(hubConfig).getBytes(UTF_8));
             }
         }
         return filePath;
@@ -307,7 +308,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             nodeConfig.servlets = Arrays.asList(servlets.toArray(new String[0]));
             try(OutputStream fos = new FileOutputStream(filePath.toFile());
                 OutputStream out = new BufferedOutputStream(fos)) {
-                out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
+                out.write(new Json().toJson(nodeConfig).getBytes(UTF_8));
             }
         }
         return filePath;

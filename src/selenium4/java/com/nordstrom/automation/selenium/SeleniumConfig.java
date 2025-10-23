@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.openqa.selenium.json.Json.LIST_OF_MAPS_TYPE;
 import static org.openqa.selenium.json.Json.MAP_TYPE;
 
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -422,7 +422,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             distributorOptions.put("slot-matcher", slotMatcher);
             try (OutputStream fos = new FileOutputStream(filePath.toFile());
                  OutputStream out = new BufferedOutputStream(fos)) {
-                out.write(new Json().toJson(hubConfig).getBytes(StandardCharsets.UTF_8));
+                out.write(new Json().toJson(hubConfig).getBytes(UTF_8));
             }
         }
         return filePath;
@@ -505,7 +505,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             }
             try (OutputStream fos = new FileOutputStream(filePath.toFile());
                  OutputStream out = new BufferedOutputStream(fos)) {
-                out.write(new Json().toJson(nodeConfig).getBytes(StandardCharsets.UTF_8));
+                out.write(new Json().toJson(nodeConfig).getBytes(UTF_8));
             }
         }
         return filePath;

@@ -1,5 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +15,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -207,7 +208,7 @@ public final class GridUtility {
             length = inputStream.read(buffer);
             result.write(buffer, 0, length);
         }
-        return result.toString(StandardCharsets.UTF_8.name());
+        return result.toString(UTF_8.name());
     }
 
     /**
