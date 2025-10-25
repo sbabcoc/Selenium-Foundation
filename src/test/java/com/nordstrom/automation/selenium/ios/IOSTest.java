@@ -17,8 +17,8 @@ public class IOSTest extends TestNgTargetBase {
     @TargetPlatform(IOS_APP_NAME)
     public void testEditing() {
         IOSPage page = getInitialPage();
-        page.modifyField("Hello world!");
-        assertEquals(page.accessField(), "Hello world!");
+        assertEquals(page.computeSum(1, 2), 3);
+        assertEquals(page.getAnswerAsString(), "3");
     }
     
 }

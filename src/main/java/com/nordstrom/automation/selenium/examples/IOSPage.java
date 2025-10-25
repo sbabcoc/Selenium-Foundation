@@ -23,8 +23,10 @@ public class IOSPage extends Page {
      * This enumeration defines element locator constants.
      */
     protected enum Using implements ByEnum {
-        /** text field */
-        TEXT_FIELD(By.className("XCUIElementTypeTextField"));
+        INTEGER_A(By.id("IntegerA")),
+        INTEGER_B(By.id("IntegerB")),
+        COMPUTE_SUM(By.id("ComputeSumButton")),
+        ANSWER(By.id("Answer"));
         
         private final By locator;
         
@@ -38,23 +40,35 @@ public class IOSPage extends Page {
         }
     }
     
-    /**
-     * Populate text field with the specified string.
-     * 
-     * @param keys string to type into text field
-     */
-    public void modifyField(String keys) {
-        findElement(Using.TEXT_FIELD).click();
-        findElement(Using.TEXT_FIELD).sendKeys(keys);
+    public int computeSum(int a, int b) {
+    	updateIntegerA(a);
+    	updateIntegerB(b);
+    	return computeSum();
     }
     
-    /**
-     * Get text field content.
-     * 
-     * @return text field content
-     */
-    public String accessField() {
-        return findElement(Using.TEXT_FIELD).getText();
+    public void updateIntegerA(int a) {
+    	findElement(Using.INTEGER_A).sendKeys(Integer.toString(a));
+    }
+    
+    public void updateIntegerB(int b) {
+    	findElement(Using.INTEGER_B).sendKeys(Integer.toString(b));
+    }
+    
+    public int computeSum() {
+    	findElement(Using.COMPUTE_SUM).click();
+    	return getAnswerAsInt();
+    }
+    
+    public int getAnswerAsInt() {
+    	try {
+    		return Integer.parseInt(getAnswerAsString());
+    	} catch (NumberFormatException e) {
+    		return 0;
+    	}
+    }
+    
+    public String getAnswerAsString() {
+    	return findElement(Using.ANSWER).getText();
     }
     
 }
