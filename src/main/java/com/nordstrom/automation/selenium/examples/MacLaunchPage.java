@@ -8,14 +8,14 @@ import com.nordstrom.automation.selenium.model.Page;
 /**
  * This class is the model for the target view of the sample application used by the Appium Macintosh unit test.
  */
-public class MacPage extends Page {
+public class MacLaunchPage extends Page {
 
     /**
      * Constructor for main view context.
      * 
      * @param driver driver object
      */
-    public MacPage(WebDriver driver) {
+    public MacLaunchPage(WebDriver driver) {
         super(driver);
     }
     
@@ -23,8 +23,7 @@ public class MacPage extends Page {
      * This enumeration defines element locator constants.
      */
     protected enum Using implements ByEnum {
-        /** text field */
-        EDIT_FIELD(By.className("XCUIElementTypeTextView"));
+        NEW_DOCUMENT(By.id("New Document"));
         
         private final By locator;
         
@@ -38,22 +37,12 @@ public class MacPage extends Page {
         }
     }
     
-    /**
-     * Populate text field with the specified string.
-     * 
-     * @param keys string to type into text field
-     */
-    public void modifyDocument(String keys) {
-        findElement(Using.EDIT_FIELD).sendKeys(keys);
-    }
-    
-    /**
-     * Get text field content.
-     * 
-     * @return text field content
-     */
-    public String accessDocument() {
-        return findElement(Using.EDIT_FIELD).getText();
+    public MacDocumentPage openNewDocument() {
+        findElement(Using.NEW_DOCUMENT).click();
+        setWindowState(WindowState.WILL_CLOSE);
+        MacDocumentPage newPage = new MacDocumentPage(driver);
+        newPage.setWindowState(WindowState.WILL_CLOSE);
+        return newPage;
     }
     
 }
