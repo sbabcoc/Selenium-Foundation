@@ -9,6 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -139,7 +140,7 @@ public enum ContainerMethodInterceptor {
                     driver.switchTo().alert();
                     // alert is shown
                     hasDialog = true;
-                } catch (NoAlertPresentException eaten) {
+                } catch (NoAlertPresentException | UnsupportedCommandException eaten) {
                     try {
                         // get stale wait reference element by XPath
                         reference = driver.findElement(By.xpath("//*"));
