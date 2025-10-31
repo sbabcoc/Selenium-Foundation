@@ -23,9 +23,13 @@ public class IOSPage extends Page {
      * This enumeration defines element locator constants.
      */
     protected enum Using implements ByEnum {
+        /** addend A input field */
         INTEGER_A(By.id("IntegerA")),
+        /** addend B input field */
         INTEGER_B(By.id("IntegerB")),
+        /** 'Compute Sum' button */
         COMPUTE_SUM(By.id("ComputeSumButton")),
+        /** answer label */
         ANSWER(By.id("Answer"));
         
         private final By locator;
@@ -65,7 +69,7 @@ public class IOSPage extends Page {
     /**
      * Update the value of addend B.
      * 
-     * @param a new value 
+     * @param b new value 
      */
     public void updateIntegerB(int b) {
     	findElement(Using.INTEGER_B).sendKeys(Integer.toString(b));
