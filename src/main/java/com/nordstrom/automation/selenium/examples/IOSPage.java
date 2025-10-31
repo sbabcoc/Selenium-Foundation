@@ -40,25 +40,52 @@ public class IOSPage extends Page {
         }
     }
     
+    /**
+     * Populate the two addend fields and tap the 'Compute Sum' button.
+     * 
+     * @param a addend A
+     * @param b addend B
+     * @return sum shown by the application
+     */
     public int computeSum(int a, int b) {
     	updateIntegerA(a);
     	updateIntegerB(b);
     	return computeSum();
     }
     
+    /**
+     * Update the value of addend A.
+     * 
+     * @param a new value 
+     */
     public void updateIntegerA(int a) {
     	findElement(Using.INTEGER_A).sendKeys(Integer.toString(a));
     }
     
+    /**
+     * Update the value of addend B.
+     * 
+     * @param a new value 
+     */
     public void updateIntegerB(int b) {
     	findElement(Using.INTEGER_B).sendKeys(Integer.toString(b));
     }
     
+    /**
+     * Tap the 'Compute Sum' button.
+     * 
+     * @return sum shown by the application
+     */
     public int computeSum() {
     	findElement(Using.COMPUTE_SUM).click();
     	return getAnswerAsInt();
     }
     
+    /**
+     * Get displayed sum as an integer.
+     * 
+     * @return displayed sum; 0 if integer conversion fails
+     */
     public int getAnswerAsInt() {
     	try {
     		return Integer.parseInt(getAnswerAsString());
@@ -67,6 +94,11 @@ public class IOSPage extends Page {
     	}
     }
     
+    /**
+     * Get displayed sum as a string.
+     * 
+     * @return displayed sum as a string
+     */
     public String getAnswerAsString() {
     	return findElement(Using.ANSWER).getText();
     }
