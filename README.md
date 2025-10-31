@@ -73,14 +73,14 @@ To add a dependency on **Selenium Foundation** for Maven, use the following:
 
 | Selenium 3 | Selenium 4 |
 |:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.5.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.5.0-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.6.0-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;29.6.0-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 To add a dependency for Gradle:
 
 | Platform | Dependency |
 |:---:|:---|
-| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.5.0-s3'<br/>}</pre> |
-| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.5.0-s4'<br/>}</pre> |
+| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.6.0-s3'<br/>}</pre> |
+| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:29.6.0-s4'<br/>}</pre> |
 
 ### Building Selenium Foundation
 
