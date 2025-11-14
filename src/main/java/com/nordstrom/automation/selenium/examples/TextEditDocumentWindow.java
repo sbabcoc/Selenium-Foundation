@@ -1,6 +1,8 @@
 package com.nordstrom.automation.selenium.examples;
 
 import org.openqa.selenium.By;
+
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.PageComponent;
 
@@ -48,7 +50,7 @@ public class TextEditDocumentWindow extends PageComponent {
      * @return document window title
      */
     public String getDocumentTitle() {
-    	return getWrappedElement().getDomAttribute("title");
+    	return WebDriverUtils.getDomAttributeOf(getWrappedElement(), "title");
     }
     
     /**

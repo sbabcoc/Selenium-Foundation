@@ -33,6 +33,7 @@ Within the script, use **`document`** to refer to the current document. Note tha
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
  
 public class JavaScriptExample {
  
@@ -50,7 +51,7 @@ public class JavaScriptExample {
         // Execute script as anonymous function, passing specified argument
         WebElement response = JsUtility.runAndReturn(driver, script, "viewport");
         // If element reference was returned, extract 'content' attribute
-        return (response == null) ? null : response.getDomAttribute("content");
+        return (response == null) ? null : WebDriverUtils.getDomAttributeOf(response, "content");
     }
 }
 ```
@@ -88,6 +89,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
  
 public class AnotherJavaScriptExample {
  
@@ -109,7 +111,7 @@ public class AnotherJavaScriptExample {
             // Execute script as anonymous function, passing specified argument
             WebElement response = JsUtility.runAndReturn(driver, script, name);
             // Extract 'content' attribute
-            return response.getDomAttribute("content");
+            return WebDriverUtils.getDomAttributeOf(response, "content");
         } catch (WebDriverException e) {
             // Extract encoded exception
             throw JsUtility.propagate(e);
