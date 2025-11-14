@@ -13,6 +13,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
+
 public class TableComponent extends PageComponent {
 
     public TableComponent(By locator, ComponentContainer parent) {
@@ -69,7 +71,7 @@ public class TableComponent extends PageComponent {
     }
     
     public static Object getKey(SearchContext context) {
-        return ((WebElement) context).getDomAttribute("id");
+        return WebDriverUtils.getDomAttributeOf((WebElement) context, "id");
     }
 }
 ```

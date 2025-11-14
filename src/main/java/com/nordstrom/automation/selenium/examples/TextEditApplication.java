@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.examples;
 
-import java.util.List;
+import static com.nordstrom.automation.selenium.utility.KeysPayloadBuilder.CMD;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -10,10 +11,12 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.NoDocumentAppearedTimeoutException;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.model.PageComponent;
 import com.nordstrom.automation.selenium.support.Coordinator;
+import com.nordstrom.automation.selenium.utility.KeysPayloadBuilder;
 
 /**
  * This class is the model for the <b>TextEdit</b> application.
@@ -29,12 +32,15 @@ public class TextEditApplication extends Page {
 		super(driver);
 	}
 	
-	private static final String DOC_WINDOW_TEMPLATE = ".//XCUIElementTypeWindow[@title='%s']";
+	static {
+		KeysPayloadBuilder.Builder builder = KeysPayloadBuilder.builder();
+		CMD_N = builder.key("n", CMD).build();
+		CMD_O = builder.key("o", CMD).build();
+	}
 	
-	private static final Map<String, Object> CMD_N = 
-			Map.of("keys", List.of(Map.of("key", "n", "modifierFlags", 1 << 4)));
-	private static final Map<String, Object> CMD_O = 
-			Map.of("keys", List.of(Map.of("key", "o", "modifierFlags", 1 << 4)));
+	private static final Map<String, Object> CMD_N;
+	private static final Map<String, Object> CMD_O;
+	private static final String DOC_WINDOW_TEMPLATE = ".//XCUIElementTypeWindow[@title='%s']";
 	
 	private TextEditManagementPanel managementPanel;
 	
@@ -90,7 +96,7 @@ public class TextEditApplication extends Page {
      */
     public Set<String> getOpenDocumentNames() {
 		return driver.findElements(Using.DOCUMENT_WINDOW.locator).stream()
-				.map(e -> e.getDomAttribute("title")).collect(Collectors.toSet());
+				.map(e -> WebDriverUtils.getDomAttributeOf(e, "title")).collect(Collectors.toSet());
     }
     
     /**
@@ -118,9 +124,8 @@ public class TextEditApplication extends Page {
                     return null;
                 } else {
                 	String name = currentNames.iterator().next();
-                	String xpath = DOC_WINDOW_TEMPLATE.formatted(name);
-                	By locator = By.xpath(xpath);
-                	return new TextEditDocumentWindow(locator, application);
+                	String xpath = String.format(DOC_WINDOW_TEMPLATE, name);
+                	return new TextEditDocumentWindow(By.xpath(xpath), application);
                 }
             }
             
