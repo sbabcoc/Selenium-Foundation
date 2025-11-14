@@ -19,7 +19,7 @@ public class WindowsTest extends TestNgTargetBase {
     public void testEditing() {
         WindowsPage page = getInitialPage();
         page.modifyDocument("Hello world!");
-        assertEquals(page.getDocument(), "Hello world!");
+        assertEquals(page.getDocumentContent(), "Hello world!");
         page.modifyDocument(Keys.CONTROL + "z");
     }
     

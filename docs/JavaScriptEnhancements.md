@@ -50,7 +50,7 @@ public class JavaScriptExample {
         // Execute script as anonymous function, passing specified argument
         WebElement response = JsUtility.runAndReturn(driver, script, "viewport");
         // If element reference was returned, extract 'content' attribute
-        return (response == null) ? null : response.getAttribute("content");
+        return (response == null) ? null : response.getDomAttribute("content");
     }
 }
 ```
@@ -61,7 +61,7 @@ The following code is sample JavaScript file &lt;getMetaTagByName.js&gt;. This f
 ```javascript
 var found = document.getElementsByTagName("meta");
 for (var i = 0; i < found.length; i++) {
-    if (found[i].getAttribute("name") == arguments[0]) return found[i];
+    if (found[i].getDomAttribute("name") == arguments[0]) return found[i];
 }
 return null;
 ```
@@ -109,7 +109,7 @@ public class AnotherJavaScriptExample {
             // Execute script as anonymous function, passing specified argument
             WebElement response = JsUtility.runAndReturn(driver, script, name);
             // Extract 'content' attribute
-            return response.getAttribute("content");
+            return response.getDomAttribute("content");
         } catch (WebDriverException e) {
             // Extract encoded exception
             throw JsUtility.propagate(e);
@@ -124,7 +124,7 @@ The following code is the sample JavaScript file &lt;requireMetaTagByName.js&gt;
 ```javascript
 var found = document.getElementsByTagName("meta");
 for (var i = 0; i < found.length; i++) {
-    if (found[i].getAttribute("name") == arguments[0]) return found[i];
+    if (found[i].getDomAttribute("name") == arguments[0]) return found[i];
 }
 throwNew('org.openqa.selenium.NoSuchElementException', 'No meta element found with name: ' + arguments[0]);
 ```

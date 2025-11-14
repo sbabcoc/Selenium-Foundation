@@ -69,7 +69,7 @@ public class TableComponent extends PageComponent {
     }
     
     public static Object getKey(SearchContext context) {
-        return ((WebElement) context).getAttribute("id");
+        return ((WebElement) context).getDomAttribute("id");
     }
 }
 ```

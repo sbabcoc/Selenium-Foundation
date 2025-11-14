@@ -51,7 +51,7 @@ public class WindowsPage extends Page {
      * 
      * @return document content
      */
-    public String getDocument() {
+    public String getDocumentContent() {
         return findElement(Using.EDIT_FIELD).getText();
     }
     
