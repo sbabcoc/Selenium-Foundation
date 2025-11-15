@@ -83,7 +83,8 @@ public class ExamplePageLauncher {
             
             if (process != null) {
                 process.destroy();
-                if (1 == process.waitFor()) {
+                int exitCode = process.waitFor();
+                if (exitCode == 143 || exitCode == 1) {
                     LOGGER.debug("Terminated example page server process listening to: {}", getUrl());
                     hasStarted = false;
                     isActive = false;
