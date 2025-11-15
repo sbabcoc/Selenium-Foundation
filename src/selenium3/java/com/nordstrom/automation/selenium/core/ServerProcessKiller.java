@@ -58,7 +58,8 @@ public class ServerProcessKiller {
         }
         
         if (cmdLine != null) {
-            if (1 == cmdLine.destroy()) {
+            int exitCode = cmdLine.destroy();
+            if (exitCode == 143 || exitCode == 1) {
                 LOGGER.debug("Terminated local server process listening to: {}", serverUrl);
                 return true;
             }

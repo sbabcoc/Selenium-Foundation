@@ -14,7 +14,7 @@ public class ServerPidFinder {
 
     private enum PidFinder {
         WINDOWS("cmd.exe", "/c", "for /f \"tokens=5\" %%a in ('netstat -ano ^| findstr :%d ^| findstr LISTENING') do @echo %%a"),
-        MAC_UNIX("sh", "-c", "lsof -i :%d -sTCP:LISTEN -t");
+        MAC_UNIX("sh", "-c", "lsof -iTCP:%d -sTCP:LISTEN -t");
         
         private String executable;
         private String commandOption;
