@@ -5,18 +5,18 @@
 
 ### * BREAKING NEWS *
 
-* Release _29.7.8_ of **Selenium Foundation** completes implementation of framework support for the **Mac2** engine of **Appium**.
+* Release [_29.7.8_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.7.0) of **Selenium Foundation** completes implementation of framework support for the **Mac2** engine of **Appium**.
   * **NOTE**: This was first release that I published from a new machine, and I inadvertently bumped the "patch" component of the release number several times as I tried to resolve a configuration issue.  
-* Release _29.6.0_ of **Selenium Foundation** completes implementation of framework support for the **XCUITest** engine of **Appium**.
-* Release _29.5.0_ of **Selenium Foundation** adds the ability to open **Android** activities directly with **UiAutomator2**, bypassing fixed-path navigation. 
-* Release _29.2.0_ of **Selenium Foundation** adds a new **ContainerResolver** feature that enables page model hierarchies to define multiple versions of a component container (page or component) that get selected at runtime based on the current state of the DOM.
-* With the release of **Selenium Foundation** version _29.0.0_, we now detect active local Grid instances, adopting and managing them if found at the specified (or implied) address.
-* With the release of **Selenium Foundation** version _28.6.0_, we now provide support for **Chrome** browser sessions on **Android** through the **UiAutomator2** plug-in. 
-* With the release of **Selenium Foundation** version _28.2.0_, we now provide support for **Appium** sessions via **Selenium 4 Grid**. The auto-generated configuration connects the **Appium** server to the local grid via a relay node.
+* Release [_29.6.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.6.0) of **Selenium Foundation** completes implementation of framework support for the **XCUITest** engine of **Appium**.
+* Release [_29.5.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.5.0) of **Selenium Foundation** adds the ability to open **Android** activities directly with **UiAutomator2**, bypassing fixed-path navigation. 
+* Release [_29.2.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.2.0) of **Selenium Foundation** adds a new **ContainerResolver** feature that enables page model hierarchies to define multiple versions of a component container (page or component) that get selected at runtime based on the current state of the DOM.
+* With the release of **Selenium Foundation** version [_29.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.0.0), we now detect active local Grid instances, adopting and managing them if found at the specified (or implied) address.
+* With the release of **Selenium Foundation** version [_28.6.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v28.6.0), we now provide support for **Chrome** browser sessions on **Android** through the **UiAutomator2** plug-in. 
+* With the release of **Selenium Foundation** version [_28.2.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v28.2.0), we now provide support for **Appium** sessions via **Selenium 4 Grid**. The auto-generated configuration connects the **Appium** server to the local grid via a relay node.
   * **NOTE**: To properly support **HtmlUnitDriver**, **Appium**, and **Safari**, this release includes new custom slot matcher (Selenium 4) and capabilities matcher (Selenium 3). These matchers are activated via a new setting, which can be easily overridden should the need arise.
-* With the release of **Selenium Foundation** version _28.1.1_, we now provide support for remote **HtmlUnitDriver** sessions with [HtmlUnit Remote](https://github.com/seleniumhq-community/htmlunit-remote). The project unit tests for **Selenium Foundation** have been switched back to running under this "headless" browser.
-* With the release of **Selenium Foundation** version _28.0.0_, we now use **Selenium Manager** (Selenium 4) and **Web Driver Manager** (Selenium 3) to acquire compatible drivers for the browsers targeted by your tests.
-* With the release of **Selenium Foundation** version _26.3.4_, automation of Macintosh native applications via the Mac2 engine of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent) project (_1.5.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include Mac2 nodes.
+* With the release of **Selenium Foundation** version [_28.1.1_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v28.1.1), we now provide support for remote **HtmlUnitDriver** sessions with [HtmlUnit Remote](https://github.com/seleniumhq-community/htmlunit-remote). The project unit tests for **Selenium Foundation** have been switched back to running under this "headless" browser.
+* With the release of **Selenium Foundation** version [_28.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v28.0.0), we now use **Selenium Manager** (Selenium 4) and **Web Driver Manager** (Selenium 3) to acquire compatible drivers for the browsers targeted by your tests.
+* With the release of **Selenium Foundation** version [_26.3.4_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v26.3.4), automation of Macintosh native applications via the Mac2 engine of Appium is complete. The latest release of the [local-grid-parent](https://github.com/sbabcoc/local-grid-parent) project (_1.5.0_) builds on the [local grid](docs/LocalGridConfiguration.md#introduction) feature of **Selenium Foundation** to launch grid collections that include Mac2 nodes.
 
 #### Table of Contents
 
