@@ -5,9 +5,9 @@
 
 ### * BREAKING NEWS *
 
-* Release _29.7.8_ of **Selenium Foundation** completes implementation of support for the **Mac2** engine of **Appium**.
+* Release _29.7.8_ of **Selenium Foundation** completes implementation of framework support for the **Mac2** engine of **Appium**.
   * **NOTE**: This was first release that I published from a new machine, and I inadvertently bumped the "patch" component of the release number several times as I tried to resolve a configuration issue.  
-* Release _29.6.0_ of **Selenium Foundation** completes implementation of support for the **XCUITest** engine of **Appium**.
+* Release _29.6.0_ of **Selenium Foundation** completes implementation of framework support for the **XCUITest** engine of **Appium**.
 * Release _29.5.0_ of **Selenium Foundation** adds the ability to open **Android** activities directly with **UiAutomator2**, bypassing fixed-path navigation. 
 * Release _29.2.0_ of **Selenium Foundation** adds a new **ContainerResolver** feature that enables page model hierarchies to define multiple versions of a component container (page or component) that get selected at runtime based on the current state of the DOM.
 * With the release of **Selenium Foundation** version _29.0.0_, we now detect active local Grid instances, adopting and managing them if found at the specified (or implied) address.
