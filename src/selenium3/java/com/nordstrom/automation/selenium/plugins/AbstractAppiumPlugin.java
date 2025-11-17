@@ -204,19 +204,26 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add(0, address);
         argsList.add(0, "--address");
         
+        // UiAutomator2: enable ChromeDriver auto-download
+        if (getBrowserName().equalsIgnoreCase("uiautomator2")) {
+            argsList.add(0, "*:chromedriver_autodownload,*:adb_shell");
+            argsList.add(0, "--allow-insecure");
+        }
+        
         CommandLine cmdLine;
         String appiumBinaryPath = findMainScript().getAbsolutePath();
         
         // if running with 'pm2'
         if (config.appiumWithPM2()) {
             File pm2Binary = findPM2Binary().getAbsoluteFile();
-
+            String winQuote = (SystemUtils.IS_OS_WINDOWS) ? "\"" : "";
+            
             argsList.add(0, "--");
             
             // if capturing output
             if (outputPath != null) {
                 // specify 'pm2' log output path
-                argsList.add(0, "\"" + outputPath.toString() + "\"");
+                argsList.add(0, winQuote + outputPath + winQuote);
                 argsList.add(0, "--log");
             }
             
@@ -225,7 +232,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             argsList.add(0, "--name");
             
             // specify path to 'appium' main script 
-            argsList.add(0, "\"" + appiumBinaryPath + "\"");
+            argsList.add(0, winQuote + appiumBinaryPath + winQuote);
             argsList.add(0, "start");
             
             String executable;
@@ -248,6 +255,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             cmdLine = new CommandLine(findNodeBinary().getAbsolutePath(), argsList.toArray(new String[0]));
         }
         
+        cmdLine.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
         return new AppiumGridServer(address, portNum, false, cmdLine, workingPath, outputPath);
     }
 
