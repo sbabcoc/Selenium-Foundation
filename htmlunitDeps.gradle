@@ -1,7 +1,7 @@
 def driverPlugins = System.getProperty('selenium.grid.plugins', '')
-System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin' + File.pathSeparator)
-System.setProperty('selenium.browser.name', 'htmlunit')
-System.setProperty('selenium.context.platform', 'web-app')
+System.setProperty('injected.selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin' + File.pathSeparator)
+System.setProperty('injected.selenium.browser.name', 'htmlunit')
+System.setProperty('injected.selenium.context.platform', 'web-app')
 dependencies {
   if ("${profile}" == "selenium4") {
     testImplementation 'com.nordstrom.ui-tools:htmlunit-remote'

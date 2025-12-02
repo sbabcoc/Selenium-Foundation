@@ -30,17 +30,22 @@ public class HtmlUnitCaps {
                                 "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
     private static final String CHROME = 
-            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"chrome\"," +
+            "{\"browserName\":\"htmlunit\",\"garg:browserVersion\":\"chrome\"," +
              "\"nord:options\":{\"personality\":\"htmlunit.chrome\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
+    private static final String EDGE = 
+            "{\"browserName\":\"htmlunit\",\"garg:browserVersion\":\"edge\"," +
+             "\"nord:options\":{\"personality\":\"htmlunit.edge\"," +
+                               "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
+    
     private static final String FIREFOX = 
-            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"firefox\"," +
+            "{\"browserName\":\"htmlunit\",\"garg:browserVersion\":\"firefox\"," +
              "\"nord:options\":{\"personality\":\"htmlunit.firefox\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
     private static final String INT_EXP = 
-            "{\"browserName\":\"htmlunit\",\"browserVersion\":\"ie\"," +
+            "{\"browserName\":\"htmlunit\",\"garg:browserVersion\":\"ie\"," +
              "\"nord:options\":{\"personality\":\"htmlunit.ie\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.HtmlUnitPlugin\"}}";
     
@@ -55,6 +60,7 @@ public class HtmlUnitCaps {
         Map<String, String> personalities = new HashMap<>();
         personalities.put(DRIVER_NAME, BASELINE);
         personalities.put(DRIVER_NAME + ".chrome", CHROME);
+        personalities.put(DRIVER_NAME + ".edge", EDGE);
         personalities.put(DRIVER_NAME + ".firefox", FIREFOX);
         personalities.put(DRIVER_NAME + ".ie", INT_EXP);
         personalities.put(DRIVER_NAME + ".nojs", NO_JS);
