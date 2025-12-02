@@ -6,6 +6,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.PageComponent;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
@@ -13,7 +14,7 @@ import com.nordstrom.automation.selenium.model.RobustWebElement;
 /**
  * This class is the model for the example page form component.
  */
-public class FormComponent extends PageComponent {
+public class FormComponent extends PageComponent implements DetectsLoadCompletion<FormComponent> {
 
     /**
      * Constructor for page component by element locator
@@ -44,6 +45,8 @@ public class FormComponent extends PageComponent {
      * This enumeration defines element locator constants.
      */
     protected enum Using implements ByEnum {
+        /** form component form element */
+        FORM_ELEM(By.cssSelector("form")),
         /** form component optional element */
         OPTIONAL(By.cssSelector("optional"));
         
@@ -59,6 +62,11 @@ public class FormComponent extends PageComponent {
         }
     }
     
+    @Override
+    public boolean isLoadComplete() {
+        return findOptional(Using.FORM_ELEM).hasReference();
+    }
+
     /**
      * Get optional reference to the form component "optional" element.
      * 

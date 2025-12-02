@@ -29,7 +29,7 @@ import com.nordstrom.common.uri.UriUtils;
  * This class is the model for the 'Example' page used by Selenium Foundation unit tests.
  */
 @PageUrl("/grid/admin/ExamplePageServlet")
-public class ExamplePage extends Page implements DetectsLoadCompletion {
+public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePage> {
 
     /** page title */
     public static final String TITLE = "Example Page";

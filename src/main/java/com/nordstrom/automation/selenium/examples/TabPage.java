@@ -13,7 +13,7 @@ import com.nordstrom.automation.selenium.model.Page;
  * the specific page that gets opened ({@link TabPageA} or {@link TabPageB}).
  */
 @Resolver(TabPageResolver.class)
-public class TabPage extends Page implements DetectsLoadCompletion {
+public class TabPage extends Page implements DetectsLoadCompletion<TabPage> {
     
     /**
      * Constructor for tab page view context.

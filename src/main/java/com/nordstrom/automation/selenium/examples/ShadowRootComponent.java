@@ -8,6 +8,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.core.ByType;
+import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
 import com.nordstrom.automation.selenium.model.ShadowRoot;
@@ -15,7 +16,7 @@ import com.nordstrom.automation.selenium.model.ShadowRoot;
 /**
  * This class is the model for example page shadow root components.
  */
-public class ShadowRootComponent extends ShadowRoot {
+public class ShadowRootComponent extends ShadowRoot implements DetectsLoadCompletion<ShadowRootComponent> {
 
     /**
      * Constructor for shadow root by element locator
@@ -49,7 +50,7 @@ public class ShadowRootComponent extends ShadowRoot {
     }
     
     private enum Using implements ByEnum {
-        HEADING(By.cssSelector("h1")),
+        HEADING(By.cssSelector("h1[id^='shadow-heading-']")),
         PARA(By.cssSelector("p[id^='para-']")),
         INPUT(By.cssSelector("input[id^='input-field-']")),
         CHECK(By.cssSelector("input[id^='checkbox-']"));
@@ -66,6 +67,11 @@ public class ShadowRootComponent extends ShadowRoot {
         }
     }
     
+    @Override
+    public boolean isLoadComplete() {
+        return findOptional(Using.HEADING).hasReference();
+    }
+
     /**
      * Get heading of this shadow root component.
      * 

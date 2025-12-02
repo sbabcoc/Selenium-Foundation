@@ -1,9 +1,10 @@
 def driverPlugins = System.getProperty('selenium.grid.plugins', '')
 System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.WindowsPlugin' + File.pathSeparator)
-System.setProperty('selenium.browser.caps', '{"platformName":"Windows","appium:automationName":"Windows","appium:app":"C:/Windows/system32/notepad.exe"}')
-System.setProperty('selenium.context.platform', 'windows')
-System.setProperty('selenium.grid.examples', 'false')
-System.setProperty('appium.with.pm2', 'true')
+System.setProperty('injected.selenium.browser.caps', '{"platformName":"Windows","appium:automationName":"Windows","appium:app":"C:/Windows/system32/notepad.exe"}')
+System.setProperty('injected.selenium.context.platform', 'windows')
+System.setProperty('injected.selenium.grid.examples', 'false')
+System.setProperty('injected.selenium.timeout.host', '60')
+System.setProperty('injected.appium.with.pm2', 'true')
 dependencies {
   api('io.appium:java-client') {
     exclude group: 'org.seleniumhq.selenium', module: 'selenium-java'

@@ -2,9 +2,11 @@ package com.nordstrom.automation.selenium.utility;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.ByType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
@@ -25,6 +27,8 @@ public class SearchContextUtils {
     private static final String LOCATE_FIRST_BY_XPATH = JsUtility.getScriptResource("locateFirstByXpath.format");
     private static final String LOCATE_INDEX_BY_CSS = JsUtility.getScriptResource("locateIndexByCss.format");
     private static final String LOCATE_INDEX_BY_XPATH = JsUtility.getScriptResource("locateIndexByXpath.format");
+    
+    private static final String SHADOW_ROOT_KEY = "shadow-6066-11e4-a52e-4f735466cecf";
     
     /**
      * This enumeration defines constants for JavaScript search context types.
@@ -190,7 +194,20 @@ public class SearchContextUtils {
      * @return {@link ContextType} constant
      */
     public static ContextType getContextType(final WrapsContext context) {
-        return (context.getWrappedContext() instanceof WebElement) ? ContextType.ELEMENT : ContextType.DOCUMENT;
+        return isElementContext(context.getWrappedContext()) ? ContextType.ELEMENT : ContextType.DOCUMENT;
+    }
+    
+    /**
+     * Determine if the specified search context is a web element.
+     * 
+     * @param context {@link SearchContext} object
+     * @return {@code true} if context is a {@link WebElement}; otherwise {@code false}
+     */
+    public static boolean isElementContext(final SearchContext context) {
+        if (context instanceof WebDriver) return false;
+        if (context instanceof WebElement) return true;
+        String json = SeleniumConfig.getConfig().toJson(context);
+        return json.contains(SHADOW_ROOT_KEY);
     }
     
     /**

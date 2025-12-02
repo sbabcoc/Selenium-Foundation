@@ -240,10 +240,7 @@ public enum ContainerMethodInterceptor {
                 
                 // if load logic spec'd
                 if (detectsCompletion) {
-                    // wait until load logic indicates completion
-                    ((ComponentContainer) result).getWait(WaitType.PAGE_LOAD)
-                                    .ignoring(PageNotLoadedException.class)
-                                    .until(loadIsComplete());
+                    waitForLoadCompletion((ComponentContainer) result);
                 // otherwise, if stale wait
                 } else if (reference != null) {
                     // wait until reference element goes stale
@@ -251,11 +248,13 @@ public enum ContainerMethodInterceptor {
                 // otherwise, if dialog is shown
                 } else if (hasDialog) {
                     container.getLogger().warn("Container type '{}' doesn't detect load completion, " +
-                            "and modal dialog precluded fallback load completion check", result.getClass());
+                            "and modal dialog precluded fallback load completion check", 
+                            Enhanceable.getContainerClass(result).getName());
                 // otherwise (new window opened)
                 } else {
                     container.getLogger().warn("Container type '{}' doesn't detect load completion, " +
-                            "and new window precluded fallback load completion check", result.getClass());
+                            "and new window precluded fallback load completion check", 
+                            Enhanceable.getContainerClass(result).getName());
                 }
             }
             
@@ -327,6 +326,18 @@ public enum ContainerMethodInterceptor {
     }
     
     /**
+     * Wait for the specified component container to finish loading.
+     * 
+     * @param container {@link ComponentContainer} object
+     * @return always {@code true}
+     * @throws TimeoutException if maximum interval expires prior to load completion
+     */
+    public static boolean waitForLoadCompletion(ComponentContainer container) {
+        if (!(container instanceof DetectsLoadCompletion)) { return false; }
+        return container.getWait(WaitType.PAGE_LOAD).ignoring(PageNotLoadedException.class).until(loadIsComplete());
+    }
+    
+    /**
      * Returns a 'wait' proxy that determines if the container has finished loading.
      * 
      * @return 'true' if the container has finished loading; otherwise 'false'
@@ -335,9 +346,11 @@ public enum ContainerMethodInterceptor {
         return new Coordinator<Boolean>() {
 
             @Override
+            @SuppressWarnings("rawtypes")
             public Boolean apply(final SearchContext context) {
                 scanForErrors(context);
                 if (context instanceof DetectsLoadCompletion) {
+                    // determine if load is complete
                     return ((DetectsLoadCompletion) context).isLoadComplete();
                 } else {
                     Logger logger = LoggerFactory.getLogger(Enhanceable.getContainerClass(context));

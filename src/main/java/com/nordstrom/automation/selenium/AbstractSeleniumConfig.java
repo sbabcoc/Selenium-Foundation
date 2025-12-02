@@ -563,6 +563,11 @@ public abstract class AbstractSeleniumConfig extends
             defaults.put(SeleniumSettings.NODE_BINARY_PATH.key(), nodePath);
         }
         
+        // propagate "injected" settings, which take precedence over default values
+        System.getProperties().entrySet().stream()
+                .filter(e -> e.getKey().toString().startsWith("injected."))
+                .forEach(e -> defaults.put(e.getKey().toString().substring(9), e.getValue().toString()));
+        
         return defaults;
     }
 
