@@ -24,9 +24,18 @@ public class EdgePlugin extends RemoteWebDriverPlugin {
      *  &lt;artifactId&gt;selenium-edge-driver&lt;/artifactId&gt;
      *  &lt;version&gt;4.30.0&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
+     *
+     * <b>org.openqa.selenium.chrome.ChromiumDriver</b>
+     * 
+     * <pre>&lt;dependency&gt;
+     *  &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+     *  &lt;artifactId&gt;selenium-chromium-driver&lt;/artifactId&gt;
+     *  &lt;version&gt;4.30.0&lt;/version&gt;
+     *&lt;/dependency&gt;</pre>
      */
     private static final String[] DEPENDENCY_CONTEXTS = {
-        "org.openqa.selenium.edge.EdgeDriver"
+        "org.openqa.selenium.edge.EdgeDriver",
+        "org.openqa.selenium.chromium.ChromiumDriver"
     };
     
     /**

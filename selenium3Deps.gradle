@@ -34,7 +34,7 @@ dependencies {
     api 'org.seleniumhq.selenium:selenium-safari-driver:3.141.59'
     api 'org.seleniumhq.selenium:htmlunit-driver:2.70.0'
     api 'com.codeborne:phantomjsdriver:1.4.4'
-    api 'io.github.bonigarcia:webdrivermanager:6.0.0'
+    api 'io.github.bonigarcia:webdrivermanager:6.3.3'
     api 'org.apache.httpcomponents:httpclient:4.5.14'
     api 'org.jsoup:jsoup:1.19.1'
     api 'org.apache.commons:commons-lang3:3.17.0'

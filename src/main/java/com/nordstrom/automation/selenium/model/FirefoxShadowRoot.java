@@ -47,14 +47,6 @@ public final class FirefoxShadowRoot extends PageComponent {
     }
     
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SearchContext getWrappedContext() {
-        return this;
-    }
-    
-    /**
      * Prepare the specified script and arguments for invocation.
      * <p>
      * <b>NOTE</b>: If the targeted browser is Firefox and the script arguments include <b>FirefoxShadowRoot</b>

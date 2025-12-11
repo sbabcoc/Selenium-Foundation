@@ -1,10 +1,12 @@
 package com.nordstrom.automation.selenium.model;
 
+import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import com.nordstrom.automation.selenium.core.JsUtility;
@@ -30,6 +32,9 @@ public class ShadowRoot extends PageComponent {
     private static final String SHADOW_ROOT = "return arguments[0].shadowRoot;";
     private static final String ROOT_KEY = "shadow-6066-11e4-a52e-4f735466cecf";
 
+    /** context of this container */
+    protected final SearchContext shadowRoot;
+    
     /**
      * Constructor for shadow root by element locator
      * 
@@ -39,6 +44,7 @@ public class ShadowRoot extends PageComponent {
     public ShadowRoot(final By locator, final ComponentContainer parent) {
         super(locator, parent);
         SearchContextUtils.validateShadowHost(context);
+        shadowRoot = getShadowRoot(this);
     }
     
     /**
@@ -51,6 +57,7 @@ public class ShadowRoot extends PageComponent {
     public ShadowRoot(final By locator, final int index, final ComponentContainer parent) {
         super(locator, index, parent);
         SearchContextUtils.validateShadowHost(context);
+        shadowRoot = getShadowRoot(this);
     }
     
     /**
@@ -62,6 +69,23 @@ public class ShadowRoot extends PageComponent {
     public ShadowRoot(final RobustWebElement element, final ComponentContainer parent) {
         super(element, parent);
         SearchContextUtils.validateShadowHost(context);
+        shadowRoot = getShadowRoot(this);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<WebElement> findElements(final By by) {
+        return shadowRoot.findElements(by);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebElement findElement(final By by) {
+        return shadowRoot.findElement(by);
     }
     
     /**
@@ -69,7 +93,7 @@ public class ShadowRoot extends PageComponent {
      */
     @Override
     public SearchContext getWrappedContext() {
-        return getShadowRoot(this);
+        return shadowRoot;
     }
     
     /**

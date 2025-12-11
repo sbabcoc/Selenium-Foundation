@@ -323,10 +323,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String[] DEPENDENCY_CONTEXTS = { "com.nordstrom.automation.selenium.core.LocalSeleniumGrid",
             "com.nordstrom.common.file.PathUtils", "org.apache.commons.lang3.StringUtils",
             "org.eclipse.jetty.util.Attributes", "javax.servlet.http.HttpServletResponse",
-            "org.eclipse.jetty.http.HttpField", "org.openqa.selenium.chromium.ChromiumDriver",
-            "org.openqa.selenium.grid.Main", "com.beust.jcommander.Strings", "org.openqa.selenium.remote.http.Route",
-            "com.google.common.base.Utf8", "org.openqa.selenium.Keys", "org.openqa.selenium.remote.tracing.Tracer",
-            "org.openqa.selenium.json.Json", "io.opentelemetry.sdk.autoconfigure.ResourceConfiguration",
+            "org.eclipse.jetty.http.HttpField", "org.openqa.selenium.grid.Main", "com.beust.jcommander.Strings",
+            "org.openqa.selenium.remote.http.Route", "com.google.common.base.Utf8", "org.openqa.selenium.Keys",
+            "org.openqa.selenium.remote.tracing.Tracer", "org.openqa.selenium.json.Json",
+            "io.opentelemetry.sdk.autoconfigure.ResourceConfiguration",
             "io.opentelemetry.sdk.autoconfigure.spi.Ordered", "io.opentelemetry.api.trace.Span",
             "io.opentelemetry.sdk.trace.SdkSpan", "io.opentelemetry.context.Scope", "io.opentelemetry.sdk.metrics.View",
             "io.opentelemetry.sdk.logs.LogLimits", "io.opentelemetry.sdk.common.Clock",
@@ -337,9 +337,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             "io.opentelemetry.api.logs.Logger", "org.openqa.selenium.net.Urls", "org.dataloader.DataLoader",
             "com.google.common.util.concurrent.internal.InternalFutures", "org.eclipse.jetty.server.Server",
             "org.reactivestreams.Publisher", "org.openqa.selenium.manager.SeleniumManager",
-            "org.apache.commons.exec.Executor", "io.netty.buffer.ByteBufUtil", 
+            "org.apache.commons.exec.Executor", "io.netty.buffer.ByteBufUtil",
             "io.netty.handler.codec.compression.ZlibCodecFactory", "io.opentelemetry.common.ComponentLoader",
-            "com.github.benmanes.caffeine.cache.Weigher"};
+            "com.github.benmanes.caffeine.cache.Weigher" };
     
     static {
         try {
