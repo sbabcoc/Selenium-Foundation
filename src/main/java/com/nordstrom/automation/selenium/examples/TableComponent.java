@@ -8,6 +8,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.PageComponent;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
@@ -15,7 +16,7 @@ import com.nordstrom.automation.selenium.model.RobustWebElement;
 /**
  * This class is the model for example page table component.
  */
-public class TableComponent extends PageComponent {
+public class TableComponent extends PageComponent implements DetectsLoadCompletion<TableComponent> {
 
     /**
      * Constructor for page component by element locator
@@ -62,7 +63,11 @@ public class TableComponent extends PageComponent {
         }
     }
     
-    
+    @Override
+    public boolean isLoadComplete() {
+        return findOptional(Using.HDR_ROW).hasReference();
+    }
+
     /**
      * Get headings of this table component.
      * 

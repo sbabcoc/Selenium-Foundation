@@ -9,7 +9,7 @@ import com.nordstrom.automation.selenium.model.ComponentContainer;
  * detection of page load completion. This is typically required for single-page applications or more conventional
  * multi-page applications that use dynamic load techniques (e.g. - AJAX).
  */
-public interface DetectsLoadCompletion {
+public interface DetectsLoadCompletion<T extends ComponentContainer> {
     
     /**
      * Determine if the page has finished loading.

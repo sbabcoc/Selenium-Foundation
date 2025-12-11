@@ -73,6 +73,9 @@ abstract class ContainerList<E extends ComponentContainer> extends AbstractList<
             container = ComponentContainer.newContainer(containerType, getArgumentTypes(), getArguments(index));
             container = container.enhanceContainer(container);
             containers.set(index, container);
+            
+            // if load completion logic is spec'd, wait for it
+            ContainerMethodInterceptor.waitForLoadCompletion(container);
         }
         return container;
     }

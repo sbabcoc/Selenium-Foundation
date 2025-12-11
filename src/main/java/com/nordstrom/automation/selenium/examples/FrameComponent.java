@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 
+import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
 import com.nordstrom.automation.selenium.model.Frame;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
@@ -11,7 +12,7 @@ import com.nordstrom.automation.selenium.model.RobustWebElement;
 /**
  * This class is the model for example page frame components.
  */
-public class FrameComponent extends Frame {
+public class FrameComponent extends Frame implements DetectsLoadCompletion<FrameComponent> {
     
     /**
      * Constructor for frame by locator
@@ -80,6 +81,11 @@ public class FrameComponent extends Frame {
         }
     }
     
+    @Override
+    public boolean isLoadComplete() {
+        return findOptional(Using.HEADING).hasReference();
+    }
+
     /**
      * Get text content of this frame component.
      * 

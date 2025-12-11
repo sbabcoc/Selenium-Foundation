@@ -1,7 +1,7 @@
 def driverPlugins = System.getProperty('selenium.grid.plugins', '')
-System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.EdgePlugin' + File.pathSeparator)
-System.setProperty('selenium.browser.name', 'MicrosoftEdge')
-System.setProperty('selenium.context.platform', 'web-app')
+System.setProperty('injected.selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.EdgePlugin' + File.pathSeparator)
+System.setProperty('injected.selenium.browser.name', 'MicrosoftEdge')
+System.setProperty('injected.selenium.context.platform', 'web-app')
 dependencies {
   testImplementation('org.seleniumhq.selenium:selenium-edge-driver') {
     exclude module: 'selenium-remote-driver'

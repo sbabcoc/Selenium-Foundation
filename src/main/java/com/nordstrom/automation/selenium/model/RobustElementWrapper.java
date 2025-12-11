@@ -360,7 +360,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
                         wrapper.wrapped = context.findElement(wrapper.locator);
                     } catch (NoSuchElementException e) {
                         // if context is a web element
-                        if (context instanceof WebElement) {
+                        if (SearchContextUtils.isElementContext(context)) {
                             // force exception if context stale
                             ((WebElement) context).getTagName();
                         }
@@ -373,7 +373,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             }
         } else {
             // if context is a container element
-            if (context instanceof WebElement) {
+            if (SearchContextUtils.isElementContext(context)) {
                 // invoke script to acquire reference (element-relative)
                 wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script, context);
             } else {
@@ -385,7 +385,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             if (wrapper.wrapped == null) {
                 String message;
                 // if context is a container element
-                if (context instanceof WebElement) {
+                if (SearchContextUtils.isElementContext(context)) {
                     message = String.format("Failed to locate element using script: %s\nin context: %s",
                             wrapper.script.trim(), context);
                 } else {

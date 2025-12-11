@@ -230,6 +230,9 @@ abstract class ContainerMap<V extends ComponentContainer> extends AbstractMap<Ob
                 v = ComponentContainer.newContainer(map.containerType, argumentTypes, arguments);
                 v = v.enhanceContainer(v);
                 value = v;
+                
+                // if load completion logic is spec'd, wait for it
+                ContainerMethodInterceptor.waitForLoadCompletion(v);
             }
             return v;
         }
