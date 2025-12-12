@@ -59,6 +59,18 @@ public class SearchContextUtils {
      * Build a JavaScript to locate all elements matching the specified locator within contexts of the the same type
      * as the exemplar context.
      * 
+     * @param context exemplar search context wrapper
+     * @param locator locator for desired elements
+     * @return JavaScript code string
+     */
+    public static String buildScriptToLocateElements(final WrapsContext context, final By locator) {
+        return buildScriptToLocateElements(context.getWrappedContext(), locator);
+    }
+    
+    /**
+     * Build a JavaScript to locate all elements matching the specified locator within contexts of the the same type
+     * as the exemplar context.
+     * 
      * @param context exemplar search context
      * @param locator locator for desired elements
      * @return JavaScript code string
@@ -87,6 +99,19 @@ public class SearchContextUtils {
         }
         
         return String.format(shadow + format, type.name, selector);
+    }
+    
+    /**
+     * Build a JavaScript to locate the first element matching the specified locator within contexts of the the same
+     * type as the exemplar context.
+     * 
+     * @param context exemplar search context wrapper
+     * @param locator locator for desired elements
+     * @param Index element index
+     * @return JavaScript code string
+     */
+    public static String buildScriptToLocateElement(final WrapsContext context, final By locator, final int Index) {
+        return buildScriptToLocateElement(context.getWrappedContext(), locator, Index);
     }
     
     /**
@@ -154,6 +179,16 @@ public class SearchContextUtils {
         default:
             return "\"" + selector + "\"";
         }
+    }
+    
+    /**
+     * Get the component container that holds the specified search context.
+     * 
+     * @param context target search context wrapper
+     * @return containing {@link ComponentContainer}
+     */
+    public static ComponentContainer getContainingContext(final WrapsContext context) {
+        return getContainingContext(context.getWrappedContext());
     }
     
     /**

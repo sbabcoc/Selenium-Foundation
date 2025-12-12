@@ -101,7 +101,7 @@ public final class FirefoxShadowRoot extends PageComponent {
                 element = (RobustWebElement) shadowRoot.getWrappedElement();
             } else if (context instanceof RobustWebElement) {
                 element = (RobustWebElement) context;
-                ComponentContainer parent = SearchContextUtils.getContainingContext(element);
+                ComponentContainer parent = SearchContextUtils.getContainingContext((SearchContext) context);
                 shadowRoot = new ShadowRoot(element, parent);
             } else {
                 return null;
