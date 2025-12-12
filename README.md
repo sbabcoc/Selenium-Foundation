@@ -5,6 +5,7 @@
 
 ### * BREAKING NEWS *
 
+* Release [_30.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v30.0.0) of **Selenium Foundation** provides critical fixes to the implementation of the **ShadowRoot** feature, as well as a number of other featues and fixes.
 * Release [_29.7.8_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.7.0) of **Selenium Foundation** completes implementation of framework support for the **Mac2** engine of **Appium**.
   * **NOTE**: This was first release that I published from a new machine, and I inadvertently bumped the "patch" component of the release number several times as I tried to resolve a configuration issue.  
 * Release [_29.6.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.6.0) of **Selenium Foundation** completes implementation of framework support for the **XCUITest** engine of **Appium**.
