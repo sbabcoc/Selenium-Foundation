@@ -98,7 +98,8 @@ public class RobustElementWrapper implements ReferenceFetcher {
             this.context = context;
             
             if ((index == OPTIONAL) || (index > 0)) {
-                this.script = SearchContextUtils.buildScriptToLocateElement(context, locator, index);
+                this.script = SearchContextUtils.buildScriptToLocateElement(
+                        context.getWrappedContext(), locator, index);
                 this.locator = null;
                 this.index = (index == OPTIONAL) ? OPTIONAL : CARDINAL;
                 this.strategy = Strategy.SCRIPT;

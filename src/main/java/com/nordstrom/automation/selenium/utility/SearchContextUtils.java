@@ -63,7 +63,7 @@ public class SearchContextUtils {
      * @param locator locator for desired elements
      * @return JavaScript code string
      */
-    public static String buildScriptToLocateElements(final WrapsContext context, final By locator) {
+    public static String buildScriptToLocateElements(final SearchContext context, final By locator) {
         return buildScriptToLocateElements(getContextType(context), locator);
     }
     
@@ -98,7 +98,7 @@ public class SearchContextUtils {
      * @param Index element index
      * @return JavaScript code string
      */
-    public static String buildScriptToLocateElement(final WrapsContext context, final By locator, final int Index) {
+    public static String buildScriptToLocateElement(final SearchContext context, final By locator, final int Index) {
         return buildScriptToLocateElement(getContextType(context), locator, Index);
     }
     
@@ -193,8 +193,8 @@ public class SearchContextUtils {
      * @param context context object
      * @return {@link ContextType} constant
      */
-    public static ContextType getContextType(final WrapsContext context) {
-        return isElementContext(context.getWrappedContext()) ? ContextType.ELEMENT : ContextType.DOCUMENT;
+    public static ContextType getContextType(final SearchContext context) {
+        return isElementContext(context) ? ContextType.ELEMENT : ContextType.DOCUMENT;
     }
     
     /**
@@ -204,10 +204,18 @@ public class SearchContextUtils {
      * @return {@code true} if context is a {@link WebElement}; otherwise {@code false}
      */
     public static boolean isElementContext(final SearchContext context) {
-        if (context instanceof WebDriver) return false;
-        if (context instanceof WebElement) return true;
-        String json = SeleniumConfig.getConfig().toJson(context);
-        return json.contains(SHADOW_ROOT_KEY);
+        SearchContext unwrapped = unwrapContext(context);
+        
+        if (unwrapped == null) return false;
+        if (unwrapped instanceof WebDriver) return false;
+        if (unwrapped instanceof WebElement) return true;
+        
+        try {
+            String json = SeleniumConfig.getConfig().toJson(unwrapped);
+            return json.contains(SHADOW_ROOT_KEY);
+        } catch (WebDriverException eaten) {
+            return false;
+        }
     }
     
     /**
