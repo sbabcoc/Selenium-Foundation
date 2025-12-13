@@ -122,7 +122,7 @@ The `personality` property directs **Selenium Foundation** to run the unit tests
 
 A complete list of supported browser profiles can be found [here](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/ConfiguringProjectSettings.md#grid-configuration-for-selenium-foundation-unit-tests), 
 
-> **NOTE**: Properties specified in your stored settings file ([settings.properties)(#overriding-defaults)) take precedence over the default values established by the `browsers` and `personality` project command line property declarations. 
+> **NOTE**: Properties specified in your stored settings file ([settings.properties](#overriding-defaults)) take precedence over the default values established by the `browsers` and `personality` project command line property declarations. 
 
 ## Getting Started
 
