@@ -122,6 +122,8 @@ The `personality` property directs **Selenium Foundation** to run the unit tests
 
 A complete list of supported browser profiles can be found [here](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/ConfiguringProjectSettings.md#grid-configuration-for-selenium-foundation-unit-tests), 
 
+> **NOTE**: Properties specified in your stored settings file ([settings.properties)(#overriding-defaults)) take precedence over the default values established by the `browsers` and `personality` project command line property declarations. 
+
 ## Getting Started
 
 The [QuickStart](src/main/java/com/nordstrom/automation/selenium/examples/QuickStart.java) class provides a fully-functional example of a test class built around **Selenium Foundation**,  [TestNG Foundation](https://github.com/sbabcoc/TestNG-Foundation), and the [Settings API](https://github.com/sbabcoc/Settings). It demonstrates how to set up required elements and introduces several key features that you're likely to use on a regular basis. 
