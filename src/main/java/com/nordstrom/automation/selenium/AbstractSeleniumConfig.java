@@ -630,7 +630,7 @@ public abstract class AbstractSeleniumConfig extends
      * <b>NOTE</b>: If hub host is unspecified, a local address is synthesized from hub port.
      * If hub port is also unspecified, this method returns {@code null}.
      * 
-     * @return {@link URL} for hub host; {@code null} if neither host nor port is unspecified
+     * @return {@link URL} for hub host; {@code null} if both host and port are unspecified
      */
     public synchronized URL getHubUrl() {
         if (hubUrl == null) {
