@@ -153,12 +153,30 @@ task testNG(type: Test) {
   useTestNG()
   reports.html.destination = file("${buildDir}/reports/testng")
   testLogging.showStandardStreams = true
+  
+  // --- Optional test JVM debugging ---
+  if (project.findProperty('debugTestNG') == 'true') {
+    jvmArgs += [
+      '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005'
+    ]
+    maxParallelForks = 1
+    forkEvery = 0
+  }
 }
 
 test {
   dependsOn testNG
   reports.html.destination = file("${buildDir}/reports/junit")
   testLogging.showStandardStreams = true
+  
+  // --- Optional test JVM debugging ---
+  if (project.findProperty('debugJUnit') == 'true') {
+    jvmArgs += [
+      '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006'
+    ]
+    maxParallelForks = 1
+    forkEvery = 0
+  }
 }
 
 scmVersion {

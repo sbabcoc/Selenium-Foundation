@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.grid.data.SlotMatcher;
-import org.openqa.selenium.remote.Browser;
 
 /**
 * Default matching implementation for slots, loosely based on the requirements for capability
@@ -72,8 +71,7 @@ public class FoundationSlotMatcher implements SlotMatcher, Serializable {
         boolean browserNameMatch = capabilities.getBrowserName() == null 
                 || capabilities.getBrowserName().isEmpty()
                 || Objects.equals(stereotype.getBrowserName(), capabilities.getBrowserName());
-        boolean browserVersionMatch = Browser.HTMLUNIT.is(capabilities)
-                || capabilities.getBrowserVersion() == null
+        boolean browserVersionMatch = capabilities.getBrowserVersion() == null
                 || capabilities.getBrowserVersion().isEmpty()
                 || Objects.equals(capabilities.getBrowserVersion(), "stable")
                 || Objects.equals(stereotype.getBrowserVersion(), capabilities.getBrowserVersion());

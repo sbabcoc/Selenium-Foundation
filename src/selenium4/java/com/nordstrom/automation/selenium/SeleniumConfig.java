@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -465,16 +466,22 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         // convert capabilities string to List<Map<String, Object>>
         String capsList = (capabilities.startsWith("[")) ? capabilities : "[" + capabilities + "]";
         List<Map<String, Object>> capsMapList = new Json().toType(capsList, LIST_OF_MAPS_TYPE);
-        
+        // convert list of maps into [MutableCapabilities]
+        // => apply specified node modifications (if any)
         List<MutableCapabilities> capabilitiesList = capsMapList.stream()
                  .map(MutableCapabilities::new)
                  .map(theseCaps -> theseCaps.merge(getModifications(theseCaps, NODE_MODS_SUFFIX)))
                  .collect(Collectors.toList());
         
+        // convert list of [MutableCapabilities] objects to set of maps
+        Set<Map<String, Object>> capabilitiesSet = capabilitiesList.stream()
+                .map(caps -> caps.toJson())
+                .collect(Collectors.toSet());
+        
         // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        // get hash code of capabilities list and hub URL as 8-digit hexadecimal string
-        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl));
+        // get hash code of capabilities set and hub URL as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesSet, hubUrl));
         // assemble node configuration file path with aggregated hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         
