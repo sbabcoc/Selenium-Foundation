@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
@@ -289,13 +290,18 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             theseCaps.merge(getModifications(theseCaps, NODE_MODS_SUFFIX));
         }
         
+        // convert list of [MutableCapabilities] objects to set of maps
+        Set<Map<String, Object>> capabilitiesSet = capabilitiesList.stream()
+                .map(caps -> caps.toJson())
+                .collect(Collectors.toSet());
+        
         // get configured node servlet collection
         Set<String> servlets = new HashSet<>(nodeConfig.servlets);
         
         // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);
-        // get hash code of capabilities list, hub URL, and servlets as 8-digit hexadecimal string
-        String hashCode = String.format("%08X", Objects.hash(capabilitiesList, hubUrl, servlets));
+        // get hash code of capabilities set, hub URL, and servlets as 8-digit hexadecimal string
+        String hashCode = String.format("%08X", Objects.hash(capabilitiesSet, hubUrl, servlets));
         // assemble node configuration file path with aggregated hash code
         Path filePath = Paths.get(configPathBase + "-" + hashCode + ".json");
         
