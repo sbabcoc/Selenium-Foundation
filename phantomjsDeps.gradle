@@ -1,5 +1,5 @@
 def driverPlugins = System.getProperty('selenium.grid.plugins', '')
-System.setProperty('injected.selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.PhantomJsPlugin' + File.pathSeparator)
+System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.PhantomJsPlugin' + File.pathSeparator)
 System.setProperty('injected.selenium.browser.name', 'phantomjs')
 System.setProperty('injected.selenium.context.platform', 'web-app')
 dependencies {
