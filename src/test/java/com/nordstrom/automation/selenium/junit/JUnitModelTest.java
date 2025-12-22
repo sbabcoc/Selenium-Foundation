@@ -3,9 +3,9 @@ package com.nordstrom.automation.selenium.junit;
 import static org.junit.Assume.assumeNoException;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.JUnitTargetRoot;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
@@ -133,7 +133,7 @@ public class JUnitModelTest extends JUnitTargetRoot {
         try {
             ModelTestCore.testShadowRootByLocator(this).run();
         } catch (ShadowRootContextException e) {
-            assumeNoException(e);
+            skipIfHtmlUnit(e);
         }
     }
 
@@ -143,7 +143,7 @@ public class JUnitModelTest extends JUnitTargetRoot {
         try {
             ModelTestCore.testShadowRootByElement(this).run();
         } catch (ShadowRootContextException e) {
-            assumeNoException(e);
+            skipIfHtmlUnit(e);
         }
     }
     
@@ -153,7 +153,7 @@ public class JUnitModelTest extends JUnitTargetRoot {
         try {
             ModelTestCore.testShadowRootList(this).run();
         } catch (ShadowRootContextException e) {
-            assumeNoException(e);
+            skipIfHtmlUnit(e);
         }
     }
 
@@ -163,7 +163,7 @@ public class JUnitModelTest extends JUnitTargetRoot {
         try {
             ModelTestCore.testShadowRootMap(this).run();
         } catch (ShadowRootContextException e) {
-            assumeNoException(e);
+            skipIfHtmlUnit(e);
         }
     }
 
@@ -213,7 +213,7 @@ public class JUnitModelTest extends JUnitTargetRoot {
         try {
             ModelTestCore.testShadowParagraphs(this).run();
         } catch (ShadowRootContextException e) {
-            assumeNoException(e);
+            skipIfHtmlUnit(e);
         }
     }
     
@@ -223,4 +223,11 @@ public class JUnitModelTest extends JUnitTargetRoot {
         ModelTestCore.testContainerResolution(this);
     }
 
+    private void skipIfHtmlUnit(final ShadowRootContextException e) {
+        // if browser is HtmlUnit
+        if (WebDriverUtils.getBrowserName(getDriver()).equals("htmlunit")) {
+            assumeNoException(e);
+        }
+        throw e;
+    }
 }

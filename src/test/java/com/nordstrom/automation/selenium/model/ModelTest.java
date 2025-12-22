@@ -4,6 +4,7 @@ import org.testng.SkipException;
 import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
@@ -112,7 +113,7 @@ public class ModelTest extends TestNgTargetRoot {
         try {
             ModelTestCore.testShadowRootByLocator(this).run();
         } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
+            skipIfHtmlUnit(e);
         }
     }
 
@@ -121,7 +122,7 @@ public class ModelTest extends TestNgTargetRoot {
         try {
             ModelTestCore.testShadowRootByElement(this).run();
         } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
+            skipIfHtmlUnit(e);
         }
     }
     
@@ -130,7 +131,7 @@ public class ModelTest extends TestNgTargetRoot {
         try {
             ModelTestCore.testShadowRootList(this).run();
         } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
+            skipIfHtmlUnit(e);
         }
     }
 
@@ -139,7 +140,7 @@ public class ModelTest extends TestNgTargetRoot {
         try {
             ModelTestCore.testShadowRootMap(this).run();
         } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
+            skipIfHtmlUnit(e);
         }
     }
 
@@ -182,7 +183,7 @@ public class ModelTest extends TestNgTargetRoot {
         try {
             ModelTestCore.testShadowParagraphs(this).run();
         } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
+            skipIfHtmlUnit(e);
         }
     }
     
@@ -190,5 +191,12 @@ public class ModelTest extends TestNgTargetRoot {
     public void testContainerResolution() {
         ModelTestCore.testContainerResolution(this);
     }
-
+    
+    private void skipIfHtmlUnit(final ShadowRootContextException e) {
+        // if browser is HtmlUnit
+        if (WebDriverUtils.getBrowserName(getDriver()).equals("htmlunit")) {
+            throw new SkipException(e.getMessage(), e);
+        }
+        throw e;
+    }
 }
