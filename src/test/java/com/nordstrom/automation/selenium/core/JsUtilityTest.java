@@ -97,7 +97,7 @@ public class JsUtilityTest extends TestNgTargetRoot {
                     page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator(), "test");
             assertEquals(shadowRoot.getInputValue(), "test");
         } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
+            skipIfHtmlUnit(e);
         }
     }
     
@@ -112,7 +112,7 @@ public class JsUtilityTest extends TestNgTargetRoot {
                     page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator());
             assertEquals(value, "test");
         } catch (ShadowRootContextException e) {
-            throw new SkipException(e.getMessage(), e);
+            skipIfHtmlUnit(e);
         }
     }
     
@@ -130,5 +130,13 @@ public class JsUtilityTest extends TestNgTargetRoot {
     
     private ExamplePage getPage() {
         return (ExamplePage) getInitialPage();
+    }
+    
+    private void skipIfHtmlUnit(final ShadowRootContextException e) {
+        // if browser is HtmlUnit
+        if (WebDriverUtils.getBrowserName(getDriver()).equals("htmlunit")) {
+            throw new SkipException(e.getMessage(), e);
+        }
+        throw e;
     }
 }

@@ -7,6 +7,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
@@ -59,9 +60,9 @@ public final class FirefoxShadowRoot extends PageComponent {
      * @return revised script if arguments include {@link FirefoxShadowRoot} objects; otherwise, original script
      */
     public static String injectShadowArgs(final WebDriver driver, final String js, final Object... args) {
-        // if browser isn't Firefox, return without altering anything
-        if ( ! (WebDriverUtils.getBrowserName(driver).equals("firefox")) ) {
-            return js;
+        // if not Firefox on Selenium 3
+        if ( ! isFirefoxOnSelenium3(driver)) {
+            return js; // return without altering anything
         }
         
         String origin = js;
@@ -92,8 +93,8 @@ public final class FirefoxShadowRoot extends PageComponent {
      * @throws ShadowRootContextException if unable to acquire shadow root
      */
     static FirefoxShadowRoot getShadowRoot(final SearchContext context) {
-        // if browser is Firefox
-        if (WebDriverUtils.getBrowserName(context).equals("firefox")) {
+        // if running Firefox on Selenium 3
+        if (isFirefoxOnSelenium3(context)) {
             ShadowRoot shadowRoot;
             RobustWebElement element;
             if (context instanceof ShadowRoot) {
@@ -110,6 +111,10 @@ public final class FirefoxShadowRoot extends PageComponent {
             return new FirefoxShadowRoot(element, shadowRoot);
         }
         return null;
+    }
+    
+    private static boolean isFirefoxOnSelenium3(final SearchContext context) {
+        return (SeleniumConfig.getConfig().getVersion() == 3) && WebDriverUtils.getBrowserName(context).equals("firefox");
     }
 
 }
