@@ -5,6 +5,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WrapsDriver;
 
+import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 /**
@@ -25,7 +26,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
  */
 public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver {
     
-    private JavascriptExecutor executor;
+    private WebDriver driver;
     
     /**
      * Constructor for robust JavaScript executor
@@ -35,7 +36,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
      */
     public RobustJavascriptExecutor(final WebDriver driver) {
         if (driver instanceof JavascriptExecutor && WebDriverUtils.isJavascriptEnabled(driver)) {
-            executor = (JavascriptExecutor) driver;
+            this.driver = driver;
         } else {
             throw new UnsupportedOperationException("The specified context doesn't support JavaScript");
         }
@@ -48,7 +49,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
     public Object executeAsyncScript(final String script, final Object... args) {
         Object result = null;
         try {
-            result = executor.executeAsyncScript(script, args);
+            result = JsUtility.runAsyncAndReturn(driver, script, args);
         } catch (StaleElementReferenceException e) {
             if (refreshReferences(e, args)) {
                 executeAsyncScript(script, args);
@@ -66,7 +67,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
     public Object executeScript(final String script, final Object... args) {
         Object result = null;
         try {
-            result = executor.executeScript(script, args);
+            result = JsUtility.runAndReturn(driver, script, args);
         } catch (StaleElementReferenceException e) {
             if (refreshReferences(e, args)) {
                 executeScript(script, args);
@@ -82,7 +83,7 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
      */
     @Override
     public WebDriver getWrappedDriver() {
-        return (WebDriver) executor;
+        return driver;
     }
     
     /**
