@@ -7,14 +7,14 @@ import com.nordstrom.automation.selenium.model.Page;
 /**
  * This class is the model for the target view of the sample application used by the Appium Windows unit test.
  */
-public class WindowsPage extends Page {
+public class NotepadApplication extends Page {
 
     /**
      * Constructor for main view context.
      * 
      * @param driver driver object
      */
-    public WindowsPage(WebDriver driver) {
+    public NotepadApplication(WebDriver driver) {
         super(driver);
     }
     

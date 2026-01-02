@@ -1,6 +1,6 @@
 def driverPlugins = System.getProperty('selenium.grid.plugins', '')
 System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.XCUITestPlugin' + File.pathSeparator)
-System.setProperty('injected.selenium.browser.caps', '{"platformName":"iOS","appium:automationName":"XCUITest","appium:app":"https://github.com/appium/appium/raw/master/packages/appium/sample-code/apps/TestApp.app.zip"}')
+System.setProperty('injected.selenium.browser.caps', '{"platformName":"iOS","appium:automationName":"XCUITest","appium:app":"https://github.com/appium-pro/TheApp/releases/download/v1.12.0/TheApp.app.zip"}')
 System.setProperty('injected.selenium.context.platform', 'ios-app')
 System.setProperty('injected.selenium.grid.examples', 'false')
 System.setProperty('injected.selenium.timeout.host', '60')
