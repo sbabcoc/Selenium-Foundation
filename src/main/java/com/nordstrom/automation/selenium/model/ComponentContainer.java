@@ -511,7 +511,8 @@ public abstract class ComponentContainer
      * @return the specified element
      */
     public static WebElement scrollIntoView(final WebElement element) {
-        WebDriverUtils.getExecutor(element).executeScript("arguments[0].scrollIntoView(true);", element);
+    	WebDriver driver = WebDriverUtils.getDriver(element);
+        JsUtility.run(driver, "arguments[0].scrollIntoView(true);", element);
         return element;
     }
     
@@ -629,7 +630,7 @@ public abstract class ComponentContainer
         T pageObj = Page.newPage(pageClass, driver);
         if (newWindow) {
             pageObj.setWindowState(WindowState.WILL_OPEN);
-            WebDriverUtils.getExecutor(driver).executeScript("window.open('" + url + "','_blank');");
+            JsUtility.run(driver, "window.open('" + url + "','_blank');");
         } else {
             getUrl(url, driver);
         }
