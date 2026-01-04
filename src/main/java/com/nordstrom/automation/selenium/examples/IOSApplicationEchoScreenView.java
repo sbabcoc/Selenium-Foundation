@@ -48,7 +48,7 @@ public class IOSApplicationEchoScreenView extends Page implements DetectsLoadCom
     
     @Override
     public boolean isLoadComplete() {
-        return getViewHeading().equals("Echo Screen");
+        return "Echo Screen".equals(findOptional(Using.HEADING).getText());
     }
     
     /**
