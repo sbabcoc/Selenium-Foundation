@@ -17,7 +17,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver.Timeouts;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
-import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
 import com.nordstrom.automation.selenium.exceptions.OptionalElementNotAcquiredException;
@@ -47,14 +46,10 @@ public class RobustElementWrapper implements ReferenceFetcher {
     /** boolean methods that return 'false' when optional element is absent */
     private static final List<String> BOOLEAN_METHODS = Arrays.asList("isDisplayed", "isEnabled");
     
-    private enum Strategy { LOCATOR, SCRIPT }
-    
     private final WebDriver driver;
     private final WrapsContext context;
-    private final String script;
     private final By locator;
     private final int index;
-    private final Strategy strategy;
     
     private WebElement wrapped;
     
@@ -79,37 +74,22 @@ public class RobustElementWrapper implements ReferenceFetcher {
             
             this.driver = wrapper.driver;
             this.context = wrapper.context;
-            
-            this.script = wrapper.script;
             this.locator = wrapper.locator;
             this.index = wrapper.index;
-            this.strategy = wrapper.strategy;
-            
             this.wrapped = wrapper.wrapped;
             this.acquiredAt = wrapper.acquiredAt;
         } else {
             Objects.requireNonNull(context, "[context] must be non-null");
             Objects.requireNonNull(locator, "[locator] must be non-null");
+            
             if (index < OPTIONAL) {
                 throw new IndexOutOfBoundsException("Specified index is invalid");
             }
             
             this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
             this.context = context;
-            
-            if ((index == OPTIONAL) || (index > 0)) {
-                this.script = SearchContextUtils.buildScriptToLocateElement(
-                        context.getWrappedContext(), locator, index);
-                this.locator = null;
-                this.index = (index == OPTIONAL) ? OPTIONAL : CARDINAL;
-                this.strategy = Strategy.SCRIPT;
-            } else {
-                this.script = null;
-                this.locator = locator;
-                this.index = index;
-                this.strategy = Strategy.LOCATOR;
-            }
-            
+            this.locator = locator;
+            this.index = index;
             this.wrapped = element;
         }
         
@@ -137,11 +117,8 @@ public class RobustElementWrapper implements ReferenceFetcher {
         this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
         this.context = context;
         
-        this.script = script;
         this.locator = null;
         this.index = CARDINAL;
-        this.strategy = Strategy.SCRIPT;
-        
         this.wrapped = element;
         
         if (this.wrapped == null) {
@@ -337,63 +314,39 @@ public class RobustElementWrapper implements ReferenceFetcher {
         NoSuchElementException thrown = null;
         SearchContext context = wrapper.context.getWrappedContext();
         
-        if (wrapper.strategy == Strategy.LOCATOR) {
-            // disable implicit wait
-            Timeouts timeouts = wrapper.driver.manage().timeouts();
-            WebDriverUtils.implicitlyWait(timeouts, Duration.ZERO);
-            try {
-                // if index specified
-                if (wrapper.index > 0) {
-                    // find elements specified by wrapper locator
-                    List<WebElement> elements = context.findElements(wrapper.locator);
-                    // if sufficient elements were found
-                    if (wrapper.index < elements.size()) {
-                        // get element at specified index
-                        wrapper.wrapped = elements.get(wrapper.index);
-                    } else {
-                        thrown = new NoSuchElementException(
-                                String.format("Too few elements located %s: need: %d; have: %d", 
-                                        wrapper.locator, wrapper.index + 1, elements.size()));
-                    }
+        // disable implicit wait
+        Timeouts timeouts = wrapper.driver.manage().timeouts();
+        WebDriverUtils.implicitlyWait(timeouts, Duration.ZERO);
+        try {
+            // if index specified
+            if (wrapper.index > 0) {
+                // find elements specified by wrapper locator
+                List<WebElement> elements = context.findElements(wrapper.locator);
+                // if sufficient elements were found
+                if (wrapper.index < elements.size()) {
+                    // get element at specified index
+                    wrapper.wrapped = elements.get(wrapper.index);
                 } else {
-                    try {
-                        // find element specified by wrapper locator
-                        wrapper.wrapped = context.findElement(wrapper.locator);
-                    } catch (NoSuchElementException e) {
-                        // if context is a web element
-                        if (SearchContextUtils.isElementContext(context)) {
-                            // force exception if context stale
-                            ((WebElement) context).getTagName();
-                        }
-                        thrown = e;
-                    }
+                    thrown = new NoSuchElementException(
+                            String.format("Too few elements located %s: need: %d; have: %d", 
+                                    wrapper.locator, wrapper.index + 1, elements.size()));
                 }
-            } finally {
-                // restore implicit wait
-                WebDriverUtils.implicitlyWait(timeouts, Duration.ofSeconds(WaitType.IMPLIED.getInterval()));
-            }
-        } else {
-            // if context is a container element
-            if (SearchContextUtils.isElementContext(context)) {
-                // invoke script to acquire reference (element-relative)
-                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script, context);
             } else {
-                // invoke script to acquire reference (document-relative)
-                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script);
-            }
-            
-            // if no reference acquired
-            if (wrapper.wrapped == null) {
-                String message;
-                // if context is a container element
-                if (SearchContextUtils.isElementContext(context)) {
-                    message = String.format("Failed to locate element using script: %s\nin context: %s",
-                            wrapper.script.trim(), context);
-                } else {
-                    message = String.format("Failed to locate element using script: %s", wrapper.script.trim());
+                try {
+                    // find element specified by wrapper locator
+                    wrapper.wrapped = context.findElement(wrapper.locator);
+                } catch (NoSuchElementException e) {
+                    // if context is a web element
+                    if (SearchContextUtils.isElementContext(context)) {
+                        // force exception if context stale
+                        ((WebElement) context).getTagName();
+                    }
+                    thrown = e;
                 }
-                thrown = new NoSuchElementException(message);
             }
+        } finally {
+            // restore implicit wait
+            WebDriverUtils.implicitlyWait(timeouts, Duration.ofSeconds(WaitType.IMPLIED.getInterval()));
         }
         
         // if exception thrown

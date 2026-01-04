@@ -43,7 +43,7 @@ public class IOSApplicationMainView extends Page implements DetectsLoadCompletio
     
     @Override
     public boolean isLoadComplete() {
-        return getViewHeading().equals("TheApp");
+        return "TheApp".equals(findOptional(Using.HEADING).getText());
     }
     
     /**
