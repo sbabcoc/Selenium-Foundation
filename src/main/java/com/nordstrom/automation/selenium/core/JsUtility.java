@@ -94,13 +94,11 @@ public final class JsUtility {
      * Executes JavaScript in the context of the currently selected frame or window. The script
      * fragment provided will be executed as the body of an anonymous function.
      * 
-     * <p>
-     * Within the script, use <code>document</code> to refer to the current document. Note that local
+     * <p>Within the script, use <code>document</code> to refer to the current document. Note that local
      * variables will not be available once the script has finished executing, though global variables
      * will persist.
      * 
-     * <p>
-     * Arguments must be a number, a boolean, a String, WebElement, or a List of any combination of
+     * <p>Arguments must be a number, a boolean, a String, WebElement, or a List of any combination of
      * the above. An exception will be thrown if the arguments do not meet these criteria. The
      * arguments will be made available to the JavaScript via the "arguments" magic variable, as if
      * the function were called via "Function.apply"
@@ -111,10 +109,9 @@ public final class JsUtility {
      * @see JavascriptExecutor#executeScript(String, Object...)
      */
     public static void run(final WebDriver driver, final String js, final Object... args) {
-        String script = FirefoxShadowRoot.injectShadowArgs(driver, js, args);
-        Object result = WebDriverUtils.getExecutor(driver).executeScript(script, args);
+        Object result = runScript(false, driver, js, args);
         if (result != null) {
-            LOGGER.warn("The specified JavaScript returned a non-null result");
+            LOGGER.warn("The specified synchronous JavaScript returned a non-null result");
         }
     }
     
@@ -122,28 +119,26 @@ public final class JsUtility {
      * Executes JavaScript in the context of the currently selected frame or window. The script
      * fragment provided will be executed as the body of an anonymous function.
      * 
-     * <p>
-     * Within the script, use <code>document</code> to refer to the current document. Note that local
+     * <p>Within the script, use <code>document</code> to refer to the current document. Note that local
      * variables will not be available once the script has finished executing, though global variables
      * will persist.
      * 
-     * <p>
-     * If the script has a return value (i.e. if the script contains a <code>return</code> statement),
+     * <p>If the script has a return value (i.e. if the script contains a <code>return</code> statement),
      * then the following steps will be taken:
      * 
      * <ul>
-     * <li>For an HTML element, this method returns a WebElement</li>
-     * <li>For a decimal, a Double is returned</li>
-     * <li>For a non-decimal number, a Long is returned</li>
-     * <li>For a boolean, a Boolean is returned</li>
-     * <li>For all other cases, a String is returned.</li>
-     * <li>For an array, return a List&lt;Object&gt; with each object following the rules above. We
-     * support nested lists.</li>
-     * <li>Unless the value is null or there is no return value, in which null is returned</li>
+     *     <li>For an HTML element, this method returns a WebElement.</li>
+     *     <li>For a decimal number, a Double is returned.</li>
+     *     <li>For a non-decimal number, a Long is returned.</li>
+     *     <li>For a boolean, a Boolean is returned.</li>
+     *     <li>For all other cases, a String is returned.</li>
+     *     <li>For an array, return a List&lt;Object&gt; with each object following the rules above.
+     *         We support nested lists.</li>
+     *     <li>For a map, return a Map&lt;String, Object&gt; with values following the rules above.</li>
+     *     <li>Unless the value is null or there is no return value, in which null is returned.</li>
      * </ul>
      * 
-     * <p>
-     * Arguments must be a number, a boolean, a String, WebElement, or a List of any combination of
+     * <p>Arguments must be a number, a boolean, a String, WebElement, or a List of any combination of
      * the above. An exception will be thrown if the arguments do not meet these criteria. The
      * arguments will be made available to the JavaScript via the "arguments" magic variable, as if
      * the function were called via "Function.apply"
@@ -157,8 +152,201 @@ public final class JsUtility {
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
     public static <T> T runAndReturn(final WebDriver driver, final String js, final Object... args) {
+        Object result = runScript(false, driver, js, args);
+        if (result == null) {
+            LOGGER.warn("The specified synchronous JavaScript returned a null result");
+        }
+        return (T) result;
+    }
+    
+    /**
+     * Execute an asynchronous piece of JavaScript in the context of the currently selected frame or
+     * window. Unlike executing {@link #run(WebDriver, String, Object...) synchronous JavaScript},
+     * scripts executed with this method must explicitly signal they are finished by invoking the
+     * provided callback. This callback is always injected into the executed function as the last
+     * argument.
+     *
+     * <p>The first argument passed to the callback function will be used as the script's result. This
+     * value will be handled as follows:
+     *
+     * <ul>
+     *     <li>For an HTML element, this method returns a WebElement.</li>
+     *     <li>For a decimal number, a Double is returned.</li>
+     *     <li>For a non-decimal number, a Long is returned.</li>
+     *     <li>For a boolean, a Boolean is returned.</li>
+     *     <li>For all other cases, a String is returned.</li>
+     *     <li>For an array, return a List&lt;Object&gt; with each object following the rules above.
+     *         We support nested lists.</li>
+     *     <li>For a map, return a Map&lt;String, Object&gt; with values following the rules above.</li>
+     *     <li>Unless the value is null or there is no return value, in which null is returned.</li>
+     * </ul>
+     *
+     * <p>The default timeout for a script to be executed is 0ms. In most cases, including the
+     * examples below, one must set the script timeout {@link
+     * WebDriver.Timeouts#scriptTimeout(java.time.Duration)} beforehand to a value sufficiently large
+     * enough.
+     *
+     * <p>Example #1: Performing a sleep in the browser under test.
+     *
+     * <pre>{@code
+     * long start = System.currentTimeMillis();
+     * JsUtility.runAsync(driver,
+     *     "window.setTimeout(arguments[arguments.length - 1], 500);");
+     * System.out.println(
+     *     "Elapsed time: " + (System.currentTimeMillis() - start));
+     * }</pre>
+     *
+     * <p>Example #2: Synchronizing a test with an AJAX application:
+     *
+     * <pre>{@code
+     * WebElement composeButton = driver.findElement(By.id("compose-button"));
+     * composeButton.click();
+     * JsUtility.runAsync(driver,
+     *     "var callback = arguments[arguments.length - 1];" +
+     *     "mailClient.getComposeWindowWidget().onload(callback);");
+     * driver.switchTo().frame("composeWidget");
+     * driver.findElement(By.id("to")).sendKeys("bog@example.com");
+     * }</pre>
+     *
+     * <p>Script arguments must be a number, a boolean, a String, WebElement, or a List of any
+     * combination of the above. An exception will be thrown if the arguments do not meet these
+     * criteria. The arguments will be made available to the JavaScript via the "arguments" variable.
+     *
+     * @param driver A handle to the currently running Selenium test window.
+     * @param js The JavaScript to execute.
+     * @param args The arguments to the script. May be empty.
+     * @see WebDriver.Timeouts#scriptTimeout(java.time.Duration)
+     * @see JavascriptExecutor#executeAsyncScript(String, Object...)
+     */
+    public static void runAsync(final WebDriver driver, final String js, final Object... args) {
+        Object result = runScript(true, driver, js, args);
+        if (result != null) {
+            LOGGER.warn("The specified asynchronous JavaScript returned a non-null result");
+        }
+    }
+    
+    /**
+     * Execute an asynchronous piece of JavaScript in the context of the currently selected frame or
+     * window. Unlike executing {@link #runAndReturn(WebDriver, String, Object...) synchronous JavaScript},
+     * scripts executed with this method must explicitly signal they are finished by invoking the
+     * provided callback. This callback is always injected into the executed function as the last
+     * argument.
+     *
+     * <p>The first argument passed to the callback function will be used as the script's result. This
+     * value will be handled as follows:
+     *
+     * <ul>
+     *     <li>For an HTML element, this method returns a WebElement.</li>
+     *     <li>For a decimal number, a Double is returned.</li>
+     *     <li>For a non-decimal number, a Long is returned.</li>
+     *     <li>For a boolean, a Boolean is returned.</li>
+     *     <li>For all other cases, a String is returned.</li>
+     *     <li>For an array, return a List&lt;Object&gt; with each object following the rules above.
+     *         We support nested lists.</li>
+     *     <li>For a map, return a Map&lt;String, Object&gt; with values following the rules above.</li>
+     *     <li>Unless the value is null or there is no return value, in which null is returned.</li>
+     * </ul>
+     *
+     * <p>The default timeout for a script to be executed is 0ms. In most cases, including the
+     * examples below, one must set the script timeout {@link
+     * WebDriver.Timeouts#scriptTimeout(java.time.Duration)} beforehand to a value sufficiently large
+     * enough.
+     *
+     * <p>Example: Injecting a XMLHttpRequest and waiting for the result:
+     *
+     * <pre>{@code
+     * Object response = JsUtility.runAsyncAndReturn(driver,
+     *     "var callback = arguments[arguments.length - 1];" +
+     *     "var xhr = new XMLHttpRequest();" +
+     *     "xhr.open('GET', '/resource/data.json', true);" +
+     *     "xhr.onreadystatechange = function() {" +
+     *     "  if (xhr.readyState == 4) {" +
+     *     "    callback(xhr.responseText);" +
+     *     "  }" +
+     *     "};" +
+     *     "xhr.send();");
+     * JsonObject json = new JsonParser().parse((String) response);
+     * assertEquals("cheese", json.get("food").getAsString());
+     * }</pre>
+     *
+     * <p>Script arguments must be a number, a boolean, a String, WebElement, or a List of any
+     * combination of the above. An exception will be thrown if the arguments do not meet these
+     * criteria. The arguments will be made available to the JavaScript via the "arguments" variable.
+     *
+     * @param <T> return type
+     * @param driver A handle to the currently running Selenium test window.
+     * @param js The JavaScript to execute.
+     * @param args The arguments to the script. May be empty.
+     * @return One of Boolean, Long, String, List, Map, WebElement, or null.
+     * @see WebDriver.Timeouts#scriptTimeout(java.time.Duration)
+     * @see JavascriptExecutor#executeAsyncScript(String, Object...)
+     */
+    @SuppressWarnings("unchecked") // required because Selenium is not type safe.
+    public static <T> T runAsyncAndReturn(final WebDriver driver, final String js, final Object... args) {
+        Object result = runScript(true, driver, js, args);
+        if (result == null) {
+            LOGGER.warn("The specified asynchronous JavaScript returned a null result");
+        }
+        return (T) result;
+    }
+
+    /**
+     * Execute the specified piece of JavaScript in the context of the currently selected frame or
+     * window.
+     * 
+     * <ul>
+     *     <li>The caller specifies whether to execute the script synchronously or asynchronously.</li>
+     *     <li>If the script execution triggers a {@code WebDriverException}, the exception message is
+     *         scanned for a serialized exception. 
+     *         <ul>
+     *             <li>If a serialized exception is found, this exception is de-serialized and thrown.</li>
+     *             <li>If no serialized exception is found, the original exception is thrown.</li>
+     *         </ul>
+     *     </li>
+     *     <li>[Safari] If the script returns a {@code Map} object, this map is scanned for a serialized
+     *         exception. 
+     *         <ul>
+     *             <li>If a serialized exception is found, this exception is de-serialized and thrown.</li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     * 
+     * @param doAsync {@code true} to execute asynchronously; {@code false} to execute synchronously
+     * @param driver A handle to the currently running Selenium test window.
+     * @param js The JavaScript to execute.
+     * @param args The arguments to the script. May be empty.
+     * @return One of Boolean, Long, String, List, Map, WebElement, or null.
+     */
+    private static Object runScript(final boolean doAsync,
+            final WebDriver driver, final String js, final Object... args) {
+        
+        Object result = null;
+        WebDriverException exception = null;
+        
         String script = FirefoxShadowRoot.injectShadowArgs(driver, js, args);
-        return (T) WebDriverUtils.getExecutor(driver).executeScript(script, args);
+        try {
+            if (doAsync) {
+                result = ((JavascriptExecutor) driver).executeAsyncScript(script, args);
+            } else {
+                result = ((JavascriptExecutor) driver).executeScript(script, args);
+            }
+        } catch (WebDriverException e) {
+            exception = e;
+            result = e.getMessage();
+        }
+        
+        if (result != null) {
+            Throwable thrown = null;
+            if (result instanceof Map) {
+                thrown = extractException(exception, (Map<?, ?>) result);
+            } else if (result instanceof String) {
+                thrown = extractException(exception, (String) result);
+            }
+            if (thrown != null) {
+                UncheckedThrow.throwUnchecked(thrown);
+            }
+        }
+        return result;
     }
     
     /**
@@ -174,7 +362,7 @@ public final class JsUtility {
              */
             @Override
             public Boolean apply(final SearchContext context) {
-                return (Boolean) WebDriverUtils.getExecutor(context).executeScript(DOCUMENT_READY);
+                return runAndReturn(WebDriverUtils.getDriver(context), DOCUMENT_READY);
             }
             
             /**
@@ -196,14 +384,13 @@ public final class JsUtility {
     }
     
     /**
-     * Inject the Java glue code library into the current window
+     * Inject the Java glue code library into the current window.
      * 
      * @param driver A handle to the currently running Selenium test window.
      */
     public static void injectGlueLib(final WebDriver driver) {
-        JavascriptExecutor executor = WebDriverUtils.getExecutor(driver);
-        if ((boolean) executor.executeScript("return (typeof isObject != 'function');")) {
-            executor.executeScript(CREATE_SCRIPT_NODE, getScriptResource(JAVA_GLUE_LIB));
+        if ((boolean) runAndReturn(driver, "return (typeof isObject != 'function');")) {
+            run(driver, CREATE_SCRIPT_NODE, getScriptResource(JAVA_GLUE_LIB));
         }
     }
     
@@ -225,10 +412,10 @@ public final class JsUtility {
     }
     
     /**
-     * Propagate the specified web driver exception, extracting encoded JavaScript exception if present
+     * Propagate the specified web driver exception, extracting encoded JavaScript exception if present.
      * 
      * @param driver A handle to the currently running Selenium test window.
-     * @param exception web driver exception to propagate
+     * @param exception web driver exception to propagate (may be {@code null})
      * @return nothing (this method always throws the specified exception)
      * @since 17.4.0 
      */
@@ -262,13 +449,13 @@ public final class JsUtility {
     /**
      * If present, extract JSON-formatted serialized exception object from the specified message.
      * <p>
-     * <b>NOTE</b>: If the message contains a serialized exception object, the exception is deserialized with its cause
+     * <b>NOTE</b>: If the message contains a serialized exception object, the exception is de-serialized with its cause
      * set to the specified {@code WebDriverException}. If no serialized exception is found, the specified exception is
      * returned instead.
      * 
-     * @param exception web driver exception
+     * @param exception web driver exception (may be {@code null})
      * @param message message to scan for serialized exception object
-     * @return deserialized exception; specified exception is none is found
+     * @return de-serialized exception; specified exception is none is found
      */
     private static Throwable extractException(final WebDriverException exception, String message) {
         // only retain the first line
@@ -297,38 +484,56 @@ public final class JsUtility {
     /**
      * De-serialize the specified JSON-encoded exception
      * 
-     * @param exception web driver exception to propagate
+     * @param exception web driver exception to propagate (may be {@code null})
      * @param jsonStr JSON string
      * @return if present, exception decoded from JSON; otherwise, original WebDriverException object
      */
-    @SuppressWarnings("unchecked")
-    private static Throwable deserializeException(final WebDriverException cause, final String jsonStr) {
-        Throwable thrown = cause;
+    private static Throwable deserializeException(final WebDriverException exception, final String jsonStr) {
+        Throwable thrown = exception;
         // if message appears to be an encoded exception object
         if (jsonStr.contains("\"" + CLASS_NAME_KEY + "\"") && jsonStr.contains("\"" + MESSAGE_KEY + "\"")) {
             Map<String, ?> obj = DataUtils.fromString(jsonStr, HashMap.class);
             
             // if successful
             if (obj != null) {
-                if (obj.containsKey(ERROR_MESSAGE_KEY)) {
-                    obj = (Map<String, String>) obj.get(ERROR_MESSAGE_KEY);
-                }
-                
-                String className = (String) obj.get(CLASS_NAME_KEY);
-                String message = (String) obj.get(MESSAGE_KEY);
-                
-                try {
-                    Class<?> clazz = Class.forName(className);
-                    Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
-                    thrown = (Throwable) ctor.newInstance(message, cause);
-                    thrown.setStackTrace(new Throwable().getStackTrace());
-                } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-                        | InstantiationException | IllegalAccessException | IllegalArgumentException
-                        | InvocationTargetException eaten) {
-                    LOGGER.warn("Unable to instantiate exception: {}", className, eaten);
-                }
+                thrown = extractException(exception, obj);
             } else {
                 LOGGER.warn("Unable to deserialize encoded exception object: {}", jsonStr);
+            }
+        }
+        return thrown;
+    }
+
+    /**
+     * If present, extract serialized exception object from the specified map.
+     * <p>
+     * <b>NOTE</b>: If the map contains a serialized exception object, the exception is de-serialized with its cause
+     * set to the specified {@code WebDriverException}. If no serialized exception is found, the specified exception is
+     * returned instead.
+     * 
+     * @param exception web driver exception (may be {@code null})
+     * @param obj map to scan for serialized exception object
+     * @return de-serialized exception; specified exception is none is found
+     */
+    private static Throwable extractException(final WebDriverException exception, Map<?, ?> obj) {
+        Throwable thrown = null;
+        if (obj.containsKey(ERROR_MESSAGE_KEY)) {
+            obj = (Map<?, ?>) obj.get(ERROR_MESSAGE_KEY);
+        }
+        
+        String className = (String) obj.get(CLASS_NAME_KEY);
+        String message = (String) obj.get(MESSAGE_KEY);
+        
+        if (className != null && message != null) {
+            try {
+                Class<?> clazz = Class.forName(className);
+                Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
+                thrown = (Throwable) ctor.newInstance(message, exception);
+                thrown.setStackTrace(new Throwable().getStackTrace());
+            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
+                    | InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException eaten) {
+                LOGGER.warn("Unable to instantiate exception: {}", className, eaten);
             }
         }
         return thrown;
