@@ -114,7 +114,7 @@ public final class WebDriverUtils {
      * @return {@link Platform} hosting the browser; {@code null} if context doesn't
      *         describe its capabilities
      */
-    public Platform getPlatform(final SearchContext context) {
+    public static Platform getPlatform(final SearchContext context) {
         Capabilities caps = getCapabilities(context);
         return (caps != null) ? caps.getPlatformName() : null;
     }

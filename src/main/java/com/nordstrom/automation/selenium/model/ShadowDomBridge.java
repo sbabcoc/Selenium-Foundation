@@ -3,6 +3,7 @@ package com.nordstrom.automation.selenium.model;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,11 +16,11 @@ import com.nordstrom.automation.selenium.utility.SearchContextUtils;
 import com.nordstrom.automation.selenium.utility.SearchContextUtils.ContextType;
 
 /**
- * This class implements a search context for <b>Firefox</b> shadow DOM element search.
+ * This class implements a search context for pre-W3C shadow DOM element search.
  */
-public final class FirefoxShadowRoot extends PageComponent {
+public final class ShadowDomBridge extends PageComponent {
     
-    private FirefoxShadowRoot(final RobustWebElement element, final ComponentContainer parent) {
+    private ShadowDomBridge(final RobustWebElement element, final ComponentContainer parent) {
         super(element, parent);
     }
 
@@ -50,18 +51,19 @@ public final class FirefoxShadowRoot extends PageComponent {
     /**
      * Prepare the specified script and arguments for invocation.
      * <p>
-     * <b>NOTE</b>: If the targeted browser is Firefox and the script arguments include <b>FirefoxShadowRoot</b>
-     * objects, this method will revise the specified script and alter the corresponding arguments to retrieve
-     * and use references to the associated shadow root nodes. Otherwise, script and arguments are unaltered.
+     * <b>NOTE</b>: If the targeted browser requires <b>ShadowDomBridge</b> and the script arguments include
+     * <b>ShadowDomBridge</b> objects, this method will revise the specified script and alter the corresponding
+     * arguments to retrieve and use references to the associated shadow root nodes. Otherwise, script and
+     * arguments are unaltered.
      * 
      * @param driver A handle to the currently running Selenium test window.
      * @param js The JavaScript to execute
      * @param args The arguments to the script. May be empty
-     * @return revised script if arguments include {@link FirefoxShadowRoot} objects; otherwise, original script
+     * @return revised script if arguments include {@link ShadowDomBridge} objects; otherwise, original script
      */
     public static String injectShadowArgs(final WebDriver driver, final String js, final Object... args) {
-        // if not Firefox on Selenium 3
-        if ( ! isFirefoxOnSelenium3(driver)) {
+        // if not using ShadowDomBridge
+        if ( ! useShadowDomBridge(driver)) {
             return js; // return without altering anything
         }
         
@@ -70,10 +72,10 @@ public final class FirefoxShadowRoot extends PageComponent {
         
         // iterate over arguments
         for (int i = 0; i < args.length; i++) {
-            // if this argument is a FirefoxShadowRoot
-            if (args[i] instanceof FirefoxShadowRoot) {
+            // if this argument is a ShadowDomBridge
+            if (args[i] instanceof ShadowDomBridge) {
                 // replace argument with shadow host element
-                args[i] = ((FirefoxShadowRoot) args[i]).getWrappedElement();
+                args[i] = ((ShadowDomBridge) args[i]).getWrappedElement();
                 // add statement to acquire shadow root reference
                 script.append("var shadow").append(i).append(" = arguments[").append(i).append("].shadowRoot;\n");
                 // replace references to original argument with shadow root variables
@@ -89,12 +91,12 @@ public final class FirefoxShadowRoot extends PageComponent {
      * Get the underlying shadow root for the specified context.
      * 
      * @param context search context
-     * @return shadow root context; {@code null} if browser isn't Firefox
+     * @return shadow root context; {@code null} if not using ShadowDomBridge 
      * @throws ShadowRootContextException if unable to acquire shadow root
      */
-    static FirefoxShadowRoot getShadowRoot(final SearchContext context) {
-        // if running Firefox on Selenium 3
-        if (isFirefoxOnSelenium3(context)) {
+    static ShadowDomBridge getShadowRoot(final SearchContext context) {
+        // if using ShadowDomBridge
+        if (useShadowDomBridge(context)) {
             ShadowRoot shadowRoot;
             RobustWebElement element;
             if (context instanceof ShadowRoot) {
@@ -107,14 +109,22 @@ public final class FirefoxShadowRoot extends PageComponent {
             } else {
                 return null;
             }
-            // return a FirefoxShadowRoot object
-            return new FirefoxShadowRoot(element, shadowRoot);
+            // return a ShadowDomBridge object
+            return new ShadowDomBridge(element, shadowRoot);
         }
         return null;
     }
     
-    private static boolean isFirefoxOnSelenium3(final SearchContext context) {
-        return (SeleniumConfig.getConfig().getVersion() == 3) && WebDriverUtils.getBrowserName(context).equals("firefox");
+    private static boolean useShadowDomBridge(final SearchContext context) {
+        // if running Firefox on Selenium 3
+        if ((SeleniumConfig.getConfig().getVersion() == 3) && "firefox".equals(WebDriverUtils.getBrowserName(context))) {
+            return true;
+        }
+        // if running Safari on iOS
+        if (Platform.IOS.equals(WebDriverUtils.getPlatform(context)) && "Safari".equals(WebDriverUtils.getBrowserName(context))) {
+            return true;
+        }
+        return false;
     }
 
 }

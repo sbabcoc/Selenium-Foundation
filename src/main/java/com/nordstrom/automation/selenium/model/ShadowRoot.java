@@ -106,9 +106,9 @@ public class ShadowRoot extends PageComponent {
     @SuppressWarnings("unchecked")
     public static SearchContext getShadowRoot(final SearchContext context) {
         try {
-            // invoke special handling for Firefox
-            SearchContext shadowRoot = FirefoxShadowRoot.getShadowRoot(context);
-            // if Firefox shadow root created, use it 
+            // determine if ShadowDomBridge is required
+            SearchContext shadowRoot = ShadowDomBridge.getShadowRoot(context);
+            // if ShadowDomBridge was created, use it 
             if (shadowRoot != null) return shadowRoot;
         } catch (Exception eaten) {
             // nothing to do here

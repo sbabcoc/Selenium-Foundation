@@ -89,7 +89,7 @@ public final class RobustElementFactory {
     }
     
     /**
-     * Robust web element builder for FirefoxShadowRoot.
+     * Robust web element builder for {@link ShadowDomBridge}.
      * 
      * @param element element reference to be wrapped (may be 'null')
      * @param context element search context
