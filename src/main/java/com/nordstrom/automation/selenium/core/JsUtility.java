@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.exceptions.DocumentNotReadyTimeoutException;
-import com.nordstrom.automation.selenium.model.FirefoxShadowRoot;
+import com.nordstrom.automation.selenium.model.ShadowDomBridge;
 import com.nordstrom.automation.selenium.support.Coordinator;
 import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -323,7 +323,7 @@ public final class JsUtility {
         Object result = null;
         WebDriverException exception = null;
         
-        String script = FirefoxShadowRoot.injectShadowArgs(driver, js, args);
+        String script = ShadowDomBridge.injectShadowArgs(driver, js, args);
         try {
             if (doAsync) {
                 result = ((JavascriptExecutor) driver).executeAsyncScript(script, args);

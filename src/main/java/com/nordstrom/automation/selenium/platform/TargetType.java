@@ -30,9 +30,9 @@ public enum TargetType implements TargetTypeName {
     
     /**
      * target: web application<br>
-     * driver: {@link RemoteWebDriverPlugin}, {@link UiAutomator2Plugin}
+     * driver: {@link RemoteWebDriverPlugin}, {@link UiAutomator2Plugin}, {@link XCUITestPlugin}
      */
-    WEB_APP(WEB_APP_NAME, RemoteWebDriverPlugin.class, UiAutomator2Plugin.class),
+    WEB_APP(WEB_APP_NAME, RemoteWebDriverPlugin.class, UiAutomator2Plugin.class, XCUITestPlugin.class),
     
     /**
      * target: Android application<br>
