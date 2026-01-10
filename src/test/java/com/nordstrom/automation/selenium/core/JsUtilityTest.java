@@ -11,6 +11,7 @@ import java.lang.reflect.Modifier;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -78,6 +79,7 @@ public class JsUtilityTest extends TestNgTargetRoot {
     
     @Test
     public void testPropagate() {
+        skipIfSafariOnIOS();
         ExamplePage page = getPage();
         try {
             getMetaTagNamed(page.getWrappedDriver(), "test");
@@ -138,5 +140,13 @@ public class JsUtilityTest extends TestNgTargetRoot {
             throw new SkipException(e.getMessage(), e);
         }
         throw e;
+    }
+    
+    private void skipIfSafariOnIOS() {
+        // if running Safari on iOS
+        if (Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
+                && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            throw new SkipException("This scenario is unsupported on iOS Safari");
+        }
     }
 }

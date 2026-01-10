@@ -199,7 +199,7 @@ This constructor is required to enable lazy initialization of the items in the c
 In addition, to be grouped as a component map, page components and frames must declare a method with signature:
 
 ```java
-public static Object getKey(SearchContext context)
+public static Object getKey(RobustWebElement element)
 ```
 
 This method is required to supply the keys that uniquely identify each item in the map.
@@ -213,11 +213,10 @@ Switching the driver focus to a frame context is an expensive process, so **Sele
 ###### Producing map keys with frame content (from [FrameComponent.java](example/FrameComponent.md))
 ```java
 ...
-    public static Object getKey(SearchContext context) {
-        RobustWebElement element = (RobustWebElement) context;
+    public static Object getKey(RobustWebElement element) {
         WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
         Object key = driver.findElement(Using.HEADING.selector).getText();
-        switchToParentFrame(element);
+        element.getContext().switchTo();
         return key;
     }
 ...

@@ -93,6 +93,7 @@ public class Page extends ComponentContainer {
         if (windowHandle != null) {
             driver.switchTo().window(windowHandle);
         }
+        driver.switchTo().defaultContent();
         return this;
     }
     
@@ -224,6 +225,7 @@ public class Page extends ComponentContainer {
      */
     @Override
     public SearchContext refreshContext(final long expiration) {
+        driver.switchTo().defaultContent();
         return this;
     }
     

@@ -70,8 +70,8 @@ public class TableComponent extends PageComponent {
         return tableRows;
     }
     
-    public static Object getKey(SearchContext context) {
-        return WebDriverUtils.getDomAttributeOf((WebElement) context, "id");
+    public static Object getKey(RobustWebElement element) {
+        return WebDriverUtils.getDomAttributeOf(element, "id");
     }
 }
 ```

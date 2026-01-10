@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import com.nordstrom.automation.selenium.core.ByType;
@@ -150,11 +149,11 @@ public class ShadowRootComponent extends ShadowRoot implements DetectsLoadComple
     /**
      * Get the key that uniquely identifies the specified shadow root context.
      * 
-     * @param context shadow root component search context
+     * @param element shadow root component search context
      * @return shadow root component key
      */
-    public static Object getKey(final SearchContext context) {
-        return getShadowRoot(context).findElement(Using.HEADING.locator).getText();
+    public static Object getKey(final RobustWebElement element) {
+        return getShadowRoot(element).findElement(Using.HEADING.locator).getText();
     }
 
 }

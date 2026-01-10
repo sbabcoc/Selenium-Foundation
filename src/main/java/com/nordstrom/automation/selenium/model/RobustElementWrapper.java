@@ -423,6 +423,8 @@ public class RobustElementWrapper implements ReferenceFetcher {
     public SearchContext refreshContext(final long expiration) {
         // if wrapped element has expired
         if (expiration >= acquiredAt()) {
+            // refresh context ancestry
+            context.refreshContext(expiration);
             // refresh wrapped element
             return refreshReference(null);
         }
@@ -465,6 +467,14 @@ public class RobustElementWrapper implements ReferenceFetcher {
     @Override
     public SearchContext switchTo() {
         return context.switchTo();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SearchContext switchToParentFrame() {
+        return context.switchToParentFrame();
     }
     
     /**

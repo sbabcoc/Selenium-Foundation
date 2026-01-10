@@ -19,6 +19,13 @@ public interface WrapsContext extends WrapsDriver {
     SearchContext switchTo();
     
     /**
+     * Switch the driver to the parent frame of the underlying search context.
+     * 
+     * @return parent frame search context of the underlying search context
+     */
+    SearchContext switchToParentFrame();
+    
+    /**
      * Get the underlying search context for this object.
      * 
      * @return object search context

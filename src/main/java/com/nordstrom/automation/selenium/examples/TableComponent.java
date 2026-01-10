@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
-
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.ComponentContainer;
@@ -117,11 +115,11 @@ public class TableComponent extends PageComponent implements DetectsLoadCompleti
     /**
      * Get the key that uniquely identifies the specified table context.
      * 
-     * @param context table component search context
+     * @param element table component search context
      * @return table component key
      */
-    public static Object getKey(SearchContext context) {
-        return WebDriverUtils.getDomAttributeOf((WebElement) context, "id");
+    public static Object getKey(final RobustWebElement element) {
+        return WebDriverUtils.getDomAttributeOf(element, "id");
     }
 
     /**

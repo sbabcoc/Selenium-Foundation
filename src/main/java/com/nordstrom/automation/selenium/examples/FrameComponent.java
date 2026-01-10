@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.examples;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
@@ -98,14 +97,13 @@ public class FrameComponent extends Frame implements DetectsLoadCompletion<Frame
     /**
      * Get the key that uniquely identifies the specified frame context.
      * 
-     * @param context frame component search context
+     * @param element frame component search context
      * @return frame component key
      */
-    public static Object getKey(SearchContext context) {
-        RobustWebElement element = (RobustWebElement) context;
-        WebDriver driver = switchTo(element);
+    public static Object getKey(final RobustWebElement element) {
+        WebDriver driver = element.getWrappedDriver().switchTo().frame(element);
         Object key = driver.findElement(Using.HEADING.locator).getText();
-        switchToParentFrame(element);
+        element.getContext().switchTo();
         return key;
     }
 
