@@ -117,11 +117,13 @@ public final class ShadowDomBridge extends PageComponent {
     
     private static boolean useShadowDomBridge(final SearchContext context) {
         // if running Firefox on Selenium 3
-        if ((SeleniumConfig.getConfig().getVersion() == 3) && "firefox".equals(WebDriverUtils.getBrowserName(context))) {
+        if ((SeleniumConfig.getConfig().getVersion() == 3)
+                && "firefox".equals(WebDriverUtils.getBrowserName(context))) {
             return true;
         }
         // if running Safari on iOS
-        if (Platform.IOS.equals(WebDriverUtils.getPlatform(context)) && "Safari".equals(WebDriverUtils.getBrowserName(context))) {
+        if (Platform.IOS.equals(WebDriverUtils.getPlatform(context))
+                && "Safari".equals(WebDriverUtils.getBrowserName(context))) {
             return true;
         }
         return false;

@@ -2,11 +2,6 @@ package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.UnsupportedCommandException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-
-import com.google.common.base.Throwables;
 
 /**
  * Extend this class when modeling a browser frame element.
@@ -34,8 +29,6 @@ public class Frame extends Page {
     private static final Class<?>[] ARG_TYPES_2 = {By.class, Integer.TYPE, ComponentContainer.class};
     private static final Class<?>[] ARG_TYPES_4 = {Integer.TYPE, ComponentContainer.class};
     private static final Class<?>[] ARG_TYPES_5 = {String.class, ComponentContainer.class};
-    
-    private static boolean canSwitchToParentFrame = true;
     
     private enum FrameSelect {
         ELEMENT,
@@ -124,7 +117,7 @@ public class Frame extends Page {
     protected SearchContext switchToContext() {
         switch (frameSelect) {
             case ELEMENT:
-                driver.switchTo().frame(element.getWrappedElement());
+                driver.switchTo().frame(element);
                 break;
 
             case INDEX:
@@ -136,40 +129,6 @@ public class Frame extends Page {
                 break;
         }
         return this;
-    }
-    
-    /**
-     * Switch focus to the specified frame context.
-     * 
-     * @param element frame context element
-     * @return driver focused on specified frame context
-     */
-    public static WebDriver switchTo(final RobustWebElement  element) {
-        return element.getWrappedDriver().switchTo().frame(element.getWrappedElement());
-    }
-    
-    /**
-     * Switch driver focus to the parent of the specified frame context element.
-     * <p>
-     * <b>NOTE</b> This method initially invokes {@code driver.switchTo().parentFrame()}. If that fails with
-     * {@link UnsupportedCommandException}, it invokes {@code element.switchTo()} as a fallback.
-     * 
-     * @param element frame context element
-     * @return parent search context
-     */
-    public static SearchContext switchToParentFrame(final RobustWebElement element) {
-        if (canSwitchToParentFrame) {
-            try {
-                return element.getWrappedDriver().switchTo().parentFrame();
-            } catch (WebDriverException e) {
-                if (Throwables.getRootCause(e) instanceof UnsupportedCommandException) {
-                    canSwitchToParentFrame = false;
-                } else {
-                    throw e;
-                }
-            }
-        }
-        return element.switchTo();
     }
     
     /**

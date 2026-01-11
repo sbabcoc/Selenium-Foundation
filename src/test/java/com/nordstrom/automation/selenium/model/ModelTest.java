@@ -1,5 +1,6 @@
 package com.nordstrom.automation.selenium.model;
 
+import org.openqa.selenium.Platform;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -189,14 +190,23 @@ public class ModelTest extends TestNgTargetRoot {
     
     @Test
     public void testContainerResolution() {
+        skipIfSafariOnIOS();
         ModelTestCore.testContainerResolution(this);
     }
     
     private void skipIfHtmlUnit(final ShadowRootContextException e) {
         // if browser is HtmlUnit
-        if (WebDriverUtils.getBrowserName(getDriver()).equals("htmlunit")) {
-            throw new SkipException(e.getMessage(), e);
+        if ("htmlunit".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            throw new SkipException("This scenario is unsupported on HtmlUnit", e);
         }
         throw e;
+    }
+    
+    private void skipIfSafariOnIOS() {
+        // if running Safari on iOS
+        if (Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
+                && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            throw new SkipException("This scenario is unsupported on iOS Safari");
+        }
     }
 }

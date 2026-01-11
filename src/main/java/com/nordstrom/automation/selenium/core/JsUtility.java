@@ -182,9 +182,8 @@ public final class JsUtility {
      * </ul>
      *
      * <p>The default timeout for a script to be executed is 0ms. In most cases, including the
-     * examples below, one must set the script timeout {@link
-     * WebDriver.Timeouts} beforehand to a value sufficiently large
-     * enough.
+     * examples below, one must set the script timeout {@link WebDriver.Timeouts scriptTimeout()}
+     * beforehand to a value sufficiently large enough.
      *
      * <p>Example #1: Performing a sleep in the browser under test.
      *
@@ -215,7 +214,7 @@ public final class JsUtility {
      * @param driver A handle to the currently running Selenium test window.
      * @param js The JavaScript to execute.
      * @param args The arguments to the script. May be empty.
-     * @see WebDriver.Timeouts
+     * @see WebDriver.Timeouts scriptTimeout()
      * @see JavascriptExecutor#executeAsyncScript(String, Object...)
      */
     public static void runAsync(final WebDriver driver, final String js, final Object... args) {
@@ -248,9 +247,8 @@ public final class JsUtility {
      * </ul>
      *
      * <p>The default timeout for a script to be executed is 0ms. In most cases, including the
-     * examples below, one must set the script timeout {@link
-     * WebDriver.Timeouts} beforehand to a value sufficiently large
-     * enough.
+     * examples below, one must set the script timeout {@link WebDriver.Timeouts scriptTimeout()}
+     * beforehand to a value sufficiently large enough.
      *
      * <p>Example: Injecting a XMLHttpRequest and waiting for the result:
      *
@@ -278,7 +276,7 @@ public final class JsUtility {
      * @param js The JavaScript to execute.
      * @param args The arguments to the script. May be empty.
      * @return One of Boolean, Long, String, List, Map, WebElement, or null.
-     * @see WebDriver.Timeouts
+     * @see WebDriver.Timeouts scriptTimeout()
      * @see JavascriptExecutor#executeAsyncScript(String, Object...)
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.

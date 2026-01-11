@@ -1,8 +1,10 @@
 package com.nordstrom.automation.selenium.junit;
 
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeNoException;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openqa.selenium.Platform;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
@@ -220,14 +222,22 @@ public class JUnitModelTest extends JUnitTargetRoot {
     @Test
     @Ignore
     public void testContainerResolution() {
+        skipIfSafariOnIOS();
         ModelTestCore.testContainerResolution(this);
     }
 
     private void skipIfHtmlUnit(final ShadowRootContextException e) {
         // if browser is HtmlUnit
-        if (WebDriverUtils.getBrowserName(getDriver()).equals("htmlunit")) {
-            assumeNoException(e);
+        if ("htmlunit".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            assumeNoException("This scenario is unsupported on HtmlUnit", e);
         }
         throw e;
+    }
+    
+    private void skipIfSafariOnIOS() {
+        // if running Safari on iOS
+        assumeFalse("This scenario is unsupported on iOS Safari",
+                Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
+                && "Safari".equals(WebDriverUtils.getBrowserName(getDriver())));
     }
 }

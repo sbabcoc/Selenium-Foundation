@@ -224,6 +224,23 @@ public abstract class ComponentContainer
         return getWait().until(contextIsSwitched(this));
     }
     
+    @Override
+    public SearchContext switchToParentFrame() {
+        ComponentContainer cursor;
+        
+        if (parent == null) {
+            driver.switchTo().defaultContent();
+            return this;
+        }
+        
+        // traverse down the container hierarchy to find the current frame, stopping at root context
+        for (cursor = this; !(cursor instanceof Frame || cursor.getParent() == null); cursor = cursor.getParent()) {
+            // nothing to do here
+        }
+
+        return (cursor.getParent() != null) ? cursor.getParent().switchTo() : cursor.switchTo();
+    }
+    
     /**
      * Returns a 'wait' proxy that switches focus to the specified context
      * 
@@ -779,7 +796,7 @@ public abstract class ComponentContainer
      * 
      * @param pageObj target page object
      */
-    static void waitForLandingPage(final Page pageObj) {
+    public static void waitForLandingPage(final Page pageObj) {
         SearchContextWait wait = (SearchContextWait)
                 pageObj.getWait(WaitType.PAGE_LOAD).ignoring(LandingPageMismatchException.class);
         wait.until(landingPageAppears());
@@ -1013,17 +1030,17 @@ public abstract class ComponentContainer
     }
     
     /**
-     * Get {@link Method} object for the static {@code getKey(SearchContext)} method declared by the specified
-     * container type.
+     * Get {@link Method} object for the static {@code getKey(RobustWebElement)}
+     * method declared by the specified container type.
      * 
      * @param <T> component container type
      * @param containerType target container type
-     * @return method object for getKey(SearchContext) 
+     * @return method object for getKey(RobustWebElement)
      * @throws UnsupportedOperationException The required method is missing
      */
     static <T extends ComponentContainer> Method getKeyMethod(final Class<T> containerType) {
         try {
-            Method method = containerType.getMethod("getKey", SearchContext.class);
+            Method method = containerType.getMethod("getKey", RobustWebElement.class);
             if (Modifier.isStatic(method.getModifiers())) {
                 return method;
             }
@@ -1031,7 +1048,7 @@ public abstract class ComponentContainer
             // fall through to 'throw' statement below
         }
         throw new UnsupportedOperationException(
-                "Container class must declare method: public static Object getKey(SearchContext)");
+                "Container class must declare method: public static Object getKey(RobustWebElement)");
     }
     
     /**

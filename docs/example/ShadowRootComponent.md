@@ -43,9 +43,8 @@ public class ShadowRootComponent extends ShadowRoot {
         return findElement(Using.HEADING).getText();
     }
 
-    public static Object getKey(SearchContext context) {
-        RobustWebElement element = (RobustWebElement) context;
-        WebDriver driver = element.getWrappedDriver();
+    public static Object getKey(RobustWebElement context) {
+        WebDriver driver = context.getWrappedDriver();
         Object key = driver.findElement(Using.HEADING.locator).getText();
         return key;
     }
