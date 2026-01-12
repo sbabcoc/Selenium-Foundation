@@ -126,7 +126,7 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      * <p>
      * <b>NOTE</b>: This method throws an {@link AssumptionViolatedException} with the specified message.
      */
-    public void skipTest(final String message) throws Exception {
+    public void skipTest(final String message) throws RuntimeException {
         throw new AssumptionViolatedException(message);
     }
     

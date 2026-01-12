@@ -219,7 +219,7 @@ public abstract class TestNgBase extends TestBase {
      * <p>
      * <b>NOTE</b>: This method throws a {@link SkipException} with the specified message.
      */
-    public void skipTest(final String message) throws Exception {
+    public void skipTest(final String message) throws RuntimeException {
         throw new SkipException(message);
     }
     
