@@ -3,11 +3,14 @@ package com.nordstrom.automation.selenium.core;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
+import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.model.Page;
 
 /**
@@ -100,6 +103,44 @@ public abstract class TestBase {
      */
     public boolean hasInitialPage() {
         return nabInitialPage().isPresent();
+    }
+    
+    /**
+     * Skip this test if running Safari on Selenium 3.
+     */
+    public void skipIfSafariInSelenium3() {
+        // if running Safari in Selenium 3
+        if ((SeleniumConfig.getConfig().getVersion() == 3)
+                && "safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            skipTest("This scenario is unsupported on Safari in Selenium 3");
+        }
+    }
+    
+    /**
+     * Skip this test if running HtmlUnit.
+     * <p>
+     * <b>NOTE</b>: If not running HtmlUnit, the specified exception is thrown.
+     * 
+     * @param e shadow root context exception
+     */
+    public void skipIfHtmlUnit(final ShadowRootContextException e) {
+        // if running HtmlUnit
+        if ("htmlunit".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            skipTest(e.getMessage());
+        }
+        throw e;
+    }
+    
+    /**
+     * Skip this test if running iOS Safari.
+     */
+    public void skipIfSafariOnIOS() {
+        // if running Safari on iOS
+        System.out.println("browser name = " + WebDriverUtils.getBrowserName(getDriver()));
+        if (Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
+                && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            skipTest("This scenario is unsupported on iOS Safari");
+        }
     }
     
     /**
@@ -204,7 +245,7 @@ public abstract class TestBase {
      * Skip the test that's about to executed.
      * 
      * @param message message for the framework-specific test-skip exception
-     * @throws Exception framework-specific exception throw to skip the test
+     * @throws RuntimeException framework-specific exception throw to skip the test
      */
-    public abstract void skipTest(String message) throws Exception;
+    public abstract void skipTest(String message) throws RuntimeException;
 }

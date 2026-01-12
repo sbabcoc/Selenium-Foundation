@@ -1,12 +1,8 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.nordstrom.automation.selenium.exceptions.DriverExecutableNotFoundException;
-import com.nordstrom.automation.selenium.utility.BinaryFinder;
 
 /**
  * This class defines properties and methods used by plug-ins that support the Apple Safari browser.
@@ -69,23 +65,11 @@ public class SafariCaps {
 
     /**
      * Get list of system property names recognized by the driver associated with this plug-in.
-     * <p>
-     * <b>NOTE</b>: As a side-effect, this method invokes <b>WebDriverManager</b> (Selenium 3) or
-     * <b>SeleniumManager</b> (Selenium 4) to acquire the driver path. If a driver that supports the
-     * browser corresponding to the specified capabilities is not found, the manager will attempt to
-     * install one. If the manager acquires the driver path, this method stores it in the associated
-     * system property.
      * 
      * @param capabilities JSON {@link org.openqa.selenium.Capabilities Capabilities} object
      * @return list of system property names
      */
     public static String[] getPropertyNames(String capabilities) {
-        try {
-            File driverPath = BinaryFinder.findDriver(capabilities);
-            System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
-        } catch (IllegalStateException e) {
-            throw new DriverExecutableNotFoundException(DRIVER_PATH);
-        }
         return PROPERTY_NAMES;
     }
 

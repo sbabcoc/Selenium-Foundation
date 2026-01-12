@@ -1,11 +1,8 @@
 package com.nordstrom.automation.selenium.model;
 
-import org.openqa.selenium.Platform;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
-import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
@@ -111,6 +108,7 @@ public class ModelTest extends TestNgTargetRoot {
     
     @Test
     public void testShadowRootByLocator() {
+        skipIfSafariInSelenium3();
         try {
             ModelTestCore.testShadowRootByLocator(this).run();
         } catch (ShadowRootContextException e) {
@@ -120,6 +118,7 @@ public class ModelTest extends TestNgTargetRoot {
 
     @Test
     public void testShadowRootByElement() {
+        skipIfSafariInSelenium3();
         try {
             ModelTestCore.testShadowRootByElement(this).run();
         } catch (ShadowRootContextException e) {
@@ -129,6 +128,7 @@ public class ModelTest extends TestNgTargetRoot {
     
     @Test
     public void testShadowRootList() {
+        skipIfSafariInSelenium3();
         try {
             ModelTestCore.testShadowRootList(this).run();
         } catch (ShadowRootContextException e) {
@@ -138,6 +138,7 @@ public class ModelTest extends TestNgTargetRoot {
 
     @Test
     public void testShadowRootMap() {
+        skipIfSafariInSelenium3();
         try {
             ModelTestCore.testShadowRootMap(this).run();
         } catch (ShadowRootContextException e) {
@@ -192,21 +193,5 @@ public class ModelTest extends TestNgTargetRoot {
     public void testContainerResolution() {
         skipIfSafariOnIOS();
         ModelTestCore.testContainerResolution(this);
-    }
-    
-    private void skipIfHtmlUnit(final ShadowRootContextException e) {
-        // if browser is HtmlUnit
-        if ("htmlunit".equals(WebDriverUtils.getBrowserName(getDriver()))) {
-            throw new SkipException("This scenario is unsupported on HtmlUnit", e);
-        }
-        throw e;
-    }
-    
-    private void skipIfSafariOnIOS() {
-        // if running Safari on iOS
-        if (Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
-                && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
-            throw new SkipException("This scenario is unsupported on iOS Safari");
-        }
     }
 }

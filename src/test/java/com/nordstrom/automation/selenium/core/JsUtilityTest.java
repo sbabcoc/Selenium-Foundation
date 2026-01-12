@@ -11,11 +11,9 @@ import java.lang.reflect.Modifier;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -132,21 +130,5 @@ public class JsUtilityTest extends TestNgTargetRoot {
     
     private ExamplePage getPage() {
         return (ExamplePage) getInitialPage();
-    }
-    
-    private void skipIfHtmlUnit(final ShadowRootContextException e) {
-        // if browser is HtmlUnit
-        if (WebDriverUtils.getBrowserName(getDriver()).equals("htmlunit")) {
-            throw new SkipException(e.getMessage(), e);
-        }
-        throw e;
-    }
-    
-    private void skipIfSafariOnIOS() {
-        // if running Safari on iOS
-        if (Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
-                && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
-            throw new SkipException("This scenario is unsupported on iOS Safari");
-        }
     }
 }
