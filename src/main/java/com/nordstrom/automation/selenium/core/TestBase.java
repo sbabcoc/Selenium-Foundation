@@ -136,7 +136,6 @@ public abstract class TestBase {
      */
     public void skipIfSafariOnIOS() {
         // if running Safari on iOS
-        System.out.println("browser name = " + WebDriverUtils.getBrowserName(getDriver()));
         if (Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
                 && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
             skipTest("This scenario is unsupported on iOS Safari");

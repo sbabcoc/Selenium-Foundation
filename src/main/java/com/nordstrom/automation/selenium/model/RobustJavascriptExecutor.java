@@ -5,6 +5,8 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WrapsDriver;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
@@ -49,7 +51,9 @@ public class RobustJavascriptExecutor implements JavascriptExecutor, WrapsDriver
     public Object executeAsyncScript(final String script, final Object... args) {
         Object result = null;
         try {
-            result = JsUtility.runAsyncAndReturn(driver, script, args);
+            SeleniumConfig config = SeleniumConfig.getConfig();
+            long timeout = WaitType.SCRIPT.getInterval(config);
+            result = JsUtility.runAsyncAndReturn(driver, script, timeout, args);
         } catch (StaleElementReferenceException e) {
             if (refreshReferences(e, args)) {
                 executeAsyncScript(script, args);

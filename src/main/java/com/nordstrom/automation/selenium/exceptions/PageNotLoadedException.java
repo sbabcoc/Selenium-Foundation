@@ -25,7 +25,7 @@ import com.nordstrom.automation.selenium.support.Coordinator;
  * (e.g. - {@link NoSuchElementException}) with this exception, as these are automatically handled by
  * {@link ComponentContainer#waitForLandingPage(Page)}.
  */
-public class PageNotLoadedException extends RuntimeException {
+public class PageNotLoadedException extends SeleniumFoundationException {
     private static final long serialVersionUID = -8491929915611599716L;
     
     /**

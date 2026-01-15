@@ -12,7 +12,6 @@ import java.lang.reflect.Modifier;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -66,12 +65,12 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     @Test
-    public void testInjectGlueLib() {
+    public void testRuntimeLib() {
         ExamplePage page = getPage();
         WebDriver driver = page.getWrappedDriver();
         JavascriptExecutor executor = (JavascriptExecutor) driver;
-        JsUtility.injectGlueLib(page.getWrappedDriver());
-        Boolean hasFunction = (Boolean) executor.executeScript("return (typeof isObject == 'function');");
+        JsUtility.injectRuntime(driver);
+        Boolean hasFunction = (Boolean) executor.executeScript("return (typeof __wdRuntime.runSync === 'function');");
         assertTrue(hasFunction);
     }
     
@@ -117,15 +116,9 @@ public class JsUtilityTest extends TestNgTargetRoot {
     }
     
     private String getMetaTagNamed(WebDriver driver, String name) {
-        JsUtility.injectGlueLib(driver);
         String script = JsUtility.getScriptResource("requireMetaTagByName.js");
-         
-        try {
-            WebElement response = JsUtility.runAndReturn(driver, script, name);
-            return WebDriverUtils.getDomPropertyOf(response, "content");
-        } catch (WebDriverException e) {
-            throw JsUtility.propagate(driver, e);
-        }
+        WebElement response = JsUtility.runAndReturn(driver, script, name);
+        return WebDriverUtils.getDomPropertyOf(response, "content");
     }
     
     private ExamplePage getPage() {

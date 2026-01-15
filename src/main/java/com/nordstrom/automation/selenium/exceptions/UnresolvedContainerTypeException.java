@@ -3,7 +3,7 @@ package com.nordstrom.automation.selenium.exceptions;
 /**
  * This exception is thrown if the concrete container type cannot be resolved.
  */
-public class UnresolvedContainerTypeException extends RuntimeException {
+public class UnresolvedContainerTypeException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = -422498744356462151L;
 

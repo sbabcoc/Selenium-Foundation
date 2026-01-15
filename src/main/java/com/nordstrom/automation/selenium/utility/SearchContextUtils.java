@@ -225,11 +225,7 @@ public class SearchContextUtils {
      * @throws ShadowRootContextException if context isn't a valid shadow host
      */
     public static void validateShadowHost(final SearchContext context) {
-        try {
-            JsUtility.run(WebDriverUtils.getDriver(context), CHECK_SHADOW_HOST, context);
-        } catch (WebDriverException e) {
-            throw new ShadowRootContextException();
-        }
+        JsUtility.run(WebDriverUtils.getDriver(context), CHECK_SHADOW_HOST, context);
     }
     
 }

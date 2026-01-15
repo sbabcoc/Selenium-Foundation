@@ -3,7 +3,7 @@ package com.nordstrom.automation.selenium.exceptions;
 /**
  * Thrown if a Grid component process failed to start.
  */
-public class GridServerLaunchFailedException extends RuntimeException {
+public class GridServerLaunchFailedException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = 5186366410431999078L;
     private static final String TEMPLATE = "Failed to start grid %s process";
