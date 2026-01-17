@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
@@ -234,7 +235,7 @@ public final class DriverManager {
             WebDriver driver = optDriver.get();
             
             try {
-                JsUtility.run(driver, "window.stop();");
+                ((JavascriptExecutor) driver).executeScript("window.stop();");
             } catch (WebDriverException | UnsupportedOperationException eaten) {
                 // Let's make sure our graceful shutdown process doesn't cause failures.
             }

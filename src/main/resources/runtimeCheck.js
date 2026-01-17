@@ -1,0 +1,1 @@
+typeof __wdRuntime === "object" && typeof __wdRuntime.runSync === "function" && typeof __wdRuntime.runAsync === "function"

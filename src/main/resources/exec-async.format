@@ -1,0 +1,14 @@
+return (function () {
+    var args = arguments;
+    var callback = args[args.length - 1];
+
+    return __wdRuntime.runAsync(
+        function () {
+            return (function () {
+                {{USER_SCRIPT}}
+            }).apply(null, args);
+        },
+        callback,
+        {{TIMEOUT}}
+    );
+}).apply(null, arguments);

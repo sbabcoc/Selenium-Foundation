@@ -1,0 +1,8 @@
+return (function () {
+    var args = arguments;
+    return __wdRuntime.runSync(function () {
+        return (function () {
+            {{USER_SCRIPT}}
+        }).apply(null, args);
+    });
+}).apply(null, arguments);
