@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 /**
  * This exception indicates that the configured Selenium Grid server host name couldn't be resolved to an IP address.
  */
-public class UnknownGridHostException extends RuntimeException {
+public class UnknownGridHostException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = -3037697283479571401L;
     private static final String TEMPLATE = "Specified Selenium Grid %s host '%s' was not found";

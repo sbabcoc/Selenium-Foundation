@@ -3,7 +3,7 @@ package com.nordstrom.automation.selenium.exceptions;
 /**
  * This exception is thrown if no initial page was specified.
  */
-public class InitialPageNotSpecifiedException extends RuntimeException {
+public class InitialPageNotSpecifiedException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = -6182879162513331011L;
 

@@ -5,29 +5,17 @@ import static com.nordstrom.automation.selenium.servlet.ExamplePageServlet.readA
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.DocumentNotReadyTimeoutException;
 import com.nordstrom.automation.selenium.model.ShadowDomBridge;
 import com.nordstrom.automation.selenium.support.Coordinator;
-import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
 /**
@@ -71,17 +59,13 @@ import com.nordstrom.common.base.UncheckedThrow;
 public final class JsUtility {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JsUtility.class);
-    private static final String JAVA_GLUE_LIB = "javaGlueLib.js";
-    private static final String ERROR_MESSAGE_KEY = "errorMessage";
-    private static final String CLASS_NAME_KEY = "className";
-    private static final String MESSAGE_KEY = "message";
     
     private static final String DOCUMENT_READY = getScriptResource("documentReady.js");
-    private static final String CREATE_SCRIPT_NODE = getScriptResource("createScriptNode.js");
-    
-    private static final List<String> JS_EXCEPTIONS = Arrays.asList(
-                    "org.openqa.selenium.WebDriverException",
-                    "org.openqa.selenium.JavascriptException");
+    private static final String ENSURE_INSTALLED = getScriptResource("ensureInstalled.js");
+    private static final String EXEC_RUNTIME = getScriptResource("scriptExecRuntime.js");
+    private static final String RUNTIME_CHECK = getScriptResource("runtimeCheck.js");
+    private static final String SYNC_TEMPLATE = getScriptResource("exec-sync.format");
+    private static final String ASYNC_TEMPLATE = getScriptResource("exec-async.format");
     
     /**
      * Private constructor to prevent instantiation.
@@ -109,7 +93,7 @@ public final class JsUtility {
      * @see JavascriptExecutor#executeScript(String, Object...)
      */
     public static void run(final WebDriver driver, final String js, final Object... args) {
-        Object result = runScript(false, driver, js, args);
+        Object result = runScript(false, driver, js, 0, args);
         if (result != null) {
             LOGGER.warn("The specified synchronous JavaScript returned a non-null result");
         }
@@ -152,7 +136,7 @@ public final class JsUtility {
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
     public static <T> T runAndReturn(final WebDriver driver, final String js, final Object... args) {
-        Object result = runScript(false, driver, js, args);
+        Object result = runScript(false, driver, js, 0, args);
         if (result == null) {
             LOGGER.warn("The specified synchronous JavaScript returned a null result");
         }
@@ -213,12 +197,13 @@ public final class JsUtility {
      *
      * @param driver A handle to the currently running Selenium test window.
      * @param js The JavaScript to execute.
+     * @param timeout asynchronous script timeout in milliseconds
      * @param args The arguments to the script. May be empty.
      * @see WebDriver.Timeouts scriptTimeout()
      * @see JavascriptExecutor#executeAsyncScript(String, Object...)
      */
-    public static void runAsync(final WebDriver driver, final String js, final Object... args) {
-        Object result = runScript(true, driver, js, args);
+    public static void runAsync(final WebDriver driver, final String js, long timeout, final Object... args) {
+        Object result = runScript(true, driver, js, timeout, args);
         if (result != null) {
             LOGGER.warn("The specified asynchronous JavaScript returned a non-null result");
         }
@@ -274,14 +259,16 @@ public final class JsUtility {
      * @param <T> return type
      * @param driver A handle to the currently running Selenium test window.
      * @param js The JavaScript to execute.
+     * @param timeout asynchronous script timeout in milliseconds
      * @param args The arguments to the script. May be empty.
      * @return One of Boolean, Long, String, List, Map, WebElement, or null.
      * @see WebDriver.Timeouts scriptTimeout()
      * @see JavascriptExecutor#executeAsyncScript(String, Object...)
      */
     @SuppressWarnings("unchecked") // required because Selenium is not type safe.
-    public static <T> T runAsyncAndReturn(final WebDriver driver, final String js, final Object... args) {
-        Object result = runScript(true, driver, js, args);
+    public static <T> T runAsyncAndReturn(final WebDriver driver, final String js, long timeout,
+            final Object... args) {
+        Object result = runScript(true, driver, js, timeout, args);
         if (result == null) {
             LOGGER.warn("The specified asynchronous JavaScript returned a null result");
         }
@@ -312,39 +299,40 @@ public final class JsUtility {
      * @param doAsync {@code true} to execute asynchronously; {@code false} to execute synchronously
      * @param driver A handle to the currently running Selenium test window.
      * @param js The JavaScript to execute.
+     * @param timeout asynchronous script timeout in milliseconds
      * @param args The arguments to the script. May be empty.
      * @return One of Boolean, Long, String, List, Map, WebElement, or null.
      */
-    private static Object runScript(final boolean doAsync,
-            final WebDriver driver, final String js, final Object... args) {
-        
+    private static Object runScript(final boolean doAsync, final WebDriver driver, final String js, long timeout,
+            final Object... args) {
+
         Object result = null;
-        WebDriverException exception = null;
-        
-        String script = ShadowDomBridge.injectShadowArgs(driver, js, args);
-        try {
-            if (doAsync) {
-                result = ((JavascriptExecutor) driver).executeAsyncScript(script, args);
-            } else {
-                result = ((JavascriptExecutor) driver).executeScript(script, args);
-            }
-        } catch (WebDriverException e) {
-            exception = e;
-            result = e.getMessage();
+
+        injectRuntime(driver);
+        String userScript = ShadowDomBridge.injectShadowArgs(driver, js, args);
+
+        if (doAsync) {
+            String script = ASYNC_TEMPLATE
+                    .replace("{{USER_SCRIPT}}", userScript)
+                    .replace("{{TIMEOUT}}", String.valueOf(timeout));
+
+            result = ((JavascriptExecutor) driver).executeAsyncScript(script, args);
+        } else {
+            String script = SYNC_TEMPLATE
+                    .replace("{{USER_SCRIPT}}", userScript);
+
+            result = ((JavascriptExecutor) driver).executeScript(script, args);
         }
-        
-        if (result != null) {
-            Throwable thrown = null;
-            if (result instanceof Map) {
-                thrown = extractException(exception, (Map<?, ?>) result);
-            } else if (result instanceof String) {
-                thrown = extractException(exception, (String) result);
-            }
-            if (thrown != null) {
-                UncheckedThrow.throwUnchecked(thrown);
-            }
+
+        ScriptResult scriptResult = ScriptResult.from(result);
+
+        if (scriptResult.isError()) {
+            Throwable scriptException = SeleniumConfig.getConfig().getExceptionFactory()
+                    .create(scriptResult.getExceptionClassName(), scriptResult.getMessage(), scriptResult.getStack());
+            throw UncheckedThrow.throwUnchecked(scriptException);
         }
-        return result;
+
+        return scriptResult.getValue();
     }
     
     /**
@@ -382,13 +370,16 @@ public final class JsUtility {
     }
     
     /**
-     * Inject the Java glue code library into the current window.
-     * 
+     * Inject the script execution runtime into the current window if not already present.
+     *
      * @param driver A handle to the currently running Selenium test window.
      */
-    public static void injectGlueLib(final WebDriver driver) {
-        if ((boolean) runAndReturn(driver, "return (typeof isObject != 'function');")) {
-            run(driver, CREATE_SCRIPT_NODE, getScriptResource(JAVA_GLUE_LIB));
+    public static void injectRuntime(WebDriver driver) {
+        Boolean installed = (Boolean) ((JavascriptExecutor) driver).executeScript(
+                ENSURE_INSTALLED, EXEC_RUNTIME, RUNTIME_CHECK);
+        
+        if (!Boolean.TRUE.equals(installed)) {
+            throw new IllegalStateException("Failed to install JavaScript execution runtime");
         }
     }
     
@@ -407,133 +398,5 @@ public final class JsUtility {
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to load JavaScript resource '" + resource + "'", e);
         }
-    }
-    
-    /**
-     * Propagate the specified web driver exception, extracting encoded JavaScript exception if present.
-     * 
-     * @param driver A handle to the currently running Selenium test window.
-     * @param exception web driver exception to propagate (may be {@code null})
-     * @return nothing (this method always throws the specified exception)
-     * @since 17.4.0 
-     */
-    public static RuntimeException propagate(final WebDriver driver, final WebDriverException exception) {
-        Throwable thrown = exception;
-        // if exception is a WebDriverException (not a sub-class)
-        if (JS_EXCEPTIONS.contains(exception.getClass().getName())) {
-            // extract serialized exception object from message
-            thrown = extractException(exception, exception.getMessage());
-            
-            // if driver spec'd and no serialized exception found
-            if ((driver != null) && (thrown.equals(exception))) {
-                // get browser log entries
-                LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-
-                // for each log entry
-                for (LogEntry logEntry : logEntries) {
-                    if (Level.WARNING.equals(logEntry.getLevel())) {
-                        // extract serialized exception object from message
-                        thrown = extractException(exception, logEntry.getMessage());
-                        // done if serialized exception found
-                        if (!thrown.equals(exception)) break;
-                    }
-                }
-            }
-        }
-        // throw resolved exception as unchecked
-        throw UncheckedThrow.throwUnchecked(thrown);
-    }
-
-    /**
-     * If present, extract JSON-formatted serialized exception object from the specified message.
-     * <p>
-     * <b>NOTE</b>: If the message contains a serialized exception object, the exception is de-serialized with its cause
-     * set to the specified {@code WebDriverException}. If no serialized exception is found, the specified exception is
-     * returned instead.
-     * 
-     * @param exception web driver exception (may be {@code null})
-     * @param message message to scan for serialized exception object
-     * @return de-serialized exception; specified exception is none is found
-     */
-    private static Throwable extractException(final WebDriverException exception, String message) {
-        // only retain the first line
-        message = message.split("\n")[0].trim();
-        // extract JSON string from message
-        message = extractJsonString(message);
-        // deserialize encoded exception object if present
-        return deserializeException(exception, message);
-    }
-    
-    /**
-     * Remove the error prefix from the specified exception message
-     * 
-     * @param message exception message
-     * @return exception message with error prefix removed
-     */
-    private static String extractJsonString(final String message) {
-        int beginIndex = message.indexOf('{');
-        int endIndex = message.lastIndexOf('}');
-        if ((beginIndex != -1) && (endIndex != -1)) {
-            return message.substring(beginIndex, endIndex + 1);
-        }
-        return message;
-    }
-    
-    /**
-     * De-serialize the specified JSON-encoded exception
-     * 
-     * @param exception web driver exception to propagate (may be {@code null})
-     * @param jsonStr JSON string
-     * @return if present, exception decoded from JSON; otherwise, original WebDriverException object
-     */
-    private static Throwable deserializeException(final WebDriverException exception, final String jsonStr) {
-        Throwable thrown = exception;
-        // if message appears to be an encoded exception object
-        if (jsonStr.contains("\"" + CLASS_NAME_KEY + "\"") && jsonStr.contains("\"" + MESSAGE_KEY + "\"")) {
-            Map<String, ?> obj = DataUtils.fromString(jsonStr, HashMap.class);
-            
-            // if successful
-            if (obj != null) {
-                thrown = extractException(exception, obj);
-            } else {
-                LOGGER.warn("Unable to deserialize encoded exception object: {}", jsonStr);
-            }
-        }
-        return thrown;
-    }
-
-    /**
-     * If present, extract serialized exception object from the specified map.
-     * <p>
-     * <b>NOTE</b>: If the map contains a serialized exception object, the exception is de-serialized with its cause
-     * set to the specified {@code WebDriverException}. If no serialized exception is found, the specified exception is
-     * returned instead.
-     * 
-     * @param exception web driver exception (may be {@code null})
-     * @param obj map to scan for serialized exception object
-     * @return de-serialized exception; specified exception is none is found
-     */
-    private static Throwable extractException(final WebDriverException exception, Map<?, ?> obj) {
-        Throwable thrown = null;
-        if (obj.containsKey(ERROR_MESSAGE_KEY)) {
-            obj = (Map<?, ?>) obj.get(ERROR_MESSAGE_KEY);
-        }
-        
-        String className = (String) obj.get(CLASS_NAME_KEY);
-        String message = (String) obj.get(MESSAGE_KEY);
-        
-        if (className != null && message != null) {
-            try {
-                Class<?> clazz = Class.forName(className);
-                Constructor<?> ctor = clazz.getConstructor(String.class, Throwable.class);
-                thrown = (Throwable) ctor.newInstance(message, exception);
-                thrown.setStackTrace(new Throwable().getStackTrace());
-            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-                    | InstantiationException | IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException eaten) {
-                LOGGER.warn("Unable to instantiate exception: {}", className, eaten);
-            }
-        }
-        return thrown;
     }
 }

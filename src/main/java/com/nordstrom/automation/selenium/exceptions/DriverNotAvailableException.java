@@ -5,7 +5,7 @@ import com.nordstrom.automation.selenium.core.TestBase;
 /**
  * This exception is thrown by {@link TestBase#getDriver} when no driver is available.
  */
-public class DriverNotAvailableException extends RuntimeException {
+public class DriverNotAvailableException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = 657965846077748022L;
 

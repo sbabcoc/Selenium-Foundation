@@ -7,7 +7,7 @@ import org.apache.http.HttpHost;
 /**
  * This exception is thrown to indicate that the Selenium Grid host specification is malformed.
  */
-public class InvalidGridHostException extends RuntimeException {
+public class InvalidGridHostException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = -3037697283479571401L;
     private static final String TEMPLATE = "Specified Selenium Grid %s host URI '%s' is malformed";

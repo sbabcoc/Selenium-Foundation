@@ -6,7 +6,7 @@ import com.nordstrom.automation.selenium.utility.BinaryFinder;
  * This exception is associated with the {@link BinaryFinder#findDriver(String)} method and indicates that a
  * driver matching the specified capabilities could not be acquired.
  */
-public class DriverExecutableNotFoundException extends RuntimeException {
+public class DriverExecutableNotFoundException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = -5718589545720652315L;
     

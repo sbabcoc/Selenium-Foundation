@@ -1,13 +1,11 @@
 package com.nordstrom.automation.selenium.exceptions;
 
-import org.openqa.selenium.WebDriverException;
-
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 
 /**
  * This exception is thrown when page load verification detects that the actual landing page differs from expectations.
  */
-public class LandingPageMismatchException extends WebDriverException {
+public class LandingPageMismatchException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = -2375529252543798864L;
     

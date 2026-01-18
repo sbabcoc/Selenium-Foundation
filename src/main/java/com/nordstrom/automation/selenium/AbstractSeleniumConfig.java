@@ -32,6 +32,7 @@ import org.openqa.selenium.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nordstrom.automation.selenium.core.ExceptionFactory;
 import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
@@ -67,7 +68,7 @@ public abstract class AbstractSeleniumConfig extends
     
     private static final String APPIUM_HOST = "\"appium:host\":\"0.0.0.0\",";
     private static final String PERSONALITY = "\"nord:options\":{\"personality\":\"%s\"}";
-        
+    
     /**
      * This enumeration declares the settings that enable you to control the parameters used by
      * <b>Selenium Foundation</b>.
@@ -289,6 +290,15 @@ public abstract class AbstractSeleniumConfig extends
          * default: <b>30</b>
          */
         HOST_TIMEOUT("selenium.timeout.host", "30"),
+        
+        /**
+         * This setting specifies a comma-delimited list of Java exceptions, packages, and subtrees
+         * that are allowed from script errors.
+         * <p>
+         * name: <b>selenium.allowed.exceptions</b><br>
+         * default: {@code null}
+         */
+        ALLOWED_EXCEPTIONS("selenium.allowed.exceptions", null),
         
         /**
          * This setting specifies the working directory for local <b>Selenium Grid</b> server processes.
@@ -533,6 +543,7 @@ public abstract class AbstractSeleniumConfig extends
     private Path hubConfigPath;
     private URL hubUrl;
     private SeleniumGrid seleniumGrid;
+    private ExceptionFactory exceptionFactory;
     
     /**
      * Instantiate a configuration object for the specified enumeration class.
@@ -581,6 +592,22 @@ public abstract class AbstractSeleniumConfig extends
             return seleniumConfig;
         }
         throw new IllegalStateException("SELENIUM_CONFIG must be populated by subclass static initializer");
+    }
+    
+    /**
+     * Get the exception factory to propagate exceptions from JavaScript into Java.
+     * <p>
+     * <b>NOTE</b>: By default, <b>AssertionError</b>, <b>RuntimeException</b> types, <b>Selenium</b>
+     * exceptions, and <b>Selenium Foundation</b> exceptions are allowed.
+     * 
+     * @return configured {@link ExceptionFactory} object
+     * @see SeleniumSettings#ALLOWED_EXCEPTIONS
+     */
+    public ExceptionFactory getExceptionFactory() {
+        if (exceptionFactory == null) {
+            exceptionFactory = new ExceptionFactory(getAllowedExceptions());
+        }
+        return exceptionFactory;
     }
     
     /**
@@ -990,6 +1017,24 @@ public abstract class AbstractSeleniumConfig extends
      * @throws IOException on failure to create configuration file
      */
     public abstract Path createNodeConfig(String capabilities, URL hubUrl) throws IOException;
+    
+    /**
+     * Get the collection of exceptions that are allowed to be returned by executed JavaScript snippets.
+     * 
+     * @return collection of specified allowed exceptions (may be empty)
+     */
+    private Set<String> getAllowedExceptions() {
+        Set<String> exceptions = new HashSet<>();
+        // get specified allowed exceptions classes
+        String allowedExceptions = getString(SeleniumSettings.ALLOWED_EXCEPTIONS.key());
+        // if allowed exceptions are specified
+        if (!(allowedExceptions == null || allowedExceptions.isEmpty())) {
+            // collect allowed exception names, minus leading/trailing white space
+            exceptions.addAll(Arrays.asList(allowedExceptions.trim().split("\\s*,\\s*")));
+        }
+        
+        return exceptions;
+    }
     
     /**
      * Get the collection of servlets to install on Selenium Grid hub.

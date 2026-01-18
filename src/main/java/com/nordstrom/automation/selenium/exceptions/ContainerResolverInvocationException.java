@@ -6,7 +6,7 @@ import com.nordstrom.automation.selenium.interfaces.ContainerResolver;
  * This exception is thrown if specified container resolver cannot be instantiated or if
  * invocation of the {@link ContainerResolver#resolve resolve} method fails.
  */
-public class ContainerResolverInvocationException extends RuntimeException {
+public class ContainerResolverInvocationException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = -422498744356462151L;
 

@@ -10,7 +10,7 @@ import com.nordstrom.automation.selenium.platform.PlatformTargetable;
  * method to indicate that platform activation failed.
  * 
  */
-public class PlatformActivationFailedException extends RuntimeException {
+public class PlatformActivationFailedException extends SeleniumFoundationException {
 
     private static final long serialVersionUID = 7336291801605667538L;
     private static final String TEMPLATE = "Failed to activate target platform '%s'";
