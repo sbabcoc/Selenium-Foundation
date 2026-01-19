@@ -3,14 +3,12 @@ package com.nordstrom.automation.selenium.core;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
-import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.model.Page;
 
 /**
@@ -106,37 +104,26 @@ public abstract class TestBase {
     }
     
     /**
-     * Skip this test if running Safari on Selenium 3.
+     * Skip this test if target browser lacks Shadow DOM support.
      */
-    public void skipIfSafariInSelenium3() {
-        // if running Safari in Selenium 3
-        if ((SeleniumConfig.getConfig().getVersion() == 3)
-                && "safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
-            skipTest("This scenario is unsupported on Safari in Selenium 3");
-        }
-    }
-    
-    /**
-     * Skip this test if running HtmlUnit.
-     * <p>
-     * <b>NOTE</b>: If not running HtmlUnit, the specified exception is thrown.
-     * 
-     * @param e shadow root context exception
-     */
-    public void skipIfHtmlUnit(final ShadowRootContextException e) {
+    public void skipIfNoShadowDom() {
         // if running HtmlUnit
         if ("htmlunit".equals(WebDriverUtils.getBrowserName(getDriver()))) {
-            skipTest(e.getMessage());
+            skipTest("This scenario is unsupported on HtmlUnit");
         }
-        throw e;
+        // if running Safari in Selenium 3
+        if ((SeleniumConfig.getConfig().getVersion() == 3)
+                && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
+            skipTest("This scenario is unsupported on Safari in Selenium 3");
+        }
     }
     
     /**
      * Skip this test if running iOS Safari.
      */
     public void skipIfSafariOnIOS() {
-        // if running Safari on iOS
-        if (Platform.IOS.equals(WebDriverUtils.getPlatform(getDriver()))
+        // if running Safari on iOS via XCUITest
+        if ("XCUITest".equals(WebDriverUtils.getAutomationEngine(getDriver()))
                 && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
             skipTest("This scenario is unsupported on iOS Safari");
         }

@@ -24,6 +24,7 @@ import com.nordstrom.automation.selenium.examples.TabPage;
 import com.nordstrom.automation.selenium.examples.TableComponent;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
+import com.nordstrom.automation.selenium.model.ContainerMethodInterceptor;
 import com.nordstrom.automation.selenium.model.Enhanced;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
 
@@ -263,6 +264,8 @@ public class ModelTestCore {
         
         // refresh page to force DOM rebuild
         page.getWrappedDriver().navigate().refresh();
+        // wait for page load to complete
+        ContainerMethodInterceptor.waitForLoadCompletion(page);
         // verify table contents
         // NOTE: This necessitates refreshing stale element references
         verifyTable(component);
@@ -338,6 +341,7 @@ public class ModelTestCore {
         
         int count = page.getRefreshCount();
         page.getWrappedDriver().navigate().refresh();
+        ContainerMethodInterceptor.waitForLoadCompletion(page);
         assertTrue("Failed appending optional node", form.toggleOptionalNode());
         assertEquals("Optional node context mismatch", "I'm optional", optional.getText());
         assertEquals("Page refresh count not incremented", count + 2, page.getRefreshCount());

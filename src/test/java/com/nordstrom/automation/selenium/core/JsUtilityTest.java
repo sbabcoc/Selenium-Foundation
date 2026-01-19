@@ -20,7 +20,6 @@ import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
 import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
-import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 
 @InitialPage(ExamplePage.class)
@@ -88,31 +87,25 @@ public class JsUtilityTest extends TestNgTargetRoot {
     
     @Test
     public void testShadowRun() {
-        try {
-            ExamplePage page = getPage();
-            ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
-            String script = "arguments[0].querySelector(arguments[1]).value = arguments[2];";
-            JsUtility.run(
-                    page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator(), "test");
-            assertEquals(shadowRoot.getInputValue(), "test");
-        } catch (ShadowRootContextException e) {
-            skipIfHtmlUnit(e);
-        }
+        skipIfNoShadowDom();
+        ExamplePage page = getPage();
+        ShadowRootComponent shadowRoot = page.getShadowRootByLocator();
+        String script = "arguments[0].querySelector(arguments[1]).value = arguments[2];";
+        JsUtility.run(
+                page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator(), "test");
+        assertEquals(shadowRoot.getInputValue(), "test");
     }
     
     @Test
     public void testShadowRunAndReturn() {
-        try {
-            ExamplePage page = getPage();
-            ShadowRootComponent shadowRoot = page.getShadowRootByElement();
-            shadowRoot.setInputValue("test");
-            String script = "return arguments[0].querySelector(arguments[1]).value;";
-            String value = JsUtility.runAndReturn(
-                    page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator());
-            assertEquals(value, "test");
-        } catch (ShadowRootContextException e) {
-            skipIfHtmlUnit(e);
-        }
+        skipIfNoShadowDom();
+        ExamplePage page = getPage();
+        ShadowRootComponent shadowRoot = page.getShadowRootByElement();
+        shadowRoot.setInputValue("test");
+        String script = "return arguments[0].querySelector(arguments[1]).value;";
+        String value = JsUtility.runAndReturn(
+                page.getWrappedDriver(), script, shadowRoot.getWrappedContext(), shadowRoot.getInputLocator());
+        assertEquals(value, "test");
     }
     
     private String getMetaTagNamed(WebDriver driver, String name) {
