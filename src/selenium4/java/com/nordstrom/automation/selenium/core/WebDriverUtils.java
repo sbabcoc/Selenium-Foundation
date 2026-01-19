@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,6 +120,19 @@ public final class WebDriverUtils {
         return (caps != null) ? caps.getPlatformName() : null;
     }
 
+    /**
+     * Get the automation engine associated with the specified driver.
+     * 
+     * @param context search context
+     * @return Appium automation engine name (Espresso/UiAutomator2)
+     */
+    public static String getAutomationEngine(final SearchContext context) {
+        Capabilities caps = getCapabilities(context);
+        return Optional
+                .ofNullable((String) caps.getCapability("appium:automationName"))
+                .orElse((String) caps.getCapability("automationName"));
+    }
+    
     /**
      * Get the capabilities of the specified search context
      * 

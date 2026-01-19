@@ -2,10 +2,10 @@ package com.nordstrom.automation.selenium.plugins;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 
 import java.io.UnsupportedEncodingException;
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -82,7 +81,7 @@ public class AndroidActivityLauncher {
         List<String> intentArgs = getIntentArgs(params);
 
         // Detect active automation engine
-        String engine = getAutomationEngine((HasCapabilities) driver);
+        String engine = WebDriverUtils.getAutomationEngine(driver);
 
         if ("Espresso".equalsIgnoreCase(engine)) {
             startActivityViaScript((JavascriptExecutor) driver, authority, path, action, category, intentArgs);
@@ -139,18 +138,6 @@ public class AndroidActivityLauncher {
         if (values.size() != 1)
             throw new IllegalStateException("Expected exactly one value for key: " + key);
         return values.get(0);
-    }
-
-    /**
-     * Get the automation engine associated with the specified driver.
-     * 
-     * @param caps Android driver as <b>HasCapabilities</b> object
-     * @return Appium automation engine name (Espresso/UiAutomator2)
-     */
-    private static String getAutomationEngine(final HasCapabilities caps) {
-        return Optional
-                .ofNullable((String) caps.getCapabilities().getCapability("appium:automationName"))
-                .orElse((String) caps.getCapabilities().getCapability("automationName"));
     }
 
     /**

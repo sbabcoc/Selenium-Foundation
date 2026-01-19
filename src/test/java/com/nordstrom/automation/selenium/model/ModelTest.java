@@ -6,7 +6,6 @@ import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.TestNgTargetRoot;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
-import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 
 @InitialPage(ExamplePage.class)
 public class ModelTest extends TestNgTargetRoot {
@@ -108,42 +107,26 @@ public class ModelTest extends TestNgTargetRoot {
     
     @Test
     public void testShadowRootByLocator() {
-        skipIfSafariInSelenium3();
-        try {
-            ModelTestCore.testShadowRootByLocator(this).run();
-        } catch (ShadowRootContextException e) {
-            skipIfHtmlUnit(e);
-        }
+        skipIfNoShadowDom();
+        ModelTestCore.testShadowRootByLocator(this).run();
     }
 
     @Test
     public void testShadowRootByElement() {
-        skipIfSafariInSelenium3();
-        try {
-            ModelTestCore.testShadowRootByElement(this).run();
-        } catch (ShadowRootContextException e) {
-            skipIfHtmlUnit(e);
-        }
+        skipIfNoShadowDom();
+        ModelTestCore.testShadowRootByElement(this).run();
     }
     
     @Test
     public void testShadowRootList() {
-        skipIfSafariInSelenium3();
-        try {
-            ModelTestCore.testShadowRootList(this).run();
-        } catch (ShadowRootContextException e) {
-            skipIfHtmlUnit(e);
-        }
+        skipIfNoShadowDom();
+        ModelTestCore.testShadowRootList(this).run();
     }
 
     @Test
     public void testShadowRootMap() {
-        skipIfSafariInSelenium3();
-        try {
-            ModelTestCore.testShadowRootMap(this).run();
-        } catch (ShadowRootContextException e) {
-            skipIfHtmlUnit(e);
-        }
+        skipIfNoShadowDom();
+        ModelTestCore.testShadowRootMap(this).run();
     }
 
     /**
@@ -182,11 +165,8 @@ public class ModelTest extends TestNgTargetRoot {
     
     @Test
     public void testShadowParagraphs() {
-        try {
-            ModelTestCore.testShadowParagraphs(this).run();
-        } catch (ShadowRootContextException e) {
-            skipIfHtmlUnit(e);
-        }
+        skipIfNoShadowDom();
+        ModelTestCore.testShadowParagraphs(this).run();
     }
     
     @Test
