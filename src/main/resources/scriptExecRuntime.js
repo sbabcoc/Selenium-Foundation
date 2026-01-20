@@ -189,7 +189,7 @@
       var args = Array.prototype.slice.call(arguments, 1); // grab extra args
 
       try {
-          return { ok: true, value: fn.apply(null, args) }; // forward arguments
+          return { status: 'ok', value: fn.apply(null, args) }; // forward arguments
       } catch (e) {
           if (e && e.__wdUserFailure) return e.payload;
           return jsFailure(e);
