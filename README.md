@@ -5,6 +5,7 @@
 
 ### * BREAKING NEWS *
 
+* Release [_32.1.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v32.1.0) of **Selenium Foundation** introduces a complete re-design of the **JavaScript** execution runtime. This removes reliance on non-standard features that are incompatible with some browsers, especially in the exception propagation facility.
 * Release [_31.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v31.0.0) of **Selenium Foundation** resolves a few issues that were affecting functionality on **Safari for iOS**. Fixes in this release include revisions to frame-related driver targeting.
 * Release [_30.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v30.0.0) of **Selenium Foundation** provides critical fixes to the implementation of the **ShadowRoot** feature, as well as a number of other featues and fixes.
 * Release [_29.7.8_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v29.7.0) of **Selenium Foundation** completes implementation of framework support for the **Mac2** engine of **Appium**.
