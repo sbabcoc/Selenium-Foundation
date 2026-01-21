@@ -338,9 +338,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             "io.opentelemetry.api.logs.Logger", "org.openqa.selenium.net.Urls", "org.dataloader.DataLoader",
             "com.google.common.util.concurrent.internal.InternalFutures", "org.eclipse.jetty.server.Server",
             "org.reactivestreams.Publisher", "org.openqa.selenium.manager.SeleniumManager",
-            "org.apache.commons.exec.Executor", "io.netty.buffer.ByteBufUtil",
+            "org.apache.commons.lang3.Range", "io.netty.buffer.ByteBufUtil",
             "io.netty.handler.codec.compression.ZlibCodecFactory", "io.opentelemetry.common.ComponentLoader",
-            "com.github.benmanes.caffeine.cache.Weigher" };
+            "com.github.benmanes.caffeine.cache.Weigher", "org.openqa.selenium.os.ExternalProcess" };
     
     static {
         try {
