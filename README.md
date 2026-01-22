@@ -67,7 +67,7 @@
 * [Handling Web Site Variations](docs/HandlingWebSiteVariations.md#introduction)
 * [Working with Browser Modals](docs/WorkingWithBrowserModals.md)
 * [Transition Error Detection](docs/TransitionErrorDetection.md#introduction)
-* [JavaScript Enhancements](docs/JavaScriptEnhancements.md#the-basics-what-webdriver-provides)
+* [JavaScript Execution Runtime](docs/ScriptExecRuntime.md)
 
 ## Selenium API Support
 
