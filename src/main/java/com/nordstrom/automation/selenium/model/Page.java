@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
@@ -93,7 +94,11 @@ public class Page extends ComponentContainer {
         if (windowHandle != null) {
             driver.switchTo().window(windowHandle);
         }
-        driver.switchTo().defaultContent();
+        try {
+            driver.switchTo().defaultContent();
+        } catch(UnsupportedCommandException eaten) {
+            // unsupported on native platforms
+        }
         return this;
     }
     
@@ -225,7 +230,11 @@ public class Page extends ComponentContainer {
      */
     @Override
     public SearchContext refreshContext(final long expiration) {
-        driver.switchTo().defaultContent();
+        try {
+            driver.switchTo().defaultContent();
+        } catch(UnsupportedCommandException eaten) {
+            // unsupported on native platforms
+        }
         return this;
     }
     
