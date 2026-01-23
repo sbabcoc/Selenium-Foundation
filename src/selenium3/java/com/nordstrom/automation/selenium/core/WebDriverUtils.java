@@ -148,8 +148,8 @@ public final class WebDriverUtils {
      * @return the property's current value or {@code null} if the value is not set
      */
     public static String getDomPropertyOf(final WebElement element, final String name) {
-        return (String) ((JavascriptExecutor) getDriver(element))
-                .executeScript("arguments[0][arguments[1]];", element, name);
+            return (String) ((JavascriptExecutor) getDriver(element))
+                    .executeScript("return arguments[0][arguments[1]];", element, name);
     }
     
     /**
