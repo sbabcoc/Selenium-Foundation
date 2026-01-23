@@ -66,6 +66,7 @@ public class ServerProcessKiller {
             }
         } else {
             LOGGER.debug("Failed to identify process listening to: {}", serverUrl);
+            return true;
         }
         
         return false;

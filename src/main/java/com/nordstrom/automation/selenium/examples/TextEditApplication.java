@@ -7,10 +7,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.NoDocumentAppearedTimeoutException;
 import com.nordstrom.automation.selenium.model.Page;
@@ -72,7 +72,7 @@ public class TextEditApplication extends Page {
      */
     public TextEditManagementPanel openManagementPanel() {
     	if (managementPanel == null || managementPanel.isInvisible()) {
-			JsUtility.run(driver, "macos: keys", CMD_O);
+			((JavascriptExecutor) driver).executeScript("macos: keys", CMD_O);
     		managementPanel = new TextEditManagementPanel(Using.MANAGEMENT_PANEL.locator, this);
     	}
     	return managementPanel;
@@ -85,7 +85,7 @@ public class TextEditApplication extends Page {
      */
     public TextEditDocumentWindow openNewDocument() {
     	Set<String> initialNames = getOpenDocumentNames();
-		JsUtility.run(driver, "macos: keys", CMD_N);
+        ((JavascriptExecutor) driver).executeScript("macos: keys", CMD_N);
 		return (TextEditDocumentWindow) getWait().until(newDocumentIsOpened(initialNames));
     }
     
