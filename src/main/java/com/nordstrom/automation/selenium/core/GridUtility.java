@@ -27,15 +27,20 @@ import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeoutException;
+
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -93,9 +98,22 @@ public final class GridUtility {
      */
     public static HttpResponse getHttpResponse(final URL hostUrl, final String... pathAndParams) throws IOException {
         Objects.requireNonNull(hostUrl, "[hostUrl] must be non-null");
-        HttpClient client = HttpClientBuilder.create().build();
+
         URI uri = UriUtils.makeBasicURI(hostUrl.getProtocol(), hostUrl.getHost(), hostUrl.getPort(), pathAndParams);
-        return client.execute(extractHost(hostUrl), new HttpGet(uri.toURL().toExternalForm()));
+
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000)
+                .setConnectionRequestTimeout(2000).setSocketTimeout(5000).build();
+        CloseableHttpClient client = HttpClientBuilder.create().disableAutomaticRetries()
+                .setDefaultRequestConfig(requestConfig).build();
+
+        HttpGet request = new HttpGet(uri.toString());
+        HttpResponse response = client.execute(extractHost(hostUrl), request);
+        HttpEntity entity = response.getEntity();
+        if (entity != null && entity.isStreaming()) {
+            response.setEntity(new BufferedHttpEntity(entity));
+        }
+
+        return response;
     }
     
     /**
