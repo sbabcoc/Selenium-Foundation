@@ -6,8 +6,8 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
@@ -96,7 +96,7 @@ public class Page extends ComponentContainer {
         }
         try {
             driver.switchTo().defaultContent();
-        } catch(UnsupportedCommandException eaten) {
+        } catch(WebDriverException eaten) {
             // unsupported on native platforms
         }
         return this;
@@ -232,7 +232,7 @@ public class Page extends ComponentContainer {
     public SearchContext refreshContext(final long expiration) {
         try {
             driver.switchTo().defaultContent();
-        } catch(UnsupportedCommandException eaten) {
+        } catch(WebDriverException eaten) {
             // unsupported on native platforms
         }
         return this;
