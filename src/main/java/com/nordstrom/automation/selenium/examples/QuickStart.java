@@ -142,17 +142,15 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * provide additional configuration details via scenario-specific means.
  * <p>
  * Here are the official homes for several of the major drivers: <ul>
- *     <li>GhostDriver (PhantomJS) - <a href="http://phantomjs.org/download.html">
- *     http://phantomjs.org/download.html</a></li>
  *     <li>ChromeDriver - <a href="https://sites.google.com/a/chromium.org/chromedriver/downloads">
  *     https://sites.google.com/a/chromium.org/chromedriver/downloads</a></li>
  *     <li>IEDriver - <a href="https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver">
  *     https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver</a></li>
  * </ul>
- * <b>NOTE</b>: GhostDriver and ChromeDriver are simple binary installations, but several system configuration changes
- * must be applied for IEDriver to work properly. For details, visit the InternetExplorerDriver project Wiki on GitHub
- * and follow the <a href="https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration">
- * Required Configuration</a> procedure.
+ * <b>NOTE</b>: ChromeDriver is a simple binary installation, but several system configuration changes must be applied
+ * for IEDriver to work properly. For details, visit the InternetExplorerDriver project Wiki on GitHub and follow the
+ * <a href="https://www.selenium.dev/documentation/ie_driver_server#required-configuration">Required Configuration</a>
+ * procedure.
  */
 @InitialPage(ExamplePage.class)
 public class QuickStart extends TestNgRoot {

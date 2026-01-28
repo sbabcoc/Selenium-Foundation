@@ -88,22 +88,6 @@
 </dependency>
 ```
 
-## PhantomJS (`phantomjs`)
-
-**PhantomJS** is a headless browser packaged as a command line utility. No application binary exists for **PhantomJS**.
-
-| Application | Driver |
-|---|---|
-| N/A | [2.1.1](https://bitbucket.org/ariya/phantomjs/downloads/) |
-
-```xml
-<dependency>
-  <groupId>com.codeborne</groupId>
-  <artifactId>phantomjsdriver</artifactId>
-  <version>1.3.0</version>
-</dependency>
-```
-
 ## Safari (`safari`)
 
 | Application | Driver |
