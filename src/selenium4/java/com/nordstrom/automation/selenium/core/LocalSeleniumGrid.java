@@ -1,9 +1,13 @@
 package com.nordstrom.automation.selenium.core;
 
+import static org.openqa.selenium.json.Json.MAP_TYPE;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -14,12 +18,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import java.util.concurrent.TimeoutException;
+
+import org.openqa.selenium.grid.config.ConfigException;
+import org.openqa.selenium.json.Json;
 import org.openqa.selenium.net.PortProber;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
-import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
 import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
@@ -110,10 +116,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     static boolean isGridReady(SeleniumConfig config, GridServer hubServer, Collection<GridServer> nodeServers) {
         if (!GridServer.isHubActive(hubServer.getUrl())) return false;
         for (GridServer nodeServer : nodeServers) {
-            // if not an Appium Grid server
-            if (!(nodeServer instanceof AppiumGridServer)) {
-                if (!GridServer.isNodeRegistered(config, hubServer.getUrl(), nodeServer.getUrl())) return false;
+            if (nodeServer instanceof LocalGridServer) {
+                if (((LocalGridServer) nodeServer).getRelayServer() != null) continue;
             }
+            if (!GridServer.isNodeRegistered(config, hubServer.getUrl(), nodeServer.getUrl())) return false;
         }
         return true;
     }
@@ -173,17 +179,16 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             if (seleniumGrid == null || !seleniumGrid.personalities.containsKey(driverPlugin.getBrowserName())) {
                 // create node server for this driver plug-in
                 LocalGridServer nodeServer = driverPlugin.create(config, launcherClassName, dependencyContexts,
-                        hubServer.getUrl(), workingPath);
+                        hubServer.getUrl(), -1, workingPath);
                 // add server to nodes list
                 nodeServers.add(nodeServer);
-                // if this is an Appium Grid server
-                if (nodeServer instanceof AppiumGridServer) {
-                    // get path to relay configuration path from Appium process environment
-                    Path nodeConfigPath = ((AppiumGridServer) nodeServer).getNodeConfigPath();
-                    // add relay node for Appium Grid server to nodes list
-                    nodeServers.add(create(config, launcherClassName, dependencyContexts, false, -1, nodeConfigPath,
-                            workingPath, GridUtility.getOutputPath(config, null)));
-                    LOGGER.debug("Adding local Grid relay for Appium server providing personalities: {}",
+                //
+                LocalGridServer relayServer = nodeServer.getRelayServer();
+                // 
+                if (relayServer != null) {
+                    // add relay server to nodes list
+                    nodeServers.add(relayServer);
+                    LOGGER.debug("Adding local relay-proxied node providing personalities: {}",
                             nodeServer.getPersonalities().keySet());
                 } else {
                     LOGGER.debug("Adding local Grid node providing personalities: {}",
@@ -228,7 +233,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
      * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
-     * @param port port that Grid server should use; -1 to specify auto-configuration
+     * @param portNum port that Grid server should use; -1 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
@@ -241,7 +246,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      *      Getting Command-Line Help</a>
      */
     public static LocalGridServer create(final SeleniumConfig config, final String launcherClassName,
-            final String[] dependencyContexts, final boolean isHub, final Integer port, final Path configPath,
+            final String[] dependencyContexts, final boolean isHub, final Integer portNum, final Path configPath,
             final Path workingPath, final Path outputPath, final String... propertyNames) {
         
         List<String> argsList = new ArrayList<>();
@@ -261,16 +266,11 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         argsList.add(OPT_HOST);
         argsList.add(hostUrl);
         
-        Integer portNum = port;
-        // if port auto-select spec'd
-        if (portNum == -1) {
-            // acquire available port
-            portNum = PortProber.findFreePort();
-        }
+        Integer targetPort = (portNum == null || portNum.equals(-1)) ? PortProber.findFreePort() : portNum;
         
         // specify server port
         argsList.add(OPT_PORT);
-        argsList.add(portNum.toString());
+        argsList.add(targetPort.toString());
         
         // specify server configuration file
         argsList.add(OPT_CONFIG);
@@ -310,7 +310,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         argsList.add(0, System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         ProcessBuilder builder = new ProcessBuilder(argsList);
         builder.environment().put("PATH", PathUtils.getSystemPath());
-        return new LocalGridServer(hostUrl, portNum, isHub, builder, workingPath, outputPath);
+        return new LocalGridServer(hostUrl, targetPort, isHub, builder, workingPath, outputPath);
     }
 
     /**
@@ -323,6 +323,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         private boolean hasStarted = false;
         private boolean isActive = false;
         private final Map<String, String> personalities = new HashMap<>();
+        private LocalGridServer relayServer = null;
         
         /**
          * Constructor for local Grid server object.
@@ -367,6 +368,23 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         }
         
         /**
+         * 
+         * @param relayServer
+         */
+        public LocalGridServer setRelayServer(final LocalGridServer relayServer) {
+            this.relayServer = relayServer;
+            return this;
+        }
+        
+        /**
+         * 
+         * @return
+         */
+        public LocalGridServer getRelayServer() {
+            return relayServer;
+        }
+        
+        /**
          * Start the process associated with this local Grid server object.
          * <p>
          * This method ensures that this local Grid server (hub or node) is launched and active, and it also ensures
@@ -408,6 +426,24 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             }
             
             return false;
+        }
+        
+        /**
+         * 
+         * @param relayConfigPath
+         * @return
+         */
+        @SuppressWarnings("unchecked")
+        public static URL getRelayTarget(final Path relayConfigPath) {
+            try (Reader reader = Files.newBufferedReader(relayConfigPath)) {
+                Map<String, Object> nodeConfig = new Json().toType(reader, MAP_TYPE);
+                Map<String, Object> relayOptions = (Map<String, Object>) nodeConfig.get("relay");
+                String address = (String) relayOptions.get("host");
+                Integer portNum = ((Long) relayOptions.get("port")).intValue();
+                return getServerUrl(address, portNum);
+            } catch (IOException e) {
+                throw new ConfigException("Failed reading relay configuration.", e);
+            }
         }
         
         /**

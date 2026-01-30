@@ -173,7 +173,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             // if creating new local Grid or active Grid doesn't include current driver plug-in
             if (seleniumGrid == null || !seleniumGrid.personalities.containsKey(driverPlugin.getBrowserName())) {
                 // add server for this driver plug-in to nodes list
-                nodeServers.add(driverPlugin.create(config, launcherClassName, dependencyContexts, hubServer.getUrl(), workingPath));
+                nodeServers.add(driverPlugin.create(config, launcherClassName, dependencyContexts, hubServer.getUrl(), -1, workingPath));
             }
         }
         
@@ -213,7 +213,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
      * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
-     * @param port port that Grid server should use; -1 to specify auto-configuration
+     * @param portNum port that Grid server should use; -1 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
@@ -226,7 +226,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      *      Getting Command-Line Help</a>
      */
     public static LocalGridServer create(final SeleniumConfig config, final String launcherClassName,
-            final String[] dependencyContexts, final boolean isHub, final Integer port, final Path configPath,
+            final String[] dependencyContexts, final boolean isHub, final Integer portNum, final Path configPath,
             final Path workingPath, final Path outputPath, final String... propertyNames) {
         
         List<String> argsList = new ArrayList<>();
@@ -247,16 +247,11 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         argsList.add(OPT_HOST);
         argsList.add(hostUrl);
         
-        Integer portNum = port;
-        // if port auto-select spec'd
-        if (portNum == -1) {
-            // acquire available port
-            portNum = PortProber.findFreePort();
-        }
+        Integer targetPort = (portNum == null || portNum.equals(-1)) ? PortProber.findFreePort() : portNum;
         
         // specify server port
         argsList.add(OPT_PORT);
-        argsList.add(portNum.toString());
+        argsList.add(targetPort.toString());
         
         // specify server configuration file
         argsList.add("-" + gridRole + "Config");
@@ -296,7 +291,7 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         String executable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
         CommandLine process = new CommandLine(executable, argsList.toArray(new String[0]));
         process.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
-        return new LocalGridServer(hostUrl, portNum, isHub, process, workingPath, outputPath);
+        return new LocalGridServer(hostUrl, targetPort, isHub, process, workingPath, outputPath);
     }
 
     /**

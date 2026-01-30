@@ -121,10 +121,8 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      */
     @Override
     public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            URL hubUrl, Path workingPath, Path outputPath) throws IOException {
+            URL hubUrl, Integer portNum, Path workingPath, Path outputPath) throws IOException {
         
-        String address;
-        Integer portNum;
         List<String> argsList = new ArrayList<>();
         
         // create node configuration for this plug-in
@@ -184,9 +182,8 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             }
         }
         
-        // get 'localhost' and free port
-        address = HostUtils.getLocalHost();
-        portNum = PortProber.findFreePort();
+        String targetAddr = HostUtils.getLocalHost();
+        Integer targetPort = (portNum == null || portNum.equals(-1)) ? PortProber.findFreePort() : portNum;
         
         // add 'base-path' argument
         argsList.add("--base-path");
@@ -197,11 +194,11 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         argsList.add(nodeConfigPath.toString());
         
         // specify server port
-        argsList.add(0, portNum.toString());
+        argsList.add(0, targetPort.toString());
         argsList.add(0, "--port");
         
         // specify server host
-        argsList.add(0, address);
+        argsList.add(0, targetAddr);
         argsList.add(0, "--address");
         
         // UiAutomator2: enable ChromeDriver auto-download
@@ -256,7 +253,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         }
         
         cmdLine.setEnvironmentVariable("PATH", PathUtils.getSystemPath());
-        return new AppiumGridServer(address, portNum, false, cmdLine, workingPath, outputPath);
+        return new AppiumGridServer(targetAddr, targetPort, false, cmdLine, workingPath, outputPath);
     }
 
     /**

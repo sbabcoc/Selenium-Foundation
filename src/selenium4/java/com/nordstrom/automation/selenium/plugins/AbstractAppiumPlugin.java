@@ -1,16 +1,12 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import static org.openqa.selenium.json.Json.MAP_TYPE;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,8 +22,6 @@ import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.grid.config.ConfigException;
-import org.openqa.selenium.json.Json;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +30,7 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
@@ -131,17 +126,21 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            URL hubUrl, Path workingPath, Path outputPath) throws IOException {
+            URL hubUrl, Integer portNum, Path workingPath, Path outputPath) throws IOException {
         
-        String address;
-        Integer portNum;
+        // create relay server to proxy this new Appium node
+        Path relayConfigPath = config.createRelayConfig(getCapabilities(config), hubUrl);
+        Path relayOutputPath = (outputPath != null) ? GridUtility.getOutputPath(config, null) : null;
+        LocalGridServer relayServer = LocalSeleniumGrid.create(config, launcherClassName,
+                dependencyContexts, false, portNum, relayConfigPath, workingPath, relayOutputPath);
+        
+        // extract target node URL from relay configuration
+        URL relayTarget = LocalGridServer.getRelayTarget(relayConfigPath);
+        String targetAddr = relayTarget.getHost();
+        Integer targetPort = relayTarget.getPort();
         List<String> argsList = new ArrayList<>();
-        
-        // create node configuration for this plug-in
-        Path nodeConfigPath = config.createNodeConfig(getCapabilities(config), hubUrl);
-        
+                
         // allow specification of multiple command line arguments
         String[] cliArgs = config.getStringArray(SeleniumSettings.APPIUM_CLI_ARGS.key());
         // if args specified
@@ -196,16 +195,6 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             }
         }
         
-        // extract address and port from relay configuration
-        try (Reader reader = Files.newBufferedReader(nodeConfigPath)) {
-            Map<String, Object> nodeConfig = new Json().toType(reader, MAP_TYPE);
-            Map<String, Object> relayOptions = (Map<String, Object>) nodeConfig.get("relay");
-            address = (String) relayOptions.get("host");
-            portNum = ((Long) relayOptions.get("port")).intValue();
-        } catch (IOException e) {
-            throw new ConfigException("Failed reading node configuration.", e);
-        }
-        
         // add driver specification
         argsList.add("--use-drivers");
         argsList.add(getBrowserName().toLowerCase());
@@ -217,11 +206,11 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         }
         
         // specify server port
-        argsList.add(0, portNum.toString());
+        argsList.add(0, targetPort.toString());
         argsList.add(0, "--port");
         
         // specify server host
-        argsList.add(0, address);
+        argsList.add(0, targetAddr);
         argsList.add(0, "--address");
         
         ProcessBuilder builder;
@@ -242,7 +231,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             }
             
             // specify 'pm2' process name
-            argsList.add(0, "appium-" + portNum);
+            argsList.add(0, "appium-" + targetPort);
             argsList.add(0, "--name");
             
             // specify path to 'appium' main script 
@@ -272,14 +261,14 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         builder = new ProcessBuilder(argsList);
         builder.environment().put("PATH", PathUtils.getSystemPath());
         
-        // store path to relay configuration in Appium process environment
-        builder.environment().put("nodeConfigPath", nodeConfigPath.toString());
         // set APPIUM_HOME to work around auto-detection issue
         builder.environment().put(APPIUM_HOME, Optional.ofNullable(System.getenv(APPIUM_HOME))
                 .orElse(System.getProperty("user.home") + File.separator + ".appium"));
-        return new AppiumGridServer(address, portNum, false, builder, workingPath, outputPath);
+        
+        return new AppiumGridServer(targetAddr, targetPort, false, builder, workingPath, outputPath)
+                .setRelayServer(relayServer);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -480,17 +469,6 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
             if (!isActive()) return true;
             if (shutdownAppiumWithPM2(getUrl())) return true;
             return super.shutdown();
-        }
-        
-        /**
-         * Get stored relay node configuration path. <br>
-         * <b>NOTE</b>: A relay node is needed to connect the Appium server to a Selenium 4+ Grid hub.
-         * 
-         * @return path to relay node configuration; may be {@code null}
-         */
-        public Path getNodeConfigPath() {
-            String nodeConfigPath = getEnvironment().get("nodeConfigPath");
-            return (nodeConfigPath != null) ? Paths.get(nodeConfigPath) : null;
         }
         
         /**

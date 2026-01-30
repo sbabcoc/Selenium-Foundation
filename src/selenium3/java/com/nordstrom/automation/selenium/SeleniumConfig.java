@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -257,8 +258,10 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         // if assembled path does not exist
         if (filePath.toFile().createNewFile()) {
             try {
-                hubConfig.capabilityMatcher = (CapabilityMatcher) Class.forName(slotMatcher).newInstance();
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                hubConfig.capabilityMatcher = (CapabilityMatcher) Class.forName(slotMatcher)
+                        .getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                 throw new ConfigException("Failed instantiating capability matcher: " + slotMatcher, e);
             }
             hubConfig.servlets = Arrays.asList(servlets.toArray(new String[0]));
@@ -318,6 +321,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
             }
         }
         return filePath;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Path createRelayConfig(String capabilities, URL hubUrl) throws IOException {
+        throw new UnsupportedOperationException("Relay nodes are unsupported prior to Selenium 4");
     }
     
     /**

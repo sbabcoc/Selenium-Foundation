@@ -3,7 +3,15 @@ System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.autom
 System.setProperty('injected.selenium.browser.name', 'opera')
 System.setProperty('injected.selenium.context.platform', 'web-app')
 dependencies {
-  testImplementation('org.seleniumhq.selenium:selenium-opera-driver') {
-    exclude module: 'selenium-remote-driver'
+  if ("${profile}" == "selenium4") {
+    testImplementation('org.seleniumhq.selenium:selenium-chrome-driver') {
+      exclude module: 'selenium-remote-driver'
+    }
+    api 'io.github.bonigarcia:webdrivermanager'
+    testImplementation 'com.google.code.gson:gson'
+  } else {
+    testImplementation('org.seleniumhq.selenium:selenium-opera-driver') {
+      exclude module: 'selenium-remote-driver'
+    }
   }
 }

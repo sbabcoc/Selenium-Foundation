@@ -42,6 +42,7 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      * @param launcherClassName fully-qualified class name for Grid launcher
      * @param dependencyContexts common dependency contexts for all Grid nodes
      * @param hubUrl Grid hub {@link URL} with which node should register
+     * @param portNum 
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
      * @return {@link LocalGridServer} object for specified node
@@ -49,14 +50,14 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      */
     @Override
     public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            URL hubUrl, final Path workingPath, final Path outputPath) throws IOException {
+            URL hubUrl, Integer portNum, final Path workingPath, final Path outputPath) throws IOException {
         
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, this);
         String capabilities = getCapabilities(config);
         Path nodeConfigPath = config.createNodeConfig(capabilities, hubUrl);
         String[] propertyNames = getPropertyNames(capabilities);
         return LocalSeleniumGrid.create(config, launcherClassName, combinedContexts,
-                false, -1, nodeConfigPath, workingPath, outputPath, propertyNames);
+                false, portNum, nodeConfigPath, workingPath, outputPath, propertyNames);
     }
 
     /**

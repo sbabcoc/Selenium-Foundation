@@ -1,7 +1,6 @@
 package com.nordstrom.automation.selenium.plugins;
 
 import java.util.Map;
-
 import com.nordstrom.automation.selenium.SeleniumConfig;
 
 /**

@@ -30,7 +30,6 @@ dependencies {
     api 'org.seleniumhq.selenium:selenium-chrome-driver:4.40.0'
     api 'org.seleniumhq.selenium:selenium-edge-driver:4.40.0'
     api 'org.seleniumhq.selenium:selenium-firefox-driver:4.40.0'
-    api 'org.seleniumhq.selenium:selenium-opera-driver:4.4.0'
     api 'org.seleniumhq.selenium:selenium-safari-driver:4.40.0'
     api 'com.nordstrom.ui-tools:htmlunit-remote:4.40.1'
     api 'org.seleniumhq.selenium:htmlunit3-driver:4.40.0'
@@ -43,6 +42,8 @@ dependencies {
     api 'io.netty:netty-transport-native-epoll:4.1.119.Final'
     api 'io.netty:netty-transport-native-kqueue:4.1.119.Final'
     api 'io.appium:java-client:10.0.0'
+    api 'io.github.bonigarcia:webdrivermanager:6.3.3'
+    testImplementation 'com.google.code.gson:gson:2.13.2'
     testImplementation 'org.mockito:mockito-core:4.11.0'
   }
   api 'com.nordstrom.tools:testng-foundation'

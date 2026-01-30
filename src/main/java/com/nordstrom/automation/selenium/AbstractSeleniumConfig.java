@@ -1019,6 +1019,16 @@ public abstract class AbstractSeleniumConfig extends
     public abstract Path createNodeConfig(String capabilities, URL hubUrl) throws IOException;
     
     /**
+     * Create relay configuration file from the specified JSON string, to be registered with the indicated hub.
+     * 
+     * @param capabilities relay configuration as JSON string
+     * @param hubUrl URL of hub host with which to register
+     * @return {@link Path} object for the created (or previously existing) configuration file
+     * @throws IOException on failure to create configuration file
+     */
+    public abstract Path createRelayConfig(String capabilities, URL hubUrl) throws IOException;
+    
+    /**
      * Get the collection of exceptions that are allowed to be returned by executed JavaScript snippets.
      * 
      * @return collection of specified allowed exceptions (may be empty)

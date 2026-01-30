@@ -1,6 +1,6 @@
 package com.nordstrom.automation.selenium.plugins;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,8 +97,8 @@ public class ChromeCaps {
      */
     public static String[] getPropertyNames(String capabilities) {
         try {
-            File driverPath = BinaryFinder.findDriver(capabilities);
-            System.setProperty(DRIVER_PATH, driverPath.getAbsolutePath());
+            Path driverPath = BinaryFinder.findDriver(capabilities);
+            System.setProperty(DRIVER_PATH, driverPath.toAbsolutePath().toString());
         } catch (IllegalStateException e) {
             throw new DriverExecutableNotFoundException(DRIVER_PATH);
         }
