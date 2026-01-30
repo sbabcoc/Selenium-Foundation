@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.nordstrom.automation.selenium.exceptions.DriverExecutableNotFoundException;
 import com.nordstrom.automation.selenium.utility.BinaryFinder;
 
@@ -24,31 +23,34 @@ public class OperaCaps {
     public static final String DRIVER_NAME = "opera";
     /** driver path system property */
     public static final String DRIVER_PATH = "webdriver.opera.driver";
-    /** browser binary path system property */
-    public static final String BINARY_PATH = "webdriver.opera.bin";
     /** log file path system property */
     public static final String LOGFILE_PATH = "webdriver.opera.logfile";
     /** verbose logging system property */
     public static final String VERBOSE_LOG = "webdriver.opera.verboseLogging";
     /** "silent mode" system property */
     public static final String SILENT_MODE = "webdriver.opera.silentOutput";
-    /** extension capability name for <b>OperaOptions</b> */
-    public static final String OPTIONS_KEY = "operaOptions";
+    /** extension capability name for <b>ChromeOptions</b> */
+    public static final String OPTIONS_KEY = "goog:chromeOptions";
     
     private static final String[] PROPERTY_NAMES = 
-        { DRIVER_PATH, BINARY_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE };
+        { DRIVER_PATH, LOGFILE_PATH, VERBOSE_LOG, SILENT_MODE };
     
     private static final String CAPABILITIES = 
             "{\"browserName\":\"opera\"}";
     
-    private static final String BASELINE = 
+    private static final String BASELINE_TEMPLATE = 
             "{\"browserName\":\"opera\"," +
+             "\"goog:chromeOptions\":{\"binary\":\"<browser-binary>\",\"w3c\":false}," +
              "\"nord:options\":{\"personality\":\"opera\"," +
                                "\"pluginClass\":\"com.nordstrom.automation.selenium.plugins.OperaPlugin\"}}";
     
+    private static final String BASELINE;
     private static final Map<String, String> PERSONALITIES;
     
     static {
+        BASELINE = BASELINE_TEMPLATE
+                .replace("<browser-binary>", OperaCommon.getOperaBinaryPath().replaceAll("\\\\", "/"));
+        
         Map<String, String> personalities = new HashMap<>();
         personalities.put(DRIVER_NAME, BASELINE);
         PERSONALITIES = Collections.unmodifiableMap(personalities);
@@ -94,4 +96,12 @@ public class OperaCaps {
         return PROPERTY_NAMES;
     }
 
+    /**
+     * Find 'operadriver' binary that works with the active installation of Opera.
+     * 
+     * @return path to 'operadriver' binary
+     */
+    public static String findDriverBinary() {
+        return BinaryFinder.findDriver(CAPABILITIES).getAbsolutePath();
+    }
 }
