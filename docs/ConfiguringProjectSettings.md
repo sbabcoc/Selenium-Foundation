@@ -107,7 +107,6 @@ By default, the unit tests are [configured](LocalGridConfiguration.md) to run th
 | firefox | Mozilla Firefox |
 | htmlunit | Gargoyle HtmlUnit |
 | mac2 | Macintosh Mac2 engine (Appium) |
-| opera | Opera |
 | safari | Apple Safari |
 | uiautomator2 | Android UiAutomator2 engine (Appium) |
 | windows | Microsoft Windows engine (Appium) |
@@ -131,7 +130,6 @@ To run the unit tests on a specific browser, add the corresponding option to the
 | Firefox | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/FirefoxPlugin.java) |
 | HtmlUnit | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/HtmlUnitPlugin.java) |
 | Internet Explorer | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/InternetExplorerPlugin.java) |
-| Opera | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/OperaPlugin.java) |
 | Safari | [source](../src/selenium3/java/com/nordstrom/automation/selenium/plugins/SafariPlugin.java) |
 
 #### Appium Automation Engine Support

@@ -1,9 +1,0 @@
-def driverPlugins = System.getProperty('selenium.grid.plugins', '')
-System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.OperaPlugin' + File.pathSeparator)
-System.setProperty('injected.selenium.browser.name', 'opera')
-System.setProperty('injected.selenium.context.platform', 'web-app')
-dependencies {
-  testImplementation('org.seleniumhq.selenium:selenium-opera-driver') {
-    exclude module: 'selenium-remote-driver'
-  }
-}
