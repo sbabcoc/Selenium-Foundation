@@ -30,7 +30,6 @@ dependencies {
     api 'org.seleniumhq.selenium:selenium-chrome-driver:4.40.0'
     api 'org.seleniumhq.selenium:selenium-edge-driver:4.40.0'
     api 'org.seleniumhq.selenium:selenium-firefox-driver:4.40.0'
-    api 'org.seleniumhq.selenium:selenium-opera-driver:4.4.0'
     api 'org.seleniumhq.selenium:selenium-safari-driver:4.40.0'
     api 'com.nordstrom.ui-tools:htmlunit-remote:4.40.1'
     api 'org.seleniumhq.selenium:htmlunit3-driver:4.40.0'

@@ -30,7 +30,6 @@ dependencies {
     api 'org.seleniumhq.selenium:selenium-chrome-driver:3.141.59'
     api 'org.seleniumhq.selenium:selenium-edge-driver:3.141.59'
     api 'org.seleniumhq.selenium:selenium-firefox-driver:3.141.59'
-    api 'org.seleniumhq.selenium:selenium-opera-driver:3.141.59'
     api 'org.seleniumhq.selenium:selenium-safari-driver:3.141.59'
     api 'org.seleniumhq.selenium:htmlunit-driver:2.70.0'
     api 'io.github.bonigarcia:webdrivermanager:6.3.3'

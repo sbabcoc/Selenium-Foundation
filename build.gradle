@@ -7,196 +7,177 @@ plugins {
   id 'maven-publish'
   id 'jacoco'
   id 'signing'
-  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-  id 'pl.allegro.tech.build.axion-release' version '1.13.14'
+
+  id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
+  id 'pl.allegro.tech.build.axion-release' version '1.18.0'
 }
 
 group = 'com.nordstrom.ui-tools'
 description = 'Selenium Foundation'
 
-if (!project.hasProperty('profile')) {
-  ext.profile = 'selenium4'
-} else {
-  assert ['selenium3', 'selenium4'].contains(profile)
-}
+ext.profile = project.findProperty('profile') ?: 'selenium4'
+assert ['selenium3', 'selenium4'].contains(profile)
 
 apply from: "${profile}Deps.gradle"
 
 if (project.hasProperty('browsers')) {
-  ext.browsers.split(',').each {
-    def browser = it.trim()
+  project.browsers.split(',').each { browser ->
+    browser = browser.trim()
     if (browser) {
       apply from: "${browser}Deps.gradle"
     }
   }
 }
 
-// if "personality" is specified
+/* personality injection */
 if (project.hasProperty('personality')) {
-  // store "injected" browser name setting
-  System.setProperty('injected.selenium.browser.name', ext.personality)
-  // if target is a mobile browser
-  if ([".chrome", ".safari"].any { ext.personality.endsWith(it) }) {
-    // specify "web-app" as the injected default context platform
+  System.setProperty('injected.selenium.browser.name', personality)
+
+  if ([".chrome", ".safari"].any { personality.endsWith(it) }) {
     System.setProperty('injected.selenium.context.platform', 'web-app')
-    // ensure ExamplePageServlet is installed
     System.setProperty('injected.selenium.grid.examples', 'true')
   }
 }
 
-def archiveVer = null
+/* Version logic */
 def verBits = scmVersion.version.split('-')
-def seleniumApi = 's' + profile.charAt(8)
-if (verBits.length > 1) {
-  if (verBits[1].equals(seleniumApi)) {
-    archiveVer = project.version
-  } else {
-    archiveVer = verBits[0] + '-' + seleniumApi + '-' + verBits[1]
-  }
-} else {
-  archiveVer = verBits[0] + '-' + seleniumApi
-}
+def seleniumApi = "s${profile.charAt(8)}"
 
-project.version = archiveVer
-  
-def archiveBase = rootProject.name + '-' + archiveVer
+def archiveVer = (verBits.length > 1 && verBits[1] == seleniumApi)
+  ? project.version
+  : verBits[0] + "-${seleniumApi}" + (verBits.length > 1 ? "-${verBits[1]}" : "")
+
+version = archiveVer
+def archiveBase = "${rootProject.name}-${archiveVer}"
 
 java {
   withJavadocJar()
   withSourcesJar()
 }
 
-clean {
-  delete 'logs'
-  delete 'target'
+/* Clean */
+tasks.named('clean') {
+  delete 'logs', 'target', buildRoot
 }
 
+/* JaCoCo */
 jacoco {
   toolVersion = '0.8.8'
-  reportsDirectory = file("${buildDir}/customJacocoReportDir")
+  reportsDirectory = layout.buildDirectory.dir("jacoco")
 }
 
-//jacocoTestReport {
-//  reports {
-//    xml.enabled false
-//    csv.enabled false
-//    html.destination file("${buildDir}/jacocoHtml")
-//  }
-//}
+/* Shared libs dir */
+def libsDirProvider = layout.buildDirectory.dir("libs")
 
-jar {
-  group 'Build'
-  description "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
-  
+/* Main JAR */
+tasks.named('jar', Jar) {
+  group = 'Build'
+  description = "Assembles a jar archive containing the '${profile}' classes, POM and Maven properties."
+
   def destPath = "META-INF/maven/${project.group}/${rootProject.name}"
-  def timestamp = Long.valueOf(System.currentTimeMillis()).toString()
-  def pomTokens = [projectVersion: archiveVer, projectTimestamp: timestamp, seleniumApi: seleniumApi]
-  def propTokens = [projectVersion: archiveVer, projectGroupId: project.group, projectArtifactId: rootProject.name]
-  
+  def timestamp = System.currentTimeMillis().toString()
+
   from('.') {
-    include('pom.xml')
-    into(destPath)
-    filter(ReplaceTokens, tokens: pomTokens)
+    include 'pom.xml'
+    into destPath
+    filter ReplaceTokens, tokens: [
+      projectVersion : archiveVer,
+      projectTimestamp: timestamp,
+      seleniumApi    : seleniumApi
+    ]
   }
+
   from('.') {
-    include('pom.properties')
-    into(destPath)
-    filter(ReplaceTokens, tokens: propTokens)
+    include 'pom.properties'
+    into destPath
+    filter ReplaceTokens, tokens: [
+      projectVersion   : archiveVer,
+      projectGroupId   : project.group,
+      projectArtifactId: rootProject.name
+    ]
   }
-  archiveFileName = archiveBase + '.jar'
-  destinationDirectory = libsDir
+
+  archiveFileName.set("${archiveBase}.jar")
+  destinationDirectory.set(libsDirProvider)
 }
 
-clean {
-  delete buildRoot
+/* Sources JAR */
+tasks.named('sourcesJar', Jar) {
+  group = 'Build'
+  archiveClassifier.set('sources')
+  archiveFileName.set("${archiveBase}-sources.jar")
+  destinationDirectory.set(libsDirProvider)
 }
 
-sourcesJar {
-  group 'Build'
-  description "Assembles a jar archive containing the '${profile}' source files."
-  
-  archiveClassifier = 'sources'
-  from sourceSets.main.allSource
-  archiveFileName = archiveBase + '-sources.jar'
-  destinationDirectory = libsDir
+/* Javadoc JAR */
+tasks.named('javadocJar', Jar) {
+  group = 'Build'
+  archiveClassifier.set('javadoc')
+  archiveFileName.set("${archiveBase}-javadoc.jar")
+  destinationDirectory.set(libsDirProvider)
 }
 
-javadocJar {
-  dependsOn javadoc
-  group 'Build'
-  description "Assembles a jar archive containing the '${profile}' JavaDoc files."
-  
-  archiveClassifier = 'javadoc'
-  from javadoc.destinationDir
-  archiveFileName = archiveBase + '-javadoc.jar'
-  destinationDirectory = libsDir
-}
-
+/* Test system property propagation */
 tasks.withType(Test).configureEach {
-  // iterate over system properties
-  System.getProperties().each { key, val ->
-    // if this is a property that should be propagated to the test task
-    if (key.endsWith('.binary.path') || ['injected.', 'selenium.', 'appium.', 'testng.', 'junit.'].any { key.startsWith(it) }) {
-      // if running on Windows and this property defines JSON browser capabilities
-      if (OperatingSystem.current().isWindows() && key.endsWith('selenium.browser.caps')) {
-        // escape double quotes
-        val = val.replace('"', '\\\"')
+  systemProperties.putAll(
+    System.properties.findAll { k, _ ->
+      k.endsWith('.binary.path') ||
+      ['injected.', 'selenium.', 'appium.', 'testng.', 'junit.']
+        .any { k.startsWith(it) }
+    }.collectEntries { k, v ->
+      if (OperatingSystem.current().isWindows() && k.endsWith('selenium.browser.caps')) {
+        [(k): v.replace('"', '\\\"')]
+      } else {
+        [(k): v]
       }
-      // propagate property
-      systemProperty key, val
     }
-  }
+  )
+
+  reports.html.outputLocation.set(
+    layout.buildDirectory.dir("reports/${name}")
+  )
 }
 
-
-task testNG(type: Test) {
+/* TestNG */
+tasks.register('testNG', Test) {
   useTestNG()
-  reports.html.destination = file("${buildDir}/reports/testng")
   testLogging.showStandardStreams = true
   
-  // --- Optional test JVM debugging ---
+  testClassesDirs = sourceSets.test.output.classesDirs
+  classpath = sourceSets.test.runtimeClasspath
+
   if (project.findProperty('debugTestNG') == 'true') {
-    jvmArgs += [
-      '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005'
-    ]
+    jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005'
     maxParallelForks = 1
     forkEvery = 0
   }
 }
 
-test {
-  dependsOn testNG
-  reports.html.destination = file("${buildDir}/reports/junit")
+/* JUnit */
+tasks.named('test', Test) {
+  dependsOn tasks.named('testNG')
   testLogging.showStandardStreams = true
-  
-  // --- Optional test JVM debugging ---
+
   if (project.findProperty('debugJUnit') == 'true') {
-    jvmArgs += [
-      '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006'
-    ]
+    jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006'
     maxParallelForks = 1
     forkEvery = 0
   }
+
+  jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }}"
 }
 
-scmVersion {
-  hooks {
-    pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /(&lt;version&gt;)\d+\.\d+\.\d+(-s[34]&lt;\/version&gt;)/}, replacement: {v, p -> "\$1$v\$2"}]
-    pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /(selenium-foundation:)\d+\.\d+\.\d+(-s[34])/}, replacement: {v, p -> "\$1$v\$2"}]
-    pre 'commit'
-    post 'push'
-  }
-}
-
+/* Artifacts */
 artifacts {
-  archives tasks['sourcesJar']
-  archives tasks['javadocJar']
+  archives tasks.named('sourcesJar')
+  archives tasks.named('javadocJar')
 }
 
+/* Publishing */
 publishing {
   publications {
     mavenJava(MavenPublication) {
-      from(components.java)
+      from components.java
       pom {
         name = 'Selenium Foundation'
         groupId = project.group
@@ -234,16 +215,19 @@ publishing {
   }
 }
 
+/* Signing */
 signing {
   sign publishing.publications.mavenJava
 }
 
-task install {
-  dependsOn publishToMavenLocal
-  group publishToMavenLocal.group
-  description '[alias] ' + publishToMavenLocal.description
+/* Install alias */
+tasks.register('install') {
+  dependsOn tasks.named('publishToMavenLocal')
+  group = tasks.named('publishToMavenLocal').get().group
+  description = "[alias] publish to Maven Local"
 }
 
+/* Nexus publishing */
 nexusPublishing {
   packageGroup = 'com.nordstrom'
   repositories {
@@ -257,6 +241,7 @@ nexusPublishing {
   }
 }
 
+/* Repositories */
 repositories {
   mavenLocal()
   mavenCentral()
@@ -265,6 +250,7 @@ repositories {
   maven { url "${projectDir}/repo" }
 }
 
+/* Dependencies */
 dependencies {
   constraints {
     api 'com.nordstrom.tools:java-utils:3.4.1'
@@ -274,18 +260,15 @@ dependencies {
     api 'org.hamcrest:hamcrest-core:3.0'
     api 'org.yaml:snakeyaml:2.4'
   }
+
   api 'com.nordstrom.tools:java-utils'
   api 'com.nordstrom.tools:settings'
   api 'com.nordstrom.tools:junit-foundation'
+
   api('com.github.sbabcoc:logback-testng') {
     exclude group: 'org.testng', module: 'testng'
   }
+
   api 'org.hamcrest:hamcrest-core'
   api 'org.yaml:snakeyaml'
-}
-
-test {
-  jvmArgs = [
-    "-javaagent:${classpath.find { it.name.contains('junit-foundation') }.absolutePath}"
-  ]
 }
