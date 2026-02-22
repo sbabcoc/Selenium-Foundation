@@ -1,5 +1,5 @@
-ext.buildRoot = file('build-s4')
-ext.libsDir = new File(buildRoot, 'libs')
+ext.buildRoot = layout.projectDirectory.dir('build-s4')
+ext.libsDir   = buildRoot.dir('libs')
 
 java {
   toolchain {
@@ -10,21 +10,21 @@ java {
 sourceSets {
   main {
     java {
-      srcDirs = [ 'src/main/java', 'src/selenium4/java' ]
-      destinationDirectory = new File(buildRoot, 'classes')
+      srcDirs = ['src/main/java', 'src/selenium4/java']
+      destinationDirectory = buildRoot.dir('classes')
     }
-    output.resourcesDir = "${buildRoot}/classes"
+    output.resourcesDir = buildRoot.dir('classes')
   }
   test {
     java {
-      destinationDirectory = new File(buildRoot, 'test-classes')
+      destinationDirectory = buildRoot.dir('test-classes')
     }
   }
 }
 
 dependencies {
   constraints {
-    api 'com.nordstrom.tools:testng-foundation:5.2.1-j11'
+    api 'com.nordstrom.tools:testng-foundation:6.0.0-j11'
     api 'org.seleniumhq.selenium:selenium-grid:4.40.0'
     api 'org.seleniumhq.selenium:selenium-support:4.40.0'
     api 'org.seleniumhq.selenium:selenium-chrome-driver:4.40.0'
@@ -36,11 +36,11 @@ dependencies {
     api 'org.htmlunit:htmlunit:4.21.0'
     api 'org.apache.httpcomponents:httpclient:4.5.14'
     api 'org.eclipse.jetty:jetty-servlet:9.4.57.v20241219'
-    api 'org.jsoup:jsoup:1.19.1'
+    api 'org.jsoup:jsoup:1.21.2'
     api 'org.apache.commons:commons-lang3:3.20.0'
     api 'com.beust:jcommander:1.82'
-    api 'io.netty:netty-transport-native-epoll:4.1.119.Final'
-    api 'io.netty:netty-transport-native-kqueue:4.1.119.Final'
+    api 'io.netty:netty-transport-native-epoll:4.1.121.Final'
+    api 'io.netty:netty-transport-native-kqueue:4.1.121.Final'
     api 'io.appium:java-client:10.0.0'
     testImplementation 'org.mockito:mockito-core:4.11.0'
   }
