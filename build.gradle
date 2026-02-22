@@ -9,7 +9,7 @@ plugins {
   id 'signing'
 
   id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
-  id 'pl.allegro.tech.build.axion-release' version '1.18.0'
+  id 'pl.allegro.tech.build.axion-release' version '1.21.1'
 }
 
 group = 'com.nordstrom.ui-tools'
@@ -17,6 +17,13 @@ description = 'Selenium Foundation'
 
 ext.profile = project.findProperty('profile') ?: 'selenium4'
 assert ['selenium3', 'selenium4'].contains(profile)
+
+/* Repositories */
+repositories {
+  mavenLocal()
+  mavenCentral()
+  maven { url "${projectDir}/repo" }
+}
 
 apply from: "${profile}Deps.gradle"
 
@@ -62,8 +69,16 @@ tasks.named('clean') {
 
 /* JaCoCo */
 jacoco {
-  toolVersion = '0.8.8'
+  toolVersion = '0.8.13'
   reportsDirectory = layout.buildDirectory.dir("jacoco")
+}
+
+jacocoTestReport {
+  reports {
+    xml.required  = false
+    csv.required  = false
+    html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+  }
 }
 
 /* Shared libs dir */
@@ -164,13 +179,9 @@ tasks.named('test', Test) {
     forkEvery = 0
   }
 
-  jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }}"
-}
-
-/* Artifacts */
-artifacts {
-  archives tasks.named('sourcesJar')
-  archives tasks.named('javadocJar')
+  doFirst {
+    jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }}"
+  }
 }
 
 /* Publishing */
@@ -241,24 +252,15 @@ nexusPublishing {
   }
 }
 
-/* Repositories */
-repositories {
-  mavenLocal()
-  mavenCentral()
-  maven { url 'https://repo1.maven.org/maven2' }
-  maven { url 'https://repo.maven.apache.org/maven2' }
-  maven { url "${projectDir}/repo" }
-}
-
 /* Dependencies */
 dependencies {
   constraints {
-    api 'com.nordstrom.tools:java-utils:3.4.1'
-    api 'com.nordstrom.tools:settings:3.0.8'
-    api 'com.nordstrom.tools:junit-foundation:17.2.4'
-    api 'com.github.sbabcoc:logback-testng:2.0.1'
+    api 'com.nordstrom.tools:java-utils:4.0.0'
+    api 'com.nordstrom.tools:settings:4.0.0'
+    api 'com.nordstrom.tools:junit-foundation:18.0.0'
+    api 'com.github.sbabcoc:logback-testng:2.1.2'
     api 'org.hamcrest:hamcrest-core:3.0'
-    api 'org.yaml:snakeyaml:2.4'
+    api 'org.yaml:snakeyaml:2.5'
   }
 
   api 'com.nordstrom.tools:java-utils'
