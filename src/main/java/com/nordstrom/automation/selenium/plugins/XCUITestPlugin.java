@@ -22,8 +22,8 @@ public class XCUITestPlugin extends AbstractAppiumPlugin {
     }
 
     private static final String CAPABILITIES =
-            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\",\"appium:deviceName\":\"iPhone Simulator\"}," +
-            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\",\"appium:deviceName\":\"iPhone Simulator\",\"browserName\":\"Safari\"}";
+            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\"}," +
+            "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\",\"browserName\":\"Safari\"}";
     
     private static final String BASELINE =
             "{\"appium:automationName\":\"XCUITest\",\"platformName\":\"iOS\"," +
