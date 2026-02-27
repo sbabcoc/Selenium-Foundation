@@ -15,6 +15,7 @@ import com.nordstrom.automation.selenium.examples.TextEditApplication;
 import com.nordstrom.automation.selenium.examples.TextEditDocumentWindow;
 import com.nordstrom.automation.selenium.examples.TextEditManagementPanel;
 import com.nordstrom.automation.selenium.listeners.PageSourceCapture;
+import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 import com.nordstrom.automation.selenium.support.TestNgTargetBase;
 
@@ -36,6 +37,15 @@ public class MacTest extends TestNgTargetBase {
     @TargetPlatform(MAC_APP_NAME)
     public void testMacHierarchyCapture() {
         PageSourceCapture collector = getLinkedListener(PageSourceCapture.class);
+        assertTrue(collector.getArtifactProvider().canGetArtifact(Reporter.getCurrentTestResult()));
+        Optional<Path> optArtifactPath = collector.captureArtifact(Reporter.getCurrentTestResult());
+        assertTrue(optArtifactPath.isPresent());
+    }
+    
+    @Test
+    @TargetPlatform(MAC_APP_NAME)
+    public void testMacScreenshotCapture() {
+        ScreenshotCapture collector = getLinkedListener(ScreenshotCapture.class);
         assertTrue(collector.getArtifactProvider().canGetArtifact(Reporter.getCurrentTestResult()));
         Optional<Path> optArtifactPath = collector.captureArtifact(Reporter.getCurrentTestResult());
         assertTrue(optArtifactPath.isPresent());

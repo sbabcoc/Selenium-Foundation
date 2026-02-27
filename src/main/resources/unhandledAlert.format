@@ -1,0 +1,7 @@
+<html>
+  <head><title>Capture Failed</title></head>
+  <body style='font-family: sans-serif;'>
+    <h2>Page Source Blocked by Alert</h2>
+    <p><strong>Alert Text:</strong>%s</p>
+  </body>
+</html>

@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.AndroidPage;
 import com.nordstrom.automation.selenium.listeners.PageSourceCapture;
+import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 import com.nordstrom.automation.selenium.support.TestNgTargetBase;
 
@@ -31,6 +32,15 @@ public class AndroidTest extends TestNgTargetBase {
     @TargetPlatform(ANDROID_NAME)
     public void testAndroidHierarchyCapture() {
         PageSourceCapture collector = getLinkedListener(PageSourceCapture.class);
+        assertTrue(collector.getArtifactProvider().canGetArtifact(Reporter.getCurrentTestResult()));
+        Optional<Path> optArtifactPath = collector.captureArtifact(Reporter.getCurrentTestResult());
+        assertTrue(optArtifactPath.isPresent());
+    }
+    
+    @Test
+    @TargetPlatform(ANDROID_NAME)
+    public void testAndroidScreenshotCapture() {
+        ScreenshotCapture collector = getLinkedListener(ScreenshotCapture.class);
         assertTrue(collector.getArtifactProvider().canGetArtifact(Reporter.getCurrentTestResult()));
         Optional<Path> optArtifactPath = collector.captureArtifact(Reporter.getCurrentTestResult());
         assertTrue(optArtifactPath.isPresent());
