@@ -14,18 +14,21 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
@@ -46,9 +49,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
@@ -62,8 +62,8 @@ import com.nordstrom.common.uri.UriUtils;
  */
 public final class GridUtility {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(GridUtility.class);
-    
+    private static final Set<InetAddress> LOCAL_ADDRESSES = Collections.unmodifiableSet(getAllLocalAddresses());
+
     /**
      * Private constructor to prevent instantiation.
      */
@@ -288,35 +288,50 @@ public final class GridUtility {
      */
     public static boolean isLocalHost(URL host) {
         Objects.requireNonNull(host, "[host] must be non-null");
-        
-        try {
-            InetAddress addr = InetAddress.getByName(host.getHost());
-            return (isThisMyIpAddress(addr));
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Unable to get IP address for '{}'", host.getHost(), e);
-            return false;
-        }
-    }
-    
-    /**
-     * Determine if the specified address is local to the machine we're running on.
-     * 
-     * @param addr Internet protocol address object
-     * @return 'true' if the specified address is local; otherwise 'false'
-     */
-    public static boolean isThisMyIpAddress(final InetAddress addr) {
-        // Check if the address is a valid special local or loop back
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
+        String hostStr = host.getHost();
+
+        if ("localhost".equalsIgnoreCase(hostStr) || "127.0.0.1".equals(hostStr) || "::1".equals(hostStr)) {
             return true;
         }
 
-        // Check if the address is defined on any interface
-        try {
-            return NetworkInterface.getByInetAddress(addr) != null;
-        } catch (SocketException e) {
-            LOGGER.warn("Attempt to associate IP address with adapter triggered I/O exception: {}", e.getMessage());
-            return false;
+        for (InetAddress thisAddress : LOCAL_ADDRESSES) {
+            if (thisAddress.getHostAddress().equalsIgnoreCase(hostStr)) {
+                return true;
+            }
         }
+
+        return false;
+    }
+
+    /**
+     * Get the set of IP addresses assigned to the local machine.
+     * <p>
+     * This method enumerates all available network interfaces, filtering for those that are 
+     * currently "up" (active). It collects all associated {@link InetAddress} objects, 
+     * including IPv4, IPv6, and loopback addresses. 
+     * <p>
+     * In the event of a {@link SocketException} during enumeration, the method fails 
+     * gracefully by returning a set containing only the standard loopback address.
+     * 
+     * @return a {@link Set} of {@link InetAddress} objects representing local adapters
+     */
+    private static Set<InetAddress> getAllLocalAddresses() {
+        Set<InetAddress> localAddresses = new HashSet<>();
+        try {
+            Enumeration<NetworkInterface> interfaceEnum = NetworkInterface.getNetworkInterfaces();
+            while (interfaceEnum.hasMoreElements()) {
+                NetworkInterface thisInterface = interfaceEnum.nextElement();
+                if (thisInterface.isUp()) {
+                    Enumeration<InetAddress> addressEnum = thisInterface.getInetAddresses();
+                    while (addressEnum.hasMoreElements()) {
+                        localAddresses.add(addressEnum.nextElement());
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            localAddresses.add(InetAddress.getLoopbackAddress());
+        }
+        return localAddresses;
     }
 
     /**
