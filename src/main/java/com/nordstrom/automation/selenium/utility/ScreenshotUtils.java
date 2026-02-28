@@ -1,10 +1,10 @@
 package com.nordstrom.automation.selenium.utility;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
@@ -17,6 +17,9 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
+
+import com.nordstrom.automation.selenium.core.TestBase;
+import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 /**
  * This utility class contains low-level methods that support screenshot artifact capture.
@@ -38,25 +41,33 @@ public final class ScreenshotUtils {
      * @return 'true' if driver can take screenshots; otherwise 'false'
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
-        Boolean isAble = null;
-        if (optDriver.isPresent()) {
-            WebDriver driver = optDriver.get();
-            if (driver instanceof HasCapabilities) {
-                Capabilities caps = ((HasCapabilities) driver).getCapabilities();
-                Object takesScreenshot = caps.getCapability("takesScreenshot");
-                if (takesScreenshot != null) {
-                    isAble = Boolean.parseBoolean(String.valueOf(takesScreenshot));
+        if (!optDriver.isPresent()) return false;
+        
+        WebDriver driver = optDriver.get();
+        if (!(driver instanceof TakesScreenshot)) {
+            if (logger != null) {
+                logger.warn("Driver does not implement TakesScreenshot; skipping artifact.");
+            }
+            return false;
+        }
+
+        if (driver instanceof HasCapabilities) {
+            Capabilities caps = TestBase.invokeSafely(((HasCapabilities) driver)::getCapabilities);
+            
+            if (caps == null) {
+                if (logger != null) {
+                    logger.warn("Driver session appears to be dead; cannot capture screenshot.");
                 }
+                return false;
             }
-            if (isAble == null) {
-                // for remote drivers, this may be bogus
-                isAble = (driver instanceof TakesScreenshot);
-            }
-            if (!isAble && logger != null) {
-                logger.warn("This driver is not able to take screenshots.");
+
+            Object capability = caps.getCapability("takesScreenshot");
+            if (capability instanceof Boolean && !(Boolean) capability) {
+                return false; 
             }
         }
-        return isAble == Boolean.TRUE;
+
+        return true;
     }
     
     /**
@@ -77,7 +88,7 @@ public final class ScreenshotUtils {
             } catch (UnsupportedCommandException e) {
                 return proxyArtifact();
             } catch (WebDriverException e) {
-                if (e.getCause() instanceof ClassCastException) {
+                if (WebDriverUtils.isClassCastFailure(e)) {
                     return proxyArtifact();
                 } else if (logger != null) {
                     logger.warn("Failed taking a screenshot.", e);
@@ -92,16 +103,23 @@ public final class ScreenshotUtils {
      * 
      * @return proxy screenshot artifact
      */
-    private static byte[] proxyArtifact(){ 
+    private static byte[] proxyArtifact() {
         BufferedImage image = new BufferedImage(155, 45, BufferedImage.TYPE_INT_RGB);
         Graphics graphics = image.getGraphics();
-        graphics.drawString("This remote driver is not", 10, 20);
-        graphics.drawString("able to take screenshots", 10, 35);
         
+        try {
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(0, 0, 155, 45);
+            graphics.setColor(Color.BLACK);
+            graphics.drawString("This remote driver is not", 10, 20);
+            graphics.drawString("able to take screenshots", 10, 35);
+        } finally {
+            graphics.dispose();
+        }
+
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             ImageIO.write(image, "png", bos);
-            String imageString = Base64.getEncoder().encodeToString(bos.toByteArray());
-            return OutputType.BYTES.convertFromBase64Png(imageString);
+            return bos.toByteArray();
         } catch (IOException e) {
             return new byte[0];
         }

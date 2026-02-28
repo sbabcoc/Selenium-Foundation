@@ -16,8 +16,9 @@ import com.nordstrom.automation.junit.ArtifactType;
 public class PageSourceArtifact extends ArtifactType {
     
     private static final String ARTIFACT_PATH = "page-source";
-    private static final String EXTENSION = "html";
     private static final Logger LOGGER = LoggerFactory.getLogger(PageSourceArtifact.class);
+    
+    private String memoizedExtension;
     
     /**
      * {@inheritDoc}
@@ -33,8 +34,18 @@ public class PageSourceArtifact extends ArtifactType {
      */
     @Override
     public byte[] getArtifact(final Object instance, final Throwable reason) {
-        Optional<WebDriver> optDriver = DriverManager.nabDriver(instance);
-        return PageSourceUtils.getArtifact(optDriver, reason, LOGGER).getBytes();
+        memoizedExtension = null;
+        
+        Optional<byte[]> optArtifact = DriverManager.nabDriver(instance)
+                .map(driver -> PageSourceUtils.getArtifact(Optional.of(driver), reason, LOGGER));
+
+        return optArtifact
+                .filter(bytes -> bytes.length > 0)
+                .map(bytes -> {
+                    memoizedExtension = PageSourceUtils.isXml(bytes) ? "xml" : "html";
+                    return bytes;
+                })                
+                .orElse(new byte[0]);
     }
     
     /**
@@ -50,7 +61,7 @@ public class PageSourceArtifact extends ArtifactType {
      */
     @Override
     public String getArtifactExtension() {
-        return EXTENSION;
+        return Optional.ofNullable(memoizedExtension).orElse("html");
     }
     
     /**

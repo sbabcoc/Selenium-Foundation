@@ -1,14 +1,18 @@
 package com.nordstrom.automation.selenium.utility;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.net.URI;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 
+import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 /**
@@ -16,7 +20,7 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
  */
 public final class PageSourceUtils {
     
-    private static final String TAKES_ELEMENT_SCREENSHOT = "takesElementScreenshot";
+    private static final String PROXY_TEMPLATE = JsUtility.getScriptResource("unhandledAlert.format");
     
     /**
      * Private constructor to prevent instantiation.
@@ -33,25 +37,20 @@ public final class PageSourceUtils {
      * @return 'true' if driver can produce page source; otherwise 'false
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
-        if (optDriver.isPresent()) {
-            WebDriver driver = optDriver.get();
-            if (driver instanceof HasCapabilities) {
-                Capabilities caps = ((HasCapabilities) driver).getCapabilities();
-                // if driver explicitly reports that it cannot produce page source
-                if (Boolean.FALSE.equals(caps.getCapability(TAKES_ELEMENT_SCREENSHOT))) {
-                    if (logger != null) {
-                        logger.warn("This driver is not capable of producing page source.");
-                    }
-                } else {
-                    return true;
-                }
-            } else {
+        if (!optDriver.isPresent()) return false;
+        
+        WebDriver driver = optDriver.get();
+        if (driver instanceof HasCapabilities) {
+            Capabilities caps = TestBase.invokeSafely(((HasCapabilities) driver)::getCapabilities);
+            if (caps == null) {
                 if (logger != null) {
-                    logger.warn("Unable to determine if this driver can capture page source.");
+                    logger.warn("Driver session appears to be dead; cannot capture page source.");
                 }
+                return false;
             }
         }
-        return false;
+        
+        return true;
     }
     
     /**
@@ -62,22 +61,30 @@ public final class PageSourceUtils {
      * @param logger SLF4J logger object; may be 'null'
      * @return page source; if capture fails, an empty string is returned
      */
-    public static String getArtifact(
+    public static byte[] getArtifact(
                     final Optional<WebDriver> optDriver, final Throwable reason, final Logger logger) {
         
-        if (canGetArtifact(optDriver, logger)) {
-            WebDriver driver = optDriver.get();
+        if (!canGetArtifact(optDriver, logger)) return new byte[0];
+        
+        WebDriver driver = optDriver.get();
+        try {
             String rawSource = driver.getPageSource();
-            if (rawSource == null) return null;
+            if (rawSource == null) return new byte[0];
             
             StringBuilder sourceBuilder = new StringBuilder(rawSource);
             insertBreakpointInfo(sourceBuilder, reason);
             insertBaseElement(sourceBuilder, getPortableUrl(driver));
             insertOriginalUrl(sourceBuilder, driver);
-            return sourceBuilder.toString();
+            return sourceBuilder.toString().getBytes(UTF_8);
+        } catch (UnhandledAlertException e) {
+            String alertText = (e.getAlertText() != null) ? e.getAlertText() : "Unknown Alert";
+            String diagnosticHtml = String.format(PROXY_TEMPLATE, alertText);
+            if (logger != null) logger.warn("Page source blocked by alert: {}", alertText);
+            return diagnosticHtml.getBytes(UTF_8);
+        } catch (WebDriverException e) {
+            if (logger != null) logger.warn("Failed to capture page source artifact.", e);
+            return new byte[0];
         }
-        
-        return "";
     }
     
     /**
@@ -159,7 +166,7 @@ public final class PageSourceUtils {
      * @param driver web driver object
      */
     private static void insertOriginalUrl(final StringBuilder sourceBuilder, final WebDriver driver) {
-        String url = invokeSafely(driver::getCurrentUrl);
+        String url = TestBase.invokeSafely(driver::getCurrentUrl);
         if (url != null) {
             sourceBuilder.append("\n<!-- Original URL: ").append(url).append(" -->");
         }
@@ -242,7 +249,7 @@ public final class PageSourceUtils {
      * @return a portable Web URL string; {@code null} if the URL is local or invalid
      */
     public static String getPortableUrl(final WebDriver driver) {
-        String url = invokeSafely(driver::getCurrentUrl);
+        String url = TestBase.invokeSafely(driver::getCurrentUrl);
 
         if (url == null || !url.toLowerCase().startsWith("http")) {
             return null;
@@ -269,6 +276,41 @@ public final class PageSourceUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Detects if the provided byte array represents an XML document or a Mobile 
+     * Native Hierarchy.
+     * <p>
+     * This method performs "content sniffing" on the first 128 bytes of the artifact 
+     * to distinguish between standard HTML and various XML formats returned by 
+     * Appium (Android/iOS) and Selenium. This allows for dynamic file extension 
+     * assignment without requiring an active {@code WebDriver} session or 
+     * context-switching overhead.
+     * </p>
+     * 
+     * @param data the artifact byte array to inspect
+     * @return {@code true} if the content matches known XML signatures or mobile 
+     * native root tags; {@code false} if it appears to be HTML or is too 
+     * short to identify.
+     */
+    public static boolean isXml(byte[] data) {
+        if (data.length < 5) return false;
+    
+        int peekLength = Math.min(data.length, 128);
+        String lead = new String(data, 0, peekLength).trim();
+        String leadLower = lead.toLowerCase();
+    
+        boolean isKnownXml = leadLower.startsWith("<?xml") || 
+                             leadLower.startsWith("<hierarchy") || 
+                             leadLower.startsWith("<appiumaut") || 
+                             leadLower.startsWith("<xcuielementtype");
+    
+        boolean isNotHtml = lead.startsWith("<") && 
+                           !leadLower.startsWith("<html") && 
+                           !leadLower.startsWith("<!doctype");
+    
+        return isKnownXml || isNotHtml;
     }
     
     /**
@@ -298,23 +340,5 @@ public final class PageSourceUtils {
             if (match) return i;
         }
         return -1;
-    }
-    
-    /**
-     * Executes a {@link Callable} and returns the result, suppressing all exceptions.
-     * <p>
-     * This is used for diagnostic "best-effort" data collection where a failure 
-     * in metadata retrieval should not crash the primary reporting flow.
-     * 
-     * @param <T> the type of result
-     * @param callable the task to execute
-     * @return the result of the task; {@code null} if an exception occurred
-     */
-    public static <T> T invokeSafely(final Callable<T> callable) {
-        try {
-            return callable.call();
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

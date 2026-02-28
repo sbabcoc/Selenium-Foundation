@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.nordstrom.automation.selenium.examples.NotepadApplication;
 import com.nordstrom.automation.selenium.listeners.PageSourceCapture;
+import com.nordstrom.automation.selenium.listeners.ScreenshotCapture;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.platform.TargetPlatform;
 import com.nordstrom.automation.selenium.support.TestNgTargetBase;
@@ -33,6 +34,15 @@ public class WindowsTest extends TestNgTargetBase {
     @TargetPlatform(WINDOWS_NAME)
     public void testWindowsHierarchyCapture() {
         PageSourceCapture collector = getLinkedListener(PageSourceCapture.class);
+        assertTrue(collector.getArtifactProvider().canGetArtifact(Reporter.getCurrentTestResult()));
+        Optional<Path> optArtifactPath = collector.captureArtifact(Reporter.getCurrentTestResult());
+        assertTrue(optArtifactPath.isPresent());
+    }
+    
+    @Test
+    @TargetPlatform(WINDOWS_NAME)
+    public void testWindowsScreenshotCapture() {
+        ScreenshotCapture collector = getLinkedListener(ScreenshotCapture.class);
         assertTrue(collector.getArtifactProvider().canGetArtifact(Reporter.getCurrentTestResult()));
         Optional<Path> optArtifactPath = collector.captureArtifact(Reporter.getCurrentTestResult());
         assertTrue(optArtifactPath.isPresent());

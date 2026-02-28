@@ -19,8 +19,9 @@ import com.nordstrom.automation.testng.ArtifactType;
 public class PageSourceArtifact extends ArtifactType {
     
     private static final String ARTIFACT_PATH = "page-source";
-    private static final String EXTENSION = "html";
     private static final Logger LOGGER = LoggerFactory.getLogger(PageSourceArtifact.class);
+    
+    private String memoizedExtension;
     
     /**
      * {@inheritDoc}
@@ -37,11 +38,21 @@ public class PageSourceArtifact extends ArtifactType {
      * {@inheritDoc}
      */
     @Override
-    public byte[] getArtifact(final ITestResult result) {
+    public byte[] getArtifact(ITestResult result) {
+        memoizedExtension = null;
+        
         // ensure current test result is set
         Reporter.setCurrentTestResult(result);
-        Optional<WebDriver> optDriver = DriverManager.nabDriver(result.getInstance());
-        return PageSourceUtils.getArtifact(optDriver, result.getThrowable(), LOGGER).getBytes();
+        Optional<byte[]> optArtifact = DriverManager.nabDriver(result.getInstance())
+                .map(driver -> PageSourceUtils.getArtifact(Optional.of(driver), result.getThrowable(), LOGGER));
+
+        return optArtifact
+                .filter(bytes -> bytes.length > 0)
+                .map(bytes -> {
+                    memoizedExtension = PageSourceUtils.isXml(bytes) ? "xml" : "html";
+                    return bytes;
+                })                
+                .orElse(new byte[0]);
     }
     
     /**
@@ -57,7 +68,7 @@ public class PageSourceArtifact extends ArtifactType {
      */
     @Override
     public String getArtifactExtension() {
-        return EXTENSION;
+        return Optional.ofNullable(memoizedExtension).orElse("html");
     }
     
     /**

@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -184,6 +185,24 @@ public abstract class TestBase {
             return Optional.of(obj);
         } else {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Executes a {@link Callable} and returns the result, suppressing all exceptions.
+     * <p>
+     * This is used for diagnostic "best-effort" data collection where a failure 
+     * in metadata retrieval should not crash the primary reporting flow.
+     * 
+     * @param <T> the type of result
+     * @param callable the task to execute
+     * @return the result of the task; {@code null} if an exception occurred
+     */
+    public static <T> T invokeSafely(final Callable<T> callable) {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            return null;
         }
     }
     

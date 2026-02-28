@@ -228,6 +228,23 @@ public final class WebDriverUtils {
     }
 
     /**
+     * Determines if the provided exception is, or was caused by, a casting failure.
+     * <p>
+     * This handles both local JVM failures and remote-side failures that have been 
+     * serialized into the exception message by the Selenium/Appium server.
+     * 
+     * @param e the exception to analyze
+     * @return {@code true} if the failure is casting-related; otherwise {@code false}
+     */
+    public static boolean isClassCastFailure(final WebDriverException e) {
+        if (e.getCause() instanceof ClassCastException) {
+            return true;
+        }
+        
+        return (e.getMessage() != null && e.getMessage().contains("ClassCastException"));
+    }
+    
+    /**
      * Unwrap the specified exception to reveal its report-able cause.
      * 
      * @param exception exception to be unwrapped
