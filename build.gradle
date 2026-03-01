@@ -184,6 +184,23 @@ tasks.named('test', Test) {
   }
 }
 
+scmVersion {
+  hooks {
+    pre 'fileUpdate', [
+        file: 'README.md', 
+        pattern: { v, p -> /(&lt;version&gt;)\d+\.\d+\.\d+(-s[34]&lt;\/version&gt;)/ }, 
+        replacement: { v, p, m -> "${m.group(1)}${v}${m.group(2)}" }
+    ]
+    pre 'fileUpdate', [
+        file: 'README.md', 
+        pattern: { v, p -> /(selenium-foundation:)\d+\.\d+\.\d+(-s[34])/ }, 
+        replacement: { v, p, m -> "${m.group(1)}${v}${m.group(2)}" }
+    ]
+    pre 'commit'
+    post 'push'
+  }
+}
+
 /* Publishing */
 publishing {
   publications {

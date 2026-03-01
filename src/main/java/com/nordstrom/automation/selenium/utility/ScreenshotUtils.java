@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -41,33 +40,29 @@ public final class ScreenshotUtils {
      * @return 'true' if driver can take screenshots; otherwise 'false'
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
-        if (!optDriver.isPresent()) return false;
-        
-        WebDriver driver = optDriver.get();
-        if (!(driver instanceof TakesScreenshot)) {
-            if (logger != null) {
-                logger.warn("Driver does not implement TakesScreenshot; skipping artifact.");
-            }
-            return false;
-        }
-
-        if (driver instanceof HasCapabilities) {
-            Capabilities caps = TestBase.invokeSafely(((HasCapabilities) driver)::getCapabilities);
-            
-            if (caps == null) {
-                if (logger != null) {
-                    logger.warn("Driver session appears to be dead; cannot capture screenshot.");
-                }
-                return false;
-            }
-
-            Object capability = caps.getCapability("takesScreenshot");
-            if (capability instanceof Boolean && !(Boolean) capability) {
-                return false; 
-            }
-        }
-
-        return true;
+        return optDriver
+                .filter(TakesScreenshot.class::isInstance)
+                .map(driver -> {
+                    if (!(driver instanceof HasCapabilities)) return true;
+                    return TestBase.invokeSafely(((HasCapabilities) driver)::getCapabilities)
+                            .map(caps -> {
+                                if (logger != null && caps == null) {
+                                    logger.warn("Driver session appears to be dead; cannot capture screenshot.");
+                                }
+                                Object capability = caps.getCapability("takesScreenshot");
+                                return !(capability instanceof Boolean) || (Boolean) capability;
+                            })
+                            .orElseGet(() -> {
+                                Optional.ofNullable(logger)
+                                        .ifPresent(l -> l.warn("Driver session appears to be dead; cannot capture screenshot."));
+                                return false;
+                            });
+                })
+                .orElseGet(() -> {
+                    Optional.ofNullable(logger)
+                            .ifPresent(l -> l.warn("Driver does not implement TakesScreenshot; skipping artifact."));
+                    return false;
+                });
     }
     
     /**

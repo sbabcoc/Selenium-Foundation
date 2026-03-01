@@ -3,8 +3,11 @@ package com.nordstrom.automation.selenium.utility;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
-import org.openqa.selenium.Capabilities;
+import java.util.Set;
+
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -21,6 +24,8 @@ import com.nordstrom.automation.selenium.core.WebDriverUtils;
 public final class PageSourceUtils {
     
     private static final String PROXY_TEMPLATE = JsUtility.getScriptResource("unhandledAlert.format");
+    private static final Set<String> LOCAL_HOSTS = new HashSet<>(Arrays.asList(
+            "localhost", "127.0.0.1", "0.0.0.0", "::1"));
     
     /**
      * Private constructor to prevent instantiation.
@@ -37,20 +42,19 @@ public final class PageSourceUtils {
      * @return 'true' if driver can produce page source; otherwise 'false
      */
     public static boolean canGetArtifact(final Optional<WebDriver> optDriver, final Logger logger) {
-        if (!optDriver.isPresent()) return false;
-        
-        WebDriver driver = optDriver.get();
-        if (driver instanceof HasCapabilities) {
-            Capabilities caps = TestBase.invokeSafely(((HasCapabilities) driver)::getCapabilities);
-            if (caps == null) {
-                if (logger != null) {
-                    logger.warn("Driver session appears to be dead; cannot capture page source.");
-                }
-                return false;
-            }
-        }
-        
-        return true;
+        return optDriver
+                .filter(HasCapabilities.class::isInstance)
+                .map(HasCapabilities.class::cast)
+                .map(driver -> TestBase.invokeSafely(driver::getCapabilities))
+                .map(caps -> {
+                    if (!caps.isPresent()) {
+                        Optional.ofNullable(logger)
+                                .ifPresent(l -> l.warn("Driver session appears to be dead; cannot capture page source."));
+                        return false;
+                    }
+                    return true;
+                })
+                .orElse(true);
     }
     
     /**
@@ -166,10 +170,8 @@ public final class PageSourceUtils {
      * @param driver web driver object
      */
     private static void insertOriginalUrl(final StringBuilder sourceBuilder, final WebDriver driver) {
-        String url = TestBase.invokeSafely(driver::getCurrentUrl);
-        if (url != null) {
-            sourceBuilder.append("\n<!-- Original URL: ").append(url).append(" -->");
-        }
+        TestBase.invokeSafely(driver::getCurrentUrl)
+                .ifPresent(url -> sourceBuilder.append("\n<!-- Original URL: ").append(url).append(" -->"));
     }
     
     /**
@@ -249,33 +251,18 @@ public final class PageSourceUtils {
      * @return a portable Web URL string; {@code null} if the URL is local or invalid
      */
     public static String getPortableUrl(final WebDriver driver) {
-        String url = TestBase.invokeSafely(driver::getCurrentUrl);
-
-        if (url == null || !url.toLowerCase().startsWith("http")) {
-            return null;
-        }
-
-        try {
-            URI uri = URI.create(url);
-            String host = uri.getHost();
-
-            if (host == null) {
-                return null;
-            }
-
-            host = host.toLowerCase();
-
-            if (host.equals("localhost") || 
-                host.equals("127.0.0.1") || 
-                host.equals("0.0.0.0") || 
-                host.equals("::1")) {
-                return null;
-            }
-
-            return url;
-        } catch (Exception e) {
-            return null;
-        }
+        return TestBase.invokeSafely(driver::getCurrentUrl)
+                .filter(url -> url.toLowerCase().startsWith("http"))
+                .flatMap(url -> {
+                    try {
+                        return Optional.ofNullable(URI.create(url).getHost())
+                                .filter(host -> !LOCAL_HOSTS.contains(host.toLowerCase()))
+                                .map(host -> url);
+                    } catch (Exception e) {
+                        return Optional.empty();
+                    }
+                })
+                .orElse(null);
     }
 
     /**
