@@ -147,15 +147,10 @@ public class GridServer {
      * @throws IOException if an I/O error occurs
      */
     public static List<Capabilities> getNodeCapabilities(SeleniumConfig config, URL hubUrl, URL nodeUrl) throws IOException {
-        String status = getStatusOfNode(config, hubUrl, nodeUrl);
-        return new Json().toType(status, GridProxyResponse.class);
-    }
-    
-    private static String getStatusOfNode(SeleniumConfig config, URL hubUrl, URL nodeUrl) throws IOException {
         String nodeEndpoint = nodeUrl.getProtocol() + "://" + nodeUrl.getAuthority();
         String url = hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + NODE_CONFIG + "?id=" + nodeEndpoint;
         try (InputStream is = URI.create(url).toURL().openStream()) {
-            return GridUtility.readAvailable(is);
+            return new Json().toType(GridUtility.readAvailable(is), GridProxyResponse.class);
         }
     }
     
