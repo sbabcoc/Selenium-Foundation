@@ -141,8 +141,11 @@ public final class WebDriverUtils {
      *         capabilities
      */
     public static Capabilities getCapabilities(final SearchContext context) {
-        WebDriver driver = getDriver(context);
-        return (driver instanceof HasCapabilities) ? ((HasCapabilities) driver).getCapabilities() : null;
+        return Optional.ofNullable(getDriver(context))
+                .filter(HasCapabilities.class::isInstance)
+                .map(HasCapabilities.class::cast)
+                .flatMap(driver -> TestBase.invokeSafely(driver::getCapabilities))
+                .orElse(null);
     }
 
     /**

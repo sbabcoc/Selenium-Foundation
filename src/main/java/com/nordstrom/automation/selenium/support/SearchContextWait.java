@@ -1,15 +1,17 @@
 package com.nordstrom.automation.selenium.support;
 
 import java.time.Duration;
+import java.util.Optional;
+
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
 /**
@@ -67,16 +69,18 @@ public class SearchContextWait extends FluentWait<SearchContext> {
     protected RuntimeException timeoutException(final String message, final Throwable lastException) {
         TimeoutException ex = new TimeoutException(message, lastException);
         ex.addInfo(WebDriverException.DRIVER_INFO, context.getClass().getName());
-        WebDriver driver = WebDriverUtils.getDriver(context);
-        if (driver instanceof RemoteWebDriver) {
-            RemoteWebDriver remote = (RemoteWebDriver) driver;
-            if (remote.getSessionId() != null) {
-                ex.addInfo(WebDriverException.SESSION_ID, remote.getSessionId().toString());
-            }
-            if (remote.getCapabilities() != null) {
-                ex.addInfo("Capabilities", remote.getCapabilities().toString());
-            }
-        }
+        Optional.ofNullable(WebDriverUtils.getDriver(context))
+            .filter(RemoteWebDriver.class::isInstance)
+            .map(RemoteWebDriver.class::cast)
+            .ifPresent(remote -> {
+                Optional.ofNullable(remote.getSessionId())
+                    .map(Object::toString)
+                    .ifPresent(sid -> ex.addInfo(WebDriverException.SESSION_ID, sid));
+
+                TestBase.invokeSafely(remote::getCapabilities)
+                    .map(Object::toString)
+                    .ifPresent(caps -> ex.addInfo("Capabilities", caps));
+            });
         throw ex;
     }
     

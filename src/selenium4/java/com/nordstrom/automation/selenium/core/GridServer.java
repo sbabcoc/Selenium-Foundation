@@ -144,9 +144,11 @@ public class GridServer {
      */
     public static List<Capabilities> getNodeCapabilities(SeleniumConfig config, URL hubUrl, URL nodeUrl) throws IOException {
         URI nodeUri = URI.create(nodeUrl.getProtocol() + "://" + nodeUrl.getAuthority());
-        List<NodeStatus> nodes = getStatusOfNodes(config, hubUrl);
-        return nodes.stream().filter(node -> node.getUri().equals(nodeUri))
-                .map(node -> node.getCapabilities()).flatMap(Collection::stream).collect(Collectors.toList());
+        return getStatusOfNodes(config, hubUrl).stream()
+                .filter(node -> node.getUri().equals(nodeUri))
+                .map(NodeStatus::getCapabilities)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
     
     /**
