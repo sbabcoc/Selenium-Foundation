@@ -88,8 +88,8 @@ To add a dependency for Gradle:
 
 | Platform | Dependency |
 |:---:|:---|
-| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:33.3.0-s3'<br/>}</pre> |
-| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:33.3.0-s4'<br/>}</pre> |
+| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:33.3.1'<br/>}</pre> |
+| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:33.3.1'<br/>}</pre> |
 
 ### Building Selenium Foundation
 
