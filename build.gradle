@@ -188,8 +188,13 @@ scmVersion {
   hooks {
     pre 'fileUpdate', [
         file: 'README.md',
-        pattern: { v, p -> /\d+\.\d+\.\d+-s[34]/ },
-        replacement: { v, p -> v }
+        pattern: { v, p -> /\d+\.\d+\.\d+-s3/ },
+        replacement: { v, p -> "${v}-s3" }
+    ]
+    pre 'fileUpdate', [
+        file: 'README.md',
+        pattern: { v, p -> /\d+\.\d+\.\d+-s4/ },
+        replacement: { v, p -> "${v}-s4" }
     ]
     pre 'commit'
     post 'push'
