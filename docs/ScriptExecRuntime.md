@@ -1,3 +1,4 @@
+# Introduction
 
 The `scriptExecRuntime` wrapper is a  **self-contained JavaScript execution runtime**  designed to sit inside a browser (or WebView) and provide  **structured, Selenium/Appium-friendly execution semantics**. Its features line up closely with the needs of  `executeScript`  /  `executeAsyncScript`  when Java is on the other side.
 
@@ -171,6 +172,19 @@ Script did not complete within 30000 ms
     -   `message`
     -   stack traces
 -   Enables lossless propagation from JS → Java
+
+### Allowed Exception
+
+To guard against bad behavior, scripts wrapped and executed via `scriptExecRuntime` are constrained in the types of exceptions that they are allowed to return. By default, scripts are allowed to return **AssertionError** failures and any exception that's a subclass of **RuntimeException**. The **ALLOWED_EXCEPTIONS** setting enables you to specify additional exceptions that scripts are allowed to return.
+
+The value of **ALLOWED_EXCEPTIONS** is a comma-delimited list of exception specifications. There are three supported formats:
+
+* Fully qualified exception class names
+	* **Ex**: `com.mycompany.FooBarException` explicitly allows scripts to return **FooBarException**
+* Package wildcards using `*` (package only)
+	* **Ex**: `com.mycompany.exceptions.*` allows scripts to return exceptions defined in package **com.mycompany.exceptions**
+* Package subtree wildcards using `**`
+	* **Ex**: `com.mycompany.widget.**` allows scripts to return exceptions defined in package **com.mycompany.widget** or its subpackages
 
 ----------
 
