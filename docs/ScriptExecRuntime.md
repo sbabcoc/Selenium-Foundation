@@ -173,7 +173,7 @@ Script did not complete within 30000 ms
     -   stack traces
 -   Enables lossless propagation from JS → Java
 
-### Allowed Exception
+### Allowed Exceptions
 
 To guard against bad behavior, scripts wrapped and executed via `scriptExecRuntime` are constrained in the types of exceptions that they are allowed to return. By default, scripts are allowed to return **AssertionError** failures and any exception that's a subclass of **RuntimeException**. The **ALLOWED_EXCEPTIONS** setting enables you to specify additional exceptions that scripts are allowed to return.
 
