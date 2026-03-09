@@ -175,7 +175,7 @@ Script did not complete within 30000 ms
 
 ### Allowed Exceptions
 
-To guard against bad behavior, scripts wrapped and executed via `scriptExecRuntime` are constrained in the types of exceptions that they are allowed to return. By default, scripts are allowed to return **AssertionError** failures and any exception that's a subclass of **RuntimeException**. The **ALLOWED_EXCEPTIONS** setting enables you to specify additional exceptions that scripts are allowed to return.
+To guard against bad behavior, scripts wrapped and executed via `scriptExecRuntime` are constrained in the types of exceptions that they are allowed to return. By default, **AssertionError**, **RuntimeException** types, **Selenium** exceptions, and **Selenium Foundation** exceptions are allowed. The **ALLOWED_EXCEPTIONS** setting enables you to specify additional exceptions that scripts are allowed to return.
 
 The value of **ALLOWED_EXCEPTIONS** is a comma-delimited list of exception specifications. There are three supported formats:
 
