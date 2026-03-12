@@ -413,7 +413,7 @@ public abstract class AbstractSeleniumConfig extends
         /**
          * This setting specifies that the {@code Appium} server should be managed by the {@code PM2} utility.
          * <p>
-         * <b>NOTE</b>: {@code Appium} requires an active execution context. To run {@code Appium} as a stand-alone
+         * <b>NOTE</b>: {@code Appium} requires an active execution context. To run {@code Appium} as a standalone
          * <b>Selenium Grid</b> node, the server must to executed as a daemon process. Starting the server via the
          * {@code PM2} utility provides the required persistent execution context.
          * 

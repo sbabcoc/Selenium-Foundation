@@ -327,7 +327,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         // if not running with 'pm2', no options to add
         if (!config.appiumWithPM2()) return nodeCapabilities;
         
-        // add indication of stand-alone execution of 'appium' with 'pm2'
+        // add indication of standalone execution of 'appium' with 'pm2'
         Capabilities nordOptions = config.getCapabilitiesForJson(APPIUM_WITH_PM2)[0];
         return config.toJson(Arrays.stream(config.getCapabilitiesForJson(nodeCapabilities))
             .map(capabilities -> config.mergeCapabilities(capabilities, nordOptions))
@@ -540,14 +540,14 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         }
 
         /**
-         * Determine if using 'pm2' for stand-alone execution of 'appium'.
+         * Determine if using 'pm2' for standalone execution of 'appium'.
          * 
          * @param nodeUrl {@link URL} object for target node server
          * @return {@code true} if using 'pm2'; otherwise {@code false}
          */
         public static boolean isAppiumWithPM2(URL nodeUrl) {
             SeleniumConfig config = SeleniumConfig.getConfig();
-            // check settings to determine if 'pm2' used for stand-alone execution of 'appium'
+            // check settings to determine if 'pm2' used for standalone execution of 'appium'
             boolean appiumWithPM2 = config.getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key());
             // if undetermined
             if (!appiumWithPM2) {
