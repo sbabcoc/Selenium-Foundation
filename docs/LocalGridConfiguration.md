@@ -2,9 +2,9 @@
 
 By default, **Selenium Foundation** acquires driver sessions from an instance of **Selenium Grid**. If you specify an existing instance in your [configuration](ConfiguringProjectSettings.md#selenium-grid-configuration), sessions will be acquired from there. If this configuration setting is left undefined or specifies an inactive `localhost` URL, **Selenium Foundation** will automatically launch a local Grid instance as specified by the local Grid configuration.
 
-## Stand-Alone Selenium Grid with [local-grid-parent](https://github.com/sbabcoc/local-grid-parent)
+## Standalone Selenium Grid with [local-grid-parent](https://github.com/sbabcoc/local-grid-parent)
 
-In addition to providing a local Grid instance for running Selenium tests on your machine, this **Selenium Foundation** feature can be used to launch stand-alone instances that can be utilized in more conventional fashion by tests running on other machines. The easiest way to manage a stand-alone instance of **Selenium Grid** is via the [Local Grid Parent](https://github.com/sbabcoc/local-grid-parent) utility. This utility leverages the capabilities of **Selenium Foundation** to configure and manage Selenium Grid instances.
+In addition to providing a local Grid instance for running Selenium tests on your machine, this **Selenium Foundation** feature can be used to launch standalone instances that can be utilized in more conventional fashion by tests running on other machines. The easiest way to manage a standalone instance of **Selenium Grid** is via the [Local Grid Parent](https://github.com/sbabcoc/local-grid-parent) utility. This utility leverages the capabilities of **Selenium Foundation** to configure and manage Selenium Grid instances.
 
 ## Local Selenium Grid Configuration
 
