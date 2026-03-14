@@ -2,7 +2,7 @@
 
 Configuration settings for **Selenium Foundation**, controlled via `settings.properties` or System property declarations.  
 
-**NOTE**: The System property key associated with each setting can be revealed by tapping the disclosure triangle next to the setting comnstant name.
+**NOTE**: The System property key associated with each setting can be revealed by tapping the disclosure triangle next to the setting constant name.
 
 ---
 
