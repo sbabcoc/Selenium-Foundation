@@ -25,7 +25,7 @@ Settings that define the components of the target URI used for test navigation.
 Settings that control the local Selenium Grid instance.
 
 | Setting | Default | Description |
-|---------|---------|-------------|
+|:---------|---------|-------------|
 | <details><summary>**GRID_PLUGINS**</summary>`selenium.grid.plugins`</details> | *(none)* | <details><summary>Path-delimited list of fully-qualified driver plug-in class names.</summary>**NOTE**: Overrides the `ServiceLoader` provider configuration file.</details> |
 | <details><summary>**GRID_SERVLETS**</summary>`selenium.grid.servlets`</details> | *(none)* | <details><summary>Comma-delimited list of fully-qualified servlet class names.</summary>**Selenium 3**: Hosted by the hub server.<br>**Selenium 4**: Hosted by `ServletContainer`.</details> |
 | <details><summary>**SHUTDOWN_GRID**</summary>`selenium.grid.shutdown`</details> | `true` | Whether to shut down the local Grid instance at the end of the test run |
