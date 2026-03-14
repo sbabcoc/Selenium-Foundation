@@ -71,7 +71,7 @@ Settings that specify the browser used for new WebDriver sessions.
 | Setting | Default | Description |
 |---------|---------|-------------|
 | <details><summary>**BROWSER_NAME**</summary>`selenium.browser.name`</details> | *(none)* | Browser name or ["personality"](CustomizingCapabilities.md#selecting-browser-capabilities-by-personality) for new session requests |
-| <details><summary>**BROWSER_CAPS**</summary>`selenium.browser.caps`</details> | *(none)* | <details><summary>Capabilities for new session requests. [Learn more...](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/CustomizingCapabilities.md#specifying-browser-capabilities-directly)</summary>Used when **BROWSER_NAME** is undefined. This setting may specify a file path (absolute, relative, or simple filename) or a JSON `Capabilities` object.</details> |
+| <details><summary>**BROWSER_CAPS**</summary>`selenium.browser.caps`</details> | *(none)* | <details><summary>Capabilities for new session requests. [Learn more...](CustomizingCapabilities.md#specifying-browser-capabilities-directly)</summary>Used when **BROWSER_NAME** is undefined. This setting may specify a file path (absolute, relative, or simple filename) or a JSON `Capabilities` object.</details> |
 
 ---
 
@@ -95,8 +95,8 @@ Settings that define the current test context.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| <details><summary>**CONTEXT_PLATFORM**</summary>`selenium.context.platform`</details> | `support` | Target platform for the current test context [Learn more...](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/TargetPlatformFeature.md#introduction) |
-| <details><summary>**ALLOWED_EXCEPTIONS**</summary>`selenium.allowed.exceptions`</details> | *(none)* | <details><summary>Java exceptions that scripts are allowed to return [Learn more...](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/ScriptExecRuntime.md#allowed-exceptions)</summary>This setting specifies a comma-delimited list of exceptions (or packages/subtrees containing exceptions) that executed JavaScript snippets are allowed to return.</details> |
+| <details><summary>**CONTEXT_PLATFORM**</summary>`selenium.context.platform`</details> | `support` | Target platform for the current test context [Learn more...](TargetPlatformFeature.md#introduction) |
+| <details><summary>**ALLOWED_EXCEPTIONS**</summary>`selenium.allowed.exceptions`</details> | *(none)* | <details><summary>Java exceptions that scripts are allowed to return [Learn more...](ScriptExecRuntime.md#allowed-exceptions)</summary>This setting specifies a comma-delimited list of exceptions (or packages/subtrees containing exceptions) that executed JavaScript snippets are allowed to return.</details> |
 
 ---
 
