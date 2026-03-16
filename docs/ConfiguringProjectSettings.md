@@ -159,7 +159,7 @@ Note that no Java dependencies are required for **Selenium Foundation** to launc
 The `getCurrentCapabilities()` method converts the configured browser settings into a **`Capabilities`** object:
 
 * If **`BROWSER_NAME`** is specified, **Selenium Foundation** uses this name to acquire a **`Capabilities`** object from the active Selenium Grid.
-* Otherwise, the JSON configuration is acquired from **`BROWSER_CAPS`**, which can be either a file path (absolute, relative, or simple filename) or a direct value.
+* Otherwise, the JSON configuration is acquired from **`BROWSER_CAPS`**, which can be either a file path (absolute, relative, or simple filename) or a JSON `Capabilities` object.
 
 As indicated by the sequence above, the desired browser can be specified solely by name. This name can be associated with a Selenium Grid browser "personality", or it may simply specify the name associated with a particular browser by its corresponding driver. If browser name is omitted, a fully-specified JSON capabilities record is acquired from the settings collection.
 
