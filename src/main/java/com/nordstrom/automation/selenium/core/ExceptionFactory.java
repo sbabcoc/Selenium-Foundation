@@ -88,12 +88,25 @@ public final class ExceptionFactory {
     /**
      * Creates a Java exception based on the requested class name.
      *
-     * <p>This method enforces whitelist rules, validates the requested exception
-     * type, attempts instantiation via reflection, and attaches any provided
-     * JavaScript stack trace.</p>
+     * <p>The following exception types are permitted without explicit whitelisting:</p>
+     * <ul>
+     *   <li>All Selenium exceptions ({@code org.openqa.selenium.**})</li>
+     *   <li>All Selenium Foundation exceptions
+     *       ({@code com.nordstrom.automation.selenium.exceptions.**})</li>
+     *   <li>{@link AssertionError} (exact class only)</li>
+     *   <li>{@link RuntimeException} and all subclasses</li>
+     * </ul>
      *
-     * <p>If the requested exception violates the configured policy or cannot be
-     * instantiated, a {@link ScriptExecutionException} is thrown instead.</p>
+     * <p>All other exception types must be explicitly permitted by the configured
+     * whitelist. See {@link ExceptionFactory} for whitelist rule syntax.</p>
+     *
+     * <p>If the requested class is not a {@link Throwable} subclass, is not found,
+     * or cannot be instantiated, a {@link ScriptExecutionException} is thrown
+     * instead. The same applies if the requested type is not permitted by the
+     * configured policy.</p>
+     *
+     * <p>If provided, the JavaScript stack trace is attached to the resulting
+     * exception as a suppressed {@link JavaScriptStackTrace} instance.</p>
      *
      * @param className
      *        fully qualified exception class name requested by JavaScript
@@ -104,48 +117,35 @@ public final class ExceptionFactory {
      *
      * @return the instantiated exception
      *
+     * @throws NullPointerException
+     *         if {@code className} is {@code null}
      * @throws ScriptExecutionException
-     *         if the class is not found, not permitted, or cannot be instantiated
+     *         if the class is not found, is not a {@link Throwable} subclass,
+     *         is not permitted by policy, or cannot be instantiated
      */
-    @SuppressWarnings("unchecked")
     public Throwable create(String className, String message, String jsStack) {
         Objects.requireNonNull(className, "className");
 
         try {
-            Class<?> clazz = Class.forName(className);
+            Class<? extends Throwable> clazz = Class.forName(className).asSubclass(Throwable.class);
 
-            // Always allow AssertionError
-            if (clazz == AssertionError.class) {
-                AssertionError ae = new AssertionError(message);
-                attachStack(ae, jsStack);
-                return ae;
-            }
-
-            // Always allow RuntimeException (including subclasses)
-            if (RuntimeException.class.isAssignableFrom(clazz)) {
-                Class<? extends RuntimeException> exClass =
-                        (Class<? extends RuntimeException>) clazz;
-
-                RuntimeException ex = instantiate(exClass, message);
-                attachStack(ex, jsStack);
-                return ex;
-            }
-
-            // All other exceptions must be explicitly allowed by the whitelist
-            if (!isAllowed(clazz)) {
+            if (clazz != AssertionError.class
+                    && !RuntimeException.class.isAssignableFrom(clazz)
+                    && !isAllowed(clazz)) {
                 throw ScriptExecutionException.policyViolation(
                         className,
                         "Requested exception not allowed by configuration: " + className
                 );
             }
 
-            // If somehow allowed by whitelist, attempt to instantiate
-            return instantiate((Class<? extends RuntimeException>) clazz, message);
+            Throwable ex = instantiate(clazz, message);
+            attachStack(ex, jsStack);
+            return ex;
 
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | ClassCastException e) {
             throw ScriptExecutionException.instantiationFailure(
                     className,
-                    "Requested exception class not found: " + className,
+                    "Requested exception class not found or invalid: " + className,
                     e
             );
         } catch (ReflectiveOperationException e) {
@@ -206,7 +206,7 @@ public final class ExceptionFactory {
     }
 
     /**
-     * Instantiates the specified {@link RuntimeException} class using reflection.
+     * Instantiates the specified class using reflection.
      *
      * <p>The instantiation strategy is:</p>
      * <ol>
@@ -220,8 +220,8 @@ public final class ExceptionFactory {
      * avoided to prevent unintended information leakage across the JavaScript
      * boundary.</p>
      *
-     * @param exClass
-     *        concrete {@link RuntimeException} class to instantiate
+     * @param clazz
+     *        concrete class to instantiate
      * @param message
      *        exception message; may be {@code null}
      *
@@ -231,16 +231,15 @@ public final class ExceptionFactory {
      *         if the exception cannot be instantiated due to missing accessible
      *         constructors or reflection errors
      */
-    private static RuntimeException instantiate(
-            Class<? extends RuntimeException> exClass,
+    private static <T extends Throwable> T instantiate(
+            Class<T> clazz,
             String message) throws ReflectiveOperationException {
 
         try {
-            Constructor<? extends RuntimeException> ctor =
-                exClass.getConstructor(String.class);
+            Constructor<T> ctor = clazz.getConstructor(String.class);
             return ctor.newInstance(message);
         } catch (NoSuchMethodException ignored) {
-            return exClass.getConstructor().newInstance();
+            return clazz.getConstructor().newInstance();
         }
     }
 

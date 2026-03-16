@@ -142,6 +142,14 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         // create node configuration for this plug-in
         Path nodeConfigPath = config.createNodeConfig(getCapabilities(config), hubUrl);
         
+        // get path to 'appium' configuration file
+        Path appiumConfigPath = config.getAppiumConfigPath();
+        // if file path is specified
+        if (appiumConfigPath != null) {
+            argsList.add("--config-file");
+            argsList.add(appiumConfigPath.toString());
+        }
+        
         // allow specification of multiple command line arguments
         String[] cliArgs = config.getStringArray(SeleniumSettings.APPIUM_CLI_ARGS.key());
         // if args specified

@@ -355,6 +355,17 @@ public abstract class AbstractSeleniumConfig extends
         CONTEXT_PLATFORM("selenium.context.platform", "support"),
         
         /**
+         * This setting specifies the path to an {@code Appium} configuration file provided to the server
+         * when it's launched as a local <b>Selenium Grid</b> node server.
+         * <p>
+         * <b>NOTE</b>: If specified, this setting 
+         * <p>
+         * name: <b>appium.config.path</b><br>
+         * default: {@code null}
+         */
+        APPIUM_CONFIG_PATH("appium.config.path", null),
+        
+        /**
          * This setting specifies server arguments passed on to {@code Appium} when it's launched as a local
          * <b>Selenium Grid</b> node server.
          * <p>
@@ -541,6 +552,7 @@ public abstract class AbstractSeleniumConfig extends
     private URI targetUri;
     private Path nodeConfigPath;
     private Path hubConfigPath;
+    private Path appiumConfigPath;
     private URL hubUrl;
     private SeleniumGrid seleniumGrid;
     private ExceptionFactory exceptionFactory;
@@ -810,6 +822,22 @@ public abstract class AbstractSeleniumConfig extends
         return hubConfigPath;
     }
     
+    /**
+     * Get the path to the Appium configuration.
+     * 
+     * @return Appium configuration path; {@code null} if no path is specified
+     */
+    public Path getAppiumConfigPath() {
+        if (appiumConfigPath == null) {
+            String appiumConfig = getConfigPath(getString(SeleniumSettings.APPIUM_CONFIG_PATH.key()));
+            if (appiumConfig != null) {
+                LOGGER.debug("appiumConfig = {}", appiumConfig);
+                appiumConfigPath = Paths.get(appiumConfig);
+            }
+        }
+        return appiumConfigPath;
+    }
+    
     /** 
      * Convert the configured browser specification from JSON to {@link Capabilities} object.   
      *  
@@ -930,6 +958,8 @@ public abstract class AbstractSeleniumConfig extends
      * @return resolved absolute path of specified file; {@code null} if file not found
      */
     private static String getConfigPath(final String path) {
+        if (path == null) { return null; }
+        
         FileHandler handler = new FileHandler();
         handler.setPath(path);
         
