@@ -108,7 +108,7 @@ Settings that configure the Appium mobile automation server.
 |---------|---------|-------------|
 | <details><summary>**APPIUM_CONFIG**</summary>`appium.config`</details> | *(none)* | <details><summary>`Appium` server configuration file name or path  [Learn more...](https://appium.io/docs/en/2.7/guides/config)</summary>The `Appium` configuration can be JSON, YAML, or JavaScript (for dynamic configuration)</details> |
 | <details><summary>**APPIUM_CLI_ARGS**</summary>`appium.cli.args`</details> | *(none)* | <details><summary>Server arguments passed to `Appium` on launch.</summary>May be declared multiple times in `settings.properties`. For complex configurations, consider using **APPIUM_CONFIG** instead.</details> |
-| <details><summary>**APPIUM_BINARY_PATH**</summary>`appium.binary.path`</details> | `$APPIUM_BINARY_PATH` env var | Path to the `Appium` main script file. If unset, the global Node package repository is searched. |
+| <details><summary>**APPIUM_BINARY_PATH**</summary>`appium.binary.path`</details> | `$APPIUM_BINARY_PATH` | Path to the `Appium` main script file. If unset, the global Node package repository is searched. |
 | <details><summary>**APPIUM_WITH_PM2**</summary>`appium.with.pm2`</details> | `false` | <details><summary>Whether `Appium` should be managed by the `PM2` process manager (required for standalone node)</summary>**NOTE**: `Appium` requires an active execution context. To run `Appium` as a stand-alone **Selenium Grid** node, the server must to executed as a daemon process. Starting the server via the `PM2` utility provides the required persistent execution context.</details> |
 
 ---
@@ -119,6 +119,6 @@ Settings that locate the Node.js runtime and associated package managers.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| <details><summary>**NODE_BINARY_PATH**</summary>`node.binary.path`</details> | `$NODE_BINARY_PATH` env var | Path to the Node.js JavaScript runtime. If unset, the system PATH is searched. |
+| <details><summary>**NODE_BINARY_PATH**</summary>`node.binary.path`</details> | `$NODE_BINARY_PATH` | Path to the Node.js JavaScript runtime. If unset, the system PATH is searched. |
 | <details><summary>**NPM_BINARY_PATH**</summary>`npm.binary.path`</details> | *(none)* | Path to the `NPM` package manager utility. If unset, the system PATH is searched. |
 | <details><summary>**PM2_BINARY_PATH**</summary>`pm2.binary.path`</details> | *(none)* | Path to the `PM2` process manager utility. If unset, the system PATH is searched. |
