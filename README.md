@@ -56,6 +56,7 @@
 #### In-Depth Documentation
 
 * [Welcome to Selenium Foundation](docs/WelcomeToSeleniumFoundation.md#welcome)
+* [Selenium Foundation Settings](docs/SeleniumFoundationSettings.md#selenium-foundation-settings)
 * [Development Environment](docs/DevelopmentEnvironment.md#introduction)
 * [Configuring Project Settings](docs/ConfiguringProjectSettings.md#introduction)
 * [Local Grid Configuration](docs/LocalGridConfiguration.md#introduction)
