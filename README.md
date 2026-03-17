@@ -4,7 +4,7 @@
 **Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium** (_WebDriver_).
 
 ### * BREAKING NEWS *
-
+* Release [_33.4.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v33.4.0) of **Selenium Foundation** adds support for declaring the settings of **Appium** servers via vendor-specific configuration files. This makes complex configurations much easier to specify, and it also enables dynamic configurations via **JavaScript**/**TypeScript** declarations.
 * Release [_33.2.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v33.2.0) of **Selenium Foundation** adds support for capturing native application element hierarchies from **Appium** sessions.
 * Release [_32.0.1_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v32.0.1) of **Selenium Foundation** introduces a complete re-design of the **JavaScript** execution runtime. This removes reliance on non-standard features that are incompatible with some browsers, especially in the exception propagation facility. For complete details, see the [comprehensive documentation](docs/ScriptExecRuntime.md).
 * Release [_31.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v31.0.0) of **Selenium Foundation** resolves a few issues that were affecting functionality on **Safari for iOS**. Fixes in this release include revisions to frame-related driver targeting.
