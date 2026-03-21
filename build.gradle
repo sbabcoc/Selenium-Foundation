@@ -1,5 +1,19 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'org.sonatype.plexus:plexus-sec-dispatcher:1.4'
+    classpath 'org.codehaus.plexus:plexus-container-default:2.1.1'
+    classpath 'org.sonatype.plexus:plexus-cipher:1.7'
+  }
+}
+
 import org.gradle.internal.os.OperatingSystem
 import org.apache.tools.ant.filters.ReplaceTokens
+import groovy.xml.XmlParser
+import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher
+import org.sonatype.plexus.components.cipher.DefaultPlexusCipher
 
 plugins {
   id 'java-library'
@@ -10,7 +24,6 @@ plugins {
 
   id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
   id 'pl.allegro.tech.build.axion-release' version '1.21.1'
-  id "net.linguica.maven-settings" version "0.5"
 }
 
 group = 'com.nordstrom.ui-tools'
@@ -185,17 +198,54 @@ tasks.named('test', Test) {
   }
 }
 
+def getMavenServer(String serverId) {
+  def settingsFile = new File(System.getProperty("user.home"), ".m2/settings.xml")
+  if (!settingsFile.exists()) return null
+
+  def settings = new XmlParser().parse(settingsFile)
+  def server = settings.servers.server.find { it.id.text() == serverId }
+
+  if (server) {
+    def dispatcher = new DefaultSecDispatcher()
+    dispatcher._cipher = new DefaultPlexusCipher()
+
+    def securityFile = new File(System.getProperty("user.home"), ".m2/settings-security.xml")
+    System.setProperty("settings.security", securityFile.absolutePath)
+
+    def decrypt = { String val ->
+      if (val == null) return null
+      return dispatcher._cipher.isEncryptedString(val) ? dispatcher.decrypt(val) : val
+    }
+
+    return [
+      username: server.username?.text(),
+      password: decrypt(server.password?.text()),
+      passphrase: decrypt(server.passphrase?.text())
+    ]
+  }
+  
+  return null
+}
+
 scmVersion {
+  repository {
+    def githubNode = getMavenServer('github')
+
+    if (githubNode) {
+      customKey = githubNode.username
+      customKeyPassword = githubNode.password
+    }
+  }
   hooks {
     pre 'fileUpdate', [
-        file: 'README.md',
-        pattern: { v, p -> /\d+\.\d+\.\d+-s3/ },
-        replacement: { v, p -> "${v}-s3" }
+      file: 'README.md',
+      pattern: { v, p -> /\d+\.\d+\.\d+-s3/ },
+      replacement: { v, p -> "${v}-s3" }
     ]
     pre 'fileUpdate', [
-        file: 'README.md',
-        pattern: { v, p -> /\d+\.\d+\.\d+-s4/ },
-        replacement: { v, p -> "${v}-s4" }
+      file: 'README.md',
+      pattern: { v, p -> /\d+\.\d+\.\d+-s4/ },
+      replacement: { v, p -> "${v}-s4" }
     ]
     pre 'commit'
     post 'push'
@@ -246,17 +296,18 @@ publishing {
 
 /* Signing */
 signing {
-  useGpgCmd()
-  sign publishing.publications.mavenJava
-}
+  if (project.hasProperty('signing.keyId')) {
+    def keyId = project.getProperty('signing.keyId')
+    def gpgNode = getMavenServer(keyId)
+    def secret = gpgNode?.passphrase
 
-mavenSettings {
-  servers {
-    ossrh {
-      project.ext.ossrhUsername = username
-      project.ext.ossrhPassword = password
+    if (secret) {
+      useGpgCmd()
+      project.ext.set("signing.gnupg.passphrase", secret)
+      project.ext.set("signing.gnupg.arguments", "--batch,--pinentry-mode,loopback")
     }
   }
+  sign publishing.publications.mavenJava
 }
 
 /* Install alias */
@@ -271,6 +322,9 @@ nexusPublishing {
   packageGroup = 'com.nordstrom'
   repositories {
     ossrh {
+      def ossrhNode = getMavenServer('ossrh')
+      username = ossrhNode?.username
+      password = ossrhNode?.password
       nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
       snapshotRepositoryUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/"))
       if (project.hasProperty('ossrhStagingProfileId')) {
