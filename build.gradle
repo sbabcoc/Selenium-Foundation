@@ -228,14 +228,16 @@ def getMavenServer(String serverId) {
 }
 
 scmVersion {
-//  repository {
-//    def githubNode = getMavenServer('github')
-//
-//    if (githubNode) {
-//      customKey = githubNode.username
-//      customKeyPassword = githubNode.password
-//    }
-//  }
+  repository {
+    def githubNode = getMavenServer('github')
+
+    if (githubNode) {
+      credentials {
+        username = githubNode.username
+        password = githubNode.password
+      }
+    }
+  }
   hooks {
     pre 'fileUpdate', [
       file: 'README.md',
