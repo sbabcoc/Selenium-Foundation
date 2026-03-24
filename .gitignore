@@ -19,3 +19,4 @@ gradlew.bat
 /bin/
 test-output/
 .DS_Store
+.vscode/
