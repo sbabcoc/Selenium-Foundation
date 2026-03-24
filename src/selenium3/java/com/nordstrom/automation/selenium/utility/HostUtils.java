@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.openqa.selenium.net.NetworkInterfaceProvider;
 import org.openqa.selenium.net.NetworkUtils;
+import org.openqa.selenium.WebDriverException;
 
 /**
  * This class serves as a shim to access {@link NetworkUtils#getIp4NonLoopbackAddressOfThisMachine()}.
@@ -41,6 +42,10 @@ public class HostUtils {
      * @return IP address for the machine we're running on (a.k.a. - 'localhost')
      */
     public static String getLocalHost() {
-        return IDENTITY.getIp4NonLoopbackAddressOfThisMachine().getHostAddress();
+        try {
+            return IDENTITY.getIp4NonLoopbackAddressOfThisMachine().getHostAddress();
+        } catch (WebDriverException e) {
+            return "127.0.0.1";
+        }
     }    
 }
