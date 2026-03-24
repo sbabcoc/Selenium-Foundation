@@ -232,8 +232,10 @@ scmVersion {
     def githubNode = getMavenServer('github')
 
     if (githubNode) {
-      customKey = githubNode.username
-      customKeyPassword = githubNode.password
+      git {
+        userName = githubNode.username
+        password = githubNode.password
+      }
     }
   }
   hooks {
