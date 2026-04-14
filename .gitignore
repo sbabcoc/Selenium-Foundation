@@ -13,9 +13,6 @@ logs-*/
 .gradle/
 build/
 build-*/
-gradle/
-gradlew
-gradlew.bat
 /bin/
 test-output/
 .DS_Store
