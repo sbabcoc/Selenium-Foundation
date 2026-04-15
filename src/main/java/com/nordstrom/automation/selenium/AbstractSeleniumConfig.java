@@ -199,7 +199,7 @@ public abstract class AbstractSeleniumConfig extends
          * Selenium 3: <b>4445</b><br>
          * Selenium 4: <b>4446</b>
          */
-        HUB_PORT("selenuim.hub.port", null),
+        HUB_PORT("selenium.hub.port", null),
         
         /**
          * This setting specifies the slot matcher used by the local <b>Selenium Grid</b> hub server.
