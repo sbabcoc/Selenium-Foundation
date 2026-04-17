@@ -98,11 +98,13 @@ public final class DriverManager {
         
         // if getting a driver
         if (getDriver) {
-            // if driver not yet acquired
-            if (!optDriver.isPresent()) {
+            // if driver already acquired
+            if (optDriver.isPresent()) {
+                driver = optDriver.get();
+            } else {
                 long prior = System.currentTimeMillis();
                 driver = injectDriver(instance, method);
-                optDriver = Optional.of(driver);
+                instance.setDriver(driver);
                 if (instance.isTest(method)) {
                     long after = System.currentTimeMillis();
                     instance.adjustTimeout(after - prior);
@@ -112,8 +114,8 @@ public final class DriverManager {
             // if initial page spec'd
             if (initialPage != null) {
                 SeleniumConfig config = SeleniumConfig.getConfig();
-                Page page = Page.openInitialPage(initialPage, optDriver.get(), config.getTargetUri());
-                instance.setInitialPage(instance.prepInitialPage(page));
+                Page page = Page.openInitialPage(initialPage, driver, config.getTargetUri());
+                instance.setInitialPage(page);
             }
         }
         

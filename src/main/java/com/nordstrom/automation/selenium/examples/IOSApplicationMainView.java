@@ -25,7 +25,7 @@ public class IOSApplicationMainView extends Page implements DetectsLoadCompletio
      */
     protected enum Using implements ByEnum {
         /** view heading */
-        HEADING(By.xpath("//XCUIElementTypeStaticText[@role='AXHeader']")),
+        HEADING(By.xpath("//XCUIElementTypeStaticText[contains(concat(' ',@traits,' '), ' Header ')]")),
         /** 'Echo Box' link */
         ECHO_BOX(By.id("Echo Box"));
         

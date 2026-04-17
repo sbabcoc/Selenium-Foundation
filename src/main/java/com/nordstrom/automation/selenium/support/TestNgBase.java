@@ -143,8 +143,8 @@ public abstract class TestNgBase extends TestBase {
      * {@inheritDoc}
      */
     @Override
-    public <T extends Page> void setInitialPage(final T initialPage) {
-        TestAttribute.INITIAL_PAGE.track(initialPage);
+    public <T extends Page> void setInitialPage(final T pageObj) {
+        TestAttribute.INITIAL_PAGE.track(pageObj);
     }
     
     /**

@@ -48,7 +48,9 @@ public class Page extends ComponentContainer {
         /** This state is set on a new page object to indicate that it will be associated with a new window. */
         WILL_OPEN,
         /** This state is set on an existing page object to indicate that its associated window will close. */
-        WILL_CLOSE
+        WILL_CLOSE,
+        /** This state is set on the initial page object to bypass the default load completion check */
+        IS_INITIAL
     }
     
     /**
@@ -185,11 +187,15 @@ public class Page extends ComponentContainer {
                     final InitialPage initialPage, final WebDriver driver, final URI targetUri) {
         
         Objects.requireNonNull(initialPage, "[initialPage] must be non-null");
+        Objects.requireNonNull(driver, "[driver] must be non-null");
         String url = getInitialUrl(initialPage, targetUri);
         if (url != null) {
             getUrl(url, driver);
         }
-        return newPage((Class<T>) initialPage.value(), driver);
+        
+        Bootstrap bootstrap = new Bootstrap(driver);
+        Bootstrap enhanced = bootstrap.enhanceContainer(bootstrap);
+        return enhanced.newInitialPage((Class<T>) initialPage.value());
     }
     
     /**
@@ -346,4 +352,14 @@ public class Page extends ComponentContainer {
             return false;
         return true;
     }
+    
+    private static class Bootstrap extends Page {
+        public Bootstrap(WebDriver driver) {
+            super(driver);
+        }
+        public <T extends Page> T newInitialPage(final Class<T> pageType) {
+            return newPage(pageType, driver).setWindowState(WindowState.IS_INITIAL);
+        }
+    }
+    
 }
