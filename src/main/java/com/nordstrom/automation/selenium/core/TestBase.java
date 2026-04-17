@@ -5,8 +5,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.exceptions.DriverNotAvailableException;
 import com.nordstrom.automation.selenium.exceptions.InitialPageNotSpecifiedException;
@@ -55,30 +53,6 @@ public abstract class TestBase {
      * @param driver driver for the current test; 'null' to discard driver
      */
     public abstract void setDriver(WebDriver driver);
-    
-    /**
-     * Prepare the specified page object for use:
-     * <ul>
-     *     <li>Ensure that the page object is associated with a window handle.</li>
-     *     <li>Set the driver for the current test to the page object driver.</li>
-     *     <li>Return an enhanced instance of the page object.</li>
-     * </ul>
-     * 
-     * @param pageObj page object to be prepared
-     * @return prepared page object
-     */
-    public Page prepInitialPage(Page pageObj) {
-        if (pageObj.getWindowHandle() == null) {
-            try {
-                pageObj.setWindowHandle(pageObj.getWrappedDriver().getWindowHandle());
-            } catch (WebDriverException ignored) {
-                // nothing to do here
-            }
-        }
-        // required when initial page is local file
-        setDriver(pageObj.getWrappedDriver());
-        return pageObj.enhanceContainer(pageObj);
-    }
     
     /**
      * Get the initial page for the current test.

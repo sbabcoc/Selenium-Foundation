@@ -201,7 +201,7 @@ public enum ContainerMethodInterceptor {
                 // if page spec'd
                 if (returnsPage) {
                     Page newPage = (Page) result;
-                    // if expecting window to open for new page 
+                    // if expecting window to open for new page
                     if (newPage.getWindowState() == WindowState.WILL_OPEN) {
                         // wait until new window opens
                         newHandle = WaitType.WAIT.getWait(driver).until(Coordinators.newWindowIsOpened(initialHandles));
@@ -221,6 +221,11 @@ public enum ContainerMethodInterceptor {
                             newHandle = driver.getWindowHandle();
                         } catch (WebDriverException eaten) {
                             // framework errors are forbidden
+                        }
+                        // if new page is the initial page
+                        if (newPage.getWindowState() == WindowState.IS_INITIAL) {
+                            // no stale wait
+                            reference = null;                        
                         }
                     }
                 }
