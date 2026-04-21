@@ -29,7 +29,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.grid.config.ConfigException;
 import org.openqa.selenium.json.Json;
-import org.openqa.selenium.net.PortProber;
 
 import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.core.GridUtility;
@@ -47,6 +46,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String DEFAULT_HUB_PORT = "4446";
     private static final String DEFAULT_HUB_CONFIG = "hubConfig-s4.json";
     private static final String DEFAULT_NODE_CONFIG = "nodeConfig-s4.json";
+    private static final String EVENT_HOST = "tcp://*:";
     
     /**
      * <b>org.openqa.selenium.grid.Main</b>
@@ -391,6 +391,18 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return defaults;
     }
 
+    @Override
+    public String getPublishUrl() {
+        int port = getAvailablePort(SeleniumSettings.PUBLISH_PORT);
+        return (port != -1) ? EVENT_HOST + port : null;
+    }
+    
+    @Override
+    public String getSubscribeUrl() {
+        int port = getAvailablePort(SeleniumSettings.SUBSCRIBE_PORT);
+        return (port != -1) ? EVENT_HOST + port : null;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -450,7 +462,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
                 // create relay configuration template if absent
                 Map<String, Object> relayOptions = (Map<String, Object>) nodeConfig.computeIfAbsent("relay", k -> new HashMap<>());
                 relayOptions.computeIfAbsent("host", k -> HostUtils.getLocalHost());
-                relayOptions.computeIfAbsent("port", k -> PortProber.findFreePort());
+                relayOptions.computeIfAbsent("port", k -> SeleniumConfig.getConfig().getAppiumServerPort());
                 relayOptions.computeIfAbsent("configs", k -> new ArrayList<>());
             // otherwise (not Appium)
             } else {

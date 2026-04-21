@@ -42,6 +42,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
     private static final String OPT_HOST = "--host";
     private static final String OPT_PORT = "--port";
     private static final String OPT_CONFIG = "--config";
+    private static final String OPT_PUB_EVENTS = "--publish-events";
+    private static final String OPT_SUB_EVENTS = "--subscribe-events";
     
     /**
      * Constructor for models of local Selenium Grid instances from hub URL.
@@ -139,6 +141,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         Objects.requireNonNull(config, "[config] must be non-null");
         
         String launcherClassName = config.getString(SeleniumSettings.GRID_LAUNCHER.key());
+        String publishUrl = config.getPublishUrl();
+        String subscribeUrl = config.getSubscribeUrl();
         String[] dependencyContexts = config.getDependencyContexts();
         String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
         Path workingPath = (workingDir == null || workingDir.isEmpty()) ? null : Paths.get(workingDir);
@@ -157,8 +161,8 @@ public class LocalSeleniumGrid extends SeleniumGrid {
             Integer hubPort = (hubUrl != null) ?
                     hubUrl.getPort() : config.getInteger(SeleniumSettings.HUB_PORT.key(), -1);
             Path outputPath = GridUtility.getOutputPath(config, true);
-            hubServer = create(config, launcherClassName, dependencyContexts, 
-                    true, hubPort, hubConfigPath, workingPath, outputPath);
+            hubServer = create(config, launcherClassName, dependencyContexts, true, hubPort,
+                    publishUrl, subscribeUrl, hubConfigPath, workingPath, outputPath);
         }
         
         // store hub host and hub port in system properties for subsequent retrieval
@@ -178,10 +182,10 @@ public class LocalSeleniumGrid extends SeleniumGrid {
                 nodeServers.add(nodeServer);
                 // if this is an Appium Grid server
                 if (nodeServer instanceof AppiumGridServer) {
-                    // get path to relay configuration path from Appium process environment
+                    // get path to relay configuration from Appium process environment
                     Path nodeConfigPath = ((AppiumGridServer) nodeServer).getNodeConfigPath();
                     // add relay node for Appium Grid server to nodes list
-                    nodeServers.add(create(config, launcherClassName, dependencyContexts, false, -1, nodeConfigPath,
+                    nodeServers.add(createNode(config, launcherClassName, dependencyContexts, -1, nodeConfigPath,
                             workingPath, GridUtility.getOutputPath(config, null)));
                     LOGGER.debug("Adding local Grid relay for Appium server providing personalities: {}",
                             nodeServer.getPersonalities().keySet());
@@ -227,21 +231,53 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param config {@link SeleniumConfig} object
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
-     * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
      * @param port port that Grid server should use; -1 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file
      * @param workingPath {@link Path} of working directory for server process; {@code null} for default
      * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
      * @param propertyNames optional array of property names to propagate to server process
      * @return {@link LocalGridServer} object for managing the server process
-     * @throws GridServerLaunchFailedException If a Grid component process failed to start
+     * @throws GridServerLaunchFailedException if a Grid component process failed to start
+     * @see #activate()
+     * @see LocalGridServer#start()
+     * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
+     *      Getting Command-Line Help</a>
+     */
+    public static LocalGridServer createNode(final SeleniumConfig config, final String launcherClassName,
+            final String[] dependencyContexts, final Integer port, final Path configPath,
+            final Path workingPath, final Path outputPath, final String... propertyNames) {
+        
+        return create(config, launcherClassName, dependencyContexts, false, port,
+                null, null, configPath, workingPath, outputPath, propertyNames);
+    }
+    
+    /**
+     * Create an object that represents a Selenium Grid server with the specified arguments.
+     * <p>
+     * <b>NOTE</b>: The created object defines a separate process for managing the local server, but does <b>NOT</b>
+     * start this process.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param launcherClassName fully-qualified name of {@code GridLauncher} class
+     * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
+     * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
+     * @param port port that Grid server should use; -1 to specify auto-configuration
+     * @param publishUrl URL for publishing Grid events
+     * @param subscribeUrl URL for subscribing to Grid events
+     * @param configPath {@link Path} to server configuration file
+     * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+     * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
+     * @param propertyNames optional array of property names to propagate to server process
+     * @return {@link LocalGridServer} object for managing the server process
+     * @throws GridServerLaunchFailedException if a Grid component process failed to start
      * @see #activate()
      * @see LocalGridServer#start()
      * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
      *      Getting Command-Line Help</a>
      */
     public static LocalGridServer create(final SeleniumConfig config, final String launcherClassName,
-            final String[] dependencyContexts, final boolean isHub, final Integer port, final Path configPath,
+            final String[] dependencyContexts, final boolean isHub, final Integer port, 
+            final String publishUrl, final String subscribeUrl, final Path configPath,
             final Path workingPath, final Path outputPath, final String... propertyNames) {
         
         List<String> argsList = new ArrayList<>();
@@ -271,6 +307,16 @@ public class LocalSeleniumGrid extends SeleniumGrid {
         // specify server port
         argsList.add(OPT_PORT);
         argsList.add(portNum.toString());
+        
+        if (publishUrl != null) {
+            argsList.add(OPT_PUB_EVENTS);
+            argsList.add(publishUrl);
+        }
+        
+        if (subscribeUrl != null) {
+            argsList.add(OPT_SUB_EVENTS);
+            argsList.add(subscribeUrl);
+        }
         
         // specify server configuration file
         argsList.add(OPT_CONFIG);

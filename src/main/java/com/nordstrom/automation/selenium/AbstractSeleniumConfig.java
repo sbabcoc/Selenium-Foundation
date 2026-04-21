@@ -2,6 +2,8 @@ package com.nordstrom.automation.selenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,6 +31,7 @@ import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.net.PortProber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,6 +205,22 @@ public abstract class AbstractSeleniumConfig extends
         HUB_PORT("selenium.hub.port", null),
         
         /**
+         * This is the port used by local <b>Selenium Grid</b> components for publishing events.
+         * <p>
+         * name: <b>selenium.publish.port</b><br>
+         * default: <b>4442</b>
+         */
+        PUBLISH_PORT("selenium.publish.port", "4442"),
+        
+        /**
+         * This is the port used by local <b>Selenium Grid</b> components for subscribing to events.
+         * <p>
+         * name: <b>selenium.subscribe.port</b><br>
+         * default: <b>4443</b>
+         */
+        SUBSCRIBE_PORT("selenium.subscribe.port", "4443"),
+        
+        /**
          * This setting specifies the slot matcher used by the local <b>Selenium Grid</b> hub server.
          * 
          * name: <b>selenium.slot.matcher</b><br>
@@ -355,10 +374,19 @@ public abstract class AbstractSeleniumConfig extends
         CONTEXT_PLATFORM("selenium.context.platform", "support"),
         
         /**
+         * This setting specifies the port that the {@code Appium} server listens on.
+         * <p>
+         * name: <b>appium.server.port</b><br>
+         * default: <b>4723</b>
+         */
+        APPIUM_SERVER_PORT("appium.server.port", "4723"),
+        
+        /**
          * This setting specifies the path to an {@code Appium} configuration file provided to the server
          * when it's launched as a local <b>Selenium Grid</b> node server.
          * <p>
-         * <b>NOTE</b>: If specified, this setting 
+         * <b>NOTE</b>: If specified, the config file indicated by this setting provides base values for the options
+         * it declares. These values can be supplemented or overridden via the {@link #APPIUM_CLI_ARGS} setting.
          * <p>
          * name: <b>appium.config.path</b><br>
          * default: {@code null}
@@ -694,6 +722,22 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
+     * Get the <b>Selenium Grid</b> event bus 'publish' URL.
+     * 
+     * @return URL for publishing <b>Grid</b> events
+     * @see SeleniumSettings#PUBLISH_PORT
+     */
+    public abstract String getPublishUrl();
+    
+    /**
+     * Get the <b>Selenium Grid</b> event bus 'subscribe' URL.
+     * 
+     * @return URL for subscribing to <b>Grid</b> events
+     * @see SeleniumSettings#SUBSCRIBE_PORT
+     */
+    public abstract String getSubscribeUrl();
+    
+    /**
      * Get object that represents the active Selenium Grid.
      * 
      * @return {@link SeleniumGrid} object
@@ -820,6 +864,16 @@ public abstract class AbstractSeleniumConfig extends
             hubConfigPath = Paths.get(hubConfig);
         }
         return hubConfigPath;
+    }
+    
+    /**
+     * Get the port that the {@code Appium} server listens on.
+     * 
+     * @return {@link SeleniumSettings#APPIUM_SERVER_PORT APPIUM_SERVER_PORT} if defined and available;
+     *         otherwise random available port
+     */
+    public int getAppiumServerPort() {
+        return getAvailablePort(SeleniumSettings.APPIUM_SERVER_PORT);
     }
     
     /**
@@ -1116,5 +1170,40 @@ public abstract class AbstractSeleniumConfig extends
     @Override
     public String getSettingsPath() {
         return SETTINGS_FILE;
+    }
+    
+    /**
+     * Get available port for the specified setting.
+     * 
+     * @param setting setting to check for port availability
+     * @return value of setting if defined and available; otherwise random available port
+     */
+    protected int getAvailablePort(final SeleniumSettings setting) {
+        int port = getInt(setting.key(), -1);
+        if (port != -1) {
+            String portStr = Integer.toString(port);
+            port = checkPortIsFree(port);
+            if (port == -1) {
+                LOGGER.warn("{} port '{}' is unavailable; finding free port", setting.name(), portStr);
+            }
+        }
+        return (port != -1) ? port : PortProber.findFreePort();
+    }
+    
+    /**
+     * Determine if the specified port is free.
+     * 
+     * @param port port to be evaluated
+     * @return the specified port if it's free; otherwise -1
+     */
+    private static int checkPortIsFree(int port) {
+        try {
+            Method method = PortProber.class.getDeclaredMethod("checkPortIsFree", int.class);
+            method.setAccessible(true);
+            return (int) method.invoke(null, port);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+                IllegalArgumentException | InvocationTargetException e) {
+            return -1;
+        }
     }
 }

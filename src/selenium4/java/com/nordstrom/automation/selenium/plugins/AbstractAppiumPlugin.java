@@ -146,7 +146,7 @@ public abstract class AbstractAppiumPlugin implements DriverPlugin {
         Path appiumConfigPath = config.getAppiumConfigPath();
         // if file path is specified
         if (appiumConfigPath != null) {
-            argsList.add("--config-file");
+            argsList.add("--config");
             argsList.add(appiumConfigPath.toString());
         }
         
