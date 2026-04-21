@@ -29,6 +29,7 @@ import org.apache.commons.configuration2.io.FileSystem;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.net.PortProber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servl
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
+import com.nordstrom.automation.selenium.utility.GridHubPortAllocator;
 import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.base.UncheckedThrow;
@@ -159,8 +161,8 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.launcher</b><br>
          * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
          * <ul>
-         *     <li>Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b></li>
          *     <li>Selenium 4: <b>org.openqa.selenium.grid.Bootstrap</b></li>
+         *     <li>Selenium 3: <b>org.openqa.grid.selenium.GridLauncherV3</b></li>
          * </ul>
          */
         GRID_LAUNCHER("selenium.grid.launcher", null),
@@ -178,8 +180,8 @@ public abstract class AbstractSeleniumConfig extends
          * This setting specifies the configuration file name/path for the local <b>Selenium Grid</b> hub server.
          * <p>
          * name: <b>selenium.hub.config</b><br>
-         * Selenium 3: <b>hubConfig-s3.json</b><br>
-         * Selenium 4: <b>hubConfig-s4.json</b>
+         * Selenium 4: <b>hubConfig-s4.json</b><br>
+         * Selenium 3: <b>hubConfig-s3.json</b>
          */
         HUB_CONFIG("selenium.hub.config", null),
         
@@ -187,8 +189,8 @@ public abstract class AbstractSeleniumConfig extends
          * This is the URL for the <b>Selenium Grid</b> endpoint: [scheme:][//authority]/wd/hub
          * <p>
          * name: <b>selenium.hub.host</b><br>
-         * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4445/wd/hub</b><br>
-         * Selenium 4: <b>http://&lt;{@code localhost}&gt;:4446/wd/hub</b>
+         * Selenium 4: <b>http://&lt;{@code localhost}&gt;:4444/wd/hub</b><br>
+         * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4445/wd/hub</b>
          */
         HUB_HOST("selenium.hub.host", null),
         
@@ -196,10 +198,26 @@ public abstract class AbstractSeleniumConfig extends
          * This is the port assigned to the local <b>Selenium Grid</b> hub server.
          * <p>
          * name: <b>selenium.hub.port</b><br>
-         * Selenium 3: <b>4445</b><br>
-         * Selenium 4: <b>4446</b>
+         * Selenium 4: <b>4444</b><br>
+         * Selenium 3: <b>4445</b>
          */
         HUB_PORT("selenium.hub.port", null),
+        
+        /**
+         * This is the port used by local <b>Selenium Grid</b> components for publishing events.
+         * <p>
+         * name: <b>selenium.publish.port</b><br>
+         * default: <b>4442</b>
+         */
+        PUBLISH_PORT("selenium.publish.port", "4442"),
+        
+        /**
+         * This is the port used by local <b>Selenium Grid</b> components for subscribing to events.
+         * <p>
+         * name: <b>selenium.subscribe.port</b><br>
+         * default: <b>4443</b>
+         */
+        SUBSCRIBE_PORT("selenium.subscribe.port", "4443"),
         
         /**
          * This setting specifies the slot matcher used by the local <b>Selenium Grid</b> hub server.
@@ -221,8 +239,8 @@ public abstract class AbstractSeleniumConfig extends
          * This setting specifies the configuration template name/path for local <b>Selenium Grid</b> node servers.
          * <p>
          * name: <b>selenium.node.config</b><br>
-         * Selenium 3: <b>nodeConfig-s3.json</b><br>
-         * Selenium 4: <b>nodeConfig-s4.json</b>
+         * Selenium 4: <b>nodeConfig-s4.json</b><br>
+         * Selenium 3: <b>nodeConfig-s3.json</b>
          */
         NODE_CONFIG("selenium.node.config", null),
         
@@ -355,10 +373,19 @@ public abstract class AbstractSeleniumConfig extends
         CONTEXT_PLATFORM("selenium.context.platform", "support"),
         
         /**
+         * This setting specifies the port that the {@code Appium} server listens on.
+         * <p>
+         * name: <b>appium.server.port</b><br>
+         * default: <b>4723</b>
+         */
+        APPIUM_SERVER_PORT("appium.server.port", "4723"),
+        
+        /**
          * This setting specifies the path to an {@code Appium} configuration file provided to the server
          * when it's launched as a local <b>Selenium Grid</b> node server.
          * <p>
-         * <b>NOTE</b>: If specified, this setting 
+         * <b>NOTE</b>: If specified, the config file indicated by this setting provides base values for the options
+         * it declares. These values can be supplemented or overridden via the {@link #APPIUM_CLI_ARGS} setting.
          * <p>
          * name: <b>appium.config.path</b><br>
          * default: {@code null}
@@ -694,6 +721,22 @@ public abstract class AbstractSeleniumConfig extends
     }
     
     /**
+     * Get the <b>Selenium Grid</b> event bus 'publish' URL.
+     * 
+     * @return URL for publishing <b>Grid</b> events
+     * @see SeleniumSettings#PUBLISH_PORT
+     */
+    public abstract String getPublishUrl();
+    
+    /**
+     * Get the <b>Selenium Grid</b> event bus 'subscribe' URL.
+     * 
+     * @return URL for subscribing to <b>Grid</b> events
+     * @see SeleniumSettings#SUBSCRIBE_PORT
+     */
+    public abstract String getSubscribeUrl();
+    
+    /**
      * Get object that represents the active Selenium Grid.
      * 
      * @return {@link SeleniumGrid} object
@@ -820,6 +863,16 @@ public abstract class AbstractSeleniumConfig extends
             hubConfigPath = Paths.get(hubConfig);
         }
         return hubConfigPath;
+    }
+    
+    /**
+     * Get the port that the {@code Appium} server listens on.
+     * 
+     * @return {@link SeleniumSettings#APPIUM_SERVER_PORT APPIUM_SERVER_PORT} if defined and available;
+     *         otherwise random available port
+     */
+    public int getAppiumServerPort() {
+        return getAvailablePort(SeleniumSettings.APPIUM_SERVER_PORT);
     }
     
     /**
@@ -1116,5 +1169,26 @@ public abstract class AbstractSeleniumConfig extends
     @Override
     public String getSettingsPath() {
         return SETTINGS_FILE;
+    }
+    
+    /**
+     * Get available port for the specified setting.
+     * 
+     * @param setting setting to check for port availability
+     * @return value of setting if defined and available; otherwise random available port
+     */
+    protected int getAvailablePort(final SeleniumSettings setting) {
+        int port = getInt(setting.key(), -1);
+        if (port != -1) {
+            if (!GridHubPortAllocator.isFree(port)) {
+                LOGGER.warn("{} port '{}' is unavailable; finding free port", setting.name(), port);
+                port = -1;
+            }
+        }
+        if (port == -1) {
+            port = PortProber.findFreePort();
+            System.setProperty(setting.key(), Integer.toString(port));
+        }
+        return port;
     }
 }

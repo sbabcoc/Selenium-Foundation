@@ -212,6 +212,35 @@ public class LocalSeleniumGrid extends SeleniumGrid {
      * @param config {@link SeleniumConfig} object
      * @param launcherClassName fully-qualified name of {@code GridLauncher} class
      * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
+     * @param port port that Grid server should use; -1 to specify auto-configuration
+     * @param configPath {@link Path} to server configuration file
+     * @param workingPath {@link Path} of working directory for server process; {@code null} for default
+     * @param outputPath {@link Path} to output log file; {@code null} to decline log-to-file
+     * @param propertyNames optional array of property names to propagate to server process
+     * @return {@link LocalGridServer} object for managing the server process
+     * @throws GridServerLaunchFailedException if a Grid component process failed to start
+     * @see #activate()
+     * @see LocalGridServer#start()
+     * @see <a href="http://www.seleniumhq.org/docs/07_selenium_grid.jsp#getting-command-line-help">
+     *      Getting Command-Line Help</a>
+     */
+    public static LocalGridServer createNode(final SeleniumConfig config, final String launcherClassName,
+            final String[] dependencyContexts, final Integer port, final Path configPath,
+            final Path workingPath, final Path outputPath, final String... propertyNames) {
+        
+        return create(config, launcherClassName, dependencyContexts, false,
+                port, configPath, workingPath, outputPath, propertyNames);
+    }
+    
+    /**
+     * Create an object that represents a Selenium Grid server with the specified arguments.
+     * <p>
+     * <b>NOTE</b>: The created object defines a separate process for managing the local server, but does <b>NOT</b>
+     * start this process.
+     * 
+     * @param config {@link SeleniumConfig} object
+     * @param launcherClassName fully-qualified name of {@code GridLauncher} class
+     * @param dependencyContexts fully-qualified names of context classes for Selenium Grid dependencies
      * @param isHub role of Grid server being started ({@code true} = hub; {@code false} = node)
      * @param port port that Grid server should use; -1 to specify auto-configuration
      * @param configPath {@link Path} to server configuration file

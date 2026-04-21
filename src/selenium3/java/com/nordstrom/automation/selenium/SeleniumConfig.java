@@ -230,6 +230,16 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         return defaults;
     }
 
+    @Override
+    public String getPublishUrl() {
+        return null;
+    }
+    
+    @Override
+    public String getSubscribeUrl() {
+        return null;
+    }
+    
     /**
      * {@inheritDoc}
      */
