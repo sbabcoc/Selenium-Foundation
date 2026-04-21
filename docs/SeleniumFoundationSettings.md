@@ -48,7 +48,7 @@ Settings that configure the Selenium Grid hub server.
 |---------|---------|-------------|
 | <details><summary>**HUB_CONFIG**</summary>`selenium.hub.config`</details> | <details><summary>*version-specific*</summary> **Selenium 3**: `hubConfig-s3.json`<br>**Selenium 4**: `hubConfig-s4.json`</details> | Hub server configuration file name or path. |
 | <details><summary>**HUB_HOST**</summary>`selenium.hub.host`</details> | <details><summary>*version-specific*</summary>**Selenium 3**: `http://localhost:4445/wd/hub`<br>**Selenium 4**: `http://localhost:4446/wd/hub`</details> | URL for the Grid hub endpoint (`[scheme:][//authority]/wd/hub`). |
-| <details><summary>**HUB_PORT**</summary>`selenuim.hub.port`</details> | <details><summary>*version-specific*</summary> **Selenium 3**: `4445`<br>**Selenium 4**: `4446`</details> | Port for the local hub server. |
+| <details><summary>**HUB_PORT**</summary>`selenium.hub.port`</details> | <details><summary>*version-specific*</summary> **Selenium 3**: `4445`<br>**Selenium 4**: `4446`</details> | Port for the local hub server. |
 | <details><summary>**HUB_DEBUG**</summary>`selenium.hub.debug`</details> | <details><summary>`false`</summary>Adds JDWP library to suspend the hub server on launch, listening at port 8000</details> | Whether to launch the hub server with JDWP debugging enabled |
 
 ---
