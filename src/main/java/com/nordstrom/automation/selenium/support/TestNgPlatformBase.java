@@ -58,7 +58,7 @@ public abstract class TestNgPlatformBase<P extends Enum<?> & PlatformEnum> exten
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings({ "unchecked", "serial" })
+    @SuppressWarnings("unchecked")
     public P getTargetPlatform() {
         P platform = null;
         ITestResult testResult = Reporter.getCurrentTestResult();
