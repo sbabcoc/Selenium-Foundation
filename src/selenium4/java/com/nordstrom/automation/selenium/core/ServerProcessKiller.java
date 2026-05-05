@@ -47,7 +47,7 @@ public class ServerProcessKiller {
         }
         
         // get ID of listening process
-        String pid = ServerPidFinder.getPidOfServerAt(serverUrl.getPort());
+        String pid = ServerPidFinder.getPidOfServerAt(serverUrl.getPort(), true);
         if (pid != null) {
             // get server process handle ('null' on failure)
             ProcessHandle handle = ProcessHandle.of(Long.parseLong(pid)).orElse(null);

@@ -65,7 +65,7 @@ public class ServerProcessKiller {
             }
         }
         
-        String pid = ServerPidFinder.getPidOfServerAt(serverUrl.getPort());
+        String pid = ServerPidFinder.getPidOfServerAt(serverUrl.getPort(), true);
         if (pid != null) {
             LOGGER.debug("Local server with process ID '{}' listening to: {}", pid, serverUrl);
             try {

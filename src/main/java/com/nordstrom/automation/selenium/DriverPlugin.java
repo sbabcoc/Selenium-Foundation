@@ -109,7 +109,7 @@ public interface DriverPlugin {
      * @throws IOException if an I/O error occurs
      */
     LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
-            URL hubUrl, final Path workingPath, final Path outputPath) throws IOException;
+            URL hubUrl, Path workingPath, Path outputPath) throws IOException;
     
     /**
      * Get constructor for this driver's {@link RemoteWebDriver} implementation.

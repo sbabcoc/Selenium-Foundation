@@ -13,17 +13,25 @@ import com.nordstrom.common.file.OSInfo;
 public class ServerPidFinder {
 
     private enum PidFinder {
-        WINDOWS("cmd.exe", "/c", "for /f \"tokens=5\" %%a in ('netstat -ano ^| findstr :%d ^| findstr LISTENING') do @echo %%a"),
-        MAC_UNIX("sh", "-c", "lsof -iTCP:%d -sTCP:LISTEN -t");
+        WINDOWS("cmd.exe",
+                "/c",
+                "for /f \"tokens=5\" %%a in ('netstat -ano ^| findstr :%d ^| findstr LISTENING') do @echo %%a",
+                "for /f \"tokens=5\" %%a in ('netstat -ano ^| findstr :%d') do @echo %%a"),
+        MAC_UNIX("sh",
+                "-c",
+                "lsof -nP -iTCP:%d -sTCP:LISTEN -t",
+                "lsof -nP -iTCP:%d -t");
         
         private String executable;
         private String commandOption;
-        private String commandFormat;
+        private String listenMode;
+        private String anyMode;
 
-        PidFinder(String execuable, String commandOption, String commandFormat) {
+        PidFinder(String execuable, String commandOption, String listenMode, String anyMode) {
             this.executable = execuable;
             this.commandOption = commandOption;
-            this.commandFormat = commandFormat;
+            this.listenMode = listenMode;
+            this.anyMode = anyMode;
         }
         
         String getExecutable() {
@@ -34,8 +42,8 @@ public class ServerPidFinder {
             return commandOption;
         }
         
-        String getCommand(int port) {
-            return String.format(commandFormat, port);
+        String getCommand(int port, boolean listen) {
+            return String.format(listen ? listenMode : anyMode, port);
         }
     }
     
@@ -50,16 +58,17 @@ public class ServerPidFinder {
      * Get the process ID of the server listening to the specified port.
      * 
      * @param port {@code localhost} port to check
+     * @param listen {@code true} to require LISTEN mode; {@code false} to accept any mode
      * @return if found, ID of listening process; otherwise {@code null}
      */
-    public static String getPidOfServerAt(int port) {
+    public static String getPidOfServerAt(int port, boolean listen) {
         String pid = null;
         
         try {
             PidFinder finder = 
                     OSInfo.getDefault().getType() == OSInfo.OSType.WINDOWS ? PidFinder.WINDOWS : PidFinder.MAC_UNIX;
-            
-            ProcessBuilder pb = new ProcessBuilder(finder.getExecutable(), finder.getOption(), finder.getCommand(port));
+            ProcessBuilder pb = 
+                    new ProcessBuilder(finder.getExecutable(), finder.getOption(), finder.getCommand(port, listen));
             Process process = pb.start();
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
