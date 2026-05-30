@@ -15,6 +15,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.core.IGridServer;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
 import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import net.bytebuddy.implementation.Implementation;
@@ -48,7 +49,7 @@ public abstract class RemoteWebDriverPlugin implements DriverPlugin {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public LocalGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
+    public IGridServer create(SeleniumConfig config, String launcherClassName, String[] dependencyContexts,
             URL hubUrl, final Path workingPath, final Path outputPath) throws IOException {
         
         String[] combinedContexts = combineDependencyContexts(dependencyContexts, this);

@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.ExceptionFactory;
 import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
+import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.core.GridUtility;
-import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
 import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
@@ -48,6 +48,7 @@ import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.automation.settings.SettingsCore;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.file.PathUtils;
+import com.nordstrom.common.uri.UriUtils;
 
 /**
  * This class declares settings and methods related to WebDriver and Grid configuration for Selenium 3 and Selenium 4.
@@ -684,9 +685,13 @@ public abstract class AbstractSeleniumConfig extends
             } else {
                 Integer hubPort = getInteger(SeleniumSettings.HUB_PORT.key(), -1);
                 if (hubPort != -1) {
-                    String localHost = HostUtils.getLocalHost();
-                    hubUrl = LocalGridServer.getServerUrl(localHost, hubPort);
-                    LOGGER.debug("Synthesized hub URL: {}", hubUrl);
+                    try {
+                        String localHost = HostUtils.getLocalHost();
+                        hubUrl = UriUtils.makeBasicURI("http", localHost, hubPort, GridServer.HUB_BASE).toURL();
+                        LOGGER.debug("Synthesized hub URL: {}", hubUrl);
+                    } catch (MalformedURLException e) {
+                        throw UncheckedThrow.throwUnchecked(e);
+                    }
                 }
             }
         }

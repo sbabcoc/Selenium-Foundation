@@ -18,12 +18,11 @@ import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
 
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.plugins.AbstractAppiumPlugin.AppiumGridServer;
 
 /**
  * This class represents a single Selenium Grid server (hub or node).
  */
-public class GridServer {
+public class GridServer implements IGridServer {
     private boolean isHub;
     private URL serverUrl;
     
@@ -50,6 +49,7 @@ public class GridServer {
      * 
      * @return {@code true} if this server is a hub; otherwise {@code false}
      */
+    @Override
     public boolean isHub() {
         return isHub;
     }
@@ -59,6 +59,7 @@ public class GridServer {
      * 
      * @return {@link URL} object for this server
      */
+    @Override
     public URL getUrl() {
         return serverUrl;
     }
@@ -68,6 +69,7 @@ public class GridServer {
      * 
      * @return {@code true} if server is active; otherwise {@code false}
      */
+    @Override
     public boolean isActive() {
         return GridUtility.isHostActive(serverUrl, SERVER_STATUS);
     }
@@ -78,10 +80,10 @@ public class GridServer {
      * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
+    @Override
     public boolean shutdown() throws InterruptedException {
         if (!GridUtility.isLocalHost(serverUrl)) return false;
         if (!isActive()) return true;
-        if (!isHub() && AppiumGridServer.shutdownAppiumWithPM2(serverUrl)) return true;
         return ServerProcessKiller.killServerProcess(null, serverUrl);
     }
 
