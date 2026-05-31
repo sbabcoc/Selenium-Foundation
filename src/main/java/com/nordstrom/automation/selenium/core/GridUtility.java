@@ -164,10 +164,9 @@ public final class GridUtility {
         if (!GridServer.isHubActive(remoteAddress)) {
             // if hub URL is on local host
             if (isLocalHost(remoteAddress)) {
-                LocalSeleniumGrid localGrid = (LocalSeleniumGrid) config.getSeleniumGrid();
                 try {
                     // activate grid
-                    localGrid.activate();
+                    config.getSeleniumGrid().activate();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new IllegalStateException("Interrupted activating local grid instance", e);

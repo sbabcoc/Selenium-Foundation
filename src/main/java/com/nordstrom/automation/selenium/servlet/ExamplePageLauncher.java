@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.GridUtility;
-import com.nordstrom.automation.selenium.core.ServerProcessKiller;
 import com.nordstrom.automation.selenium.examples.ServletContainer;
 import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.common.file.PathUtils;
@@ -91,12 +90,6 @@ public class ExamplePageLauncher {
                     return;
                 }
             }
-            
-            if (ServerProcessKiller.killServerProcess(null, getUrl())) {
-                hasStarted = false;
-                isActive = false;
-            }
-            
         }
         
         /**
