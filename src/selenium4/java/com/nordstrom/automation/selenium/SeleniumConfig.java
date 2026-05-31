@@ -31,10 +31,12 @@ import org.openqa.selenium.grid.config.ConfigException;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.net.PortProber;
 
-import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
+import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.automation.settings.SettingsCore;
+import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class declares settings and methods related to WebDriver and Grid configuration specific to the Selenium 3 API.
@@ -348,6 +350,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e);
         }
+        
+        SeleniumGrid.registerLocalGridFactory((config, hubUrl) -> {
+            try {
+                return LocalSeleniumGrid.create(config, hubUrl);
+            } catch (IOException e) {
+                throw UncheckedThrow.throwUnchecked(e);
+            }
+        });
     }
     
     /**
@@ -443,7 +453,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         try (Reader reader = Files.newBufferedReader(getNodeConfigPath())) {
             nodeConfig = new Json().toType(reader, MAP_TYPE);
             Map<String, Object> nodeOptions = (Map<String, Object>) nodeConfig.computeIfAbsent("node", k -> new HashMap<>());
-            nodeOptions.put("hub", hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + GridServer.GRID_REGISTER);
+            nodeOptions.put("hub", hubUrl.getProtocol() + "://" + hubUrl.getAuthority() + "/grid/register");
             nodeOptions.computeIfAbsent("detect-drivers", k -> false);
             // if Appium
             if (isAppium) {

@@ -9,8 +9,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * This interface defines the contract for Selenium Grid server objects.
  * <p>
- * Implementations include both local server processes ({@code LocalGridServer})
- * and remote server references ({@code GridServer}).
+ * Implementations include both local server processes and remote server references.
  */
 public interface IGridServer {
 

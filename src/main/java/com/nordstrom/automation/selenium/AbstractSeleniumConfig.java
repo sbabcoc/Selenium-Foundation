@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.ExceptionFactory;
 import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
-import com.nordstrom.automation.selenium.core.GridServer;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
@@ -687,7 +686,7 @@ public abstract class AbstractSeleniumConfig extends
                 if (hubPort != -1) {
                     try {
                         String localHost = HostUtils.getLocalHost();
-                        hubUrl = UriUtils.makeBasicURI("http", localHost, hubPort, GridServer.HUB_BASE).toURL();
+                        hubUrl = UriUtils.makeBasicURI("http", localHost, hubPort, "/wd/hub").toURL();
                         LOGGER.debug("Synthesized hub URL: {}", hubUrl);
                     } catch (MalformedURLException e) {
                         throw UncheckedThrow.throwUnchecked(e);

@@ -30,8 +30,6 @@ public class GridServer implements IGridServer {
     public static final String HUB_BASE = "/wd/hub";
     /** sub-path for Grid server 'status' endpoint */
     public static final String SERVER_STATUS = "/status";
-    /** sub-path for Grid server 'register' endpoint */
-    public static final String GRID_REGISTER = "/grid/register";
     
     /**
      * Constructor for Grid server object.

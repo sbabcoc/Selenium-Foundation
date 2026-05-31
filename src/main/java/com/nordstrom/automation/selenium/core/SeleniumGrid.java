@@ -50,6 +50,8 @@ public class SeleniumGrid {
     /** SLF4J logger for this Selenium Grid model */
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
+    private static java.util.function.BiFunction<SeleniumConfig, URL, SeleniumGrid> LOCAL_GRID_FACTORY;
+
     /**
      * No-argument constructor for subclasses. 
      */
@@ -105,10 +107,27 @@ public class SeleniumGrid {
     }
     
     /**
+     * Register the factory used to create local {@link SeleniumGrid} instances.
+     * <p>
+     * <b>NOTE</b>: This method is intended to be called from the static initializer of the
+     * version-specific {@code SeleniumConfig} subclass, which has access to the local Grid
+     * implementation. This decouples the core {@link SeleniumGrid} class from the local Grid
+     * implementation, allowing it to be provided as a separate dependency.
+     *
+     * @param factory factory function that accepts a {@link SeleniumConfig} and a hub {@link URL}
+     *     and returns a {@link SeleniumGrid} instance representing the local Grid
+     * @throws NullPointerException if {@code factory} is {@code null}
+     */
+    public static void registerLocalGridFactory(
+            java.util.function.BiFunction<SeleniumConfig, URL, SeleniumGrid> factory) {
+        LOCAL_GRID_FACTORY = Objects.requireNonNull(factory, "[factory] must be non-null");
+    }
+
+    /**
      * Create an object that represents the Selenium Grid with the specified hub endpoint.
      * <p>
      * If the endpoint is {@code null} or specifies an inactive {@code localhost} URL, this method launches a local
-     * Grid instance and returns a {@link LocalSeleniumGrid} object.
+     * Grid instance and returns a {@link SeleniumGrid} object.
      * 
      * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of hub host (may be {@code null})
@@ -120,8 +139,12 @@ public class SeleniumGrid {
         
         // if URL is undefined or specifies 'localhost' address
         if (hubUrl == null || GridUtility.isLocalHost(hubUrl)) {
-            // create/augment local grid instance
-            return LocalSeleniumGrid.create(config, hubUrl);
+            // if factory is registered
+            if (LOCAL_GRID_FACTORY != null) {
+                // create/augment local grid instance
+                return LOCAL_GRID_FACTORY.apply(config, hubUrl);
+            }
+            throw new IllegalStateException("No local Grid factory registered");
         // otherwise, if URL responds to requests
         } else if (GridServer.isHubActive(hubUrl)) {
             // store hub host and hub port in system properties for subsequent retrieval
@@ -135,7 +158,7 @@ public class SeleniumGrid {
     }
     
     /**
-     * Activate this <b>LocalSeleniumGrid</b> instance.
+     * Activate this local <b>Grid</b> instance.
      * <p>
      * This method ensures that the hub and node servers associated with this local grid are launched and active,
      * and it also ensures that grid node servers are registered with the hub. 
