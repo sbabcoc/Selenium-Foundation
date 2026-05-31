@@ -1,36 +1,21 @@
 package com.nordstrom.automation.selenium.core;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.Objects;
 import org.openqa.selenium.Capabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.core.LocalSeleniumGrid.LocalGridServer;
 import com.nordstrom.automation.selenium.plugins.PluginUtils;
 import com.nordstrom.common.uri.UriUtils;
 
@@ -55,27 +40,20 @@ import com.nordstrom.common.uri.UriUtils;
 public class SeleniumGrid {
     
     static final int CONNECT_TIMEOUT_MS = 500;
-    private static final int READ_TIMEOUT_MS = 1000;
-    private static final long MAX_POLL_INTERVAL_MS = 320;
-    private static final long MIN_POLL_INTERVAL_MS = 10;
 
-    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
-    private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool(
-        new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread(r, "UrlChecker-" + THREAD_COUNTER.incrementAndGet()); // Thread safety reviewed
-                t.setDaemon(true);
-                return t;
-            }
-        });
-
-    private GridServer hubServer;
-    private Map<URL, GridServer> nodeServers = new HashMap<>();
-    
+    /** hub server of this Grid instance */
+    protected IGridServer hubServer;
+    /** node servers of this Grid instance */
+    protected Map<URL, IGridServer> nodeServers = new HashMap<>();
     /** "personalities" supported by this Grid instance */
     protected Map<String, String> personalities = new HashMap<>();
     /** SLF4J logger for this Selenium Grid model */
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
+    
+    /**
+     * No-argument constructor for subclasses. 
+     */
+    protected SeleniumGrid() { }
     
     /**
      * Constructor for models of Selenium Grid instances from hub URL.
@@ -99,38 +77,6 @@ public class SeleniumGrid {
                 addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
             }
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
-        }
-    }
-    
-    /**
-     * Constructor for Selenium Grid from server objects.
-     * <p>
-     * This is used to create an interface for a newly-created local Grid.<br>
-     * <b>NOTE</b>: The represented local Grid instance is <b>NOT</b> immediately activated. Activation is performed
-     * by {@link GridUtility#getDriver()} the first time a supported driver is requested.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param hubServer {@link LocalGridServer} object for hub host
-     * @param nodeServers array of {@link LocalGridServer} objects for node hosts
-     * @throws IOException if unable to acquire Grid details
-     * @see GridUtility#getDriver()
-     * @see LocalSeleniumGrid#activate()
-     */
-    public SeleniumGrid(SeleniumConfig config, LocalGridServer hubServer, LocalGridServer... nodeServers) throws IOException {
-        this.hubServer = Objects.requireNonNull(hubServer, "[hubServer] must be non-null");
-        if (nodeServers.length > 0) {
-            LOGGER.debug("Assembling graph of pending grid at: {}", hubServer.getUrl());
-            for (LocalGridServer nodeServer : nodeServers) {
-                String nodeEndpoint = nodeServer.getUrl().getProtocol() + "://" + nodeServer.getUrl().getAuthority();
-                URL nodeUrl = URI.create(nodeEndpoint).toURL();
-                this.nodeServers.put(nodeUrl, nodeServer);
-                this.personalities.putAll(nodeServer.getPersonalities());
-            }
-            LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
-        } else if (config.getVersion() == 3) {
-            LOGGER.debug("Queued up servlet container at: {}", hubServer.getUrl());
-        } else {
-            LOGGER.debug("Queued up hub without nodes at: {}", hubServer.getUrl());
         }
     }
     
@@ -189,6 +135,20 @@ public class SeleniumGrid {
     }
     
     /**
+     * Activate this <b>LocalSeleniumGrid</b> instance.
+     * <p>
+     * This method ensures that the hub and node servers associated with this local grid are launched and active,
+     * and it also ensures that grid node servers are registered with the hub. 
+     * 
+     * @throws IOException if an I/O error occurs
+     * @throws InterruptedException if this thread was interrupted
+     * @throws TimeoutException if host timeout interval exceeded
+     */
+    public void activate() throws IOException, InterruptedException, TimeoutException {
+        // no-op
+    }
+    
+    /**
      * Shutdown the Selenium Grid represented by this object.
      * 
      * @return {@code false} if non-local Grid server encountered; otherwise {@code true}
@@ -196,10 +156,10 @@ public class SeleniumGrid {
      */
     public boolean shutdown() throws InterruptedException {
         boolean result = true;
-        Iterator<Entry<URL, GridServer>> iterator = nodeServers.entrySet().iterator();
+        Iterator<Entry<URL, IGridServer>> iterator = nodeServers.entrySet().iterator();
         
         while (iterator.hasNext()) {
-            Entry<URL, GridServer> serverEntry = iterator.next();
+            Entry<URL, IGridServer> serverEntry = iterator.next();
             if (serverEntry.getValue().shutdown()) {
                 iterator.remove();
             } else {
@@ -221,7 +181,7 @@ public class SeleniumGrid {
      * 
      * @return {@link GridServer} object that represents the active hub server
      */
-    public GridServer getHubServer() {
+    public IGridServer getHubServer() {
         return hubServer;
     }
     
@@ -230,7 +190,7 @@ public class SeleniumGrid {
      * 
      * @return map of {@link GridServer} objects that represent the attached node servers
      */
-    public Map<URL, GridServer> getNodeServers() {
+    public Map<URL, IGridServer> getNodeServers() {
         return nodeServers;
     }
     
@@ -259,134 +219,5 @@ public class SeleniumGrid {
         } else {
             return config.getCapabilitiesForJson(json)[0];
         }
-    }
-
-    /**
-     * Wait up to the specified interval for the indicated URL(s) to be available.
-     * <p>
-     * <b>NOTE</b>: This method was back-ported from the {@link org.openqa.selenium.net.UrlChecker UrlChecker} class in
-     * Selenium 3 to compile under Java 7.
-     * 
-     * @param timeout timeout interval
-     * @param unit granularity of specified timeout
-     * @param urls URLs to poll for availability
-     * @throws org.openqa.selenium.net.UrlChecker.TimeoutException if indicated URL is still available after specified
-     *     interval.
-     */
-    public static void waitUntilAvailable(long timeout, TimeUnit unit, final URL... urls)
-            throws org.openqa.selenium.net.UrlChecker.TimeoutException {
-        long start = System.nanoTime();
-        try {
-            Future<Void> callback = EXECUTOR.submit(new Callable<Void>() {
-                public Void call() throws InterruptedException {
-                    HttpURLConnection connection = null;
-
-                    long sleepMillis = MIN_POLL_INTERVAL_MS;
-                    while (true) {
-                        if (Thread.interrupted()) {
-                            throw new InterruptedException();
-                        }
-                        for (URL url : urls) {
-                            try {
-                                connection = connectToUrl(url);
-                                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                                    return null;
-                                }
-                            } catch (IOException e) {
-                                // Ok, try again.
-                            } finally {
-                                if (connection != null) {
-                                    connection.disconnect();
-                                }
-                            }
-                        }
-                        MILLISECONDS.sleep(sleepMillis);
-                        sleepMillis = (sleepMillis >= MAX_POLL_INTERVAL_MS) ? sleepMillis : sleepMillis * 2;
-                    }
-                }
-            });
-            callback.get(timeout, unit);
-        } catch (java.util.concurrent.TimeoutException e) {
-            throw new org.openqa.selenium.net.UrlChecker.TimeoutException(
-                    String.format("Timed out waiting for %s to be available after %d ms", Arrays.toString(urls),
-                            MILLISECONDS.convert(System.nanoTime() - start, NANOSECONDS)),
-                    e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Wait up to the specified interval for the indicated URL to be unavailable.
-     * <p>
-     * <b>NOTE</b>: This method was back-ported from the {@link org.openqa.selenium.net.UrlChecker UrlChecker} class in
-     * Selenium 3 to compile under Java 7.
-     * 
-     * @param timeout timeout interval
-     * @param unit granularity of specified timeout
-     * @param url URL to poll for availability
-     * @throws org.openqa.selenium.net.UrlChecker.TimeoutException if indicated URL is still available after specified
-     *     interval.
-     */
-    public static void waitUntilUnavailable(long timeout, TimeUnit unit, final URL url)
-                    throws org.openqa.selenium.net.UrlChecker.TimeoutException {
-        long start = System.nanoTime();
-        try {
-            Future<Void> callback = EXECUTOR.submit(new Callable<Void>() {
-                public Void call() throws InterruptedException {
-                    HttpURLConnection connection = null;
-
-                    long sleepMillis = MIN_POLL_INTERVAL_MS;
-                    while (true) {
-                        try {
-                            connection = connectToUrl(url);
-                            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                                return null;
-                            }
-                        } catch (IOException e) {
-                            return null;
-                        } finally {
-                            if (connection != null) {
-                                connection.disconnect();
-                            }
-                        }
-
-                        MILLISECONDS.sleep(sleepMillis);
-                        sleepMillis = (sleepMillis >= MAX_POLL_INTERVAL_MS) ? sleepMillis
-                                        : sleepMillis * 2;
-                    }
-                }
-            });
-            callback.get(timeout, unit);
-        } catch (TimeoutException e) {
-            throw new org.openqa.selenium.net.UrlChecker.TimeoutException(String.format(
-                            "Timed out waiting for %s to become unavailable after %d ms", url,
-                            MILLISECONDS.convert(System.nanoTime() - start, NANOSECONDS)), e);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Create a connection to the specified URL.
-     * <p>
-     * <b>NOTE</b>: This method was lifted from the {@link org.openqa.selenium.net.UrlChecker UrlChecker} class in the
-     * Selenium API.
-     * 
-     * @param url URL for connection
-     * @return connection to the specified URL
-     * @throws IOException if an I/O exception occurs
-     */
-    private static HttpURLConnection connectToUrl(URL url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
-        connection.setReadTimeout(READ_TIMEOUT_MS);
-        connection.connect();
-        return connection;
     }
 }
