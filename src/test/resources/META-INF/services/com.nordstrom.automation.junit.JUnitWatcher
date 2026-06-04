@@ -1,2 +1,3 @@
 com.nordstrom.automation.selenium.junit.DriverListener
 com.nordstrom.automation.selenium.junit.DriverWatcher
+com.nordstrom.automation.selenium.junit.GridWatcher

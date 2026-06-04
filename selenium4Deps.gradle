@@ -23,27 +23,8 @@ sourceSets {
 }
 
 dependencies {
-  constraints {
-    api 'com.nordstrom.tools:testng-foundation:6.0.0-j11'
-    api 'org.seleniumhq.selenium:selenium-grid:4.44.0'
-    api 'org.seleniumhq.selenium:selenium-support:4.44.0'
-    api 'org.seleniumhq.selenium:selenium-chrome-driver:4.44.0'
-    api 'org.seleniumhq.selenium:selenium-edge-driver:4.44.0'
-    api 'org.seleniumhq.selenium:selenium-firefox-driver:4.44.0'
-    api 'org.seleniumhq.selenium:selenium-safari-driver:4.44.0'
-    api 'com.nordstrom.ui-tools:htmlunit-remote:4.44.0'
-    api 'org.seleniumhq.selenium:htmlunit3-driver:4.44.0'
-    api 'org.htmlunit:htmlunit:5.0.0'
-    api 'org.apache.httpcomponents:httpclient:4.5.14'
-    api 'org.eclipse.jetty:jetty-servlet:9.4.57.v20241219'
-    api 'org.jsoup:jsoup:1.21.2'
-    api 'org.apache.commons:commons-lang3:3.20.0'
-    api 'com.beust:jcommander:1.82'
-    api 'io.netty:netty-transport-native-epoll:4.1.121.Final'
-    api 'io.netty:netty-transport-native-kqueue:4.1.121.Final'
-    api 'io.appium:java-client:10.0.0'
-    testImplementation 'org.mockito:mockito-core:4.11.0'
-  }
+  api platform("com.nordstrom.ui-tools:selenium-bom-s4:${baseVersion}${isSnapshot ? '-SNAPSHOT' : ''}")
+
   api 'com.nordstrom.tools:testng-foundation'
   api 'org.seleniumhq.selenium:selenium-grid'
   api 'org.seleniumhq.selenium:selenium-support'
@@ -52,5 +33,6 @@ dependencies {
   api 'org.jsoup:jsoup'
   api 'org.apache.commons:commons-lang3'
   api 'com.beust:jcommander'
+  testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager'
   testImplementation 'org.mockito:mockito-core'
 }

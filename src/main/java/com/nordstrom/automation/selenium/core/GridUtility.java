@@ -14,9 +14,6 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -29,7 +26,6 @@ import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -52,9 +48,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
-import com.nordstrom.automation.selenium.exceptions.GridServerLaunchFailedException;
 import com.nordstrom.common.base.UncheckedThrow;
-import com.nordstrom.common.file.PathUtils;
 import com.nordstrom.common.uri.UriUtils;
 
 /**
@@ -150,39 +144,26 @@ public final class GridUtility {
     
     /**
      * Get a driver with desired capabilities from specified Selenium Grid hub.
-     * 
+     *
      * @param remoteAddress Grid hub from which to obtain the driver
      * @param desiredCapabilities desired capabilities for the driver
      * @return driver object (may be 'null')
      */
     public static WebDriver getDriver(URL remoteAddress, Capabilities desiredCapabilities) {
         Objects.requireNonNull(remoteAddress, "[remoteAddress] must be non-null");
-        
+
         SeleniumConfig config = SeleniumConfig.getConfig();
-        
+
         // if specified hub is inactive
-        if (!GridServer.isHubActive(remoteAddress)) {
-            // if hub URL is on local host
-            if (isLocalHost(remoteAddress)) {
-                try {
-                    // activate grid
-                    config.getSeleniumGrid().activate();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new IllegalStateException("Interrupted activating local grid instance", e);
-                } catch (IOException | TimeoutException e) {
-                    throw new IllegalStateException("Failed activating local grid instance", e);
-                }
-            } else {
-                throw new IllegalStateException("No Selenium Grid instance was found at " + remoteAddress);
-            }
+        if (!isHostActive(remoteAddress, "/status")) {
+            throw new IllegalStateException("No Selenium Grid instance was found at " + remoteAddress);
         }
-        
+
         // get constructor for RemoteWebDriver class corresponding to desired capabilities
         Constructor<RemoteWebDriver> ctor = getRemoteWebDriverCtor(config, desiredCapabilities);
-        
+
         Map<String, Object> capsMap = new HashMap<>(desiredCapabilities.asMap());
-        
+
         // if capabilities contain 'nord:options'
         if (capsMap.containsKey("nord:options")) {
             // get map of custom options from capabilities
@@ -201,7 +182,7 @@ public final class GridUtility {
                 capsMap.put("nord:options", options);
             }
         }
-        
+
         try {
             // instantiate desired driver via configured grid
             return ctor.newInstance(remoteAddress, new MutableCapabilities(capsMap));
@@ -350,45 +331,6 @@ public final class GridUtility {
         return null;
     }
 
-    /**
-     * Get next configured output path for Grid server of specified role.
-     * 
-     * @param config {@link SeleniumConfig} object
-     * @param isHub role of Grid server being started: <ul>
-     *     <li>{@code true} = hub</li>
-     *     <li>{@code false} = node</li>
-     *     <li>{@code null} = relay</li>
-     * </ul>
-     * @return Grid server output path (may be {@code null})
-     */
-    public static Path getOutputPath(SeleniumConfig config, Boolean isHub) {
-        Path outputPath = null;
-        
-        if (!config.getBoolean(SeleniumSettings.GRID_NO_REDIRECT.key())) {
-            String gridRole = (isHub == null) ? "relay" : (isHub) ? "hub" : "node";
-            String logsFolder = config.getString(SeleniumSettings.GRID_LOGS_FOLDER.key());
-            Path logsPath = Paths.get(logsFolder);
-            if (!logsPath.isAbsolute()) {
-                String workingDir = config.getString(SeleniumSettings.GRID_WORKING_DIR.key());
-                if (workingDir == null || workingDir.isEmpty()) {
-                    workingDir = System.getProperty("user.dir");
-                }
-                logsPath = Paths.get(workingDir, logsFolder);
-            }
-            
-            try {
-                if (!logsPath.toFile().exists()) {
-                    Files.createDirectories(logsPath);
-                }
-                outputPath = PathUtils.getNextPath(logsPath, "grid-" + gridRole, "log");
-            } catch (IOException e) {
-                throw new GridServerLaunchFailedException(gridRole, e);
-            }
-        }
-        
-        return outputPath;
-    }
-    
     /**
      * Get constructor for the desired driver's {@link RemoteWebDriver} implementation.
      * 

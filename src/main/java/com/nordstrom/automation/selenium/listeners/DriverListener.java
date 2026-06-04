@@ -94,7 +94,7 @@ public class DriverListener implements IInvokedMethodListener, ITestListener {
      */
     @Override
     public void onStart(final ITestContext testContext) {
-        // no pre-run processing
+        DriverManager.onStart();
     }
 
     /**

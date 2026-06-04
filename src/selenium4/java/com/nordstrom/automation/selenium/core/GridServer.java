@@ -73,19 +73,6 @@ public class GridServer implements IGridServer {
     }
     
     /**
-     * Stop the Selenium Grid server represented by this object.
-     * 
-     * @return {@code false} if [localOnly] and server is remote; otherwise {@code true}
-     * @throws InterruptedException if this thread was interrupted
-     */
-    @Override
-    public boolean shutdown() throws InterruptedException {
-        if (!GridUtility.isLocalHost(serverUrl)) return false;
-        if (!isActive()) return true;
-        return ServerProcessKiller.killServerProcess(null, serverUrl);
-    }
-
-    /**
      * Determine if the specified Selenium Grid hub is active.
      * 
      * @param hubUrl {@link URL} to be checked

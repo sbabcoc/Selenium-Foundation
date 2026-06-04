@@ -49,11 +49,17 @@ public interface IGridServer {
 
     /**
      * Stop this Grid server.
+     * <p>
+     * <b>NOTE</b>: This default implementation returns {@code false} since non-local
+     * Grid servers cannot be shut down by the framework. Local Grid servers override
+     * this method to terminate their associated process.
      *
-     * @return {@code false} if non-local Grid server encountered; otherwise {@code true}
+     * @return {@code false} if server is non-local; {@code true} if successfully shut down
      * @throws InterruptedException if this thread was interrupted
      */
-    boolean shutdown() throws InterruptedException;
+    default boolean shutdown() throws InterruptedException {
+        return false;
+    }
 
     /**
      * Get the driver 'personalities' for this Grid server.
