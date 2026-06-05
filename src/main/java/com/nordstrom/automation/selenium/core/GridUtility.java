@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -155,8 +156,19 @@ public final class GridUtility {
         SeleniumConfig config = SeleniumConfig.getConfig();
 
         // if specified hub is inactive
-        if (!isHostActive(remoteAddress, "/status")) {
-            throw new IllegalStateException("No Selenium Grid instance was found at " + remoteAddress);
+        if (!GridServer.isHubActive(remoteAddress)) {
+            if (isLocalHost(remoteAddress)) {
+                try {
+                    config.getSeleniumGrid().activate();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted activating local grid instance", e);
+                } catch (IOException | TimeoutException e) {
+                    throw new IllegalStateException("Failed activating local grid instance", e);
+                }
+            } else {
+                throw new IllegalStateException("No Selenium Grid instance was found at " + remoteAddress);
+            }
         }
 
         // get constructor for RemoteWebDriver class corresponding to desired capabilities

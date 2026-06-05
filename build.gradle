@@ -225,6 +225,7 @@ tasks.withType(Test).configureEach {
 
 /* TestNG */
 tasks.register('testNG', Test) {
+  dependsOn tasks.named('jar')
   useTestNG()
   testLogging.showStandardStreams = true
   
