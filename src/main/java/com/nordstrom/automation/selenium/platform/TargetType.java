@@ -10,12 +10,6 @@ import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
-import com.nordstrom.automation.selenium.plugins.EspressoPlugin;
-import com.nordstrom.automation.selenium.plugins.Mac2Plugin;
-import com.nordstrom.automation.selenium.plugins.RemoteWebDriverPlugin;
-import com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin;
-import com.nordstrom.automation.selenium.plugins.WindowsPlugin;
-import com.nordstrom.automation.selenium.plugins.XCUITestPlugin;
 
 /**
  * This enumeration defines a platform that associates test methods with target characteristics and supporting driver
@@ -27,45 +21,53 @@ public enum TargetType implements TargetTypeName {
      * driver: (not-applicable)
      */
     SUPPORT(SUPPORT_NAME),
-    
+
     /**
      * target: web application<br>
-     * driver: {@link RemoteWebDriverPlugin}, {@link UiAutomator2Plugin}, {@link XCUITestPlugin}
+     * driver: {@code RemoteWebDriverPlugin}, {@code UiAutomator2Plugin}, {@code XCUITestPlugin}
      */
-    WEB_APP(WEB_APP_NAME, RemoteWebDriverPlugin.class, UiAutomator2Plugin.class, XCUITestPlugin.class),
-    
+    WEB_APP(WEB_APP_NAME,
+        "com.nordstrom.automation.selenium.plugins.RemoteWebDriverPlugin",
+        "com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin",
+        "com.nordstrom.automation.selenium.plugins.XCUITestPlugin"),
+
     /**
      * target: Android application<br>
-     * driver: {@link UiAutomator2Plugin}, {@link EspressoPlugin}
+     * driver: {@code UiAutomator2Plugin}, {@code EspressoPlugin}
      */
-    ANDROID(ANDROID_NAME, UiAutomator2Plugin.class, EspressoPlugin.class),
-    
+    ANDROID(ANDROID_NAME,
+        "com.nordstrom.automation.selenium.plugins.UiAutomator2Plugin",
+        "com.nordstrom.automation.selenium.plugins.EspressoPlugin"),
+
     /**
      * target: iOS application<br>
-     * driver: {@link XCUITestPlugin}
+     * driver: {@code XCUITestPlugin}
      */
-    IOS_APP(IOS_APP_NAME, XCUITestPlugin.class),
-    
+    IOS_APP(IOS_APP_NAME,
+        "com.nordstrom.automation.selenium.plugins.XCUITestPlugin"),
+
     /**
      * target: Macintosh application<br>
-     * driver: {@link Mac2Plugin}
+     * driver: {@code Mac2Plugin}
      */
-    MAC_APP(MAC_APP_NAME, Mac2Plugin.class),
-    
+    MAC_APP(MAC_APP_NAME,
+        "com.nordstrom.automation.selenium.plugins.Mac2Plugin"),
+
     /**
      * target: Windows application<br>
-     * driver: {@link WindowsPlugin}
+     * driver: {@code WindowsPlugin}
      */
-    WINDOWS(WINDOWS_NAME, WindowsPlugin.class);
-    
+    WINDOWS(WINDOWS_NAME,
+        "com.nordstrom.automation.selenium.plugins.WindowsPlugin");
+
     private String name;
-    private Class<?>[] classes;
-    
-    <T extends DriverPlugin> TargetType(String name, Class<?>... classes) {
+    private String[] classNames;
+
+    <T extends DriverPlugin> TargetType(String name, String... classNames) {
         this.name = name;
-        this.classes = classes;
+        this.classNames = classNames;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -73,7 +75,7 @@ public enum TargetType implements TargetTypeName {
     public String getName() {
         return name;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -98,10 +100,15 @@ public enum TargetType implements TargetTypeName {
                 options = GridUtility.getNordOptions(personality);
                 // extract plug-in class specification from 'personality' object
                 Class<?> pluginClass = Class.forName((String) options.get("pluginClass"));
-                // iterate over target plug-in classes
-                for (Class<?> thisClass : this.classes) {
-                    // if 'personality' is supported by target, run this test
-                    if (thisClass.isAssignableFrom(pluginClass)) return true;
+                // iterate over target plug-in class names
+                for (String className : this.classNames) {
+                    try {
+                        Class<?> thisClass = Class.forName(className);
+                        // if 'personality' is supported by target, run this test
+                        if (thisClass.isAssignableFrom(pluginClass)) return true;
+                    } catch (ClassNotFoundException ignored) {
+                        // plugin not on classpath - skip
+                    }
                 }
             } catch (NullPointerException | IllegalArgumentException | ClassNotFoundException eaten) {
                 Logger logger = LoggerFactory.getLogger(TargetType.class);

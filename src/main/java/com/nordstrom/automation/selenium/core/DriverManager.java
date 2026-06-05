@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Function;
@@ -45,6 +46,22 @@ public final class DriverManager {
      */
     private DriverManager() {
         throw new AssertionError("DriverManager is a static utility class that cannot be instantiated");
+    }
+    
+    /**
+     * Perform pre-suite processing, launching the local Selenium Grid.
+     * <p>
+     * <b>NOTE</b>: If the configured hub URL is null or specifies a local host,
+     * this method triggers lazy Grid creation via the registered factory.
+     * If a remote hub URL is configured, this method does nothing — the
+     * remote Grid is assumed to already be active.
+     */
+    public static void onStart() {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        URL hubUrl = config.getHubUrl();
+        if (hubUrl == null || GridUtility.isLocalHost(hubUrl)) {
+            config.getSeleniumGrid();
+        }
     }
     
     /**
@@ -145,12 +162,10 @@ public final class DriverManager {
      */
     public static void onFinish() {
         SeleniumConfig config = SeleniumConfig.getConfig();
-        if (config.getBoolean(SeleniumSettings.SHUTDOWN_GRID.key())) {
-            try {
-                config.shutdownGrid();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+        try {
+            config.shutdownGrid();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
     

@@ -32,11 +32,21 @@ description = 'Selenium Foundation'
 ext.profile = project.findProperty('profile') ?: 'selenium4'
 assert ['selenium3', 'selenium4'].contains(profile)
 
+/* Version logic */
+def verBits = scmVersion.version.split('-')
+def seleniumApi = "s${profile.charAt(8)}"
+ext.baseVersion = verBits[0]
+ext.isSnapshot = !scmVersion.version.matches('\\d+\\.\\d+\\.\\d+')
+ext.archiveVer = "${baseVersion}-${seleniumApi}" + (isSnapshot ? '-SNAPSHOT' : '')
+ext.archiveBase = "${rootProject.name}-${archiveVer}"
+
+version = archiveVer
+
 /* Repositories */
 repositories {
-  mavenLocal()
-  mavenCentral()
-  maven { url "${projectDir}/repo" }
+    mavenLocal()
+    mavenCentral()
+    maven { url "${projectDir}/repo" }
 }
 
 apply from: "${profile}Deps.gradle"
@@ -59,17 +69,6 @@ if (project.hasProperty('personality')) {
     System.setProperty('injected.selenium.grid.examples', 'true')
   }
 }
-
-/* Version logic */
-def verBits = scmVersion.version.split('-')
-def seleniumApi = "s${profile.charAt(8)}"
-
-def archiveVer = (verBits.length > 1 && verBits[1] == seleniumApi)
-  ? project.version
-  : verBits[0] + "-${seleniumApi}" + (verBits.length > 1 ? "-${verBits[1]}" : "")
-
-version = archiveVer
-def archiveBase = "${rootProject.name}-${archiveVer}"
 
 java {
   withJavadocJar()
@@ -228,6 +227,9 @@ def getMavenServer(String serverId) {
 }
 
 scmVersion {
+  branchVersionCreator.putAll([
+    '.*': { version, position -> version }
+  ])
   repository {
     def githubNode = getMavenServer('github')
 
@@ -336,23 +338,14 @@ nexusPublishing {
 
 /* Dependencies */
 dependencies {
-  constraints {
-    api 'com.nordstrom.tools:java-utils:4.0.0'
-    api 'com.nordstrom.tools:settings:4.0.0'
-    api 'com.nordstrom.tools:junit-foundation:18.0.0'
-    api 'com.github.sbabcoc:logback-testng:2.1.2'
-    api 'org.hamcrest:hamcrest-core:3.0'
-    api 'org.yaml:snakeyaml:2.5'
-  }
+  api platform("com.nordstrom.ui-tools:selenium-bom-${seleniumApi}:${baseVersion}${isSnapshot ? '-SNAPSHOT' : ''}")
 
   api 'com.nordstrom.tools:java-utils'
   api 'com.nordstrom.tools:settings'
   api 'com.nordstrom.tools:junit-foundation'
-
   api('com.github.sbabcoc:logback-testng') {
     exclude group: 'org.testng', module: 'testng'
   }
-
   api 'org.hamcrest:hamcrest-core'
   api 'org.yaml:snakeyaml'
 }

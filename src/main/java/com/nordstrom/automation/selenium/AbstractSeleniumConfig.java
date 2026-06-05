@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.ExceptionFactory;
 import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
+import com.nordstrom.automation.selenium.core.GridManagerPlugin;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
@@ -78,6 +80,18 @@ public abstract class AbstractSeleniumConfig extends
      * {@code settings.properties} file and System property declarations.
      */
     public enum SeleniumSettings implements SettingsCore.SettingsAPI {
+        /**
+         * This setting specifies the path to the Selenium Foundation settings file.
+         * <p>
+         * <b>NOTE</b>: If unspecified, the default path {@code settings.properties} is used.
+         * This setting can only be specified as a System property — it cannot be defined
+         * within the settings file itself.
+         * <p>
+         * name: <b>selenium.settings.path</b><br>
+         * default: <b>settings.properties</b>
+         */
+        SETTINGS_PATH("selenium.settings.path", "settings.properties"),
+        
         /**
          * Scheme component for the {@link AbstractSeleniumConfig#getTargetUri target URI}.
          * <p>
@@ -142,15 +156,6 @@ public abstract class AbstractSeleniumConfig extends
          * default: {@code null}
          */
         GRID_SERVLETS("selenium.grid.servlets", null),
-        
-        /**
-         * This setting specifies whether the local <b>Selenium Grid</b> instance will be shut down at the end of the
-         * test run.
-         * <p>
-         * name: <b>selenium.grid.shutdown</b><br>
-         * default: <b>true</b>
-         */
-        SHUTDOWN_GRID("selenium.grid.shutdown", "true"),
         
         /**
          * This setting specifies the fully-qualified name of the <b>GridLauncher</b> class, which provides a
@@ -565,6 +570,8 @@ public abstract class AbstractSeleniumConfig extends
      */
     public AbstractSeleniumConfig() throws ConfigurationException, IOException {
         super(SeleniumSettings.class);
+        // ensure Grid manager plugin is loaded if present on classpath
+        ServiceLoader.load(GridManagerPlugin.class).iterator().forEachRemaining(p -> {});
     }
     
     /**
@@ -699,14 +706,32 @@ public abstract class AbstractSeleniumConfig extends
     
     /**
      * Get object that represents the active Selenium Grid.
-     * 
-     * @return {@link SeleniumGrid} object
+     * <p>
+     * <b>NOTE</b>: The hub URL must be configured before calling this method, either via
+     * {@link SeleniumSettings#HUB_HOST} or {@link SeleniumSettings#HUB_PORT}. If no hub
+     * URL is configured, this method throws an {@link IllegalStateException}.
+     * <p>
+     * <b>NOTE</b>: If {@code selenium-grid-manager} is on the classpath and the configured
+     * hub URL specifies a local host, this method will launch and activate a local Grid
+     * instance if one is not already running. If {@code selenium-grid-manager} is absent,
+     * the Grid must already be active at the configured hub URL.
+     *
+     * @return {@link SeleniumGrid} object representing the active Grid instance
+     * @throws IllegalStateException if no hub URL is configured, if the specified remote
+     *     hub is inactive, or if a local hub is requested but no Grid manager is registered
      */
     public SeleniumGrid getSeleniumGrid() {
         synchronized(SeleniumGrid.class) {
             if (seleniumGrid == null) {
+                URL hubUrl = getHubUrl();
+                if (hubUrl == null) {
+                    throw new IllegalStateException(
+                        "No Selenium Grid hub URL configured - specify either " +
+                        SeleniumSettings.HUB_HOST.key() + " or " +
+                        SeleniumSettings.HUB_PORT.key());
+                }
                 try {
-                    seleniumGrid = SeleniumGrid.create(getConfig(), getHubUrl());
+                    seleniumGrid = SeleniumGrid.create(getConfig(), hubUrl);
                 } catch (IOException e) {
                     throw UncheckedThrow.throwUnchecked(e);
                 }
@@ -722,20 +747,17 @@ public abstract class AbstractSeleniumConfig extends
      * @throws InterruptedException if this thread was interrupted
      */
     public boolean shutdownGrid() throws InterruptedException {
-        boolean result = true;
         synchronized(SeleniumGrid.class) {
-            getSeleniumGrid(); // ensure local grid mappings are initialized
-            // if grid hub is active
-            if (seleniumGrid.getHubServer().isActive()) {
-                result = seleniumGrid.shutdown();
+            if (seleniumGrid != null && seleniumGrid.getHubServer().isActive()) {
+                boolean result = seleniumGrid.shutdown();
                 if (result) {
                     ExamplePageLauncher.getLauncher().shutdown();
                     seleniumGrid = null;
                 }
-            } else {
-                ExamplePageLauncher.getLauncher().shutdown();
+                return result;
             }
-            return result;
+            ExamplePageLauncher.getLauncher().shutdown();
+            return true;
         }
     }
     
@@ -1119,6 +1141,6 @@ public abstract class AbstractSeleniumConfig extends
      */
     @Override
     public String getSettingsPath() {
-        return SETTINGS_FILE;
+        return System.getProperty(SeleniumSettings.SETTINGS_PATH.key(), SETTINGS_FILE);
     }
 }

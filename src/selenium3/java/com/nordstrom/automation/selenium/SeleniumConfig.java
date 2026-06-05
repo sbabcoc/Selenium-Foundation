@@ -30,10 +30,7 @@ import org.openqa.selenium.grid.config.ConfigException;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
 
-import com.nordstrom.automation.selenium.core.LocalSeleniumGrid;
-import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.settings.SettingsCore;
-import com.nordstrom.common.base.UncheckedThrow;
 
 /**
  * This class declares settings and methods related to WebDriver and Grid configuration specific to the Selenium 3 API.
@@ -190,14 +187,6 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         } catch (ConfigurationException | IOException e) {
             throw new RuntimeException("Failed to instantiate settings", e);
         }
-        
-        SeleniumGrid.registerLocalGridFactory((config, hubUrl) -> {
-            try {
-                return LocalSeleniumGrid.create(config, hubUrl);
-            } catch (IOException e) {
-                throw UncheckedThrow.throwUnchecked(e);
-            }
-        });
     }
     
     /**

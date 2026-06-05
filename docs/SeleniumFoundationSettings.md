@@ -28,7 +28,6 @@ Settings that control the local Selenium Grid instance.
 |---------|---------|-------------|
 | <details><summary>**GRID_PLUGINS**</summary>`selenium.grid.plugins`</details> | *(none)* | <details><summary>Path-delimited list of fully-qualified driver plug-in class names.</summary>**NOTE**: Overrides the `ServiceLoader` provider configuration file.</details> |
 | <details><summary>**GRID_SERVLETS**</summary>`selenium.grid.servlets`</details> | *(none)* | <details><summary>Comma-delimited list of fully-qualified servlet class names.</summary>**Selenium 3**: Hosted by the hub server.<br>**Selenium 4**: Hosted by `ServletContainer`.</details> |
-| <details><summary>**SHUTDOWN_GRID**</summary>`selenium.grid.shutdown`</details> | `true` | Whether to shut down the local Grid instance at the end of the test run |
 | <details><summary>**GRID_LAUNCHER**</summary>`selenium.grid.launcher`</details> | <details><summary>*version-specific*</summary>**Selenium 3:** `org.openqa.grid.selenium.GridLauncherV3`<br>**Selenium 4**: `org.openqa.selenium.grid.Bootstrap`</details> | Fully-qualified name of the `GridLauncher` class. |
 | <details><summary>**LAUNCHER_DEPS**</summary>`selenium.launcher.deps`</details> | *version-specific* | Path-delimited list of fully-qualified context class names for Grid launcher dependencies |
 | <details><summary>**SLOT_MATCHER**</summary>`selenium.slot.matcher`</details> | `FoundationSlotMatcher` | Slot matcher used by the hub server |
