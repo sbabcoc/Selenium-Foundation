@@ -32,6 +32,70 @@ description = 'Selenium Foundation'
 ext.profile = project.findProperty('profile') ?: 'selenium4'
 assert ['selenium3', 'selenium4'].contains(profile)
 
+/* Repositories */
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "${projectDir}/repo" }
+}
+
+def getMavenServer(String serverId) {
+  def settingsFile = new File(System.getProperty("user.home"), ".m2/settings.xml")
+  if (!settingsFile.exists()) return null
+
+  def settings = new XmlParser().parse(settingsFile)
+  def server = settings.servers.server.find { it.id.text() == serverId }
+
+  if (server) {
+    def dispatcher = new DefaultSecDispatcher()
+    dispatcher._cipher = new DefaultPlexusCipher()
+
+    def securityFile = new File(System.getProperty("user.home"), ".m2/settings-security.xml")
+    System.setProperty("settings.security", securityFile.absolutePath)
+
+    def decrypt = { String val ->
+      if (val == null) return null
+      return dispatcher._cipher.isEncryptedString(val) ? dispatcher.decrypt(val) : val
+    }
+
+    return [
+      username: server.username?.text(),
+      password: decrypt(server.password?.text()),
+      passphrase: decrypt(server.passphrase?.text())
+    ]
+  }
+  
+  return null
+}
+
+scmVersion {
+  branchVersionCreator.putAll([
+    '.*': { version, position -> version }
+  ])
+  repository {
+    def githubNode = getMavenServer('github')
+
+    if (githubNode) {
+      customUsername.set(githubNode.username)
+      customPassword.set(githubNode.password)
+    }
+  }
+  hooks {
+    pre 'fileUpdate', [
+      file: 'README.md',
+      pattern: { v, p -> /\d+\.\d+\.\d+-s3/ },
+      replacement: { v, p -> "${v}-s3" }
+    ]
+    pre 'fileUpdate', [
+      file: 'README.md',
+      pattern: { v, p -> /\d+\.\d+\.\d+-s4/ },
+      replacement: { v, p -> "${v}-s4" }
+    ]
+    pre 'commit'
+    post 'push'
+  }
+}
+
 /* Version logic */
 def verBits = scmVersion.version.split('-')
 def seleniumApi = "s${profile.charAt(8)}"
@@ -41,13 +105,6 @@ ext.archiveVer = "${baseVersion}-${seleniumApi}" + (isSnapshot ? '-SNAPSHOT' : '
 ext.archiveBase = "${rootProject.name}-${archiveVer}"
 
 version = archiveVer
-
-/* Repositories */
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "${projectDir}/repo" }
-}
 
 apply from: "${profile}Deps.gradle"
 
@@ -194,63 +251,6 @@ tasks.named('test', Test) {
 
   doFirst {
     jvmArgs "-javaagent:${classpath.find { it.name.contains('junit-foundation') }}"
-  }
-}
-
-def getMavenServer(String serverId) {
-  def settingsFile = new File(System.getProperty("user.home"), ".m2/settings.xml")
-  if (!settingsFile.exists()) return null
-
-  def settings = new XmlParser().parse(settingsFile)
-  def server = settings.servers.server.find { it.id.text() == serverId }
-
-  if (server) {
-    def dispatcher = new DefaultSecDispatcher()
-    dispatcher._cipher = new DefaultPlexusCipher()
-
-    def securityFile = new File(System.getProperty("user.home"), ".m2/settings-security.xml")
-    System.setProperty("settings.security", securityFile.absolutePath)
-
-    def decrypt = { String val ->
-      if (val == null) return null
-      return dispatcher._cipher.isEncryptedString(val) ? dispatcher.decrypt(val) : val
-    }
-
-    return [
-      username: server.username?.text(),
-      password: decrypt(server.password?.text()),
-      passphrase: decrypt(server.passphrase?.text())
-    ]
-  }
-  
-  return null
-}
-
-scmVersion {
-  branchVersionCreator.putAll([
-    '.*': { version, position -> version }
-  ])
-  repository {
-    def githubNode = getMavenServer('github')
-
-    if (githubNode) {
-      customUsername.set(githubNode.username)
-      customPassword.set(githubNode.password)
-    }
-  }
-  hooks {
-    pre 'fileUpdate', [
-      file: 'README.md',
-      pattern: { v, p -> /\d+\.\d+\.\d+-s3/ },
-      replacement: { v, p -> "${v}-s3" }
-    ]
-    pre 'fileUpdate', [
-      file: 'README.md',
-      pattern: { v, p -> /\d+\.\d+\.\d+-s4/ },
-      replacement: { v, p -> "${v}-s4" }
-    ]
-    pre 'commit'
-    post 'push'
   }
 }
 
