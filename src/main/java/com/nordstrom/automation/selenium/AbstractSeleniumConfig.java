@@ -748,7 +748,7 @@ public abstract class AbstractSeleniumConfig extends
      */
     public boolean shutdownGrid() throws InterruptedException {
         synchronized(SeleniumGrid.class) {
-            if (seleniumGrid != null && seleniumGrid.getHubServer().isActive()) {
+            if (seleniumGrid != null && seleniumGrid.isActive()) {
                 boolean result = seleniumGrid.shutdown();
                 if (result) {
                     ExamplePageLauncher.getLauncher().shutdown();

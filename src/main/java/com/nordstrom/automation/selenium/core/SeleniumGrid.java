@@ -170,12 +170,23 @@ public class SeleniumGrid {
     }
     
     /**
+     * Determine if this Selenium Grid is active.
+     *
+     * @return {@code true} if grid is active; otherwise {@code false}
+     */
+    public boolean isActive() {
+        return (hubServer != null) && hubServer.isActive();
+    }
+    
+    /**
      * Shutdown the Selenium Grid represented by this object.
      * 
      * @return {@code false} if non-local Grid server encountered; otherwise {@code true}
      * @throws InterruptedException if this thread was interrupted
      */
     public boolean shutdown() throws InterruptedException {
+        if (!isActive()) return true;
+        
         boolean result = true;
         Iterator<Entry<URL, IGridServer>> iterator = nodeServers.entrySet().iterator();
         
