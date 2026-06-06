@@ -8,8 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import org.openqa.selenium.Capabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,8 +179,10 @@ public class SeleniumGrid {
         boolean result = true;
         Iterator<Entry<URL, IGridServer>> iterator = nodeServers.entrySet().iterator();
         
+        // shutdown node servers
         while (iterator.hasNext()) {
             Entry<URL, IGridServer> serverEntry = iterator.next();
+            // if shutdown of this node succeeds
             if (serverEntry.getValue().shutdown()) {
                 iterator.remove();
             } else {
@@ -187,10 +190,14 @@ public class SeleniumGrid {
             }
         }
         
-        if (hubServer.shutdown()) {
-            hubServer = null;
-        } else {
-            result = false;
+        // if all nodes shutdown
+        if (result) {
+            // if hub shutdown succeeds
+            if (hubServer.shutdown()) {
+                hubServer = null;
+            } else {
+                result = false;
+            }
         }
         
         return result;
