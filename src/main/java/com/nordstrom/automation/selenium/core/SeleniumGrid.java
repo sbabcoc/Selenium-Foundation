@@ -51,17 +51,7 @@ public class SeleniumGrid {
     /** SLF4J logger for this Selenium Grid model */
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
-    private static IGridServerFactory GRID_SERVER_FACTORY = new IGridServerFactory() {
-        @Override
-        public IGridServer createHubServer(URL url) {
-            return new GridServer(url, true);
-        }
-
-        @Override
-        public IGridServer createNodeServer(URL url) {
-            return new GridServer(url, false);
-        }
-    };
+    private static IGridServerFactory GRID_SERVER_FACTORY = (url, isHub) -> new GridServer(url, isHub);
     
     private static java.util.function.BiFunction<SeleniumConfig, URL, SeleniumGrid> LOCAL_GRID_FACTORY =
             (config, hubUrl) -> { throw new IllegalStateException(
@@ -82,7 +72,7 @@ public class SeleniumGrid {
      * @throws IOException if unable to acquire Grid details
      */
     public SeleniumGrid(SeleniumConfig config, URL hubUrl) throws IOException {
-        hubServer = GRID_SERVER_FACTORY.createHubServer(hubUrl);
+        hubServer = GRID_SERVER_FACTORY.createServer(hubUrl, true);
         List<URL> nodeEndpoints = GridServer.getGridProxies(config, hubUrl);
         if (nodeEndpoints.isEmpty()) {
             LOGGER.debug("Detected existing servlet container at: {}", hubUrl);
@@ -90,7 +80,7 @@ public class SeleniumGrid {
             LOGGER.debug("Mapping structure of existing grid at: {}", hubUrl);
             for (URL nodeEndpoint : nodeEndpoints) {
                 URI nodeUri = UriUtils.uriForPath(nodeEndpoint, GridServer.HUB_BASE);
-                nodeServers.put(nodeEndpoint, GRID_SERVER_FACTORY.createNodeServer(nodeUri.toURL()));
+                nodeServers.put(nodeEndpoint, GRID_SERVER_FACTORY.createServer(nodeUri.toURL(), false));
                 addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
             }
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
