@@ -14,18 +14,11 @@ import java.net.URL;
 public interface IGridServerFactory {
 
     /**
-     * Create a Grid server object for the specified hub URL.
+     * Create a Grid server object for the specified URL.
      *
-     * @param url hub server {@link URL}
-     * @return {@link IGridServer} object for the specified hub
+     * @param url server {@link URL}
+     * @param isHub {@code true} for hub; {@code false} for node
+     * @return {@link IGridServer} object for the specified server
      */
-    IGridServer createHubServer(URL url);
-
-    /**
-     * Create a Grid server object for the specified node URL.
-     *
-     * @param url node server {@link URL}
-     * @return {@link IGridServer} object for the specified node
-     */
-    IGridServer createNodeServer(URL url);
+    IGridServer createServer(URL url, boolean isHub);
 }
