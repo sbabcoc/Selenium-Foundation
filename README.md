@@ -1,3 +1,4 @@
+
 [![Maven Central](https://img.shields.io/maven-central/v/com.nordstrom.ui-tools/selenium-foundation.svg)](https://central.sonatype.com/search?q=com.nordstrom.ui-tools+selenium-foundation&core=gav)
 
 # INTRODUCTION
@@ -27,6 +28,7 @@
 
 * [Selenium API Support](#selenium-api-support)
 * [Dependency Artifact Coordinates](#dependency-artifact-coordinates)
+* [Local Grid Dependency](#local-grid-dependency)
 * [Building Selenium Foundation](#building-selenium-foundation)
   * [Building in Eclipse](#building-in-eclipse)
   * [Building from Command Line](#building-from-command-line)
@@ -92,6 +94,25 @@ To add a dependency for Gradle:
 |:---:|:---|
 | **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:34.1.0-s3'<br/>}</pre> |
 | **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:34.1.0-s4'<br/>}</pre> |
+
+### Local Grid Dependency
+
+**Selenium Foundation** relies on a local **Selenium Grid** instance to provide driver sessions for your tests. The component that manages this local grid is packaged as a separate artifact: `selenium-grid-manager`. Unless your test suite implements the [DriverProvider](docs/ConfiguringProjectSettings.md#testing-with-non-default-browser-sessions) interface, you'll need to add this as a test dependency:
+
+To add a dependency on **selenium-grid-manager** for Maven, use the following:
+
+| Selenium 3 | Selenium 4 |
+|:---|:---|
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-grid-manager&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;34.1.0-s3&lt;/version&gt;<br/>&nbsp;&nbsp;&lt;scope&gt;test&lt;/scope&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-grid-manager&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;34.1.0-s4&lt;/version&gt;<br/>&nbsp;&nbsp;&lt;scope&gt;test&lt;/scope&gt;<br/>&lt;/dependency&gt;</pre> |
+
+To add a dependency for Gradle:
+
+| Platform | Dependency |
+|:---:|:---|
+| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager:34.1.0-s3'<br/>}</pre> |
+| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager:34.1.0-s4'<br/>}</pre> |
+
+> **NOTE**: The version of `selenium-grid-manager` should always match the version of `selenium-foundation` in your project.
 
 ### Building Selenium Foundation
 

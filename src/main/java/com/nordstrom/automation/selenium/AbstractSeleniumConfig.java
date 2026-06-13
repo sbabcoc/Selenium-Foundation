@@ -297,6 +297,22 @@ public abstract class AbstractSeleniumConfig extends
         HOST_TIMEOUT("selenium.timeout.host", "30"),
         
         /**
+         * This setting specifies the maximum amount of time to spend retrying stale element references.
+         * <p>
+         * name: <b>selenium.refresh.timeout</b><br>
+         * default: <b>15</b>
+         */
+        REFRESH_RETRY_TIMEOUT("selenium.refresh.timeout", "15"),
+        
+        /**
+         * This setting specifies the maximum number of times to retry a stale element reference.
+         * <p>
+         * name: <b>selenium.refresh.maximum</b><br>
+         * default: <b>9</b>
+         */
+        REFRESH_RETRY_MAXIMUM("selenium.refresh.maximum", "9"),
+        
+        /**
          * This setting specifies a comma-delimited list of Java exceptions, packages, and subtrees
          * that are allowed from script errors.
          * <p>
