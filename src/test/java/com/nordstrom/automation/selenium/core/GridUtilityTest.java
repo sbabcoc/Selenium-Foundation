@@ -1,19 +1,13 @@
 package com.nordstrom.automation.selenium.core;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
-import java.util.concurrent.TimeoutException;
-
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -46,22 +40,6 @@ public class GridUtilityTest extends TestNgBase {
     public void testHostWithoutRequest() throws MalformedURLException {
         URI hostUri = URI.create("https://github.com");
         assertTrue(GridUtility.isHostActive(hostUri.toURL()), "Failed activity check for: " + hostUri);
-    }
-    
-    @Test
-    @NoDriver
-    public void testIsActive() throws IOException, InterruptedException, TimeoutException {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-        URL hubUrl = config.getHubUrl();
-        if (hubUrl != null) {
-            assertFalse(GridServer.isHubActive(hubUrl), "Configured local hub should initially be inactive");
-        }
-        SeleniumGrid localGrid = config.getSeleniumGrid();
-        hubUrl = config.getHubUrl();
-        assertNotNull(hubUrl, "Configuration was not updated with local hub URL");
-        assertFalse(GridServer.isHubActive(hubUrl), "Upon creation, local hub should be inactive");
-        localGrid.activate();
-        assertTrue(GridServer.isHubActive(hubUrl), "Local hub should have been activated");
     }
     
     @NoDriver

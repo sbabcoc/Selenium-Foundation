@@ -16,7 +16,9 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver.Timeouts;
 
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.WaitType;
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
@@ -153,23 +155,36 @@ public class RobustElementWrapper implements ReferenceFetcher {
      */
     @RuntimeType
     @BindingPriority(Integer.MAX_VALUE)
-    public Object intercept(@This final Object obj, @Origin final Method method,
-                    @AllArguments final Object[] args) throws Exception {
-        try {
-            return invoke(method, args);
-        } catch (StaleElementReferenceException sere) {
-            // try to refresh ref
-            refreshReference(sere);
-            // if optional not found
-            if (this.wrapped == null) {
-                // re-throw
-                throw sere;
+    public Object intercept(@This final Object obj, @Origin final Method method, @AllArguments final Object[] args)
+            throws Exception {
+        SeleniumConfig config = SeleniumConfig.getConfig();
+        long retryTimeout = config.getLong(SeleniumSettings.REFRESH_RETRY_TIMEOUT.key());
+        int retryMaximum = config.getInt(SeleniumSettings.REFRESH_RETRY_MAXIMUM.key());
+        
+        int attempts = 0;
+        long deadline = System.currentTimeMillis() + retryTimeout;
+        StaleElementReferenceException sere = null;
+
+        while (true) {
+            try {
+                return invoke(method, args);
+            } catch (StaleElementReferenceException e) {
+                sere = e;
+                // if retry count exceeded or time limit expired
+                if (++attempts > retryMaximum || System.currentTimeMillis() >= deadline)
+                    break; // exit
+                
+                // try to refresh ref
+                refreshReference(e);
+                // if ref not acquired
+                if (this.wrapped == null) 
+                    break; // exit
             }
-            // re-invoke with fresh ref
-            return invoke(method, args);
         }
+        // re-throw
+        throw sere;
     }
-    
+
     /**
      * Invoke the specified method with arguments provided.
      * 

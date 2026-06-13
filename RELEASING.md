@@ -103,7 +103,17 @@ ls ~/.m2/repository/com/nordstrom/ui-tools/selenium-bom-s3/
 ls ~/.m2/repository/com/nordstrom/ui-tools/selenium-bom-s4/
 ```
 
-### 3. Publish and install selenium-foundation
+### 3. Update and commit the Selenium-Foundation README
+
+```bash
+cd ../Selenium-Foundation
+./gradlew updateReadme
+git add README.md
+git commit -m "Update README version to $(./gradlew properties -Pprofile=selenium4 -q | grep "^version:" | awk '{print $2}')"
+git push
+```
+
+### 4. Publish and install selenium-foundation
 
 Tests are skipped during publication to avoid the circular dependency on
 `selenium-grid-manager`, which hasn't been published yet.
@@ -112,7 +122,6 @@ Tests are skipped during publication to avoid the circular dependency on
 `selenium-foundation` during its own build.
 
 ```bash
-cd ../Selenium-Foundation
 ./gradlew install publish closeAndReleaseStagingRepositories -Pprofile=selenium4 -x test -x testNG
 ./gradlew install publish closeAndReleaseStagingRepositories -Pprofile=selenium3 -x test -x testNG
 ```
@@ -122,7 +131,7 @@ Verify artifacts are in local Maven repository:
 ls ~/.m2/repository/com/nordstrom/ui-tools/selenium-foundation/
 ```
 
-### 4. Publish and install selenium-grid-manager
+### 5. Publish and install selenium-grid-manager
 
 ```bash
 cd ../selenium-grid-manager
@@ -132,7 +141,7 @@ cd ../selenium-grid-manager
 ./gradlew install -Pprofile=selenium3
 ```
 
-### 5. Verify selenium-foundation tests
+### 6. Verify selenium-foundation tests
 
 Now that `selenium-grid-manager` is published, run the full `selenium-foundation`
 test suite to verify the release:
@@ -142,7 +151,7 @@ cd ../Selenium-Foundation
 ./gradlew test testNG -Pprofile=selenium4
 ```
 
-### 6. Verify Maven Central publication
+### 7. Verify Maven Central publication
 
 Check that all artifacts appear at:
 **https://central.sonatype.com/publishing/deployments**
@@ -240,3 +249,8 @@ at the same base version. Check with:
 ```groovy
 def verBits = scmVersion.version.split('-')
 ```
+
+**README version not updated** — The `updateReadme` task was not run before
+publishing. If caught before tagging, run `./gradlew updateReadme`, commit,
+and push. If caught after publishing, update the README manually and push the
+fix as a separate commit.
