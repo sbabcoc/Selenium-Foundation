@@ -86,14 +86,14 @@ To add a dependency on **Selenium Foundation** for Maven, use the following:
 
 | Selenium 3 | Selenium 4 |
 |:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.4-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.4-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.5-s3&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-foundation&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.5-s4&lt;/version&gt;<br/>&lt;/dependency&gt;</pre> |
 
 To add a dependency for Gradle:
 
 | Platform | Dependency |
 |:---:|:---|
-| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:35.0.4-s3'<br/>}</pre> |
-| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:35.0.4-s4'<br/>}</pre> |
+| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:35.0.5-s3'<br/>}</pre> |
+| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;compile 'com.nordstrom.ui-tools:selenium-foundation:35.0.5-s4'<br/>}</pre> |
 
 ### Local Grid Dependency
 
@@ -103,14 +103,14 @@ To add a dependency on **selenium-grid-manager** for Maven, use the following:
 
 | Selenium 3 | Selenium 4 |
 |:---|:---|
-| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-grid-manager&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.4-s3&lt;/version&gt;<br/>&nbsp;&nbsp;&lt;scope&gt;test&lt;/scope&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-grid-manager&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.4-s4&lt;/version&gt;<br/>&nbsp;&nbsp;&lt;scope&gt;test&lt;/scope&gt;<br/>&lt;/dependency&gt;</pre> |
+| <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-grid-manager&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.5-s3&lt;/version&gt;<br/>&nbsp;&nbsp;&lt;scope&gt;test&lt;/scope&gt;<br/>&lt;/dependency&gt;</pre> | <pre>&lt;dependency&gt;<br/>&nbsp;&nbsp;&lt;groupId&gt;com.nordstrom.ui-tools&lt;/groupId&gt;<br/>&nbsp;&nbsp;&lt;artifactId&gt;selenium-grid-manager&lt;/artifactId&gt;<br/>&nbsp;&nbsp;&lt;version&gt;35.0.5-s4&lt;/version&gt;<br/>&nbsp;&nbsp;&lt;scope&gt;test&lt;/scope&gt;<br/>&lt;/dependency&gt;</pre> |
 
 To add a dependency for Gradle:
 
 | Platform | Dependency |
 |:---:|:---|
-| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager:35.0.4-s3'<br/>}</pre> |
-| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager:35.0.4-s4'<br/>}</pre> |
+| **Selenium 3** | <pre>dependencies {<br/>&nbsp;&nbsp;testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager:35.0.5-s3'<br/>}</pre> |
+| **Selenium 4** | <pre>dependencies {<br/>&nbsp;&nbsp;testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager:35.0.5-s4'<br/>}</pre> |
 
 > **NOTE**: The version of `selenium-grid-manager` should always match the version of `selenium-foundation` in your project.
 
