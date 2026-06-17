@@ -162,7 +162,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
         int retryMaximum = config.getInt(SeleniumSettings.REFRESH_RETRY_MAXIMUM.key());
         
         int attempts = 0;
-        long deadline = System.currentTimeMillis() + retryTimeout;
+        long deadline = System.currentTimeMillis() + (retryTimeout * 1_000);
         StaleElementReferenceException sere = null;
 
         while (true) {
@@ -174,7 +174,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 if (++attempts > retryMaximum || System.currentTimeMillis() >= deadline)
                     break; // exit
                 
-                // try to refresh ref
+                // try ref refresh
                 refreshReference(e);
                 // if ref not acquired
                 if (this.wrapped == null) 
