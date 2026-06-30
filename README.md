@@ -285,12 +285,4 @@ The hierarchy of evaluation produces the following results:
 
 > **BROWSER_NAME** = <mark>firefox</mark>; **TARGET_HOST** = <mark>my.server.com</mark>; **TARGET_PATH** = <mark>/</mark> 
 
-## Automatic Installation of Drivers 
-
-Since the release of **Selenium Foundation** [28.0.0](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v28.0.0), we now use **Selenium Manager** (Selenium 4) and **Web Driver Manager** (Selenium 3) to acquire compatible drivers for the browsers targeted by your tests. If the manager is unable to locate or download a required driver, **DriverExecutableNotFoundException** is thrown.
-
-This feature does not include management of Appium [automation engines](docs/ConfiguringProjectSettings.md#appium-automation-engine-support), which must be installed separately.
-
-**NOTE**: This driver acquisition process is bypassed for test classes that implement the [DriverProvider](docs/ConfiguringProjectSettings.md#testing-with-non-default-browser-sessions) interface.
-
 > Written with [StackEdit](https://stackedit.io/).
