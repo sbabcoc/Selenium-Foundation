@@ -254,3 +254,19 @@ def verBits = scmVersion.version.split('-')
 publishing. If caught before tagging, run `./gradlew updateReadme`, commit,
 and push. If caught after publishing, update the README manually and push the
 fix as a separate commit.
+
+## @since Placeholder Replacement
+
+New classes and interfaces use `@since [next-major]` as a placeholder.
+
+> ⚠️ **IMPORTANT**: The `publish` task (and `compileJava` in `selenium-foundation`
+> and `selenium-grid-manager`) will **fail** on non-SNAPSHOT builds if any
+> `[next-major]` placeholders remain in source.
+
+Run before tagging:
+
+    ./gradlew updateSinceAnnotations
+
+Verify clean:
+
+    grep -r '\[next-major\]' src/main/java && echo "FOUND" || echo "Clean"
