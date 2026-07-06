@@ -207,6 +207,26 @@ public abstract class AbstractSeleniumConfig extends
         HUB_PORT("selenium.hub.port", null),
         
         /**
+         * This is the event bus publisher port assigned to the local <b>Selenium Grid</b> hub server.
+         * <p>
+         * name: <b>selenium.grid.pub.port</b><br>
+         * default: <b>-1</b> (auto-select)
+         *
+         * @since [next-major]
+         */
+        GRID_PUB_PORT("selenium.grid.pub.port", "-1"),
+
+        /**
+         * This is the event bus subscriber port assigned to the local <b>Selenium Grid</b> hub server.
+         * <p>
+         * name: <b>selenium.grid.sub.port</b><br>
+         * default: <b>-1</b> (auto-select)
+         *
+         * @since [next-major]
+         */
+        GRID_SUB_PORT("selenium.grid.sub.port", "-1"),
+        
+        /**
          * This setting specifies the slot matcher used by the local <b>Selenium Grid</b> hub server.
          * 
          * name: <b>selenium.slot.matcher</b><br>
@@ -366,6 +386,85 @@ public abstract class AbstractSeleniumConfig extends
          * default: {@code true}
          */
         GRID_LIFECYCLE("selenium.grid.lifecycle", "true"),
+        
+        /**
+         * This setting specifies the fully-qualified class name of the
+         * {@code GridPortAllocationStrategy} implementation to use for allocating
+         * hub and event bus ports.
+         * <p>
+         * name: <b>selenium.grid.port.allocator</b><br>
+         * default: {@code null} (registered via {@code getDefaults()} in the appropriate
+         * {@code SeleniumConfig} subclass)
+         *
+         * @since [next-major]
+         */
+        GRID_PORT_ALLOCATOR("selenium.grid.port.allocator", null),
+
+        /**
+         * This setting specifies the port on which the sidecar servlet container listens.
+         * <p>
+         * name: <b>selenium.grid.sidecar.port</b><br>
+         * default: <b>9001</b>
+         *
+         * @since [next-major]
+         */
+        SIDECAR_PORT("selenium.grid.sidecar.port", "9001"),
+
+        /**
+         * This setting specifies the token required to authorize sensitive sidecar operations.
+         * If unset, no token is required.
+         * <p>
+         * name: <b>selenium.grid.sidecar.stop.token</b><br>
+         * default: {@code null}
+         *
+         * @since [next-major]
+         */
+        SIDECAR_STOP_TOKEN("selenium.grid.sidecar.stop.token", null),
+
+        /**
+         * This setting specifies the fully-qualified class name of the
+         * {@code SidecarAuthStrategy} implementation to use for authorizing
+         * sensitive sidecar operations.
+         * <p>
+         * name: <b>selenium.grid.sidecar.auth</b><br>
+         * default: {@code null} (registered via {@code getDefaults()} in the appropriate
+         * {@code SeleniumConfig} subclass)
+         *
+         * @since [next-major]
+         */
+        SIDECAR_AUTH_STRATEGY("selenium.grid.sidecar.auth", null),
+
+        /**
+         * This setting specifies the session TTL in minutes for authenticated sidecar browser sessions.
+         * <p>
+         * name: <b>selenium.grid.sidecar.session.ttl</b><br>
+         * default: <b>30</b>
+         *
+         * @since [next-major]
+         */
+        SIDECAR_SESSION_TTL("selenium.grid.sidecar.session.ttl", "30"),
+
+        /**
+         * This setting specifies the interval in seconds between background scans for unmanaged
+         * Grid instances. Set to {@code 0} to disable background scanning.
+         * <p>
+         * name: <b>selenium.grid.sidecar.scan.interval</b><br>
+         * default: <b>10</b>
+         *
+         * @since [next-major]
+         */
+        SIDECAR_SCAN_INTERVAL("selenium.grid.sidecar.scan.interval", "10"),
+
+        /**
+         * This setting specifies the name of the file used to persist monitored remote Grid URLs
+         * across sidecar restarts.
+         * <p>
+         * name: <b>selenium.grid.sidecar.monitor.file</b><br>
+         * default: <b>monitored-grids.json</b>
+         *
+         * @since [next-major]
+         */
+        SIDECAR_MONITOR_FILE("selenium.grid.sidecar.monitor.file", "monitored-grids.json"),
         
         /**
          * This setting specifies the target platform for the current test context.
@@ -979,6 +1078,18 @@ public abstract class AbstractSeleniumConfig extends
      * @return specified object as a JSON string
      */
     public abstract String toJson(final Object obj);
+    
+    /**
+     * Deserialize the specified JSON string into an object of the specified type.
+     *
+     * @param <T> target type
+     * @param json JSON string to deserialize
+     * @param typeOfT target type token
+     * @return deserialized object of the specified type
+     *
+     * @since [next-major]
+     */
+    public abstract <T> T fromJson(String json, java.lang.reflect.Type typeOfT);
     
     /**
      * Get the path to the specified configuration file.
