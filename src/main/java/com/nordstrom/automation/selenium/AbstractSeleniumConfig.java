@@ -440,20 +440,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>pm2.binary.path</b><br>
          * default: {@code null}
          */
-        PM2_BINARY_PATH("pm2.binary.path", null),
-        
-        /**
-         * This setting specifies that the {@code Appium} server should be managed by the {@code PM2} utility.
-         * <p>
-         * <b>NOTE</b>: {@code Appium} requires an active execution context. To run {@code Appium} as a standalone
-         * <b>Selenium Grid</b> node, the server must to executed as a daemon process. Starting the server via the
-         * {@code PM2} utility provides the required persistent execution context.
-         * 
-         * <p>
-         * name: <b>appium.with.pm2</b><br>
-         * default: {@code false}
-         */
-        APPIUM_WITH_PM2("appium.with.pm2", "false");
+        PM2_BINARY_PATH("pm2.binary.path", null);
         
         private String propertyName;
         private String defaultValue;
@@ -1141,15 +1128,6 @@ public abstract class AbstractSeleniumConfig extends
      */
     public String getContextPlatform() {
         return getConfig().getString(SeleniumSettings.CONTEXT_PLATFORM.key());
-    }
-    
-    /**
-     * Determine if the {@code Appium} server should be managed by the {@code PM2} utility.
-     * 
-     * @return {@code true} if Appium should be managed by PM2; otherwise {@code false}
-     */
-    public boolean appiumWithPM2() {
-        return getConfig().getBoolean(SeleniumSettings.APPIUM_WITH_PM2.key());
     }
     
     /**
