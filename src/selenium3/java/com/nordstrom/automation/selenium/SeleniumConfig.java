@@ -12,6 +12,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -221,12 +222,16 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      */
     @Override
     protected Map<String, String> getDefaults() {
-        Map<String, String> defaults = super.getDefaults();
+        Map<String, String> defaults = new HashMap<>(super.getDefaults());
         defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), DEFAULT_GRID_LAUNCHER);
         defaults.put(SeleniumSettings.LAUNCHER_DEPS.key(), StringUtils.join(DEPENDENCY_CONTEXTS, File.pathSeparator));
         defaults.put(SeleniumSettings.HUB_PORT.key(), DEFAULT_HUB_PORT);
         defaults.put(SeleniumSettings.HUB_CONFIG.key(), DEFAULT_HUB_CONFIG);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), DEFAULT_NODE_CONFIG);
+        defaults.put(SeleniumSettings.GRID_PORT_ALLOCATOR.key(),
+                "com.nordstrom.automation.selenium.core.DefaultGridPortAllocationStrategy");
+        defaults.put(SeleniumSettings.SIDECAR_AUTH_STRATEGY.key(),
+                "com.nordstrom.automation.selenium.core.DefaultSidecarAuthStrategy");
         return defaults;
     }
 
@@ -343,5 +348,13 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     @Override
     public String toJson(Object obj) {
         return new Json().toJson(obj);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T fromJson(String json, java.lang.reflect.Type typeOfT) {
+        return new Json().toType(json, typeOfT);
     }
 }
