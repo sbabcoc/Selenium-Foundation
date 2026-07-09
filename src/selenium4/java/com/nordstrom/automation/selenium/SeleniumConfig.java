@@ -388,9 +388,9 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         defaults.put(SeleniumSettings.HUB_CONFIG.key(), DEFAULT_HUB_CONFIG);
         defaults.put(SeleniumSettings.NODE_CONFIG.key(), DEFAULT_NODE_CONFIG);
         defaults.put(SeleniumSettings.GRID_PORT_ALLOCATOR.key(),
-                "com.nordstrom.automation.selenium.core.DefaultGridPortAllocationStrategy");
+                "com.nordstrom.automation.selenium.sidecar.DefaultGridPortAllocationStrategy");
         defaults.put(SeleniumSettings.SIDECAR_AUTH_STRATEGY.key(),
-                "com.nordstrom.automation.selenium.core.DefaultSidecarAuthStrategy");
+                "com.nordstrom.automation.selenium.sidecar.DefaultSidecarAuthStrategy");
         return defaults;
     }
 
