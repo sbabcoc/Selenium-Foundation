@@ -456,6 +456,49 @@ public abstract class AbstractSeleniumConfig extends
         SIDECAR_SCAN_INTERVAL("selenium.grid.sidecar.scan.interval", "10"),
 
         /**
+         * This setting specifies the first port in the range scanned for unmanaged Grid instances.
+         * <p>
+         * name: <b>selenium.grid.sidecar.scan.start</b><br>
+         * default: <b>4444</b>
+         *
+         * @since [next-major]
+         */
+        SIDECAR_SCAN_START("selenium.grid.sidecar.scan.start", "4444"),
+
+        /**
+         * This setting specifies the last port in the range scanned for unmanaged Grid instances.
+         * <p>
+         * name: <b>selenium.grid.sidecar.scan.end</b><br>
+         * default: <b>65535</b>
+         *
+         * @since [next-major]
+         */
+        SIDECAR_SCAN_END("selenium.grid.sidecar.scan.end", "65535"),
+
+        /**
+         * This setting specifies the port step size used during normal (non-fine-toothed) scans
+         * for unmanaged Grid instances.
+         * <p>
+         * name: <b>selenium.grid.sidecar.scan.step</b><br>
+         * default: <b>10</b>
+         *
+         * @since [next-major]
+         */
+        SIDECAR_SCAN_STEP("selenium.grid.sidecar.scan.step", "10"),
+
+        /**
+         * This setting specifies the maximum duration in milliseconds of each scan chunk.
+         * The scanner pauses between chunks per the {@link #SIDECAR_SCAN_INTERVAL} setting,
+         * allowing other activity to proceed between chunks.
+         * <p>
+         * name: <b>selenium.grid.sidecar.scan.chunk.duration</b><br>
+         * default: <b>30000</b> (30 seconds)
+         *
+         * @since [next-major]
+         */
+        SIDECAR_SCAN_CHUNK_DURATION("selenium.grid.sidecar.scan.chunk.duration", "30000"),
+        
+        /**
          * This setting specifies the name of the file used to persist monitored remote Grid URLs
          * across sidecar restarts.
          * <p>
