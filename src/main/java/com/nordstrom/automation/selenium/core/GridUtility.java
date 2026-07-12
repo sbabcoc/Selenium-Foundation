@@ -14,6 +14,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -42,13 +43,16 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.json.Json;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
+import com.nordstrom.automation.selenium.utility.DataUtils;
 import com.nordstrom.common.base.UncheckedThrow;
 import com.nordstrom.common.uri.UriUtils;
 
@@ -80,6 +84,52 @@ public final class GridUtility {
         } catch (IOException eaten) {
             // nothing to do here
         }
+        return false;
+    }
+    
+    /**
+     * Determine if the specified URL identifies an active Selenium 4 Grid hub.
+     * <p>
+     * Confirms hub identity via a GraphQL {@code grid{uri}} query, which is
+     * hub-specific and not supported by nodes or other servers.
+     *
+     * @param hubUrl {@link URL} to check
+     * @return {@code true} if the URL identifies an active Selenium 4 hub; otherwise {@code false}
+     */
+    public static boolean isSelenium4Hub(URL hubUrl) {
+        try {
+            if (!isHostActive(hubUrl, "/status")) return false;
+            HttpResponse graphQL = callGraphQLService(hubUrl, "{\"query\":\"{grid{uri}}\"}");
+            if (graphQL.getStatusLine().getStatusCode() == 200) {
+                String json = EntityUtils.toString(graphQL.getEntity(), StandardCharsets.UTF_8);
+                Map<String, Object> body = DataUtils.fromString(json, Json.MAP_TYPE);
+                return body != null && body.containsKey("data")
+                        && ((Map<?, ?>) body.get("data")).containsKey("grid");
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
+    /**
+     * Determine if the specified URL identifies an active Selenium 3 Grid hub.
+     * <p>
+     * Confirms hub identity via the {@code /grid/api/hub/} endpoint, which is
+     * hub-specific and not supported by nodes or other servers.
+     *
+     * @param hubUrl {@link URL} to check
+     * @return {@code true} if the URL identifies an active Selenium 3 hub; otherwise {@code false}
+     */
+    public static boolean isSelenium3Hub(URL hubUrl) {
+        try {
+            HttpResponse r = getHttpResponse(hubUrl, "/grid/api/hub/");
+            if (r.getStatusLine().getStatusCode() == 200) {
+                String json = EntityUtils.toString(r.getEntity(), StandardCharsets.UTF_8);
+                Map<String, Object> body = DataUtils.fromString(json, Json.MAP_TYPE);
+                return body != null
+                        && Boolean.TRUE.equals(body.get("success"))
+                        && "hub".equals(body.get("role"));
+            }
+        } catch (Exception ignored) {}
         return false;
     }
     

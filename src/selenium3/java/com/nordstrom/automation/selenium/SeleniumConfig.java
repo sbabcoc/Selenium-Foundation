@@ -43,7 +43,7 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
     private static final String JSON_HEAD = "{ \"capabilities\": [";
     private static final String JSON_TAIL = "] }";
     private static final String DEFAULT_GRID_LAUNCHER = "org.openqa.grid.selenium.GridLauncherV3";
-    private static final String DEFAULT_HUB_PORT = "4445";
+    private static final String DEFAULT_HUB_PORT = "4454";
     private static final String DEFAULT_HUB_CONFIG = "hubConfig-s3.json";
     private static final String DEFAULT_NODE_CONFIG = "nodeConfig-s3.json";
     
@@ -247,10 +247,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         
         String slotMatcher = getString(SeleniumSettings.SLOT_MATCHER.key());
         
-        // get configured grid servlet collection
-        Set<String> servlets = getGridServlets();
-        // merge with hub template servlets
-        servlets.addAll(hubConfig.servlets);
+     // get hub servlets from HUB_SERVLETS setting
+        Set<String> servlets = new HashSet<>(hubConfig.servlets);
+        String hubServlets = getString(SeleniumSettings.HUB_SERVLETS.key());
+        if (hubServlets != null && !hubServlets.isEmpty()) {
+            for (String servlet : hubServlets.split(",")) {
+                servlets.add(servlet.trim());
+            }
+        }
         
         // strip extension to get template base path
         String configPathBase = hubConfigPath.substring(0, hubConfigPath.length() - 5);
@@ -302,6 +306,15 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         
         // get configured node servlet collection
         Set<String> servlets = new HashSet<>(nodeConfig.servlets);
+        // always add LifecycleServlet for sidecar-based shutdown
+        servlets.add("org.openqa.grid.web.servlet.LifecycleServlet");
+        // add servlets from NODE_SERVLETS setting
+        String nodeServlets = getString(SeleniumSettings.NODE_SERVLETS.key());
+        if (nodeServlets != null && !nodeServlets.isEmpty()) {
+            for (String servlet : nodeServlets.split(",")) {
+                servlets.add(servlet.trim());
+            }
+        }
         
         // strip extension to get template base path
         String configPathBase = nodeConfigPath.substring(0, nodeConfigPath.length() - 5);

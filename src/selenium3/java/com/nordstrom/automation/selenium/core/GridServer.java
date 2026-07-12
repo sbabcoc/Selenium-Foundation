@@ -81,7 +81,7 @@ public class GridServer implements IGridServer {
      * @return 'true' if specified hub is active; otherwise 'false'
      */
     public static boolean isHubActive(URL hubUrl) {
-        return GridUtility.isHostActive(hubUrl, HUB_CONFIG);
+        return GridUtility.isSelenium3Hub(hubUrl);
     }
     
     /**

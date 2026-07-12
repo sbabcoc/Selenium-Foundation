@@ -38,12 +38,6 @@ import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
 import com.nordstrom.automation.selenium.core.GridManagerPlugin;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
-import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameA_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameB_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameC_Servlet;
-import com.nordstrom.automation.selenium.servlet.ExamplePageServlet.FrameD_Servlet;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
 import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.automation.settings.SettingsCore;
@@ -145,19 +139,6 @@ public abstract class AbstractSeleniumConfig extends
         GRID_PLUGINS("selenium.grid.plugins", null),
         
         /**
-         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes to extend the
-         * capabilities of the local <b>Selenium Grid</b>.
-         * <p>
-         * <b>NOTE</b>: For <b>Selenium 3</b>, the specified servlets are hosted by the <b>Grid</b> hub server.
-         * For <b>Selenium 4</b>, they're hosted by the {@link com.nordstrom.automation.selenium.examples.ServletContainer
-         * ServletContainer} class.
-         * <p>
-         * name: <b>selenium.grid.servlets</b><br>
-         * default: {@code null}
-         */
-        GRID_SERVLETS("selenium.grid.servlets", null),
-        
-        /**
          * This setting specifies the fully-qualified name of the <b>GridLauncher</b> class, which provides a
          * command-line interface for configuring and launching <b>Selenium Grid</b> servers implemented in Java.
          * <p>
@@ -235,6 +216,19 @@ public abstract class AbstractSeleniumConfig extends
         SLOT_MATCHER("selenium.slot.matcher", FoundationSlotMatcher.class.getName()),
         
         /**
+         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes
+         * to extend the capabilities of the local <b>Selenium Grid</b> hub server.
+         * <p>
+         * <b>NOTE</b>: This setting applies to <b>Selenium 3</b> only.
+         * <p>
+         * name: <b>selenium.hub.servlets</b><br>
+         * default: {@code null}
+         *
+         * @since [next-major]
+         */
+        HUB_SERVLETS("selenium.hub.servlets", null),
+        
+        /**
          * This setting specifies whether to launch the local <b>Selenium Grid</b> hub server with JDWP debugging.
          * <p>
          * name: <b>selenium.hub.debug</b><br>
@@ -250,6 +244,20 @@ public abstract class AbstractSeleniumConfig extends
          * Selenium 4: <b>nodeConfig-s4.json</b>
          */
         NODE_CONFIG("selenium.node.config", null),
+        
+        /**
+         * This setting specifies a comma-delimited list of fully-qualified names of servlet classes
+         * to be hosted by the node servers of the local <b>Selenium Grid</b> instance.
+         * <p>
+         * <b>NOTE</b>: This setting applies to <b>Selenium 3</b> only. {@code LifecycleServlet}
+         * is always included automatically and does not need to be specified here.
+         * <p>
+         * name: <b>selenium.grid.node.servlets</b><br>
+         * default: {@code null}
+         *
+         * @since [next-major]
+         */
+        NODE_SERVLETS("selenium.node.servlets", null),        
         
         /**
          * This setting specifies whether to launch the local <b>Selenium Grid</b> node server with JDWP debugging.
@@ -369,14 +377,19 @@ public abstract class AbstractSeleniumConfig extends
         GRID_NO_REDIRECT("selenium.grid.no.redirect", "false"),
         
         /**
-         * This setting specifies whether the <b>ExamplePageServlet</b> is installed on the hub server of the local
-         * <b>Selenium Grid</b> instance. This servlet provides the example page used by the <b>Selenium Foundation</b>
+         * This setting specifies whether the example page site is served alongside the local
+         * <b>Selenium Grid</b> instance. The example page is used by the <b>Selenium Foundation</b>
          * unit tests.
          * <p>
-         * name: <b>selenium.grid.examples</b><br>
+         * <b>NOTE</b>: The example page site is hosted by the sidecar servlet container,
+         * ensuring a single instance regardless of API version.
+         * <p>
+         * name: <b>selenium.serve.example.site</b><br>
          * default: {@code true}
+         *
+         * @since [next-major]
          */
-        GRID_EXAMPLES("selenium.grid.examples", "true"),
+        SERVE_EXAMPLE_SITE("selenium.serve.example.site", "true"),
         
         /**
          * This setting specifies whether the <b>LifecycleServlet</b> is installed on the hub and node servers of the
@@ -896,12 +909,10 @@ public abstract class AbstractSeleniumConfig extends
             if (seleniumGrid != null && seleniumGrid.isActive()) {
                 boolean result = seleniumGrid.shutdown();
                 if (result) {
-                    ExamplePageLauncher.getLauncher().shutdown();
                     seleniumGrid = null;
                 }
                 return result;
             }
-            ExamplePageLauncher.getLauncher().shutdown();
             return true;
         }
     }
@@ -1247,32 +1258,6 @@ public abstract class AbstractSeleniumConfig extends
         }
         
         return exceptions;
-    }
-    
-    /**
-     * Get the collection of servlets to install on Selenium Grid hub.
-     * 
-     * @return collection of specified hub servlets (may be empty)
-     */
-    public Set<String> getGridServlets() {
-        Set<String> servlets = new HashSet<>();
-        // get specified grid servlet classes
-        String gridServlets = getString(SeleniumSettings.GRID_SERVLETS.key());
-        // if servlets are specified
-        if (!(gridServlets == null || gridServlets.isEmpty())) {
-            // collect servlet names, minus leading/trailing white space
-            servlets.addAll(Arrays.asList(gridServlets.trim().split("\\s*,\\s*")));
-        }
-        // if example page feature is specified
-        if (getBoolean(SeleniumSettings.GRID_EXAMPLES.key())) {
-            // add example page servlets to the collection
-            servlets.add(ExamplePageServlet.class.getName());
-            servlets.add(FrameA_Servlet.class.getName());
-            servlets.add(FrameB_Servlet.class.getName());
-            servlets.add(FrameC_Servlet.class.getName());
-            servlets.add(FrameD_Servlet.class.getName());
-        }
-        return servlets;
     }
     
     /**

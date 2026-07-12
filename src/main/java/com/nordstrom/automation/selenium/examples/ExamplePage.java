@@ -1,28 +1,34 @@
 package com.nordstrom.automation.selenium.examples;
 
-import java.io.IOException;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.util.EntityUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.json.Json;
 
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.ByType;
+import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.AlertHandler;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
-import com.nordstrom.automation.selenium.servlet.ExamplePageLauncher;
+import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.common.uri.UriUtils;
 
 /**
@@ -570,26 +576,27 @@ public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePa
      * @return {@link URI} for the active Grid hub
      */
     public static URI setHubAsTarget() {
-        URI targetUri = null;
         SeleniumConfig config = SeleniumConfig.getConfig();
         try {
-            // if running Selenium 4+
-            if (config.getVersion() > 3) {
-                // ensure example page servlet is running
-                ExamplePageLauncher.getLauncher().start();
-                // get URI of example page servlet
-                targetUri = ExamplePageLauncher.getLauncher().getUrl().toURI();
-            } else {
-                // get URL of Selenium Grid hub server
-                URL hubUrl = config.getSeleniumGrid().getHubServer().getUrl();
-                // get base URI of grid hub server
-                targetUri = UriUtils.uriForPath(hubUrl);
+            int port = config.getInt(SeleniumSettings.SIDECAR_PORT.key());
+            URL statusUrl = UriUtils.makeBasicURI("http", HostUtils.getLocalHost(), port).toURL();
+            HttpResponse response = GridUtility.getHttpResponse(statusUrl, "/grid/control/status");
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                String json = EntityUtils.toString(response.getEntity(), UTF_8);
+                Map<String, Object> status = config.fromJson(json, Json.MAP_TYPE);
+                String exampleSiteUrl = (String) status.get("exampleSiteUrl");
+                if (exampleSiteUrl != null) {
+                    URI exampleUri = URI.create(exampleSiteUrl);
+                    URI targetUri = UriUtils.makeBasicURI(exampleUri.getScheme(),
+                            exampleUri.getHost(), exampleUri.getPort());
+                    config.setTargetUri(targetUri);
+                    return targetUri;
+                }
             }
-            config.setTargetUri(targetUri);
-        } catch (URISyntaxException | IOException eaten) {
+        } catch (Exception eaten) {
             // nothing to do here
         }
-        return targetUri;
+        return null;
     }
 
     /**

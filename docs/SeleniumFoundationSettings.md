@@ -27,15 +27,13 @@ Settings that control the local Selenium Grid instance.
 | Setting | Default | Description |
 |---------|---------|-------------|
 | <details><summary>**GRID_PLUGINS**</summary>`selenium.grid.plugins`</details> | *(none)* | <details><summary>Path-delimited list of fully-qualified driver plug-in class names.</summary>**NOTE**: Overrides the `ServiceLoader` provider configuration file.</details> |
-| <details><summary>**GRID_SERVLETS**</summary>`selenium.grid.servlets`</details> | *(none)* | <details><summary>Comma-delimited list of fully-qualified servlet class names.</summary>**Selenium 3**: Hosted by the hub server.<br>**Selenium 4**: Hosted by `ServletContainer`.</details> |
 | <details><summary>**GRID_LAUNCHER**</summary>`selenium.grid.launcher`</details> | <details><summary>*version-specific*</summary>**Selenium 3:** `org.openqa.grid.selenium.GridLauncherV3`<br>**Selenium 4**: `org.openqa.selenium.grid.Bootstrap`</details> | Fully-qualified name of the `GridLauncher` class. |
 | <details><summary>**LAUNCHER_DEPS**</summary>`selenium.launcher.deps`</details> | *version-specific* | Path-delimited list of fully-qualified context class names for Grid launcher dependencies |
 | <details><summary>**SLOT_MATCHER**</summary>`selenium.slot.matcher`</details> | `FoundationSlotMatcher` | Slot matcher used by the hub server |
 | <details><summary>**GRID_WORKING_DIR**</summary>`selenium.grid.working.dir`</details> | *(none)* | Working directory for local Grid server processes |
 | <details><summary>**GRID_LOGS_FOLDER**</summary>`selenium.grid.log.folder`</details> | `logs` | <details><summary>Log file folder for local Grid server processes.</summary>If relative, resolved against `GRID_WORKING_DIR` (or `user.dir` if unset).</details> |
 | <details><summary>**GRID_NO_REDIRECT**</summary>`selenium.grid.no.redirect`</details> | `false` | Whether to suppress capture of Grid server output to log files |
-| <details><summary>**GRID_EXAMPLES**</summary>`selenium.grid.examples`</details> | `true` | Whether to install the `ExamplePageServlet` on the hub server |
-| <details><summary>**GRID_LIFECYCLE**</summary>`selenium.grid.lifecycle`</details> | `true` | Whether to install the `LifecycleServlet` on hub and node servers (enables remote shutdown) |
+| <details><summary>**SERVE_EXAMPLE_SITE**</summary>`selenium.serve.example.site`</details> | `true` | <details><summary>Whether to serve the example page site alongside the local Grid instance.</summary>The example page site is hosted by the sidecar servlet container.</details> |
 
 ---
 
@@ -49,6 +47,7 @@ Settings that configure the Selenium Grid hub server.
 | <details><summary>**HUB_HOST**</summary>`selenium.hub.host`</details> | <details><summary>*version-specific*</summary>**Selenium 3**: `http://localhost:4445/wd/hub`<br>**Selenium 4**: `http://localhost:4446/wd/hub`</details> | URL for the Grid hub endpoint (`[scheme:][//authority]/wd/hub`). |
 | <details><summary>**HUB_PORT**</summary>`selenium.hub.port`</details> | <details><summary>*version-specific*</summary> **Selenium 3**: `4445`<br>**Selenium 4**: `4446`</details> | Port for the local hub server. |
 | <details><summary>**HUB_DEBUG**</summary>`selenium.hub.debug`</details> | <details><summary>`false`</summary>Adds JDWP library to suspend the hub server on launch, listening at port 8000</details> | Whether to launch the hub server with JDWP debugging enabled |
+| <details><summary>**HUB_SERVLETS**</summary>`selenium.hub.servlets`</details> | *(none)* | <details><summary>Comma-delimited list of fully-qualified servlet class names to host on the hub server. **(Selenium 3 only)**</summary>Servlets specified here are added to the hub server configuration alongside the example page servlets (if `SERVE_EXAMPLE_SITE` is enabled).</details> |
 
 ---
 
@@ -60,6 +59,47 @@ Settings that configure Selenium Grid node servers.
 |---------|---------|-------------|
 | <details><summary>**NODE_CONFIG**</summary>`selenium.node.config`</details> | <details><summary>*version-specific*</summary>**Selenium 3**: `nodeConfig-s3.json`<br>**Selenium 4**: `nodeConfig-s4.json`</details> | Node server configuration template file name or path. |
 | <details><summary>**NODE_DEBUG**</summary>`selenium.node.debug`</details> | <details><summary>`false`</summary>Adds JDWP library to suspend the node server on launch, listening at port 8001</details> | Whether to launch node servers with JDWP debugging enabled |
+| <details><summary>**NODE_SERVLETS**</summary>`selenium.node.servlets`</details> | *(none)* | <details><summary>Comma-delimited list of fully-qualified servlet class names to host on node servers. **(Selenium 3 only)**</summary>`LifecycleServlet` is always included automatically and does not need to be specified here.</details> |
+
+---
+
+## Port Allocation
+
+Settings that control port selection for local Selenium Grid hub instances.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| <details><summary>**GRID_PORT_ALLOCATOR**</summary>`selenium.grid.port.allocator`</details> | `DefaultGridPortAllocationStrategy` | <details><summary>Fully-qualified class name of the `GridPortAllocationStrategy` implementation to use for allocating hub and event bus ports.</summary>Custom implementations must be no-arg-constructible. The default implementation allocates port bundles by verifying simultaneous availability via `ServerSocket` reservation.</details> |
+| <details><summary>**GRID_PUB_PORT**</summary>`selenium.grid.pub.port`</details> | *auto-allocated* | <details><summary>Event bus publisher port for the local Selenium 4 Grid hub. **(Selenium 4 only)**</summary>If unset, allocated automatically as part of a port bundle. If set, the subscriber port (`GRID_SUB_PORT`) should also be set explicitly.</details> |
+| <details><summary>**GRID_SUB_PORT**</summary>`selenium.grid.sub.port`</details> | *auto-allocated* | <details><summary>Event bus subscriber port for the local Selenium 4 Grid hub. **(Selenium 4 only)**</summary>If unset, allocated automatically as part of a port bundle. If set, the publisher port (`GRID_PUB_PORT`) should also be set explicitly.</details> |
+
+---
+
+## Sidecar
+
+Settings that control the sidecar servlet container, which provides lifecycle management and a management console for local Selenium Grid instances.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| <details><summary>**SIDECAR_PORT**</summary>`selenium.grid.sidecar.port`</details> | `9001` | Port on which the sidecar servlet container listens. |
+| <details><summary>**SIDECAR_STOP_TOKEN**</summary>`selenium.grid.sidecar.stop.token`</details> | *(none)* | <details><summary>Token required to authorize sensitive sidecar operations (shutdown, stop).</summary>If unset, all requests are authorized unconditionally. When set, the token must be provided via the `token` request parameter or a valid session cookie must be present.</details> |
+| <details><summary>**SIDECAR_AUTH_STRATEGY**</summary>`selenium.grid.sidecar.auth`</details> | `DefaultSidecarAuthStrategy` | <details><summary>Fully-qualified class name of the `SidecarAuthStrategy` implementation to use for authorizing sensitive sidecar operations.</summary>Custom implementations must be no-arg-constructible. The default implementation combines token+session authentication (for browser clients) with OS user identity authentication (for CLI clients).</details> |
+| <details><summary>**SIDECAR_SESSION_TTL**</summary>`selenium.grid.sidecar.session.ttl`</details> | `30` | Session TTL in minutes for authenticated sidecar browser sessions. After a successful token authentication, a session cookie is established for this duration. |
+| <details><summary>**SIDECAR_MONITOR_FILE**</summary>`selenium.grid.sidecar.monitor.file`</details> | `monitored-grids.json` | <details><summary>Name of the file used to persist monitored remote Grid URLs across sidecar restarts.</summary>If a relative path is specified, it is resolved against the sidecar working directory.</details> |
+
+---
+
+## Sidecar Scanner
+
+Settings that control the background scanner that discovers unmanaged Selenium Grid instances.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| <details><summary>**SIDECAR_SCAN_INTERVAL**</summary>`selenium.grid.sidecar.scan.interval`</details> | `10` | <details><summary>Interval in seconds between background scan chunks.</summary>Set to `0` to disable background scanning entirely. The scanner resumes from its last position between chunks, so a full port range scan may span multiple intervals.</details> |
+| <details><summary>**SIDECAR_SCAN_START**</summary>`selenium.grid.sidecar.scan.start`</details> | `4444` | First port in the range scanned for unmanaged Grid instances. |
+| <details><summary>**SIDECAR_SCAN_END**</summary>`selenium.grid.sidecar.scan.end`</details> | `65535` | Last port in the range scanned for unmanaged Grid instances. |
+| <details><summary>**SIDECAR_SCAN_STEP**</summary>`selenium.grid.sidecar.scan.step`</details> | `10` | <details><summary>Port step size used during normal (stepped) scans.</summary>Use the **Scan All Ports** button in the management console to trigger a fine-toothed scan (step size 1) that covers every port in the range.</details> |
+| <details><summary>**SIDECAR_SCAN_CHUNK_DURATION**</summary>`selenium.grid.sidecar.scan.chunk.duration`</details> | `30000` | <details><summary>Maximum duration in milliseconds of each scan chunk.</summary>The scanner pauses between chunks per the `SIDECAR_SCAN_INTERVAL` setting, allowing other sidecar activity to proceed between chunks.</details> |
 
 ---
 
