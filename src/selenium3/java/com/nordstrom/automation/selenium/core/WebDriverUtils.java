@@ -36,12 +36,9 @@ import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
  */
 public final class WebDriverUtils {
     
-    private static final List<Class<? extends WebDriverException>> REPORTABLE_EXCEPTION =
-                    Collections.unmodifiableList(
-                            Arrays.asList(
-                                    NotFoundException.class, ElementNotVisibleException.class,
-                                    UnhandledAlertException.class, StaleElementReferenceException.class,
-                                    TimeoutException.class));
+    private static final List<Class<? extends WebDriverException>> REPORTABLE_EXCEPTION = Collections
+            .unmodifiableList(Arrays.asList(NotFoundException.class, ElementNotVisibleException.class,
+                    UnhandledAlertException.class, StaleElementReferenceException.class, TimeoutException.class));
     
     private static final Pattern FRAMEWORK_PACKAGE = Pattern.compile(
             "^(?:sun\\.reflect|java\\.lang"

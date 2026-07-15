@@ -2,6 +2,7 @@ package com.nordstrom.automation.selenium.servlet;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -14,9 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 
 /**
- * This class implements a simple HTTP servlet that provides an example page for the <b>Selenium Foundation</b> unit
- * tests. By default, this servlet is installed on the hub server of the local <b>Selenium Grid</b> instance. This
- * behavior can be overridden via the {@link SeleniumSettings#GRID_EXAMPLES GRID_EXAMPLES} setting.
+ * This class implements a simple HTTP servlet that provides an example page for the
+ * <b>Selenium Foundation</b> unit tests. When enabled via the
+ * {@link SeleniumSettings#SERVE_EXAMPLE_SITE SERVE_EXAMPLE_SITE} setting, this servlet
+ * is hosted by the sidecar servlet container, providing a single instance regardless
+ * of Selenium API version.
  */
 @WebServlet(name = "ExamplePageServlet", urlPatterns = {"/grid/admin/ExamplePageServlet"})
 public class ExamplePageServlet extends HttpServlet {
@@ -25,7 +28,7 @@ public class ExamplePageServlet extends HttpServlet {
 
     /** page source for this servlet */
     protected String pageSource;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -38,19 +41,16 @@ public class ExamplePageServlet extends HttpServlet {
      * {@inheritDoc}
      */
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
-        // Set response content type
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.setContentType("text/html");
-
-        // Actual logic goes here.
         PrintWriter out = response.getWriter();
         out.print(pageSource);
     }
 
     /**
-     * Get the content of the name resource
-     * 
+     * Get the content of the named resource.
+     *
      * @param resource resource filename
      * @return resource file content
      */
@@ -67,13 +67,19 @@ public class ExamplePageServlet extends HttpServlet {
 
     /**
      * Reads all remaining bytes from the specified input stream.
-     * 
+     *
      * @param inputStream input stream to read
      * @return array of remaining bytes
      * @throws IOException if an I/O error occurs
      */
     public static byte[] readAllBytes(final InputStream inputStream) throws IOException {
-        return inputStream.readAllBytes();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, bytesRead);
+        }
+        return buffer.toByteArray();
     }
 
     /**
@@ -81,12 +87,9 @@ public class ExamplePageServlet extends HttpServlet {
      */
     @WebServlet(name = "FrameA_Servlet", urlPatterns = {"/grid/admin/FrameA_Servlet"})
     public static class FrameA_Servlet extends ExamplePageServlet {
-
         private static final long serialVersionUID = 4547909165192240389L;
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_a.html");
@@ -98,12 +101,9 @@ public class ExamplePageServlet extends HttpServlet {
      */
     @WebServlet(name = "FrameB_Servlet", urlPatterns = {"/grid/admin/FrameB_Servlet"})
     public static class FrameB_Servlet extends ExamplePageServlet {
-
         private static final long serialVersionUID = 5903212244921125263L;
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_b.html");
@@ -115,12 +115,9 @@ public class ExamplePageServlet extends HttpServlet {
      */
     @WebServlet(name = "FrameC_Servlet", urlPatterns = {"/grid/admin/FrameC_Servlet"})
     public static class FrameC_Servlet extends ExamplePageServlet {
-
         private static final long serialVersionUID = 1448462233121165298L;
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_c.html");
@@ -132,12 +129,9 @@ public class ExamplePageServlet extends HttpServlet {
      */
     @WebServlet(name = "FrameD_Servlet", urlPatterns = {"/grid/admin/FrameD_Servlet"})
     public static class FrameD_Servlet extends ExamplePageServlet {
-
         private static final long serialVersionUID = 1444648483821114876L;
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void init() throws ServletException {
             pageSource = getResource("frame_d.html");

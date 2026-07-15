@@ -1,12 +1,8 @@
 package com.nordstrom.automation.selenium.examples;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,58 +11,28 @@ import org.seleniumhq.jetty9.server.Server;
 import org.seleniumhq.jetty9.servlet.ServletContextHandler;
 import org.seleniumhq.jetty9.servlet.ServletHolder;
 
-import com.beust.jcommander.JCommander;
-import com.nordstrom.automation.selenium.SeleniumConfig;
-
 public class ServletContainer {
     
-    private static final String[] DEPENDENCY_CONTEXTS = {
-        ServletContainer.class.getName(),
-        "javax.servlet.Servlet",
-        "org.seleniumhq.jetty9.server.Handler"
-    };
-    
     /**
-     * Get dependency contexts for this driver.
-     * 
-     * @return driver dependency contexts
+     * Start a servlet container on the specified port with the specified servlets.
+     * This method returns the started server without blocking, allowing the caller
+     * to manage the server lifecycle.
+     *
+     * @param port port on which the server should listen
+     * @param servletClasses fully-qualified names of servlet classes to register
+     * @return started {@link Server} instance
+     * @throws Exception if the server fails to start
+     * @since [next-major]
      */
-    public static String[] getDependencyContexts() {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-        Set<String> servlets = config.getGridServlets();
-        Collections.addAll(servlets, DEPENDENCY_CONTEXTS);
-        return servlets.toArray(new String[0]);
-    }
-    
-    /**
-     * Get list of <b>--servlet</b> command line arguments from specified Grid servlet classes.
-     * 
-     * @return list of servlet command line options
-     */
-    public static List<String> getServletArgs() {
-        SeleniumConfig config = SeleniumConfig.getConfig();
-       return config.getGridServlets().stream().flatMap(s -> Stream.of("--servlet", s)).collect(Collectors.toList());
-    }
-    
-    /**
-     * This is the "main" method of this Java command line utility.
-     * 
-     * @param args command line arguments
-     * @throws Exception if something goes sideways
-     */
-    public static void main(String[] args) throws Exception {
-        ServletFlags flags = new ServletFlags();
-        JCommander.newBuilder().addObject(flags).build().parse(args);
-        
+    public static Server start(int port, List<String> servletClasses) throws Exception {
         ServletContextHandler context = new ServletContextHandler();
-        for (String servletClassName : flags.getServlets()) {
+        for (String servletClassName : servletClasses) {
             addServlet(context, servletClassName);
         }
-        
-        Server server = new Server(flags.getPort());
+        Server server = new Server(port);
         server.setHandler(context);
         server.start();
-        server.join();
+        return server;
     }
     
     /**

@@ -28,9 +28,8 @@ import org.openqa.selenium.WrapsDriver;
 import com.nordstrom.automation.selenium.model.RobustJavascriptExecutor;
 
 /**
- * This static utility class contains a collection of methods primarily focused
- * on extracting useful interfaces from search contexts. It also includes a
- * method that removes hidden elements from lists of elements.
+ * This static utility class contains a collection of methods primarily focused on extracting useful interfaces from
+ * search contexts. It also includes a method that removes hidden elements from lists of elements.
  */
 public final class WebDriverUtils {
 
@@ -55,8 +54,7 @@ public final class WebDriverUtils {
      * 
      * @param context search context
      * @return search context driver
-     * @throws UnsupportedOperationException if unable to extract driver from
-     *                                       specified context
+     * @throws UnsupportedOperationException if unable to extract driver from specified context
      */
     public static WebDriver getDriver(final SearchContext context) {
         if (context instanceof WebDriver) {
@@ -73,8 +71,7 @@ public final class WebDriverUtils {
      * 
      * @param context search context
      * @return context-specific {@link JavascriptExecutor}
-     * @throws UnsupportedOperationException if specified context doesn't support
-     *                                       JavaScript
+     * @throws UnsupportedOperationException if specified context doesn't support JavaScript
      */
     public static JavascriptExecutor getExecutor(final SearchContext context) {
         return new RobustJavascriptExecutor(getDriver(context));
@@ -84,8 +81,7 @@ public final class WebDriverUtils {
      * Determine if the specified context supports JavaScript.
      * 
      * @param context search context
-     * @return {@code true} if the specified context supports JavaScript; otherwise
-     *         {@code false}
+     * @return {@code true} if the specified context supports JavaScript; otherwise {@code false}
      */
     public static boolean isJavascriptEnabled(final SearchContext context) {
         Capabilities caps = getCapabilities(context);
@@ -100,8 +96,7 @@ public final class WebDriverUtils {
      * Get the browser name for the specified context.
      * 
      * @param context search context
-     * @return context browser name; "(unknown)" if context doesn't describe its
-     *         capabilities
+     * @return context browser name; "(unknown)" if context doesn't describe its capabilities
      */
     public static String getBrowserName(final SearchContext context) {
         Capabilities caps = getCapabilities(context);
@@ -112,8 +107,7 @@ public final class WebDriverUtils {
      * Get the platform on which the browser is running.
      * 
      * @param context search context
-     * @return {@link Platform} hosting the browser; {@code null} if context doesn't
-     *         describe its capabilities
+     * @return {@link Platform} hosting the browser; {@code null} if context doesn't describe its capabilities
      */
     public static Platform getPlatform(final SearchContext context) {
         Capabilities caps = getCapabilities(context);
@@ -137,8 +131,7 @@ public final class WebDriverUtils {
      * Get the capabilities of the specified search context
      * 
      * @param context search context
-     * @return context capabilities; {@code null} if context doesn't describe its
-     *         capabilities
+     * @return context capabilities; {@code null} if context doesn't describe its capabilities
      */
     public static Capabilities getCapabilities(final SearchContext context) {
         return Optional.ofNullable(getDriver(context))
@@ -217,8 +210,7 @@ public final class WebDriverUtils {
      * Remove hidden elements from specified list.
      * 
      * @param elements list of elements
-     * @return {@code true} if no visible elements were found; otherwise
-     *         {@code false}
+     * @return {@code true} if no visible elements were found; otherwise {@code false}
      */
     public static boolean filterHidden(final List<WebElement> elements) {
         Iterator<WebElement> iter = elements.iterator();

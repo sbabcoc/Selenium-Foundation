@@ -43,7 +43,7 @@ import com.nordstrom.automation.settings.SettingsCore;
 public class SeleniumConfig extends AbstractSeleniumConfig {
     
     private static final String DEFAULT_GRID_LAUNCHER = "org.openqa.selenium.grid.Bootstrap";
-    private static final String DEFAULT_HUB_PORT = "4446";
+    private static final String DEFAULT_HUB_PORT = "4444";
     private static final String DEFAULT_HUB_CONFIG = "hubConfig-s4.json";
     private static final String DEFAULT_NODE_CONFIG = "nodeConfig-s4.json";
     

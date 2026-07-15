@@ -20,4 +20,6 @@
 
     <logger name="org.apache" level="ERROR" />
     <logger name="httpclient" level="ERROR" />
+    <logger name="org.eclipse.jetty" level="ERROR"/>
+    <logger name="org.seleniumhq.jetty9" level="ERROR"/>
 </configuration>

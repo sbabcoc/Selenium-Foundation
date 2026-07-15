@@ -6,11 +6,14 @@ import java.util.Optional;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.google.common.base.Function;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
@@ -62,6 +65,24 @@ public class SearchContextWait extends FluentWait<SearchContext> {
         this.context = context;
     }
 
+    /**
+     * Wait until the specified condition is satisfied.
+     * <p>
+     * This overload accepts an {@link ExpectedCondition}, bridging the gap between
+     * {@link FluentWait}&lt;{@link SearchContext}&gt; and the {@link WebDriver}-based
+     * {@code ExpectedCondition} interface. The search context is cast to {@link WebDriver}
+     * for compatibility with standard {@code ExpectedConditions} factory methods.
+     *
+     * @param <V> return type of the condition
+     * @param condition {@link ExpectedCondition} to evaluate
+     * @return the condition's return value if it is not {@code null} or {@code false}
+     * @throws org.openqa.selenium.TimeoutException if the condition is not satisfied
+     *         within the configured timeout
+     */
+    public <V> V until(ExpectedCondition<V> condition) {
+        return until((Function<SearchContext, V>) d -> condition.apply((WebDriver) d));
+    }
+    
     /**
      * {@inheritDoc}
      */
