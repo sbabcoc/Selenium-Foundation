@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.core;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
@@ -8,26 +9,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.NoDriver;
 import com.nordstrom.automation.testng.ExecutionFlowController;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.nordstrom.automation.selenium.listeners.DriverListener;
 import com.nordstrom.automation.selenium.support.TestNgBase;
 
-@Test(enabled=false)
+@Test
 @LinkedListeners({DriverListener.class, ExecutionFlowController.class})
 public class GridUtilityTest extends TestNgBase {
-    
-    @BeforeClass
-    public void stopLocalGrid() throws InterruptedException {
-        if (!SeleniumConfig.getConfig().shutdownGrid()) {
-            throw new IllegalStateException("Configured for non-local hub host");
-        }
-    }
     
     @NoDriver
     @Test(expectedExceptions = {NullPointerException.class},
@@ -61,5 +53,35 @@ public class GridUtilityTest extends TestNgBase {
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
+    }
+    
+    @NoDriver
+    @Test
+    public void testIsSelenium4Hub_negative() throws MalformedURLException {
+        URI hostUri = URI.create("https://github.com");
+        assertFalse(GridUtility.isSelenium4Hub(hostUri.toURL()),
+                "github.com should not be identified as a Selenium 4 hub");
+    }
+    
+    @NoDriver
+    @Test
+    public void testIsSelenium3Hub_negative() throws MalformedURLException {
+        URI hostUri = URI.create("https://github.com");
+        assertFalse(GridUtility.isSelenium3Hub(hostUri.toURL()),
+                "github.com should not be identified as a Selenium 3 hub");
+    }
+    
+    @NoDriver
+    @Test
+    public void testIsSelenium4Hub_nullCheck() {
+        assertFalse(GridUtility.isSelenium4Hub(null),
+                "isSelenium4Hub() should return false for null URL");
+    }
+
+    @NoDriver
+    @Test
+    public void testIsSelenium3Hub_nullCheck() {
+        assertFalse(GridUtility.isSelenium3Hub(null),
+                "isSelenium3Hub() should return false for null URL");
     }
 }
