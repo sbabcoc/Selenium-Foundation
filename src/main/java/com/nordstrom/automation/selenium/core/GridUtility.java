@@ -162,6 +162,36 @@ public final class GridUtility {
     }
     
     /**
+     * Send a GET request to the specified pre-constructed URL string without any
+     * path manipulation or query parameter encoding.
+     * <p>
+     * Use this method when the URL contains query parameters that must not be
+     * URL-encoded (e.g. proxy IDs containing {@code ://}).
+     *
+     * @param url pre-constructed URL string
+     * @return host response for the specified GET request
+     * @throws IOException if the request triggered an I/O exception
+     */
+    public static HttpResponse getRawHttpResponse(String url) throws IOException {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(2000)
+                .setConnectionRequestTimeout(2000)
+                .setSocketTimeout(5000)
+                .build();
+        CloseableHttpClient client = HttpClientBuilder.create()
+                .disableAutomaticRetries()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+        HttpGet request = new HttpGet(url);
+        HttpResponse response = client.execute(request);
+        HttpEntity entity = response.getEntity();
+        if (entity != null && entity.isStreaming()) {
+            response.setEntity(new BufferedHttpEntity(entity));
+        }
+        return response;
+    }
+    
+    /**
      * Send the specified GraphQL query to the indicated host.
      * 
      * @param hostUrl {@link URL} of target host

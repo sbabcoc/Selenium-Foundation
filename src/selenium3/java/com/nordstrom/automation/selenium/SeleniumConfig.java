@@ -247,8 +247,11 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
         
         String slotMatcher = getString(SeleniumSettings.SLOT_MATCHER.key());
         
-     // get hub servlets from HUB_SERVLETS setting
+        // get configured hub servlet collection
         Set<String> servlets = new HashSet<>(hubConfig.servlets);
+        // always add ProxyListServlet for programmatic node enumeration
+        servlets.add("com.nordstrom.automation.selenium.servlet.ProxyListServlet");
+        // add servlets from HUB_SERVLETS setting
         String hubServlets = getString(SeleniumSettings.HUB_SERVLETS.key());
         if (hubServlets != null && !hubServlets.isEmpty()) {
             for (String servlet : hubServlets.split(",")) {
