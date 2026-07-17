@@ -93,16 +93,17 @@ ext.archiveBase = "${rootProject.name}-${archiveVer}"
 version = archiveVer
 
 task updateReadme {
+  def base = project.ext.baseVersion
   doLast {
     def version = scmVersion.version
     if (version.endsWith('-SNAPSHOT')) return
     ant.replaceregexp(file: 'README.md',
       match: /\d+\.\d+\.\d+-s3/,
-      replace: "${ext.baseVersion}-s3",
+      replace: "${base}-s3",
       flags: 'g')
     ant.replaceregexp(file: 'README.md',
       match: /\d+\.\d+\.\d+-s4/,
-      replace: "${ext.baseVersion}-s4",
+      replace: "${base}-s4",
       flags: 'g')
   }
 }
@@ -195,6 +196,10 @@ java {
 /* Clean */
 tasks.named('clean') {
   delete 'logs', 'target', buildRoot
+  delete fileTree('.') {
+    include 'hubConfig*.json'
+    include 'nodeConfig*.json'
+  }
 }
 
 /* JaCoCo */

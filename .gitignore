@@ -17,3 +17,4 @@ build-*/
 test-output/
 .DS_Store
 .vscode/
+*.json
