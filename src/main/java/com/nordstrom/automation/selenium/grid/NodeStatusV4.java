@@ -18,7 +18,7 @@ import com.nordstrom.automation.selenium.utility.DataUtils;
  * This class is used to extract the information from a node status GraphQL query.
  *
  * @see NodesV4#NODES_INFO_QUERY
- * @since [next-major]
+ * @since 36.0.0
  */
 public class NodeStatusV4 {
 

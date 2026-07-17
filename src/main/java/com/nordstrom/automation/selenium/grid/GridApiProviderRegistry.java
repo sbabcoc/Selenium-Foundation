@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * Providers are keyed by API version, allowing callers to select the appropriate
  * provider for a given grid instance based on its detected API version.
  *
- * @since [next-major]
+ * @since 36.0.0
  */
 public class GridApiProviderRegistry {
 

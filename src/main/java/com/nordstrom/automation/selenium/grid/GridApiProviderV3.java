@@ -28,7 +28,7 @@ import com.nordstrom.automation.selenium.utility.DataUtils;
  * {@code selenium-grid-manager}), it is preferred over console scraping for
  * node enumeration.
  *
- * @since [next-major]
+ * @since 36.0.0
  */
 public class GridApiProviderV3 implements GridApiProvider {
 

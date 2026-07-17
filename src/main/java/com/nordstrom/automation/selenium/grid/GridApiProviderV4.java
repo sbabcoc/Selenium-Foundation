@@ -23,7 +23,7 @@ import com.nordstrom.automation.selenium.core.GridUtility;
  * <p>
  * Uses the Selenium 4 GraphQL API for grid interaction.
  *
- * @since [next-major]
+ * @since 36.0.0
  */
 public class GridApiProviderV4 implements GridApiProvider {
 

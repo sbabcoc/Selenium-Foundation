@@ -8,7 +8,7 @@ import org.openqa.selenium.json.JsonInput;
 /**
  * This class is used to query the status of nodes attached to a Selenium 4 Grid hub.
  *
- * @since [next-major]
+ * @since 36.0.0
  */
 public class NodesV4 {
 

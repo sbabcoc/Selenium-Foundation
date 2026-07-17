@@ -11,7 +11,7 @@ import org.openqa.selenium.MutableCapabilities;
 /**
  * This class extracts node capabilities from a Selenium 3 Grid proxy status response.
  *
- * @since [next-major]
+ * @since 36.0.0
  */
 public class GridProxyResponseV3 {
 

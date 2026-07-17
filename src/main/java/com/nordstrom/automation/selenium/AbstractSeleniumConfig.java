@@ -190,7 +190,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.pub.port</b><br>
          * default: <b>-1</b> (auto-select)
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         GRID_PUB_PORT("selenium.grid.pub.port", "-1"),
 
@@ -200,7 +200,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sub.port</b><br>
          * default: <b>-1</b> (auto-select)
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         GRID_SUB_PORT("selenium.grid.sub.port", "-1"),
         
@@ -222,7 +222,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.hub.servlets</b><br>
          * default: {@code null}
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         HUB_SERVLETS("selenium.hub.servlets", null),
         
@@ -253,7 +253,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.node.servlets</b><br>
          * default: {@code null}
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         NODE_SERVLETS("selenium.node.servlets", null),        
         
@@ -385,7 +385,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.serve.example.site</b><br>
          * default: {@code true}
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SERVE_EXAMPLE_SITE("selenium.serve.example.site", "true"),
         
@@ -407,7 +407,7 @@ public abstract class AbstractSeleniumConfig extends
          * default: {@code null} (registered via {@code getDefaults()} in the appropriate
          * {@code SeleniumConfig} subclass)
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         GRID_PORT_ALLOCATOR("selenium.grid.port.allocator", null),
 
@@ -417,7 +417,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.port</b><br>
          * default: <b>9001</b>
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_PORT("selenium.grid.sidecar.port", "9001"),
 
@@ -428,7 +428,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.stop.token</b><br>
          * default: {@code null}
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_STOP_TOKEN("selenium.grid.sidecar.stop.token", null),
 
@@ -441,7 +441,7 @@ public abstract class AbstractSeleniumConfig extends
          * default: {@code null} (registered via {@code getDefaults()} in the appropriate
          * {@code SeleniumConfig} subclass)
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_AUTH_STRATEGY("selenium.grid.sidecar.auth", null),
 
@@ -451,7 +451,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.session.ttl</b><br>
          * default: <b>30</b>
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_SESSION_TTL("selenium.grid.sidecar.session.ttl", "30"),
 
@@ -462,7 +462,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.scan.interval</b><br>
          * default: <b>10</b>
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_SCAN_INTERVAL("selenium.grid.sidecar.scan.interval", "10"),
 
@@ -472,7 +472,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.scan.start</b><br>
          * default: <b>4444</b>
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_SCAN_START("selenium.grid.sidecar.scan.start", "4444"),
 
@@ -482,7 +482,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.scan.end</b><br>
          * default: <b>65535</b>
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_SCAN_END("selenium.grid.sidecar.scan.end", "65535"),
 
@@ -493,7 +493,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.scan.step</b><br>
          * default: <b>10</b>
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_SCAN_STEP("selenium.grid.sidecar.scan.step", "10"),
 
@@ -505,7 +505,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.scan.chunk.duration</b><br>
          * default: <b>30000</b> (30 seconds)
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_SCAN_CHUNK_DURATION("selenium.grid.sidecar.scan.chunk.duration", "30000"),
         
@@ -516,7 +516,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.monitor.file</b><br>
          * default: <b>monitored-grids.json</b>
          *
-         * @since [next-major]
+         * @since 36.0.0
          */
         SIDECAR_MONITOR_FILE("selenium.grid.sidecar.monitor.file", "monitored-grids.json"),
         
@@ -1092,7 +1092,7 @@ public abstract class AbstractSeleniumConfig extends
      * @param typeOfT target type token
      * @return deserialized object of the specified type
      *
-     * @since [next-major]
+     * @since 36.0.0
      */
     public abstract <T> T fromJson(String json, java.lang.reflect.Type typeOfT);
     

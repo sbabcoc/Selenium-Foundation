@@ -22,7 +22,7 @@ public class ServletContainer {
      * @param servletClasses fully-qualified names of servlet classes to register
      * @return started {@link Server} instance
      * @throws Exception if the server fails to start
-     * @since [next-major]
+     * @since 36.0.0
      */
     public static Server start(int port, List<String> servletClasses) throws Exception {
         ServletContextHandler context = new ServletContextHandler();

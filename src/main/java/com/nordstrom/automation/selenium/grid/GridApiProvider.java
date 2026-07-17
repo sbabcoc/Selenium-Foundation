@@ -18,7 +18,7 @@ import org.openqa.selenium.Capabilities;
  * requires only a new implementation registered via {@code META-INF/services},
  * with no changes to existing code.
  *
- * @since [next-major]
+ * @since 36.0.0
  */
 public interface GridApiProvider {
 
