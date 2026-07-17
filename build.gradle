@@ -140,10 +140,11 @@ task checkSincePlaceholders {
 
 task updateSinceAnnotations {
   description = 'Replaces [next-major] placeholders in source with the current project version.'
+  def base = project.ext.baseVersion
   doLast {
     def version = project.version.toString()
     if (version.endsWith('-SNAPSHOT')) return
-    def sinceVersion = ext.baseVersion
+    def sinceVersion = base
     def sourceRoots = ['src/main/java', 'src/selenium3/java', 'src/selenium4/java']
       .collect { project.file(it) }
       .findAll { it.exists() }
