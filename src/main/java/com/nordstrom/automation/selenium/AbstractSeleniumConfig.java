@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.ExceptionFactory;
-import com.nordstrom.automation.selenium.core.FoundationSlotMatcher;
 import com.nordstrom.automation.selenium.core.GridManagerPlugin;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
@@ -53,8 +52,6 @@ public abstract class AbstractSeleniumConfig extends
 
     private static final String SETTINGS_FILE = "settings.properties";
 
-    /** suffix for node configuration modifier files */
-    protected static final String NODE_MODS_SUFFIX = ".node.mods";
     private static final String CAPS_MODS_SUFFIX = ".caps.mods";
     
     private static final String APPIUM_PATH = "APPIUM_BINARY_PATH";
@@ -213,7 +210,8 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.slot.matcher</b><br>
          * default: <b>com.nordstrom.automation.selenium.core.FoundationSlotMatcher</b>
          */
-        SLOT_MATCHER("selenium.slot.matcher", FoundationSlotMatcher.class.getName()),
+        SLOT_MATCHER("selenium.slot.matcher",
+                "com.nordstrom.automation.selenium.core.FoundationSlotMatcher"),
         
         /**
          * This setting specifies a comma-delimited list of fully-qualified names of servlet classes
@@ -713,9 +711,6 @@ public abstract class AbstractSeleniumConfig extends
     protected static SeleniumConfig seleniumConfig;
     
     private URI targetUri;
-    private Path nodeConfigPath;
-    private Path hubConfigPath;
-    private Path appiumConfigPath;
     private URL hubUrl;
     private SeleniumGrid seleniumGrid;
     private ExceptionFactory exceptionFactory;
@@ -976,50 +971,6 @@ public abstract class AbstractSeleniumConfig extends
         }
     }
     
-    /**
-     * Get the path to the Selenium Grid node configuration.
-     * 
-     * @return Selenium Grid node configuration path
-     */
-    protected Path getNodeConfigPath() {
-        if (nodeConfigPath == null) {
-            String nodeConfig = getConfigPath(getString(SeleniumSettings.NODE_CONFIG.key()));
-            LOGGER.debug("nodeConfig = {}", nodeConfig);
-            nodeConfigPath = Paths.get(nodeConfig);
-        }
-        return nodeConfigPath;
-    }
-    
-    /**
-     * Get the path to the Selenium Grid hub configuration.
-     * 
-     * @return Selenium Grid hub configuration path
-     */
-    public Path getHubConfigPath() {
-        if (hubConfigPath == null) {
-            String hubConfig = getConfigPath(getString(SeleniumSettings.HUB_CONFIG.key()));
-            LOGGER.debug("hubConfig = {}", hubConfig);
-            hubConfigPath = Paths.get(hubConfig);
-        }
-        return hubConfigPath;
-    }
-    
-    /**
-     * Get the path to the Appium configuration.
-     * 
-     * @return Appium configuration path; {@code null} if no path is specified
-     */
-    public Path getAppiumConfigPath() {
-        if (appiumConfigPath == null) {
-            String appiumConfig = getConfigPath(getString(SeleniumSettings.APPIUM_CONFIG_PATH.key()));
-            if (appiumConfig != null) {
-                LOGGER.debug("appiumConfig = {}", appiumConfig);
-                appiumConfigPath = Paths.get(appiumConfig);
-            }
-        }
-        return appiumConfigPath;
-    }
-    
     /** 
      * Convert the configured browser specification from JSON to {@link Capabilities} object.   
      *  
@@ -1077,7 +1028,7 @@ public abstract class AbstractSeleniumConfig extends
      * @param propertySuffix suffix for configuration property name
      * @return configured modifier; {@code null} if none configured
      */
-    protected Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
+    public Capabilities getModifications(final Capabilities capabilities, final String propertySuffix) {
         String personality = GridUtility.getPersonality(capabilities);
         if (personality == null) return null;
         
@@ -1151,7 +1102,7 @@ public abstract class AbstractSeleniumConfig extends
      * @param path configuration file path (absolute, relative, or simple filename)
      * @return resolved absolute path of specified file; {@code null} if file not found
      */
-    private static String getConfigPath(final String path) {
+    public static String getConfigPath(final String path) {
         if (path == null) { return null; }
         
         FileHandler handler = new FileHandler();
@@ -1223,24 +1174,6 @@ public abstract class AbstractSeleniumConfig extends
             return new String[] {};
         }
     }
-    
-    /**
-     * Create hub configuration file.
-     * 
-     * @return {@link Path} object for the created (or previously existing) configuration file
-     * @throws IOException on failure to create configuration file
-     */
-    public abstract Path createHubConfig() throws IOException;
-    
-    /**
-     * Create node configuration file from the specified JSON string, to be registered with the indicated hub.
-     * 
-     * @param capabilities node configuration as JSON string
-     * @param hubUrl URL of hub host with which to register
-     * @return {@link Path} object for the created (or previously existing) configuration file
-     * @throws IOException on failure to create configuration file
-     */
-    public abstract Path createNodeConfig(String capabilities, URL hubUrl) throws IOException;
     
     /**
      * Get the collection of exceptions that are allowed to be returned by executed JavaScript snippets.
