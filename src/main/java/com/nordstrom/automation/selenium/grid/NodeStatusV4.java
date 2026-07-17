@@ -1,4 +1,4 @@
-package com.nordstrom.automation.selenium.core;
+package com.nordstrom.automation.selenium.grid;
 
 import static org.openqa.selenium.json.Json.LIST_OF_MAPS_TYPE;
 
@@ -9,128 +9,115 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.grid.data.Availability;
-import org.openqa.selenium.grid.data.NodeId;
 import org.openqa.selenium.json.Json;
 import org.openqa.selenium.json.JsonInput;
+
 import com.nordstrom.automation.selenium.utility.DataUtils;
 
 /**
  * This class is used to extract the information from a node status GraphQL query.
- * 
- * @see Nodes#NODE_STATUS
+ *
+ * @see NodesV4#NODES_INFO_QUERY
+ * @since [next-major]
  */
-public class NodeStatus {
-    
-    private final NodeId id;
+public class NodeStatusV4 {
+
+    private final String id;
     private final URI uri;
-    private final Availability status;
+    private final String status;
     private final List<Capabilities> capabilities;
-    
+
     /**
      * Constructor for node status object with specified parameters.
-     * 
-     * @param id node ID
+     *
+     * @param id node ID string
      * @param uri node {@link URI}
-     * @param status node {@link Availability}
+     * @param status node availability status string (e.g. {@code "UP"},
+     *        {@code "DRAINING"}, {@code "DOWN"})
      * @param capabilities list of node {@link Capabilities}
      */
-    public NodeStatus(NodeId id, URI uri, Availability status, List<Capabilities> capabilities) {
+    public NodeStatusV4(String id, URI uri, String status, List<Capabilities> capabilities) {
         this.id = id;
         this.uri = uri;
         this.status = status;
         this.capabilities = capabilities;
     }
-    
+
     /**
      * Extract node status from the specified JSON input.
-     * 
+     *
      * @param input {@link JsonInput} object
-     * @return extracted {@link NodeStatus} object
+     * @return extracted {@link NodeStatusV4} object
      */
     @SuppressWarnings("unchecked")
-    public static NodeStatus fromJson(JsonInput input) {
-        NodeId id = null;
+    public static NodeStatusV4 fromJson(JsonInput input) {
+        String id = null;
         URI uri = null;
-        Availability status = null;
+        String status = null;
         List<Capabilities> capabilities = null;
-        
+
         input.beginObject();
         while (input.hasNext()) {
             switch (input.nextName()) {
             case "id":
-                id = input.read(NodeId.class);
+                id = input.read(String.class);
                 break;
-                
             case "uri":
                 uri = input.read(URI.class);
                 break;
-                
-                
             case "status":
-                status = input.read(Availability.class);
+                status = input.read(String.class);
                 break;
-                
             case "stereotypes":
                 String caps = input.read(String.class);
                 List<Map<String, Object>> listOfMaps = DataUtils.fromString(caps, LIST_OF_MAPS_TYPE);
                 capabilities = listOfMaps.stream()
-                .map(item -> item.get("stereotype"))
-                .filter(obj -> obj instanceof Map)
-                .map(obj -> (Map<String, Object>) obj)
-                .map(map -> new MutableCapabilities(map))
-                .collect(Collectors.toList());
+                        .map(item -> item.get("stereotype"))
+                        .filter(obj -> obj instanceof Map)
+                        .map(obj -> (Map<String, Object>) obj)
+                        .map(MutableCapabilities::new)
+                        .collect(Collectors.toList());
                 break;
-                
             default:
                 input.skipValue();
             }
         }
         input.endObject();
-        
-        return new NodeStatus(id, uri, status, capabilities);
+
+        return new NodeStatusV4(id, uri, status, capabilities);
     }
-    
+
     /**
      * Get the node ID.
-     * 
-     * @return node ID
+     *
+     * @return node ID string
      */
-    public NodeId getId() {
-        return id;
-    }
-    
+    public String getId() { return id; }
+
     /**
      * Get the node URI.
-     * 
+     *
      * @return node {@link URI}
      */
-    public URI getUri() {
-        return uri;
-    }
-    
+    public URI getUri() { return uri; }
+
     /**
-     * Get the node status.
-     * 
-     * @return node {@link Availability}
+     * Get the node availability status.
+     *
+     * @return node availability status string (e.g. {@code "UP"},
+     *         {@code "DRAINING"}, {@code "DOWN"})
      */
-    public Availability getStatus() {
-        return status;
-    }
-    
+    public String getStatus() { return status; }
+
     /**
      * Get list of node capabilities.
-     * 
+     *
      * @return list of {@link Capabilities}
      */
-    public List<Capabilities> getCapabilities() {
-        return capabilities;
-    }
-    
+    public List<Capabilities> getCapabilities() { return capabilities; }
+
     /**
-     * Get the string representation of this node status object.
-     * 
-     * @return node status as JSON string
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

@@ -43,15 +43,13 @@ public class SeleniumGrid {
     static final int CONNECT_TIMEOUT_MS = 500;
 
     /** hub server of this Grid instance */
-    protected IGridServer hubServer;
+    protected GridServer hubServer;
     /** node servers of this Grid instance */
-    protected Map<URL, IGridServer> nodeServers = new HashMap<>();
+    protected Map<URL, GridServer> nodeServers = new HashMap<>();
     /** "personalities" supported by this Grid instance */
     protected Map<String, String> personalities = new HashMap<>();
     /** SLF4J logger for this Selenium Grid model */
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
-    
-    private static IGridServerFactory GRID_SERVER_FACTORY = (url, isHub) -> new GridServer(url, isHub);
     
     private static java.util.function.BiFunction<SeleniumConfig, URL, SeleniumGrid> LOCAL_GRID_FACTORY =
             (config, hubUrl) -> { throw new IllegalStateException(
@@ -67,21 +65,20 @@ public class SeleniumGrid {
      * <p>
      * This is used to create an interface for an active grid - remote or local.
      * 
-     * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} for grid hub host
      * @throws IOException if unable to acquire Grid details
      */
-    public SeleniumGrid(SeleniumConfig config, URL hubUrl) throws IOException {
-        hubServer = GRID_SERVER_FACTORY.createServer(hubUrl, true);
-        List<URL> nodeEndpoints = GridServer.getGridProxies(config, hubUrl);
+    public SeleniumGrid(URL hubUrl) throws IOException {
+        hubServer = new GridServer(hubUrl, true);
+        List<URL> nodeEndpoints = GridServer.getGridProxies(hubUrl);
         if (nodeEndpoints.isEmpty()) {
             LOGGER.debug("Detected existing servlet container at: {}", hubUrl);
         } else {
             LOGGER.debug("Mapping structure of existing grid at: {}", hubUrl);
             for (URL nodeEndpoint : nodeEndpoints) {
                 URI nodeUri = UriUtils.uriForPath(nodeEndpoint, GridServer.HUB_BASE);
-                nodeServers.put(nodeEndpoint, GRID_SERVER_FACTORY.createServer(nodeUri.toURL(), false));
-                addNodePersonalities(config, hubServer.getUrl(), nodeEndpoint);
+                nodeServers.put(nodeEndpoint, new GridServer(nodeUri.toURL(), false));
+                addNodePersonalities(hubServer.getUrl(), nodeEndpoint);
             }
             LOGGER.debug("{}: Personalities => {}", hubServer.getUrl(), personalities.keySet());
         }
@@ -98,32 +95,16 @@ public class SeleniumGrid {
      *     <li><b>browserName</b>: name of target browser</li>
      * </ul>
      * 
-     * @param config {@link SeleniumConfig} object
      * @param hubUrl {@link URL} of Grid hub
      * @param nodeUrl node endpoint URL
      * @throws IOException if an I/O error occurs
      */
-    private void addNodePersonalities(SeleniumConfig config, URL hubUrl, URL nodeUrl) throws IOException {
+    private void addNodePersonalities(URL hubUrl, URL nodeUrl) throws IOException {
         LOGGER.debug("{}: Adding personalities of node: {}", hubUrl, nodeUrl);
-        List<Capabilities> capabilitiesList = GridServer.getNodeCapabilities(config, hubUrl, nodeUrl);
+        List<Capabilities> capabilitiesList = GridServer.getNodeCapabilities(hubUrl, nodeUrl);
         for (Capabilities capabilities : capabilitiesList) {
             personalities.putAll(PluginUtils.getPersonalitiesForBrowser(GridUtility.getPersonality(capabilities)));
         }
-    }
-    
-    /**
-     * Register the factory used to create {@link IGridServer} instances.
-     * <p>
-     * <b>NOTE</b>: This method overrides the default factory, which creates
-     * plain {@link GridServer} instances without process lifecycle management.
-     * The registered factory typically creates {@code LocalGridServer} instances
-     * that support shutdown via port-based process discovery.
-     *
-     * @param factory {@link IGridServerFactory} object
-     * @throws NullPointerException if {@code factory} is {@code null}
-     */
-    public static void registerGridServerFactory(IGridServerFactory factory) {
-        GRID_SERVER_FACTORY = Objects.requireNonNull(factory, "[factory] must be non-null");
     }
     
     /**
@@ -164,7 +145,7 @@ public class SeleniumGrid {
         if (GridServer.isHubActive(hubUrl)) {
             System.setProperty(SeleniumSettings.HUB_HOST.key(), hubUrl.toExternalForm());
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
-            return new SeleniumGrid(config, hubUrl);
+            return new SeleniumGrid(hubUrl);
         }
 
         throw new IllegalStateException("No active Selenium Grid found at: " + hubUrl);
@@ -203,11 +184,11 @@ public class SeleniumGrid {
         if (!isActive()) return true;
         
         boolean result = true;
-        Iterator<Entry<URL, IGridServer>> iterator = nodeServers.entrySet().iterator();
+        Iterator<Entry<URL, GridServer>> iterator = nodeServers.entrySet().iterator();
         
         // shutdown node servers
         while (iterator.hasNext()) {
-            Entry<URL, IGridServer> serverEntry = iterator.next();
+            Entry<URL, GridServer> serverEntry = iterator.next();
             // if shutdown of this node succeeds
             if (serverEntry.getValue().shutdown()) {
                 iterator.remove();
@@ -234,7 +215,7 @@ public class SeleniumGrid {
      * 
      * @return {@link GridServer} object that represents the active hub server
      */
-    public IGridServer getHubServer() {
+    public GridServer getHubServer() {
         return hubServer;
     }
     
@@ -243,7 +224,7 @@ public class SeleniumGrid {
      * 
      * @return map of {@link GridServer} objects that represent the attached node servers
      */
-    public Map<URL, IGridServer> getNodeServers() {
+    public Map<URL, GridServer> getNodeServers() {
         return nodeServers;
     }
     
