@@ -89,15 +89,15 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * <pre>&lt;dependency&gt;
      *  &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
      *  &lt;artifactId&gt;guava&lt;/artifactId&gt;
-     *  &lt;version&gt;25.0-jre&lt;/version&gt;
+     *  &lt;version&gt;33.6.0-jre&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      *
      * <b>com.beust.jcommander.JCommander</b> (for selenium-server)
      * 
      * <pre>&lt;dependency&gt;
-     *  &lt;groupId&gt;com.beust&lt;/groupId&gt;
+     *  &lt;groupId&gt;org.jcommander&lt;/groupId&gt;
      *  &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
-     *  &lt;version&gt;1.72&lt;/version&gt;
+     *  &lt;version&gt;1.85&lt;/version&gt;
      *&lt;/dependency&gt;</pre>
      *
      * <b>org.openqa.selenium.json.Json</b> (for selenium-server)

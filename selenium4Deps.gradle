@@ -32,7 +32,7 @@ dependencies {
   api 'org.eclipse.jetty:jetty-servlet'
   api 'org.jsoup:jsoup'
   api 'org.apache.commons:commons-lang3'
-  api 'com.beust:jcommander'
+  api 'org.jcommander:jcommander'
   testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager'
   testImplementation 'org.mockito:mockito-core'
 }
