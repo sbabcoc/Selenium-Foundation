@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.openqa.selenium.Capabilities;
 
+import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.grid.GridApiProvider;
 import com.nordstrom.automation.selenium.grid.GridApiProviderRegistry;
 
@@ -18,8 +19,8 @@ public class GridServer implements IGridServer {
     private final boolean isHub;
     private final URL serverUrl;
 
-    /** Base path for hub server URLs */
-    public static final String HUB_BASE = "/wd/hub";
+    /** status request path */
+    protected String statusPath;
 
     /**
      * Constructor for Grid server object.
@@ -31,6 +32,7 @@ public class GridServer implements IGridServer {
     public GridServer(URL url, boolean isHub) {
         this.isHub = isHub;
         this.serverUrl = url;
+        statusPath = SeleniumConfig.getConfig().isW3C() ? "/status" : "/wd/hub/status";
     }
 
     /**
@@ -61,7 +63,7 @@ public class GridServer implements IGridServer {
         if (isHub) {
             return isHubActive(serverUrl);
         }
-        return GridUtility.isHostActive(serverUrl, "/wd/hub/status");
+        return GridUtility.isHostActive(serverUrl, statusPath);
     }
 
     /**

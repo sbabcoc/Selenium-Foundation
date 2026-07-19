@@ -203,6 +203,14 @@ public class SeleniumConfig extends AbstractSeleniumConfig {
      * {@inheritDoc}
      */
     @Override
+    public boolean isW3C() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Map<String, String> getDefaults() {
         Map<String, String> defaults = new HashMap<>(super.getDefaults());
         defaults.put(SeleniumSettings.GRID_LAUNCHER.key(), DEFAULT_GRID_LAUNCHER);

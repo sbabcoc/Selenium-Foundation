@@ -170,8 +170,8 @@ public abstract class AbstractSeleniumConfig extends
          * This is the URL for the <b>Selenium Grid</b> endpoint: [scheme:][//authority]/wd/hub
          * <p>
          * name: <b>selenium.hub.host</b><br>
-         * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4445/wd/hub</b><br>
-         * Selenium 4: <b>http://&lt;{@code localhost}&gt;:4446/wd/hub</b>
+         * Selenium 3: <b>http://&lt;{@code localhost}&gt;:4454/wd/hub</b><br>
+         * Selenium 4: <b>http://&lt;{@code localhost}&gt;:4444 /wd/hub</b>
          */
         HUB_HOST("selenium.hub.host", null),
         
@@ -179,8 +179,8 @@ public abstract class AbstractSeleniumConfig extends
          * This is the port assigned to the local <b>Selenium Grid</b> hub server.
          * <p>
          * name: <b>selenium.hub.port</b><br>
-         * Selenium 3: <b>4445</b><br>
-         * Selenium 4: <b>4446</b>
+         * Selenium 3: <b>4454</b><br>
+         * Selenium 4: <b>4444</b>
          */
         HUB_PORT("selenium.hub.port", null),
         
@@ -788,6 +788,13 @@ public abstract class AbstractSeleniumConfig extends
      * @return target Selenium major version
      */
     public abstract int getVersion();
+    
+    /**
+     * Determine if running with W3C protocol.
+     * 
+     * @return {@code true} if W3C protocol; {@code false} if legacy protocol (JWP) 
+     */
+    public abstract boolean isW3C();
 
     /**
      * Resolve the specified property name to its value.
@@ -846,7 +853,8 @@ public abstract class AbstractSeleniumConfig extends
                 if (hubPort != -1) {
                     try {
                         String localHost = HostUtils.getLocalHost();
-                        hubUrl = UriUtils.makeBasicURI("http", localHost, hubPort, "/wd/hub").toURL();
+                        String[] pathAndParams = isW3C() ? new String[] {} : new String[] {"/wd/hub"};
+                        hubUrl = UriUtils.makeBasicURI("http", localHost, hubPort, pathAndParams).toURL();
                         LOGGER.debug("Synthesized hub URL: {}", hubUrl);
                     } catch (MalformedURLException e) {
                         throw UncheckedThrow.throwUnchecked(e);

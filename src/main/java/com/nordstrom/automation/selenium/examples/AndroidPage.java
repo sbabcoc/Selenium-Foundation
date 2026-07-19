@@ -15,7 +15,7 @@ import com.nordstrom.automation.selenium.support.SearchContextWait;
 @PageUrl(appPackage="io.appium.android.apis", value=".app.SearchInvoke")
 public class AndroidPage extends Page {
     
-    private static final boolean isSelenium3 = SeleniumConfig.getConfig().getVersion() == 3;
+    private static final boolean isW3C = SeleniumConfig.getConfig().isW3C();
 
     /**
      * Constructor for main view context.
@@ -40,7 +40,7 @@ public class AndroidPage extends Page {
         private final By locator;
         
         Using(String selector, String namespace) {
-            this.locator = By.id(isSelenium3 ? selector : namespace + selector);
+            this.locator = By.id(isW3C ? namespace + selector : selector);
         }
 
         @Override

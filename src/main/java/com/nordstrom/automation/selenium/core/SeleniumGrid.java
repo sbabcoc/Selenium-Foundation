@@ -75,8 +75,10 @@ public class SeleniumGrid {
             LOGGER.debug("Detected existing servlet container at: {}", hubUrl);
         } else {
             LOGGER.debug("Mapping structure of existing grid at: {}", hubUrl);
+            String[] pathAndParams = SeleniumConfig.getConfig().isW3C() ?
+                    new String[] {} : new String[] {"/wd/hub"};
             for (URL nodeEndpoint : nodeEndpoints) {
-                URI nodeUri = UriUtils.uriForPath(nodeEndpoint, GridServer.HUB_BASE);
+                URI nodeUri = UriUtils.uriForPath(nodeEndpoint, pathAndParams);
                 nodeServers.put(nodeEndpoint, new GridServer(nodeUri.toURL(), false));
                 addNodePersonalities(hubServer.getUrl(), nodeEndpoint);
             }
