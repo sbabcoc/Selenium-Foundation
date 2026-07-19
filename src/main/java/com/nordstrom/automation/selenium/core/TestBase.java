@@ -87,7 +87,7 @@ public abstract class TestBase {
             skipTest("This scenario is unsupported on HtmlUnit");
         }
         // if running Safari in Selenium 3
-        if ((SeleniumConfig.getConfig().getVersion() == 3)
+        if (!SeleniumConfig.getConfig().isW3C()
                 && "Safari".equals(WebDriverUtils.getBrowserName(getDriver()))) {
             skipTest("This scenario is unsupported on Safari in Selenium 3");
         }

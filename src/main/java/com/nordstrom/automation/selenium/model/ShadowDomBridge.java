@@ -117,7 +117,7 @@ public final class ShadowDomBridge extends PageComponent {
     
     private static boolean useShadowDomBridge(final SearchContext context) {
         // if running Firefox on Selenium 3
-        if ((SeleniumConfig.getConfig().getVersion() == 3)
+        if (!SeleniumConfig.getConfig().isW3C()
                 && "firefox".equals(WebDriverUtils.getBrowserName(context))) {
             return true;
         }
