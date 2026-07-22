@@ -140,7 +140,7 @@ public enum ContainerMethodInterceptor {
                     driver.switchTo().alert();
                     // alert is shown
                     hasDialog = true;
-                } catch (NoAlertPresentException | UnsupportedCommandException eaten) {
+                } catch (WebDriverException eaten) {
                     try {
                         // get stale wait reference element by XPath
                         reference = driver.findElement(By.xpath("//*"));
