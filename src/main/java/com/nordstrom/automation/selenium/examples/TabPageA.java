@@ -3,12 +3,13 @@ package com.nordstrom.automation.selenium.examples;
 import org.openqa.selenium.WebDriver;
 
 import com.nordstrom.automation.selenium.annotations.PageUrl;
+import com.nordstrom.automation.selenium.servlet.ExamplePagePathName;
 
 /**
  * This class is the model for the first concrete tab page subclass opened by the "Open A/B Tab" button on the
  * 'Example' page.
  */
-@PageUrl("/grid/admin/FrameA_Servlet")
+@PageUrl(ExamplePagePathName.FRAME_A_PATH)
 public class TabPageA extends TabPage {
     
     /** expected content */

@@ -28,13 +28,14 @@ import com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion;
 import com.nordstrom.automation.selenium.model.AlertHandler;
 import com.nordstrom.automation.selenium.model.Page;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
+import com.nordstrom.automation.selenium.servlet.ExamplePagePathName;
 import com.nordstrom.automation.selenium.utility.HostUtils;
 import com.nordstrom.common.uri.UriUtils;
 
 /**
  * This class is the model for the 'Example' page used by Selenium Foundation unit tests.
  */
-@PageUrl("/grid/admin/ExamplePageServlet")
+@PageUrl(ExamplePagePathName.EXAMPLE_PAGE_PATH)
 public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePage> {
 
     /** page title */
