@@ -21,7 +21,7 @@ import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings
  * is hosted by the sidecar servlet container, providing a single instance regardless
  * of Selenium API version.
  */
-@WebServlet(name = "ExamplePageServlet", urlPatterns = {"/grid/admin/ExamplePageServlet"})
+@WebServlet(name = ExamplePagePathName.EXAMPLE_PAGE_NAME, urlPatterns = { ExamplePagePathName.EXAMPLE_PAGE_PATH })
 public class ExamplePageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -2195313096162880627L;
@@ -85,7 +85,7 @@ public class ExamplePageServlet extends HttpServlet {
     /**
      * This class implements the HTTP servlet for example frame 'A'.
      */
-    @WebServlet(name = "FrameA_Servlet", urlPatterns = {"/grid/admin/FrameA_Servlet"})
+    @WebServlet(name = ExamplePagePathName.FRAME_A_NAME, urlPatterns = { ExamplePagePathName.FRAME_A_PATH })
     public static class FrameA_Servlet extends ExamplePageServlet {
         private static final long serialVersionUID = 4547909165192240389L;
 
@@ -99,7 +99,7 @@ public class ExamplePageServlet extends HttpServlet {
     /**
      * This class implements the HTTP servlet for example frame 'B'.
      */
-    @WebServlet(name = "FrameB_Servlet", urlPatterns = {"/grid/admin/FrameB_Servlet"})
+    @WebServlet(name = ExamplePagePathName.FRAME_B_NAME, urlPatterns = { ExamplePagePathName.FRAME_B_PATH })
     public static class FrameB_Servlet extends ExamplePageServlet {
         private static final long serialVersionUID = 5903212244921125263L;
 
@@ -113,7 +113,7 @@ public class ExamplePageServlet extends HttpServlet {
     /**
      * This class implements the HTTP servlet for example frame 'C'.
      */
-    @WebServlet(name = "FrameC_Servlet", urlPatterns = {"/grid/admin/FrameC_Servlet"})
+    @WebServlet(name = ExamplePagePathName.FRAME_C_NAME, urlPatterns = { ExamplePagePathName.FRAME_C_PATH })
     public static class FrameC_Servlet extends ExamplePageServlet {
         private static final long serialVersionUID = 1448462233121165298L;
 
@@ -127,7 +127,7 @@ public class ExamplePageServlet extends HttpServlet {
     /**
      * This class implements the HTTP servlet for example frame 'D'.
      */
-    @WebServlet(name = "FrameD_Servlet", urlPatterns = {"/grid/admin/FrameD_Servlet"})
+    @WebServlet(name = ExamplePagePathName.FRAME_D_NAME, urlPatterns = { ExamplePagePathName.FRAME_D_PATH })
     public static class FrameD_Servlet extends ExamplePageServlet {
         private static final long serialVersionUID = 1444648483821114876L;
 
