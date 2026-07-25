@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nordstrom.automation.selenium.core.ExceptionFactory;
 import com.nordstrom.automation.selenium.core.GridManagerPlugin;
+import com.nordstrom.automation.selenium.core.GridMonitorPlugin;
 import com.nordstrom.automation.selenium.core.GridUtility;
 import com.nordstrom.automation.selenium.core.SeleniumGrid;
 import com.nordstrom.automation.selenium.support.SearchContextWait;
@@ -510,6 +511,18 @@ public abstract class AbstractSeleniumConfig extends
         SIDECAR_SCAN_CHUNK_DURATION("selenium.grid.sidecar.scan.chunk.duration", "30000"),
         
         /**
+         * This setting specifies whether Grid hubs that were not created by the current
+         * process are automatically added to the sidecar's monitored list — covering both
+         * remote hubs and local hubs a client connects to without launching them.
+         * <p>
+         * name: <b>selenium.grid.sidecar.monitor.unmanaged</b><br>
+         * default: <b>true</b>
+         *
+         * @since [next-major]
+         */
+        MONITOR_UNMANAGED_HUBS("selenium.grid.sidecar.monitor.unmanaged", "true"),
+        
+        /**
          * This setting specifies the name of the file used to persist monitored remote Grid URLs
          * across sidecar restarts.
          * <p>
@@ -725,6 +738,8 @@ public abstract class AbstractSeleniumConfig extends
         super(SeleniumSettings.class);
         // ensure Grid manager plugin is loaded if present on classpath
         ServiceLoader.load(GridManagerPlugin.class).iterator().forEachRemaining(p -> {});
+        // ensure Grid monitor plugin is loaded if present on classpath
+        ServiceLoader.load(GridMonitorPlugin.class).iterator().forEachRemaining(p -> {});
     }
     
     /**

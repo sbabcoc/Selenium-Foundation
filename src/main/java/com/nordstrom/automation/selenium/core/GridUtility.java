@@ -88,6 +88,20 @@ public final class GridUtility {
     }
     
     /**
+     * Probe the API version of an active Selenium Grid hub of unknown provenance.
+     *
+     * @param hubUrl {@link URL} of the hub to probe
+     * @return 4 if the server is a Selenium 4 hub; 3 if it is a Selenium 3 hub;
+     *         -1 if the server is not a recognized Selenium Grid hub
+     * @since [next-major]
+     */
+    public static int probeApiVersion(URL hubUrl) {
+        if (isSelenium4Hub(hubUrl)) return 4;
+        if (isSelenium3Hub(hubUrl)) return 3;
+        return -1;
+    }
+    
+    /**
      * Determine if the specified URL identifies an active Selenium 4 Grid hub.
      * <p>
      * Confirms hub identity via a GraphQL {@code grid{uri}} query, which is
