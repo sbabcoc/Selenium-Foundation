@@ -51,9 +51,10 @@ public class SeleniumGrid {
     /** SLF4J logger for this Selenium Grid model */
     protected static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGrid.class);
     
-    private static java.util.function.BiFunction<SeleniumConfig, URL, SeleniumGrid> LOCAL_GRID_FACTORY =
-            (config, hubUrl) -> { throw new IllegalStateException(
-                "No local Grid factory registered - ensure selenium-grid-manager is on the classpath"); };
+    private static LocalGridFactory LOCAL_GRID_FACTORY = (config, hubUrl) -> { throw new IllegalStateException(
+            "No local Grid factory registered - ensure selenium-grid-manager is on the classpath"); };
+
+    private static UnmanagedHubRegistrar UNMANAGED_HUB_REGISTRAR = (config, hubUrl) -> { };
     
     /**
      * No-argument constructor for subclasses. 
@@ -117,13 +118,27 @@ public class SeleniumGrid {
      * is not on the classpath. The registered factory is called when
      * {@link #create(SeleniumConfig, URL)} is invoked with a local hub URL.
      *
-     * @param factory factory function that accepts a {@link SeleniumConfig} and
-     *     a hub {@link URL} and returns a {@link SeleniumGrid} instance
+     * @param factory {@link LocalGridFactory} to register
      * @throws NullPointerException if {@code factory} is {@code null}
      */
-    public static void registerLocalGridFactory(
-            java.util.function.BiFunction<SeleniumConfig, URL, SeleniumGrid> factory) {
+    public static void registerLocalGridFactory(LocalGridFactory factory) {
         LOCAL_GRID_FACTORY = Objects.requireNonNull(factory, "[factory] must be non-null");
+    }
+
+    /**
+     * Register the registrar invoked when a client connects to an active hub
+     * that the current process did not create.
+     * <p>
+     * <b>NOTE</b>: This method overrides the default registrar, which is a no-op.
+     * The registered registrar is called when {@link #create(SeleniumConfig, URL)}
+     * connects to an already-active remote hub, and only if
+     * {@link SeleniumSettings#MONITOR_UNMANAGED_HUBS} is enabled.
+     *
+     * @param registrar {@link UnmanagedHubRegistrar} to register
+     * @throws NullPointerException if {@code registrar} is {@code null}
+     */
+    public static void registerUnmanagedHubRegistrar(UnmanagedHubRegistrar registrar) {
+        UNMANAGED_HUB_REGISTRAR = Objects.requireNonNull(registrar, "[registrar] must be non-null");
     }
 
     /**
@@ -141,12 +156,15 @@ public class SeleniumGrid {
         Objects.requireNonNull(hubUrl, "[hubUrl] must be non-null");
 
         if (GridUtility.isLocalHost(hubUrl)) {
-            return LOCAL_GRID_FACTORY.apply(config, hubUrl);
+            return LOCAL_GRID_FACTORY.create(config, hubUrl);
         }
 
         if (GridServer.isHubActive(hubUrl)) {
             System.setProperty(SeleniumSettings.HUB_HOST.key(), hubUrl.toExternalForm());
             System.setProperty(SeleniumSettings.HUB_PORT.key(), Integer.toString(hubUrl.getPort()));
+            if (config.getBoolean(SeleniumSettings.MONITOR_UNMANAGED_HUBS.key())) {
+                UNMANAGED_HUB_REGISTRAR.onConnect(config, hubUrl);
+            }
             return new SeleniumGrid(hubUrl);
         }
 
