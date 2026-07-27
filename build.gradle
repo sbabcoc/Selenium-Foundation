@@ -98,7 +98,7 @@ version = archiveVer
 task updateReadme {
   def base = project.ext.baseVersion
   doLast {
-    def version = scmVersion.version
+    def version = resolvedVersion
     if (version.endsWith('-SNAPSHOT')) return
     ant.replaceregexp(file: 'README.md',
       match: /\d+\.\d+\.\d+-s3/,
@@ -110,6 +110,7 @@ task updateReadme {
       flags: 'g')
   }
 }
+
 
 task checkSincePlaceholders {
   description = 'Fails non-SNAPSHOT release builds if any [next-major] placeholders remain unreplaced in source.'
