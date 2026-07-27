@@ -150,14 +150,30 @@ public abstract class AbstractSeleniumConfig extends
         GRID_LAUNCHER("selenium.grid.launcher", null),
         
         /**
-         * This setting specifies a path-delimited list of fully-qualified names of context classes for the
-         * dependencies of the {@link #GRID_LAUNCHER} class.
+         * This setting specifies a comma-delimited list of fully-qualified class names to add to the
+         * built-in list of dependency context representatives used when assembling the classpath for
+         * a detached grid/sidecar worker process. Supplements the built-in default list.
          * <p>
-         * name: <b>selenium.launcher.deps</b><br>
-         * default: (populated by {@link SeleniumConfig#getDefaults() getDefaults()})
+         * name: <b>selenium.dep.contexts.insert</b><br>
+         * default: {@code null}
+         *
+         * @since [next-major]
          */
-        LAUNCHER_DEPS("selenium.launcher.deps", null),
-        
+        DEP_CONTEXTS_INSERT("selenium.dep.contexts.insert", null),
+
+        /**
+         * This setting specifies a comma-delimited list of fully-qualified class names to exclude from
+         * the built-in list of dependency context representatives used when assembling the classpath
+         * for a detached grid/sidecar worker process — for example, when a transitive dependency has
+         * changed and a previously-necessary representative class is no longer present.
+         * <p>
+         * name: <b>selenium.dep.contexts.delete</b><br>
+         * default: {@code null}
+         *
+         * @since [next-major]
+         */
+        DEP_CONTEXTS_DELETE("selenium.dep.contexts.delete", null),
+
         /**
          * This setting specifies the configuration file name/path for the local <b>Selenium Grid</b> hub server.
          * <p>
@@ -1177,25 +1193,6 @@ public abstract class AbstractSeleniumConfig extends
             uri = outputPath.toUri();
         }
         return uri;
-    }
-    
-    /**
-     * Get fully-qualified names of context classes for Selenium Grid dependencies.
-     * 
-     * @return context class names for Selenium Grid dependencies
-     */ 
-    public String[] getDependencyContexts() {
-        String gridLauncher = getString(SeleniumSettings.GRID_LAUNCHER.key());
-        if (gridLauncher != null) {
-            StringBuilder builder = new StringBuilder(gridLauncher);
-            String slotMatcher = getString(SeleniumSettings.SLOT_MATCHER.key());
-            if (slotMatcher != null) builder.append(File.pathSeparator).append(slotMatcher);
-            String dependencies = getString(SeleniumSettings.LAUNCHER_DEPS.key());
-            if (dependencies != null) builder.append(File.pathSeparator).append(dependencies);
-            return builder.toString().split(File.pathSeparator);
-        } else {
-            return new String[] {};
-        }
     }
     
     /**
