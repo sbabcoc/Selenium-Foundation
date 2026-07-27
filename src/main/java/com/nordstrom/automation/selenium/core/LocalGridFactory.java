@@ -20,7 +20,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
  *     <li>Never return {@code null} — throw instead if the Grid cannot be created.</li>
  * </ul>
  *
- * @since [next-major]
+ * @since 36.2.0
  */
 @FunctionalInterface
 public interface LocalGridFactory {

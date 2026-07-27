@@ -93,7 +93,7 @@ public final class GridUtility {
      * @param hubUrl {@link URL} of the hub to probe
      * @return 4 if the server is a Selenium 4 hub; 3 if it is a Selenium 3 hub;
      *         -1 if the server is not a recognized Selenium Grid hub
-     * @since [next-major]
+     * @since 36.2.0
      */
     public static int probeApiVersion(URL hubUrl) {
         if (isSelenium4Hub(hubUrl)) return 4;

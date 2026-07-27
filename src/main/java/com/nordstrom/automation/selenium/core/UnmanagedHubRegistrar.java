@@ -21,7 +21,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
  *     <li>Be safe to invoke repeatedly for the same hub URL (idempotent).</li>
  * </ul>
  *
- * @since [next-major]
+ * @since 36.2.0
  */
 @FunctionalInterface
 public interface UnmanagedHubRegistrar {

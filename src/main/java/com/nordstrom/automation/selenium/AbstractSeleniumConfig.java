@@ -157,7 +157,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.dep.contexts.insert</b><br>
          * default: {@code null}
          *
-         * @since [next-major]
+         * @since 36.2.0
          */
         DEP_CONTEXTS_INSERT("selenium.dep.contexts.insert", null),
 
@@ -170,7 +170,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.dep.contexts.delete</b><br>
          * default: {@code null}
          *
-         * @since [next-major]
+         * @since 36.2.0
          */
         DEP_CONTEXTS_DELETE("selenium.dep.contexts.delete", null),
 
@@ -534,7 +534,7 @@ public abstract class AbstractSeleniumConfig extends
          * name: <b>selenium.grid.sidecar.monitor.unmanaged</b><br>
          * default: <b>true</b>
          *
-         * @since [next-major]
+         * @since 36.2.0
          */
         MONITOR_UNMANAGED_HUBS("selenium.grid.sidecar.monitor.unmanaged", "true"),
         
