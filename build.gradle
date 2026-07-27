@@ -83,10 +83,13 @@ scmVersion {
 }
 
 /* Version logic */
-def verBits = scmVersion.version.split('-')
+def resolvedVersion = project.hasProperty('artifactVersion')
+        ? project.property('artifactVersion').toString()
+        : scmVersion.version
+def verBits = resolvedVersion.split('-')
 def seleniumApi = "s${profile.charAt(8)}"
 ext.baseVersion = verBits[0]
-ext.isSnapshot = !scmVersion.version.matches('\\d+\\.\\d+\\.\\d+')
+ext.isSnapshot = !resolvedVersion.matches('\\d+\\.\\d+\\.\\d+')
 ext.archiveVer = "${baseVersion}-${seleniumApi}" + (isSnapshot ? '-SNAPSHOT' : '')
 ext.archiveBase = "${rootProject.name}-${archiveVer}"
 
