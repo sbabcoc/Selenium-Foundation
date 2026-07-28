@@ -60,7 +60,6 @@ public abstract class AbstractSeleniumConfig extends
     
     private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumConfig.class);
     
-    private static final String APPIUM_HOST = "\"appium:host\":\"0.0.0.0\",";
     private static final String PERSONALITY = "\"nord:options\":{\"personality\":\"%s\"}";
     
     /**
@@ -1033,10 +1032,6 @@ public abstract class AbstractSeleniumConfig extends
         
         String personality = GridUtility.getPersonality(capabilities);
         String defaultCaps = String.format(PERSONALITY, personality);
-        
-        if ("Espresso".equals(personality)) {
-            defaultCaps = APPIUM_HOST +  defaultCaps;
-        }
         
         return mergeCapabilities(getCapabilitiesForJson("{" + defaultCaps + "}")[0], capabilities);
     }

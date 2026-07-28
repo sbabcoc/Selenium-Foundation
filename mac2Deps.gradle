@@ -1,6 +1,6 @@
 def driverPlugins = System.getProperty('selenium.grid.plugins', '')
 System.setProperty('selenium.grid.plugins', driverPlugins + 'com.nordstrom.automation.selenium.plugins.Mac2Plugin' + File.pathSeparator)
-System.setProperty('injected.selenium.browser.caps', '{"platformName":"Mac","appium:automationName":"Mac2","appium:bundleId":"com.apple.TextEdit"}')
+System.setProperty('injected.selenium.browser.caps', '{"platformName":"Mac","appium:automationName":"Mac2","appium:options":{"bundleId":"com.apple.TextEdit"}}')
 System.setProperty('injected.selenium.context.platform', 'mac-app')
 System.setProperty('injected.selenium.grid.examples', 'false')
 System.setProperty('injected.selenium.timeout.host', '60')
