@@ -580,7 +580,12 @@ public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePa
         SeleniumConfig config = SeleniumConfig.getConfig();
         try {
             int port = config.getInt(SeleniumSettings.SIDECAR_PORT.key());
-            URL statusUrl = UriUtils.makeBasicURI("http", HostUtils.getLocalHost(), port).toURL();
+            // the sidecar reporting exampleSiteUrl lives alongside whatever hub is actually
+            // in play — for a remote hub, that's the remote host, not this machine, so only
+            // fall back to the local host when no hub is explicitly configured
+            URL hubUrl = config.getHubUrl();
+            String host = (hubUrl != null) ? hubUrl.getHost() : HostUtils.getLocalHost();
+            URL statusUrl = UriUtils.makeBasicURI("http", host, port).toURL();
             HttpResponse response = GridUtility.getHttpResponse(statusUrl, "/grid/control/status");
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 String json = EntityUtils.toString(response.getEntity(), UTF_8);
