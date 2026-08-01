@@ -45,7 +45,7 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
      */
     @Override
     public Optional<WebDriver> nabDriver() {
-        return TestBase.optionalOf(driver);
+        return Optional.ofNullable(driver);
     }
     
     /**
@@ -62,7 +62,7 @@ public abstract class JUnitBase extends TestBase implements ArtifactParams {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Page> Optional<T> nabInitialPage() {
-        return (Optional<T>) TestBase.optionalOf(initialPage);
+        return (Optional<T>) Optional.ofNullable(initialPage);
     }
     
     /**
