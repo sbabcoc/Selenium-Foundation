@@ -148,21 +148,6 @@ public abstract class TestBase {
     }
     
     /**
-     * Wrap the specified object in an {@link Optional} object.
-     * 
-     * @param <T> type of object to be wrapped
-     * @param obj object to be wrapped (may be 'null')
-     * @return (optional) wrapped object; empty if {@code obj} is 'null'
-     */
-    public static <T> Optional<T> optionalOf(T obj) {
-        if (obj != null) {
-            return Optional.of(obj);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * Invokes the specified supplier, returning its result wrapped in an {@link Optional}.
      * If the supplier throws any exception or returns {@code null}, an empty {@link Optional}
      * is returned instead.

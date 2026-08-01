@@ -101,15 +101,17 @@ public abstract class TestNgBase extends TestBase {
          * @return (optional) stored object
          */
         private Optional<?> nab() {
-            Object obj;
+            Object obj = null;
             ITestResult result = Reporter.getCurrentTestResult();
-            Object val = result.getAttribute(key);
-            if (val instanceof TrackedObject) {
-                obj = ((TrackedObject<?>) val).getValue();
-            } else {
-                obj = val;
+            if (result != null) {
+                Object val = result.getAttribute(key);
+                if (val instanceof TrackedObject) {
+                    obj = ((TrackedObject<?>) val).getValue();
+                } else {
+                    obj = val;
+                }
             }
-            return TestBase.optionalOf(obj);
+            return Optional.ofNullable(obj);
         }
     }
     
