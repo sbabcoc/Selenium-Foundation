@@ -574,10 +574,36 @@ public abstract class AbstractSeleniumConfig extends
          * <b>NOTE</b>: This setting can define multiple {@code Appium} server arguments together, and can be
          * declared multiple times when specified in the <i>settings.properties</i> file.
          * <p>
+         * <b>NOTE</b>: Specifying {@code --default-capabilities} via this setting is deprecated — its value
+         * is redirected into {@link SeleniumSettings#APPIUM_DEFAULT_CAPS APPIUM_DEFAULT_CAPS} instead, with
+         * a warning logged. Use that setting directly going forward.
+         * <p>
          * name: <b>appium.cli.args</b><br>
          * default: {@code null}
          */
         APPIUM_CLI_ARGS("appium.cli.args", null),
+        
+        /**
+         * This setting specifies the {@code Appium} server's launch-time {@code --default-capabilities}
+         * value — a JSON object of capabilities merged into every session request that doesn't already
+         * specify them, applied once when the server process is started (there is no per-session scope
+         * for this option).
+         * <p>
+         * <b>NOTE</b>: The default value enables {@code skipServerInstallation} and
+         * {@code skipDeviceInitialization}, which is safe once the target device has been provisioned
+         * (see the sidecar's provisioning endpoint) and eliminates the per-session install/init overhead
+         * those flags would otherwise incur on every test. Overriding this setting — for example, to
+         * supply BrowserStack or other third-party credentials as default capabilities — replaces the
+         * built-in default outright; a client that overrides it takes on responsibility for including
+         * the skip capabilities themselves if that overhead reduction is still wanted.
+         * <p>
+         * name: <b>appium.default.caps</b><br>
+         * default: <b>{"appium:skipServerInstallation":true,"appium:skipDeviceInitialization":true}</b>
+         *
+         * @since 36.2.0
+         */
+        APPIUM_DEFAULT_CAPS("appium.default.caps",
+                "{\"appium:skipServerInstallation\":true,\"appium:skipDeviceInitialization\":true}"),
         
         /**
          * This setting specifies the path to the {@code Appium} main script file.
