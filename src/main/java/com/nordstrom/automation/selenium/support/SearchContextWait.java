@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Function;
+import com.nordstrom.automation.selenium.core.RobustDriverFactory;
 import com.nordstrom.automation.selenium.core.TestBase;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 
@@ -91,6 +92,7 @@ public class SearchContextWait extends FluentWait<SearchContext> {
         TimeoutException ex = new TimeoutException(message, lastException);
         ex.addInfo(WebDriverException.DRIVER_INFO, context.getClass().getName());
         Optional.ofNullable(WebDriverUtils.getDriver(context))
+            .map(RobustDriverFactory::unwrap)
             .filter(RemoteWebDriver.class::isInstance)
             .map(RemoteWebDriver.class::cast)
             .ifPresent(remote -> {

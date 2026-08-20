@@ -108,6 +108,24 @@ public class JsUtilityTest extends TestNgTargetRoot {
         assertEquals(value, "test");
     }
     
+    @Test
+    public void testDriverAutoWrapSurvivesStaleness() {
+        // This is the mechanism with the least coverage of all: it's never invoked explicitly by test
+        // code, only through RobustDriverFactory's proxy installed by DriverManager.injectDriver, so this
+        // calls executeScript() directly, the same way any ordinary, wrapping-unaware caller would, to
+        // confirm the automatic path actually wraps results and survives staleness with no opt-in at all.
+        ExamplePage page = getPage();
+        String script = "return document.querySelector(\"p[id^='para-']\");";
+        Object result = ((JavascriptExecutor) page.getWrappedDriver()).executeScript(script);
+        assertTrue(result instanceof WebElement, "Driver's own executeScript should return a wrapped element");
+        WebElement paragraph = (WebElement) result;
+        assertEquals(paragraph.getText(), page.getParagraphs().get(0));
+        
+        page.getWrappedDriver().navigate().refresh();
+        
+        assertEquals(paragraph.getText(), page.getParagraphs().get(0));
+    }
+    
     private String getMetaTagNamed(WebDriver driver, String name) {
         String script = JsUtility.getScriptResource("requireMetaTagByName.js");
         WebElement response = JsUtility.runAndReturn(driver, script, name);
