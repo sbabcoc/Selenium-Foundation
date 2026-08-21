@@ -1,0 +1,32 @@
+var __result;
+try {
+    __result = (function () {
+{{LIST_SCRIPT}}
+    }).apply(null, arguments);
+} catch (__e) {
+    if (__e && __e.__wdUserFailure) {
+        throw __e;
+    }
+    __wd.fail('org.openqa.selenium.WebDriverException',
+        'Original script failed while re-acquiring element at path {{PATH}}: '
+            + (__e && __e.message ? __e.message : String(__e)));
+}
+var __value;
+try {
+    __value = __result{{PATH}};
+} catch (__e) {
+    // an intermediate segment of the path was itself undefined/null - the structure has changed
+    // shape since the initial acquisition; treat this the same as "not found"
+    __wd.fail('org.openqa.selenium.NoSuchElementException',
+        'No element found at path {{PATH}}: ' + (__e && __e.message ? __e.message : String(__e)));
+}
+if (__value === undefined || __value === null) {
+    __wd.fail('org.openqa.selenium.NoSuchElementException',
+        'No element found at path {{PATH}}');
+}
+if (typeof __value.nodeType !== 'number' || __value.nodeType !== 1) {
+    __wd.fail('org.openqa.selenium.WebDriverException',
+        'Fatal: expected an element at path {{PATH}}, but script returned a non-element value (found: '
+            + (typeof __value) + ')');
+}
+return __value;

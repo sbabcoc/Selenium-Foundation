@@ -184,6 +184,7 @@ public final class DriverManager {
         wait.ignoring(WebDriverException.class);
         WebDriver driver = wait.until(driverIsAcquired(method));
         setDriverTimeouts(driver, config);
+        driver = RobustDriverFactory.wrapDriver(driver);
         instance.setDriver(driver);
         return driver;
     }
@@ -233,8 +234,9 @@ public final class DriverManager {
      * @return optional session ID (see NOTES) 
      */
     public static Optional<SessionId> getSessionId(final WebDriver driver) {
-        if (driver instanceof RemoteWebDriver) {
-            SessionId sessionId = ((RemoteWebDriver) driver).getSessionId();
+        WebDriver realDriver = RobustDriverFactory.unwrap(driver);
+        if (realDriver instanceof RemoteWebDriver) {
+            SessionId sessionId = ((RemoteWebDriver) realDriver).getSessionId();
             return Optional.of(sessionId);
         }
         return Optional.empty();

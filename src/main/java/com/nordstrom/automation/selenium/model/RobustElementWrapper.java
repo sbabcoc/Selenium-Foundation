@@ -54,6 +54,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
     private final WebDriver driver;
     private final WrapsContext context;
     private final String script;
+    private final Object[] scriptArgs;
     private final By locator;
     private final int index;
     private final Strategy strategy;
@@ -83,6 +84,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             this.context = wrapper.context;
             
             this.script = wrapper.script;
+            this.scriptArgs = wrapper.scriptArgs;
             this.locator = wrapper.locator;
             this.index = wrapper.index;
             this.strategy = wrapper.strategy;
@@ -100,6 +102,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
             this.context = context;
             this.script = null;
+            this.scriptArgs = new Object[0];
             this.locator = locator;
             this.index = index;
             this.strategy = Strategy.LOCATOR;
@@ -118,19 +121,29 @@ public class RobustElementWrapper implements ReferenceFetcher {
     }
     
     /**
-     * Robust web element constructor for script-based element location.
+     * Robust web element constructor for script-based element location, with script arguments.
+     * <p>
+     * {@code scriptArgs}, if given, are replayed verbatim on every future refresh, not just this initial
+     * acquisition - a script that depends on runtime arguments to run correctly (a search term, a
+     * threshold value, anything beyond the container itself) needs those arguments to survive staleness
+     * recovery just as much as it needs them the first time.
      * 
      * @param element element reference to be wrapped (may be 'null')
      * @param context element search context
      * @param script JavaScript to locate the wrapped element
+     * @param scriptArgs arguments to pass to {@code script} on this and every future invocation - the
+     *      container itself is prepended automatically when {@code context} is element-relative; this
+     *      array should hold only the caller's own additional arguments
      */
     public RobustElementWrapper(
-            final WebElement element, final WrapsContext context, final String script) {
+            final WebElement element, final WrapsContext context, final String script,
+            final Object... scriptArgs) {
         
         this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
         this.context = context;
         
         this.script = script;
+        this.scriptArgs = scriptArgs;
         this.locator = null;
         this.index = CARDINAL;
         this.strategy = Strategy.SCRIPT;
@@ -332,6 +345,33 @@ public class RobustElementWrapper implements ReferenceFetcher {
     }
     
     /**
+     * Build the effective argument list for a script-based acquisition or refresh: the underlying native
+     * search context itself, prepended automatically when {@code context} is element-relative, followed by
+     * the caller's own {@code scriptArgs}.
+     * <p>
+     * Takes the underlying native {@link SearchContext} (what {@code WrapsContext.getWrappedContext()}
+     * returns), not a {@code WrapsContext} - only an actual browser-side handle can be marshaled as a
+     * script argument at all, since {@code WrapsContext} is a pure Java-side abstraction with no wire
+     * representation.
+     * <p>
+     * Used identically for a script's initial invocation and every subsequent refresh, so a script that
+     * depends on the context being {@code arguments[0]} sees it in the same position every time.
+     * 
+     * @param context underlying native search context (element- or document-relative)
+     * @param scriptArgs the caller's own script arguments (not including the context itself)
+     * @return effective argument list to pass to the script
+     */
+    public static Object[] buildScriptArgs(final SearchContext context, final Object... scriptArgs) {
+        if (!SearchContextUtils.isElementContext(context)) {
+            return scriptArgs;
+        }
+        Object[] combined = new Object[scriptArgs.length + 1];
+        combined[0] = context;
+        System.arraycopy(scriptArgs, 0, combined, 1, scriptArgs.length);
+        return combined;
+    }
+    
+    /**
      * Acquire the element reference that's wrapped by the specified robust element wrapper.
      * 
      * @param wrapper robust element wrapper
@@ -379,17 +419,16 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 WebDriverUtils.implicitlyWait(timeouts, Duration.ofSeconds(WaitType.IMPLIED.getInterval()));
             }
         } else {
-            // if context is a container element
-            if (SearchContextUtils.isElementContext(context)) {
-                // invoke script to acquire reference (element-relative)
-                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script, context);
-            } else {
-                // invoke script to acquire reference (document-relative)
-                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script);
+            try {
+                Object[] callArgs = buildScriptArgs(context, wrapper.scriptArgs);
+                wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script, callArgs);
+            } catch (NoSuchElementException e) {
+                // e.g. an indexed-extraction script's own bounds-check failure (via __wd.fail)
+                thrown = e;
             }
             
             // if no reference acquired
-            if (wrapper.wrapped == null) {
+            if (thrown == null && wrapper.wrapped == null) {
                 String message;
                 // if context is a container element
                 if (SearchContextUtils.isElementContext(context)) {

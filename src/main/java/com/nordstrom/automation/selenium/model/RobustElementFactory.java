@@ -13,6 +13,7 @@ import org.openqa.selenium.WebElement;
 import com.nordstrom.automation.selenium.DriverPlugin;
 import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.core.GridUtility;
+import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.interfaces.WrapsContext;
 import com.nordstrom.common.base.UncheckedThrow;
 
@@ -36,6 +37,8 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 public final class RobustElementFactory {
     
     private static final Map<String, InstanceCreator> creatorMap = new HashMap<>();
+    private static final String PATH_EXTRACTION_TEMPLATE =
+            JsUtility.getScriptResource("extractPathElement.format");
     
     /**
      * Private constructor to prevent instantiation.
@@ -89,21 +92,73 @@ public final class RobustElementFactory {
     }
     
     /**
-     * Robust web element builder for {@link ShadowDomBridge}.
+    /**
+     * Robust web element builder for script-based element location, with script arguments that are
+     * replayed on every future refresh, not just this initial acquisition.
+     * <p>
+     * Used by {@link ShadowDomBridge} with no arguments.
      * 
      * @param element element reference to be wrapped (may be 'null')
      * @param context element search context
      * @param script JavaScript to locate the wrapped element
+     * @param args arguments to pass to {@code script} on this and every future invocation
      * @return robust web element
      */
     public static WebElement makeRobustElement(
-            final WebElement element, final WrapsContext context, final String script) {
+            final WebElement element, final WrapsContext context, final String script, final Object... args) {
 
         InstanceCreator creator = getCreator(context);
-        RobustElementWrapper interceptor = new RobustElementWrapper(element, context, script);
+        RobustElementWrapper interceptor = new RobustElementWrapper(element, context, script, args);
         WebElement robust = (WebElement) creator.makeInstance();
         ((InterceptionAccessor) robust).setInterceptor(interceptor);
         return robust;
+    }
+
+    /**
+     * Robust web element builder for extracting an element from an arbitrary position within a JavaScript
+     * result, addressed by a JS accessor path (e.g. {@code [2]['header']}).
+     * <p>
+     * Supports any position reachable by chaining bracket accessors off the raw script result - nested
+     * lists, maps, or combinations thereof. It's intended for use by {@code RobustDriverFactory}'s
+     * auto-wrap interceptor, which derives {@code path} automatically while walking a script's full result.
+     * <p>
+     * If a segment of {@code path} doesn't resolve (an intermediate container has shrunk or been
+     * restructured since the initial acquisition, so the position no longer exists), that's treated as a
+     * graceful {@code NoSuchElementException}. If the position resolves to something other than a DOM
+     * element, or the original script itself fails, both are treated as fatal {@code WebDriverException}s.
+     * <p>
+     * {@code args}, if given, are replayed on every future refresh, not just this initial acquisition.
+     * 
+     * @param element element reference to be wrapped (may be 'null')
+     * @param context element search context
+     * @param script JavaScript that produces the result {@code path} is evaluated against
+     * @param path JS accessor path (e.g. {@code "[2]['header']"}) locating the desired element within the
+     *      result of {@code script}
+     * @param args arguments to pass to {@code script} on this and every future invocation
+     * @return robust web element
+     */
+    public static WebElement makeRobustElement(
+            final WebElement element, final WrapsContext context, final String script, final String path,
+            final Object... args) {
+
+        String itemScript = buildPathExtractionScript(script, path);
+        return makeRobustElement(element, context, itemScript, args);
+    }
+
+    /**
+     * Build a script that invokes the specified script and extracts the element at the specified JS
+     * accessor path, failing gracefully (via {@code NoSuchElementException}) if the path doesn't resolve,
+     * or loudly (via {@code WebDriverException}) if the original script itself fails or the position found
+     * isn't a DOM element.
+     * 
+     * @param script JavaScript that produces the result {@code path} is evaluated against
+     * @param path JS accessor path locating the desired element within the result of {@code script}
+     * @return wrapped JavaScript that returns the element at {@code path}
+     */
+    private static String buildPathExtractionScript(final String script, final String path) {
+        return PATH_EXTRACTION_TEMPLATE
+                .replace("{{PATH}}", path)
+                .replace("{{LIST_SCRIPT}}", script);
     }
 
     /**

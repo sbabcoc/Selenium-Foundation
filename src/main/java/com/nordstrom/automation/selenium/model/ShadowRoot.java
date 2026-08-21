@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import com.nordstrom.automation.selenium.core.JsUtility;
+import com.nordstrom.automation.selenium.core.RobustDriverFactory;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
 import com.nordstrom.automation.selenium.exceptions.ShadowRootContextException;
 import com.nordstrom.automation.selenium.utility.SearchContextUtils;
@@ -126,10 +127,11 @@ public class ShadowRoot extends PageComponent {
         if (result instanceof Map) {
             try {
                 // build shadow root remote web element
+                RemoteWebDriver remoteDriver = (RemoteWebDriver) RobustDriverFactory.unwrap(driver);
                 RemoteWebElement shadowRoot = new RemoteWebElement();
-                shadowRoot.setParent((RemoteWebDriver) driver);
+                shadowRoot.setParent(remoteDriver);
                 shadowRoot.setId(((Map<String, String>) result).get(ROOT_KEY));
-                shadowRoot.setFileDetector(((RemoteWebDriver) driver).getFileDetector());
+                shadowRoot.setFileDetector(remoteDriver.getFileDetector());
                 return shadowRoot;
             } catch (Exception eaten) {
                 // nothing to do here
