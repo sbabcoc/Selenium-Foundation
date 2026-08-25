@@ -36,6 +36,7 @@ import com.nordstrom.automation.selenium.SeleniumConfig;
 import com.nordstrom.automation.selenium.annotations.PageUrl;
 import com.nordstrom.automation.selenium.core.JsUtility;
 import com.nordstrom.automation.selenium.core.WebDriverUtils;
+import com.nordstrom.automation.selenium.exceptions.ContextSwitchTimeoutException;
 import com.nordstrom.automation.selenium.exceptions.LandingPageMismatchException;
 import com.nordstrom.automation.selenium.exceptions.PageNotLoadedException;
 import com.nordstrom.automation.selenium.exceptions.VacationStackTrace;
@@ -189,16 +190,7 @@ public abstract class ComponentContainer
      * @return output of the specified condition
      */
     public <T> T waitUntil(Function<SearchContext, T> condition) {
-        try {
-            return getWait().until(condition);
-        } catch (TimeoutException e) {
-            if (e.getClass().equals(TimeoutException.class) && (condition instanceof Coordinator)) {
-                TimeoutException d = ((Coordinator<T>) condition).differentiateTimeout(e);
-                d.setStackTrace(e.getStackTrace());
-                throw d;
-            }
-            throw e;
-        }
+        return waitAndDifferentiate(condition);
     }
     
     /**
@@ -221,7 +213,37 @@ public abstract class ComponentContainer
      */
     @Override
     public SearchContext switchTo() {
-        return getWait().until(contextIsSwitched(this));
+        return waitAndDifferentiate(contextIsSwitched(this));
+    }
+    
+    /**
+     * Wait until the specified condition is met, converting a generic timeout failure into a condition-specific
+     * subtype via {@link Coordinator#differentiateTimeout} when the condition provides one.
+     * <p>
+     * <b>NOTE</b>: This is declared {@code private} deliberately, not merely as an implementation convenience.
+     * {@code switchTo} and {@code getWait} are both listed in {@code BYPASS_METHODS}, so neither ever reaches
+     * {@link ContainerMethodInterceptor} - that's what makes {@link #switchTo()} safe to call unconditionally
+     * from {@code ContainerMethodInterceptor.intercept()} itself. {@code waitUntil} is a normal, intercepted
+     * public method; if {@code switchTo()} called it directly, every call would be re-intercepted, immediately
+     * re-invoke {@code switchTo()} (since interception always starts with a switch), and recurse without bound.
+     * A private method is categorically exempt from interception, so routing both public callers through this
+     * one keeps that boundary intact regardless of call order.
+     * 
+     * @param <T> return type of the specified condition
+     * @param condition 'condition' function object
+     * @return output of the specified condition
+     */
+    private <T> T waitAndDifferentiate(Function<SearchContext, T> condition) {
+        try {
+            return getWait().until(condition);
+        } catch (TimeoutException e) {
+            if (e.getClass().equals(TimeoutException.class) && (condition instanceof Coordinator)) {
+                TimeoutException d = ((Coordinator<T>) condition).differentiateTimeout(e);
+                d.setStackTrace(e.getStackTrace());
+                throw d;
+            }
+            throw e;
+        }
     }
     
     @Override
@@ -272,6 +294,14 @@ public abstract class ComponentContainer
             @Override
             public String toString() {
                 return "context to be switched";
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TimeoutException differentiateTimeout(TimeoutException e) {
+                return new ContextSwitchTimeoutException(e.getMessage(), e.getCause());
             }
         };
     }

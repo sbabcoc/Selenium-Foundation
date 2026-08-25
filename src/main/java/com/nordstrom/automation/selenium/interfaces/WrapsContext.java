@@ -28,9 +28,22 @@ public interface WrapsContext extends WrapsDriver {
     /**
      * Get the underlying search context for this object.
      * 
-     * @return object search context
+     * @return object search context; {@code null} if (and only if) {@link #hasReference()} is {@code false}
      */
     SearchContext getWrappedContext();
+    
+    /**
+     * Determine whether this object's underlying search context is currently available.
+     * <p>
+     * Implementations that wrap an optional element or component must override this method to reflect whether a
+     * reference has been (or can currently be) acquired. Every other implementation may rely on the default,
+     * since a non-optional context is always available.
+     * 
+     * @return 'true' if the underlying search context is available; otherwise 'false'
+     */
+    default boolean hasReference() {
+        return true;
+    }
     
     /**
      * Refresh the underlying search context for this object.

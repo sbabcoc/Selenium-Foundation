@@ -1,6 +1,7 @@
 package com.nordstrom.automation.selenium.model;
 
 import org.testng.annotations.Test;
+import com.nordstrom.automation.selenium.AbstractSeleniumConfig.SeleniumSettings;
 import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.core.ModelTestCore;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
@@ -86,6 +87,43 @@ public class ModelTest extends TestNgTargetRoot {
     }
     
     @Test
+    public void testOptionalFrameBehavior() {
+        // the absent-context case waits out the full WAIT_TIMEOUT before surfacing (by design - an optional
+        // context's existence may be contingent on application state that hasn't happened yet), so shorten it
+        // for the duration of this test rather than eating the real (default 15-second) timeout on every run
+        String key = SeleniumSettings.WAIT_TIMEOUT.key();
+        String saved = System.getProperty(key);
+        System.setProperty(key, "1");
+        try {
+            ModelTestCore.testOptionalFrameBehavior(this);
+        } finally {
+            if (saved != null) {
+                System.setProperty(key, saved);
+            } else {
+                System.clearProperty(key);
+            }
+        }
+    }
+    
+    @Test
+    public void testOptionalComponentBehavior() {
+        // same rationale as testOptionalFrameBehavior, but this path waits out IMPLIED_TIMEOUT (via
+        // RobustElementWrapper.refreshReference), not WAIT_TIMEOUT (via switchTo()) - a different wait entirely
+        String key = SeleniumSettings.IMPLIED_TIMEOUT.key();
+        String saved = System.getProperty(key);
+        System.setProperty(key, "1");
+        try {
+            ModelTestCore.testOptionalComponentBehavior(this);
+        } finally {
+            if (saved != null) {
+                System.setProperty(key, saved);
+            } else {
+                System.clearProperty(key);
+            }
+        }
+    }
+    
+    @Test
     public void testComponentList() {
         ModelTestCore.testComponentList(this);
     }
@@ -160,7 +198,21 @@ public class ModelTest extends TestNgTargetRoot {
     
     @Test(expectedExceptions = {ElementReferenceRefreshFailureException.class})
     public void testFailedReferenceRefreshAttempt() {
-        ModelTestCore.testReferenceRefreshFailure(this);
+        // this scenario waits out the full implied-wait timeout while confirming the element is truly gone
+        // (not just temporarily stale), so shorten it for the duration of this test rather than eating the
+        // real (default 15-second) timeout on every run
+        String key = SeleniumSettings.IMPLIED_TIMEOUT.key();
+        String saved = System.getProperty(key);
+        System.setProperty(key, "1");
+        try {
+            ModelTestCore.testReferenceRefreshFailure(this);
+        } finally {
+            if (saved != null) {
+                System.setProperty(key, saved);
+            } else {
+                System.clearProperty(key);
+            }
+        }
     }
     
     @Test

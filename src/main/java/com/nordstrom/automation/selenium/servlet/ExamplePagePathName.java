@@ -29,4 +29,9 @@ public interface ExamplePagePathName {
     String FRAME_D_NAME = "FrameD_Servlet";
     /** path: example frame D */
     String FRAME_D_PATH = "/grid/admin/FrameD_Servlet";
+
+    /** name: example frame E (optional frame) */
+    String FRAME_E_NAME = "FrameE_Servlet";
+    /** path: example frame E (optional frame) */
+    String FRAME_E_PATH = "/grid/admin/FrameE_Servlet";
 }

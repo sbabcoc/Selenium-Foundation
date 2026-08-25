@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
@@ -19,11 +20,15 @@ import com.nordstrom.automation.selenium.annotations.InitialPage;
 import com.nordstrom.automation.selenium.examples.ExamplePage;
 import com.nordstrom.automation.selenium.examples.FormComponent;
 import com.nordstrom.automation.selenium.examples.FrameComponent;
+import com.nordstrom.automation.selenium.examples.OptionalComponent;
+import com.nordstrom.automation.selenium.examples.OptionalFrameComponent;
 import com.nordstrom.automation.selenium.examples.ShadowRootComponent;
 import com.nordstrom.automation.selenium.examples.TabPage;
 import com.nordstrom.automation.selenium.examples.TableComponent;
 import com.nordstrom.automation.selenium.exceptions.ContainerVacatedException;
+import com.nordstrom.automation.selenium.exceptions.ContextSwitchTimeoutException;
 import com.nordstrom.automation.selenium.exceptions.ElementReferenceRefreshFailureException;
+import com.nordstrom.automation.selenium.exceptions.OptionalElementNotAcquiredException;
 import com.nordstrom.automation.selenium.model.ContainerMethodInterceptor;
 import com.nordstrom.automation.selenium.model.Enhanced;
 import com.nordstrom.automation.selenium.model.RobustWebElement;
@@ -139,6 +144,76 @@ public class ModelTestCore {
         FrameComponent component = page.getFrameById();
         assertEquals(FRAME_D, component.getPageContent());
         assertTrue(component instanceof Enhanced);
+    }
+    
+    /**
+     * Verify the full lifecycle of a frame rooted on an optional context element: absent on first access,
+     * present with the correct content once the underlying frame appears, and absent again once it's removed.
+     * <p>
+     * A single {@link FrameComponent} reference is captured once and reused throughout, exactly as
+     * {@link #testOptionalBehavior(TestBase)} does with its optional element - the same context wrapper must
+     * correctly reflect each state transition without being re-acquired via a fresh accessor call.
+     * <p>
+     * The absent case surfaces as {@link ContextSwitchTimeoutException} wrapping
+     * {@link OptionalElementNotAcquiredException}, not the latter directly: {@code switchTo()}'s wait treats
+     * any {@link org.openqa.selenium.NotFoundException} (which {@link OptionalElementNotAcquiredException} is)
+     * as "not there yet, keep trying" - the same contingent-on-application-state semantics an ordinary
+     * required element gets. That's correct, since an optional context's existence may legitimately depend on
+     * user actions or application state transitions that haven't happened yet when this is first called.
+     * <p>
+     * Uses {@link OptionalFrameComponent}, not {@link FrameComponent} - the latter implements
+     * {@code DetectsLoadCompletion}, which would trigger an eager, construction-time load-completion check
+     * against the (initially absent) frame before this method's own {@code try} block is ever reached. See
+     * {@link ExamplePage#getOptionalFrame()} for the full explanation.
+     */
+    public static void testOptionalFrameBehavior(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        OptionalFrameComponent frame = page.getOptionalFrame();
+
+        try {
+            frame.getPageContent();
+            fail("No exception thrown for absent optional frame");
+        } catch (ContextSwitchTimeoutException e) {
+            assertTrue("Failure should be attributed to the absent optional frame context",
+                    e.getCause() instanceof OptionalElementNotAcquiredException);
+        }
+
+        assertTrue("Failed appending optional frame", page.toggleOptionalFrame());
+        assertEquals("Optional frame context mismatch", FRAME_E, frame.getPageContent());
+
+        assertFalse("Failed removing optional frame", page.toggleOptionalFrame());
+    }
+    
+    /**
+     * Verify the full lifecycle of a plain {@link PageComponent} rooted on an optional context element - the
+     * scenario selenium-foundation issue #192 was originally about. Unlike {@link #testOptionalFrameBehavior},
+     * this exercises {@code findElement} against an absent optional root directly (via
+     * {@link RobustElementWrapper#refreshReference}), not {@code switchTo()} - a genuinely different code path
+     * with a different failure shape.
+     * <p>
+     * The absent case surfaces as a bare {@link NoSuchElementException}, not wrapped in any
+     * {@link TimeoutException} subtype: {@code refreshReference}'s {@code refreshTrigger == null} branch
+     * explicitly unwraps to the underlying cause on timeout, rather than converting it the way
+     * {@code ComponentContainer.switchTo()} now does via {@code differentiateTimeout}. Both behaviors are
+     * correct for their respective call sites; this test documents which one applies here.
+     */
+    public static void testOptionalComponentBehavior(TestBase instance) {
+        ExamplePage page = instance.getInitialPage();
+        OptionalComponent component = page.getOptionalComponent();
+
+        try {
+            component.getChildText();
+            fail("No exception thrown for absent optional component");
+        } catch (NoSuchElementException e) {
+            assertTrue("Failure should be attributed to the absent optional component context",
+                    e.getMessage().contains("absent optional element"));
+        }
+
+        assertTrue("Failed appending optional component", page.toggleOptionalComponent());
+        assertEquals("Optional component context mismatch",
+                "I'm the optional component's child", component.getChildText());
+
+        assertFalse("Failed removing optional component", page.toggleOptionalComponent());
     }
     
     public static void testComponentList(TestBase instance) {

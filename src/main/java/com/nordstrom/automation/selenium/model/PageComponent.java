@@ -138,6 +138,14 @@ public class PageComponent extends ComponentContainer implements WrapsElement {
     }
     
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasReference() {
+        return ((RobustWebElement) context).hasReference();
+    }
+    
+    /**
      * Get the viewport element for this component.
      * <p>
      * <b>NOTE</b>: The default implementation of this method returns the component's context element. If the context
