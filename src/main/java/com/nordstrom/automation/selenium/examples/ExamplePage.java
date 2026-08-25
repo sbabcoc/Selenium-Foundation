@@ -55,6 +55,8 @@ public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePa
     public static final String FRAME_C = "Frame C";
     /** text content of example frame 'D' */
     public static final String FRAME_D = "Frame D";
+    /** text content of example frame 'E' (optional frame) */
+    public static final String FRAME_E = "Frame E";
     /** example table context element identifier */
     public static final String TABLE_ID = "t1";
     /** text content of example shadow DOM 'A' */
@@ -98,6 +100,10 @@ public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePa
     protected static final String FRAME_C_ID = "frame-c";
     /** identifier for frame 'D' */
     protected static final String FRAME_D_ID = "frame-d";
+    /** "toggle optional frame" script */
+    protected static final String TOGGLE_FRAME = JsUtility.getScriptResource("toggleOptionalFrame.js");
+    /** "toggle optional component" script */
+    protected static final String TOGGLE_COMPONENT = JsUtility.getScriptResource("toggleOptionalComponent.js");
 
     /**
      * This enumeration defines element locator constants.
@@ -113,6 +119,10 @@ public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePa
         FRAME_C(By.cssSelector("iframe#frame-c")),
         /** frame element 'D' */
         FRAME_D(By.cssSelector("iframe#frame-d")),
+        /** optional frame element */
+        OPTIONAL_FRAME(By.cssSelector("div#optional-frame-div iframe")),
+        /** optional component root element */
+        OPTIONAL_COMPONENT(By.cssSelector("div#optional-component-div component#optional-component")),
         /** common locator for paragraph elements */
         PARA(By.cssSelector("p[id^='para-']")),
         /** table element */
@@ -234,6 +244,63 @@ public class ExamplePage extends Page implements DetectsLoadCompletion<ExamplePa
             frameById = new FrameComponent(FRAME_D_ID, this);
         }
         return frameById;
+    }
+    
+    /**
+     * Get the automation component that models the optional frame via its (potentially absent) context
+     * element.
+     * <p>
+     * Unlike {@link #getFrameByElement()} and its siblings, this is not cached - each call performs a fresh
+     * {@code findOptional} lookup, mirroring {@link FormComponent#getOptional()}. The resulting component's
+     * own context element self-updates as the underlying frame is toggled in and out of existence; capture a
+     * single reference and reuse it, rather than calling this method again to observe a state change.
+     * <p>
+     * <b>NOTE</b>: Returns {@link OptionalFrameComponent}, not {@link FrameComponent} - deliberately not the
+     * same class used by {@link #getFrameByElement()} and its siblings. {@code FrameComponent} implements
+     * {@link com.nordstrom.automation.selenium.interfaces.DetectsLoadCompletion}, and
+     * {@code ContainerMethodInterceptor} triggers an automatic, construction-time {@code waitForLoadCompletion}
+     * check for any method returning such an instance - checked against the actual runtime object, not just
+     * the method's declared return type, so declaring a supertype return here would not avoid it. "Detects
+     * load completion" presupposes something to load; it isn't a meaningful concept for a reference that may
+     * not exist yet, so the model class for this scenario simply doesn't implement that interface.
+     * 
+     * @return {@link OptionalFrameComponent} model for the optional frame
+     */
+    public OptionalFrameComponent getOptionalFrame() {
+        RobustWebElement element = (RobustWebElement) findOptional(Using.OPTIONAL_FRAME);
+        return new OptionalFrameComponent(element, this);
+    }
+    
+    /**
+     * Toggle the existence of the optional frame element.
+     * 
+     * @return {@code true} if the optional frame was created; {@code false} if it was removed
+     */
+    public boolean toggleOptionalFrame() {
+        return JsUtility.runAndReturn(driver, TOGGLE_FRAME);
+    }
+    
+    /**
+     * Get the automation component that models the optional component via its (potentially absent) context
+     * (root) element.
+     * <p>
+     * Not cached, for the same reason as {@link #getOptionalFrame()} - each call performs a fresh
+     * {@code findOptional} lookup; capture a single reference and reuse it to observe state transitions.
+     * 
+     * @return {@link OptionalComponent} model for the optional component
+     */
+    public OptionalComponent getOptionalComponent() {
+        RobustWebElement element = (RobustWebElement) findOptional(Using.OPTIONAL_COMPONENT);
+        return new OptionalComponent(element, this);
+    }
+    
+    /**
+     * Toggle the existence of the optional component's root element.
+     * 
+     * @return {@code true} if the optional component was created; {@code false} if it was removed
+     */
+    public boolean toggleOptionalComponent() {
+        return JsUtility.runAndReturn(driver, TOGGLE_COMPONENT);
     }
     
     /**

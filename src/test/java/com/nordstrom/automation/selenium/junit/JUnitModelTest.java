@@ -99,6 +99,18 @@ public class JUnitModelTest extends JUnitTargetRoot {
     public void testFrameById() {
         ModelTestCore.testFrameById(this);
     }
+
+    @Test
+    @Ignore
+    public void testOptionalFrameBehavior() {
+        ModelTestCore.testOptionalFrameBehavior(this);
+    }
+
+    @Test
+    @Ignore
+    public void testOptionalComponentBehavior() {
+        ModelTestCore.testOptionalComponentBehavior(this);
+    }
     
     @Test
     @Ignore

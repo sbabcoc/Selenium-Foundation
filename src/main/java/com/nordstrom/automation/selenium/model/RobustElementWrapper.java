@@ -99,7 +99,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 throw new IndexOutOfBoundsException("Specified index is invalid");
             }
             
-            this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
+            this.driver = context.getWrappedDriver();
             this.context = context;
             this.script = null;
             this.scriptArgs = new Object[0];
@@ -139,7 +139,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
             final WebElement element, final WrapsContext context, final String script,
             final Object... scriptArgs) {
         
-        this.driver = WebDriverUtils.getDriver(context.getWrappedContext());
+        this.driver = context.getWrappedDriver();
         this.context = context;
         
         this.script = script;
@@ -260,6 +260,31 @@ public class RobustElementWrapper implements ReferenceFetcher {
     }
     
     /**
+     * Get the exception deferred upon failing to acquire the reference for an optional element.
+     * <p>
+     * Package-private: exists for test support only, so tests can assert on the specific cause of an
+     * acquisition failure without reflecting into the raw field.
+     * 
+     * @return deferred exception; {@code null} if no acquisition has failed
+     */
+    NoSuchElementException getDeferredException() {
+        return deferredException;
+    }
+    
+    /**
+     * Get the currently wrapped element reference, without attempting acquisition.
+     * <p>
+     * Package-private: exists for test support only. Unlike {@link #getWrappedElement()}, this never triggers
+     * {@link #refreshReference}, so it's safe to call after a failed acquisition to confirm the reference was
+     * actually cleared, rather than left dangling.
+     * 
+     * @return wrapped element reference; {@code null} if not currently acquired
+     */
+    WebElement getWrapped() {
+        return wrapped;
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -373,17 +398,26 @@ public class RobustElementWrapper implements ReferenceFetcher {
     
     /**
      * Acquire the element reference that's wrapped by the specified robust element wrapper.
+     * <p>
+     * Package-private (rather than {@code private}): the sole intended caller remains this class's own
+     * instance methods, but tests need to invoke it directly to exercise acquisition failure in isolation,
+     * without going through {@link #refreshReference}'s wait-and-retry loop.
      * 
      * @param wrapper robust element wrapper
      * @return wrapped element reference
      * @throws StaleElementReferenceElementException if container element has gone stale
      * @throws NoSuchElementException if unable to find element specified by the wrapper
      */
-    private static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
+    static RobustElementWrapper acquireReference(final RobustElementWrapper wrapper) {
         NoSuchElementException thrown = null;
-        SearchContext context = wrapper.context.getWrappedContext();
         
-        if (wrapper.strategy == Strategy.LOCATOR) {
+        if (!wrapper.context.hasReference()) {
+            // parent context is an unresolved optional element/component - nothing to search
+            thrown = new NoSuchElementException(
+                    String.format("Unable to search for %s: parent context is an absent optional element",
+                            wrapper.locator));
+        } else if (wrapper.strategy == Strategy.LOCATOR) {
+            SearchContext context = wrapper.context.getWrappedContext();
             // disable implicit wait
             Timeouts timeouts = wrapper.driver.manage().timeouts();
             WebDriverUtils.implicitlyWait(timeouts, Duration.ZERO);
@@ -419,6 +453,7 @@ public class RobustElementWrapper implements ReferenceFetcher {
                 WebDriverUtils.implicitlyWait(timeouts, Duration.ofSeconds(WaitType.IMPLIED.getInterval()));
             }
         } else {
+            SearchContext context = wrapper.context.getWrappedContext();
             try {
                 Object[] callArgs = buildScriptArgs(context, wrapper.scriptArgs);
                 wrapper.wrapped = JsUtility.runAndReturn(wrapper.driver, wrapper.script, callArgs);

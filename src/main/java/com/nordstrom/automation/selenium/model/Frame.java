@@ -1,7 +1,10 @@
 package com.nordstrom.automation.selenium.model;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+
+import com.nordstrom.automation.selenium.exceptions.OptionalElementNotAcquiredException;
 
 /**
  * Extend this class when modeling a browser frame element.
@@ -117,6 +120,10 @@ public class Frame extends Page {
     protected SearchContext switchToContext() {
         switch (frameSelect) {
             case ELEMENT:
+                if (!element.hasReference()) {
+                    throw new OptionalElementNotAcquiredException(
+                            new NoSuchElementException("Unable to switch to frame: context element is absent"));
+                }
                 driver.switchTo().frame(element);
                 break;
 

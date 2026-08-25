@@ -137,4 +137,19 @@ public class ExamplePageServlet extends HttpServlet {
             pageSource = getResource("frame_d.html");
         }
     }
+
+    /**
+     * This class implements the HTTP servlet for example frame 'E' - content for the optional frame, kept
+     * separate from frame 'A' so the optional-frame scenario doesn't couple to frame 'A''s own test coverage.
+     */
+    @WebServlet(name = ExamplePagePathName.FRAME_E_NAME, urlPatterns = { ExamplePagePathName.FRAME_E_PATH })
+    public static class FrameE_Servlet extends ExamplePageServlet {
+        private static final long serialVersionUID = 8236154471739825902L;
+
+        /** {@inheritDoc} */
+        @Override
+        public void init() throws ServletException {
+            pageSource = getResource("frame_e.html");
+        }
+    }
 }
