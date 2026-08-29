@@ -26,6 +26,7 @@ dependencies {
   api platform("com.nordstrom.ui-tools:selenium-bom-s3:${baseVersion}${isSnapshot ? '-SNAPSHOT' : ''}")
 
   api 'com.nordstrom.tools:testng-foundation'
+  api 'com.nordstrom.tools:jupiter-foundation'
   api 'org.seleniumhq.selenium:selenium-server'
   api 'org.seleniumhq.selenium:selenium-support'
   api('io.github.bonigarcia:webdrivermanager') {
@@ -40,4 +41,6 @@ dependencies {
   api 'org.eclipse.jetty.websocket:websocket-client'
   testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager'
   testImplementation 'org.mockito:mockito-core'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.4'
+  api 'org.junit.platform:junit-platform-launcher:1.14.4'
 }
