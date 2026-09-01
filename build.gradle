@@ -309,9 +309,25 @@ tasks.register('testNG', Test) {
   }
 }
 
+/* Jupiter */
+tasks.register('testJupiter', Test) {
+  dependsOn tasks.named('jar')
+  useJUnitPlatform()
+  testLogging.showStandardStreams = true
+
+  testClassesDirs = sourceSets.test.output.classesDirs
+  classpath = sourceSets.test.runtimeClasspath
+
+  if (project.findProperty('debugJupiter') == 'true') {
+    jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5007'
+    maxParallelForks = 1
+    forkEvery = 0
+  }
+}
+
 /* JUnit */
 tasks.named('test', Test) {
-  dependsOn tasks.named('testNG')
+  dependsOn tasks.named('testNG'), tasks.named('testJupiter')
   testLogging.showStandardStreams = true
 
   if (project.findProperty('debugJUnit') == 'true') {

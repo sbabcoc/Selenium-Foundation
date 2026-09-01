@@ -26,6 +26,7 @@ dependencies {
   api platform("com.nordstrom.ui-tools:selenium-bom-s4:${baseVersion}${isSnapshot ? '-SNAPSHOT' : ''}")
 
   api 'com.nordstrom.tools:testng-foundation'
+  api 'com.nordstrom.tools:jupiter-foundation'
   api 'org.seleniumhq.selenium:selenium-grid'
   api 'org.seleniumhq.selenium:selenium-support'
   api 'org.apache.httpcomponents:httpclient'
@@ -35,4 +36,6 @@ dependencies {
   api 'org.jcommander:jcommander'
   testImplementation 'com.nordstrom.ui-tools:selenium-grid-manager'
   testImplementation 'org.mockito:mockito-core'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.1.3'
+  api 'org.junit.platform:junit-platform-launcher:6.1.3'
 }
