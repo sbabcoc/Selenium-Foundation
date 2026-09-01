@@ -28,26 +28,26 @@ tasks.register('testJupiter', Test) {
 
 ## Jupiter Required Elements
 
-There are several required elements that must be included in every JUnit 5 test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [JupiterBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterBase.java) class (for `PER_METHOD` test instance lifecycle) and [JupiterClassBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterClassBase.java) class (for `PER_CLASS` lifecycle) as starters. These classes include all of the required elements outlined below.
+There are several required elements that must be included in every JUnit 5 test class to activate the features of **Selenium Foundation**. To assist you in this process, we've included the [JupiterBase](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterBase.java) class (for `PER_METHOD` test instance lifecycle) and [JupiterClassBase](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterClassBase.java) class (for `PER_CLASS` lifecycle) as starters. These classes include all of the required elements outlined below.
 
-**JupiterBase**/**JupiterClassBase** are abstract classes that implement the [TestBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/core/TestBase.java) interface, the same common abstraction shared by TestNG and JUnit 4 tests.
+**JupiterBase**/**JupiterClassBase** are abstract classes that implement the [TestBase](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/core/TestBase.java) interface, the same common abstraction shared by TestNG and JUnit 4 tests.
 
 ### Outline of Required Elements
 
-The following elements are declared as `@RegisterExtension` fields on [JupiterTestBase](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterTestBase.java), the shared parent of `JupiterBase`/`JupiterClassBase`:
+The following elements are declared as `@RegisterExtension` fields on [JupiterTestBase](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterTestBase.java), the shared parent of `JupiterBase`/`JupiterClassBase`:
 
-* [DriverWatcher](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/DriverWatcher.java):  
+* [DriverWatcher](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/DriverWatcher.java):  
 Implements JUnit 5's `InvocationInterceptor` interface to manage driver sessions around every test invocation. Unlike JUnit 4's `DriverWatcher` (which needed a separately-returned `TestWatcher` for driver cleanup), a single interceptor wraps the entire invocation lifecycle - setup, the invocation itself, and cleanup - in one place, via a `try`/`finally` block. This is also where target platform filtering is resolved and checked (see the [Target Platform Feature](TargetPlatformFeature.md#introduction) documentation), rather than through a separately-registered `ExecutionCondition` - `ExtensionContext.getTestInstance()` is not reliably populated at method-level `ExecutionCondition` evaluation time under `PER_METHOD` lifecycle, so target platform resolution needs the live instance `DriverWatcher` already has.
-* [PageSourceCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/PageSourceCapture.java) / [ScreenshotCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/ScreenshotCapture.java):  
+* [PageSourceCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/PageSourceCapture.java) / [ScreenshotCapture](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/ScreenshotCapture.java):  
 Built on **Jupiter Foundation**'s `ArtifactCollector`, these automatically capture page source and a screenshot, respectively, on test failure. Unlike JUnit 4's `Rule`-based watchers (which require explicit ordering via `@Rule(order=...)` or `RuleChain`), these are plain `@RegisterExtension` fields - no ordering declaration is needed between them and `DriverWatcher`, since neither depends on the other's side effects.
-* [SeleniumRetryExtension](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/SeleniumRetryExtension.java):  
+* [SeleniumRetryExtension](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/SeleniumRetryExtension.java):  
 Extends **Jupiter Foundation**'s `RetryExtension`, re-applying driver-lifecycle setup/teardown on every retry attempt beyond the first (a consequence of JUnit 5's `Invocation.proceed()` contract being callable only once - see `RetryExtension`'s own javadoc for the full explanation).
-* [JupiterGridListener](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterGridListener.java):  
+* [JupiterGridListener](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/JupiterGridListener.java):  
 Activated by the service loader configuration specified [above](#jupiter-required-configuration), this manages local Selenium Grid startup/shutdown for the whole test run - the Jupiter-native equivalent of the JUnit 4 `GridWatcher`/`DriverListener` pair. Unlike those two, no root-runner detection is needed - `TestExecutionListener.testPlanExecutionStarted`/`Finished` are guaranteed by the JUnit Platform Launcher to each fire exactly once per session.
 
 ## Automatic Retry of Failed Tests
 
-**Selenium Foundation** provides [SeleniumRetryExtension](https://github.com/sbabcoc/Selenium-Foundation/tree/master/src/main/java/com/nordstrom/automation/selenium/jupiter/SeleniumRetryExtension.java), which re-applies driver setup/teardown on every retry attempt. Retry itself is governed by **Jupiter Foundation**'s own settings:
+**Selenium Foundation** provides [SeleniumRetryExtension](https://github.com/sbabcoc/Selenium-Foundation/tree/main/src/main/java/com/nordstrom/automation/selenium/jupiter/SeleniumRetryExtension.java), which re-applies driver setup/teardown on every retry attempt. Retry itself is governed by **Jupiter Foundation**'s own settings:
 
 * Specify a positive value for the **MAX_RETRY** setting:
 
@@ -55,7 +55,7 @@ Activated by the service loader configuration specified [above](#jupiter-require
 | --- |
 | jupiter.max.retry=2 |
 
-* Register at least one [JupiterRetryAnalyzer](https://github.com/sbabcoc/Jupiter-Foundation/blob/master/src/main/java/com/nordstrom/automation/jupiter/JupiterRetryAnalyzer.java) implementation that approves the failure as retriable - retry is opt-in, not automatic, even with `MAX_RETRY` configured.
+* Register at least one [JupiterRetryAnalyzer](https://github.com/sbabcoc/Jupiter-Foundation/blob/main/src/main/java/com/nordstrom/automation/jupiter/JupiterRetryAnalyzer.java) implementation that approves the failure as retriable - retry is opt-in, not automatic, even with `MAX_RETRY` configured.
 
 **NOTE**: Unlike the JUnit 4 integration, which supplies a ready-made `JUnitRetryAnalyzer` that specifically approves `WebDriverException` failures, **Selenium Foundation** does not yet provide an equivalent `JupiterRetryAnalyzer` implementation. Until one is added, you'll need to supply your own analyzer (via `META-INF/services/com.nordstrom.automation.jupiter.JupiterRetryAnalyzer`) to enable retry for Jupiter test classes.
 
