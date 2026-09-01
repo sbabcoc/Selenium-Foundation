@@ -5,6 +5,9 @@
 **Selenium Foundation** is an automation framework designed to extend and enhance the capabilities provided by **Selenium** (_WebDriver_).
 
 ### * BREAKING NEWS *
+* Release [_38.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v38.0.0) of **Selenium Foundation** adds support for **JUnit Jupiter**, alongside the existing **TestNG** and **JUnit 4** integrations. Test classes built on **JUnit Jupiter** now get automatic retry, artifact capture on failure, and target platform filtering via a new set of Jupiter-native base classes and extensions.
+  * **NOTE**: This support is built on the new [**Jupiter Foundation**](https://github.com/sbabcoc/Jupiter-Foundation) library, a peer to **JUnit Foundation** and **TestNG Foundation**, built entirely on JUnit Jupiter's own sanctioned extension APIs — no bytecode instrumentation or Java agent required.
+  * See the new [Jupiter Support](docs/JupiterSupport.md#introduction) documentation for details.
 * Release [_37.0.1_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v37.0.1) of **Selenium Foundation** adds the **APPIUM_DEFAULT_CAPS** setting, which specifies the JSON object applied as **Appium**'s launch-time `--default-capabilities` argument. By default, this enables `skipServerInstallation` and `skipDeviceInitialization` for every session, eliminating per-session **UiAutomator2** install/init overhead once the target device has been provisioned. This setting can be overridden to supply default capabilities required by third-party services (e.g. device farm authentication).
   * **NOTE**: See the companion [_37.0.1_](https://github.com/sbabcoc/selenium-grid-manager/releases/tag/v37.0.1) release of **selenium-grid-manager** for the corresponding fix to how this value is safely passed through **Windows**/**PM2** process launch.
 * Release [_37.0.0_](https://github.com/sbabcoc/Selenium-Foundation/releases/tag/v37.0.0) of **Selenium Foundation** revises the local **Selenium Grid** node creation API to associate each **Appium** node with the driver plug-in that launched it, enabling reliable driver identification for grids running more than one **Appium** personality. Local **Grid** server construction also picks up its driver "personalities" directly at instantiation, rather than through a fragile post-construction mutation of a previously-empty collection. Redundant hub port/URL parameters were also removed from several public method signatures.
@@ -60,7 +63,7 @@
   * [Grid-Based Driver Creation](#grid-based-driver-creation)
   * [Automatic Phase-to-Phase Driver Hand-Off](#automatic-phase-to-phase-driver-hand-off)
   * [Automatic Capture of Screenshots and Page Source](#automatic-capture-of-screenshots-and-page-source)
-  * [Support for TestNG and JUnit 4](#support-for-testng-and-junit-4)
+  * [Support for TestNG, JUnit 4, and JUnit Jupiter](#support-for-testng-junit-4-and-junit-jupiter)
   * [Essential Settings](#essential-settings)
   * [Overriding Defaults](#overriding-defaults)
   * [Automatic Installation of Drivers](#automatic-installation-of-drivers)
@@ -75,6 +78,7 @@
 * [Customizing Capabilities](docs/CustomizingCapabilities.md#introduction)
 * [TestNG Support](docs/TestNGSupport.md#introduction)
 * [JUnit 4 Support](docs/JUnit4Support.md#introduction)
+* [Jupiter Support](docs/JupiterSupport.md#introduction)
 * [Target Platform Feature](docs/TargetPlatformFeature.md#introduction)
 * [Building Page Objects](docs/BuildingPageObjects.md#introduction)
 * [Page Components](docs/PageComponents.md#introduction)
@@ -258,13 +262,14 @@ To assist in root-cause analysis, **Selenium Foundation** automatically captures
 
 ### Support for TestNG and JUnit 4
 
-**Selenium Foundation** includes support for both **TestNG** and **JUnit 4**, enabled by several core abstractions, and through features provided by the **TestNG Foundation** and **JUnit Foundation** libraries.
+**Selenium Foundation** includes support for **TestNG**, **JUnit 4**, and **JUnit Jupiter**, enabled by several core abstractions, and through features provided by the **TestNG Foundation** and **JUnit Foundation** libraries.
 
-All of the features of **Selenium Foundation** are available regardless of which testing framework you choose. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from both TestNG (via [ModelTest](src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)) and JUnit 4 (via [JUnitModelTest](src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)).
+All of the features of **Selenium Foundation** are available regardless of which testing framework you choose. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from TestNG (via [ModelTest](src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)), JUnit 4 (via [JUnitModelTest](src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)), and JUnit Jupiter (via [JupiterModelTest](src/test/java/com/nordstrom/automation/selenium/jupiter/JupiterModelTest.java)).
 
 #### Learn more about...
 * [TestNG Support](docs/TestNGSupport.md#introduction)
 * [JUnit 4 Support](docs/JUnit4Support.md#introduction)
+* [Jupiter Support](docs/JupiterSupport.md#introduction)
 
 ## Essential Settings 
 
