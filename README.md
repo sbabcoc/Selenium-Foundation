@@ -159,7 +159,7 @@ The `personality` property directs **Selenium Foundation** to run the unit tests
 
 > `http://192.168.254.20:4445/wd/hub: Personalities => [chrome, chrome.headless]`
 
-A complete list of supported browser profiles can be found [here](https://github.com/sbabcoc/Selenium-Foundation/blob/master/docs/ConfiguringProjectSettings.md#grid-configuration-for-selenium-foundation-unit-tests), 
+A complete list of supported browser profiles can be found [here](https://github.com/sbabcoc/Selenium-Foundation/blob/main/docs/ConfiguringProjectSettings.md#grid-configuration-for-selenium-foundation-unit-tests), 
 
 > **NOTE**: Properties specified in your stored settings file ([settings.properties](#overriding-defaults)) and corresponding System proprties take precedence over the default values established by the `browsers` and `personality` project command line property declarations. 
 
