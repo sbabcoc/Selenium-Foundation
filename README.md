@@ -169,10 +169,11 @@ The [QuickStart](src/main/java/com/nordstrom/automation/selenium/examples/QuickS
 
 ### Required Configuration
 
-**Selenium Foundation** supports both **TestNG** and **JUnit 4** frameworks, but the default configuration doesn't activate test lifecycle features for either of them. Choose your platform and apply the corresponding required configuration to your project:
+**Selenium Foundation** supports **TestNG**, **JUnit 4**, and **JUnit Jupiter** frameworks, but the default configuration doesn't activate test lifecycle features for any of them. Choose your platform and apply the corresponding required configuration to your project:
 
 * [TestNG Required Configuration](docs/TestNGSupport.md#testng-required-configuration)
 * [JUnit 4 Required Configuration](docs/JUnit4Support.md#junit-4-required-configuration)
+* [JUnit Jupiter Required Configuration](docs/JupiterSupport.md#jupiter-required-configuration)
 
 ## Highlights
 
