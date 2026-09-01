@@ -260,7 +260,7 @@ Drivers allocated for per-test configuration setup methods (i.e. - **`@BeforeMet
 
 To assist in root-cause analysis, **Selenium Foundation** automatically captures a screenshot and page source for each failed test. By using the **ReporterAppender**, the log output of each **TestNG** test is captured as part of the test result object. This information is automatically shown on test result pages in **Jenkins**. No more digging through intermingled output in console logs!
 
-### Support for TestNG and JUnit 4
+### Support for TestNG, JUnit 4, and JUnit Jupiter
 
 **Selenium Foundation** includes support for **TestNG**, **JUnit 4**, and **JUnit Jupiter**, enabled by several core abstractions, and through features provided by the **TestNG Foundation** and **JUnit Foundation** libraries.
 
