@@ -263,7 +263,7 @@ To assist in root-cause analysis, **Selenium Foundation** automatically captures
 
 ### Support for TestNG, JUnit 4, and JUnit Jupiter
 
-**Selenium Foundation** includes support for **TestNG**, **JUnit 4**, and **JUnit Jupiter**, enabled by several core abstractions, and through features provided by the **TestNG Foundation** and **JUnit Foundation** libraries.
+**Selenium Foundation** includes support for **TestNG**, **JUnit 4**, and **JUnit Jupiter**, enabled by several core abstractions, and through features provided by the **TestNG Foundation**, **JUnit Foundation**, and **Jupiter Foundation** libraries.
 
 All of the features of **Selenium Foundation** are available regardless of which testing framework you choose. Once the initial configuration is done, the abstraction provided by the **TestBase** interface enables your code to be almost entirely framework-agnostic. This is clearly demonstrated in [ModelTestCore](src/test/java/com/nordstrom/automation/selenium/core/ModelTestCore.java), which contains the implementations for a collection of tests that are invoked from TestNG (via [ModelTest](src/test/java/com/nordstrom/automation/selenium/model/ModelTest.java)), JUnit 4 (via [JUnitModelTest](src/test/java/com/nordstrom/automation/selenium/junit/JUnitModelTest.java)), and JUnit Jupiter (via [JupiterModelTest](src/test/java/com/nordstrom/automation/selenium/jupiter/JupiterModelTest.java)).
 
