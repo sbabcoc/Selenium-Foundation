@@ -27,7 +27,7 @@ public class OptionalComponent extends PageComponent {
      */
     protected enum Using implements ByEnum {
         /** the component's child element */
-        CHILD(By.id("optional-component-child"));
+        CHILD(By.cssSelector("#optional-component-child"));
         
         private final By locator;
         
